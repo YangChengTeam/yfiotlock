@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_blename"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="#ffffff"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:text=""
+            android:textColor="#ee1315"
+            android:textSize="14dp" />
+
+        <CheckBox
+            android:id="@+id/ck_aes"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="数据是否加密"></CheckBox>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#f1f1f1"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:text="设置"
+            android:textColor="#333333"
+            android:textSize="14dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_reset"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="恢复出厂设置"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_wifi"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="配网"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_bind_ble"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="绑定蓝牙"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_verid"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="验证身份"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_synctime"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="同步时间"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_setkey"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="设置AES密钥"></androidx.appcompat.widget.AppCompatButton>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:background="#f1f1f1"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:text="操作"
+            android:textColor="#333333"
+            android:textSize="14dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_open"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="远程开门"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_pwd"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="添加密码"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_mod_pwd"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="修改密码"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_del_pwd"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="删除密码"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_card"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="添加卡"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_mod_card"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="修改卡"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_del_card"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="删除卡"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_fp"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="添加指纹"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_mod_fp"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="修改指纹"></androidx.appcompat.widget.AppCompatButton>
+
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
