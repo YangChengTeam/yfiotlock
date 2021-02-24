@@ -1,16 +1,16 @@
 #  "扬飞智能门锁蓝牙DEMO"：
 
-## 加密源码
+## 加密直达
 
-[加密源码:https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/cpp](https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/cpp)
+[加密直达:https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/cpp](https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/cpp)
 
-## 蓝牙实现源码
+## 蓝牙协议实现直达
 
-[蓝牙实现源码:https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/java/com/yc/yfiotlock/ble](https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/java/com/yc/yfiotlock/ble)
+[蓝牙实现直达:https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/java/com/yc/yfiotlock/ble](https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/java/com/yc/yfiotlock/ble)
 
-## demo源码
+## demo直达
 
-[demo源码:https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/java/com/yc/yfiotlock/demo](https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/java/com/yc/yfiotlock/demo)
+[demo直达:https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/java/com/yc/yfiotlock/demo](https://github.com/YangChengTeam/yfiotlock/tree/master/app/src/main/java/com/yc/yfiotlock/demo)
 
 
 ## 操作指南
