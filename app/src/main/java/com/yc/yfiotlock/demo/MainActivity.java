@@ -22,19 +22,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleGattCallback;
+import com.clj.fastble.callback.BleMtuChangedCallback;
 import com.clj.fastble.callback.BleScanCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
 import com.yc.yfiotlock.helper.PermissionHelper;
 
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+
     PermissionHelper permissionHelper;
 
     DeviceAdapter mDeviceAdapter;
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
+                .setServiceUuids(new UUID[]{UUID.fromString(SERVICE_UUID)})
                 .setScanTimeOut(10000);
 
         EditText nameEt = findViewById(R.id.et_name);
@@ -103,8 +109,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onConnect(BleDevice bleDevice) {
                 if (!BleManager.getInstance().isConnected(bleDevice)) {
-
-
                     connect(bleDevice);
                 }
             }
@@ -119,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDetail(BleDevice bleDevice) {
                 if (BleManager.getInstance().isConnected(bleDevice)) {
-                    Intent intent = new Intent(MainActivity.this, ServiceActivity.class);
+                    Intent intent = new Intent(MainActivity.this, OperationActivity.class);
                     intent.putExtra("bleDevice", bleDevice);
                     startActivity(intent);
                 }
@@ -193,6 +197,20 @@ public class MainActivity extends AppCompatActivity {
 
                 mDeviceAdapter.addDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
+
+                BleManager.getInstance().setMtu(bleDevice, mtu, new BleMtuChangedCallback() {
+                    @Override
+                    public void onSetMTUFailure(BleException exception) {
+                        Toast.makeText(MainActivity.this, "设置mtu失败", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onMtuChanged(int mtu) {
+                        // 设置MTU成功，并获得当前设备传输支持的MTU值
+                        LockBLEPackage.setMtu(mtu);
+                        Toast.makeText(MainActivity.this, "设置mtu成功" + mtu, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
@@ -268,6 +286,7 @@ public class MainActivity extends AppCompatActivity {
             public void onScanning(BleDevice bleDevice) {
                 mDeviceAdapter.addDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
+                connect(bleDevice);
             }
 
             @Override

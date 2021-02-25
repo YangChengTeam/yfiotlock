@@ -38,7 +38,7 @@ public class LockBLEOpCmd {
         final byte[] pwdBuffer = new byte[6];
         System.arraycopy(pwd.getBytes(), 0, pwdBuffer, 0, pwd.getBytes().length);
 
-        ByteBuffer bodyBuffer = ByteBuffer.allocate(pwdBuffer.length + 1).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer bodyBuffer = ByteBuffer.allocate(pwdBuffer.length + 2).order(ByteOrder.LITTLE_ENDIAN);
         byte[] bytes = bodyBuffer.put(pwdBuffer).put(id).put(type).array();
 
         return op(context, (byte) 0x03, new String(bytes));

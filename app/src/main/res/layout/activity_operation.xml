@@ -11,7 +11,7 @@
         <TextView
             android:id="@+id/tv_blename"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="40dp"
             android:background="#ffffff"
             android:gravity="center_vertical"
             android:paddingLeft="16dp"
@@ -24,6 +24,34 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:text="数据是否加密"></CheckBox>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#f1f1f1"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:text="notity响应数据:"
+            android:textColor="#333333"
+            android:textSize="14dp" />
+
+
+        <TextView
+            android:id="@+id/tv_notify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:text="暂没有接收到响应数据"
+            android:textColor="#ee1315"
+            android:textSize="14dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_copy"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:text="复制数据"></androidx.appcompat.widget.AppCompatButton>
 
         <TextView
             android:layout_width="match_parent"
@@ -150,7 +178,5 @@
             android:layout_height="44dp"
             android:layout_marginTop="10dp"
             android:text="修改指纹"></androidx.appcompat.widget.AppCompatButton>
-
-
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
