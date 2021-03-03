@@ -97,4 +97,8 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.2.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
 
+    implementation 'com.liulishuo.okdownload:okdownload:1.0.7'
+    implementation 'com.liulishuo.okdownload:sqlite:1.0.7'
+    implementation 'com.liulishuo.okdownload:okhttp:1.0.7'
+
 }

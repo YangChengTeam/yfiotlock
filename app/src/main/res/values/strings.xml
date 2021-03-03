@@ -37,5 +37,7 @@
     <string name="connected">已连接</string>
     <string name="disconnect">断开连接</string>
     <string name="enter">进入操作</string>
+    <string name="download_again_tip">更新文件不完整，正在重新下载</string>
+    <string name="downloaded">更新已下载完成</string>
 
 </resources>

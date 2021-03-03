@@ -6,17 +6,26 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.helper.PermissionHelper;
 
 import org.greenrobot.eventbus.EventBus;
 
 import butterknife.ButterKnife;
 
 public abstract class BaseActivity extends AppCompatActivity {
+
+    private PermissionHelper mPermissionHelper;
+
+    public PermissionHelper getPermissionHelper() {
+        return mPermissionHelper;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,8 +34,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getLayoutId());
         setTranslucentStatus();
         ButterKnife.bind(this);
-
+        mPermissionHelper = new PermissionHelper();
         initViews();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mPermissionHelper.onRequestPermissionsResult(this, requestCode);
     }
 
     @Override
@@ -57,5 +72,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void setFullScreen() {
         getWindow().getDecorView().setSystemUiVisibility(1280 | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
     }
+
 
 }
