@@ -39,6 +39,15 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" ></activity>
         <activity android:name=".demo.CharacteristicActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" ></activity>
+        <provider
+            android:name=".download.DownloadProvider"
+            android:authorities="${applicationId}.DownloadProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path
+        name="hm_private_cache"
+        path="apks" />
+    <root-path
+        name="name"
+        path="" />
+
+    <external-files-path
+        name="opensdk_external"
+        path="Images/tmp" />
+    <root-path
+        name="opensdk_root"
+        path="" />
+
+    <external-path
+        name="external_storage_root"
+        path="." />
+</paths>
