@@ -44,7 +44,7 @@ public class ServiceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_service);
+        setContentView(R.layout.demo_activity_service);
         serviceActivity = this;
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -137,7 +137,7 @@ public class ServiceActivity extends AppCompatActivity {
             if (convertView != null) {
                 holder = (ViewHolder) convertView.getTag();
             } else {
-                convertView = View.inflate(context, R.layout.adapter_service, null);
+                convertView = View.inflate(context, R.layout.demo_adapter_service, null);
                 holder = new ViewHolder();
                 convertView.setTag(holder);
                 holder.txt_title = (TextView) convertView.findViewById(R.id.txt_title);

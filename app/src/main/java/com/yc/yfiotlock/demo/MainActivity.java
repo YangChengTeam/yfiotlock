@@ -1,3 +1,4 @@
+
 package com.yc.yfiotlock.demo;
 
 import android.app.Activity;
@@ -32,6 +33,9 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
+import com.yc.yfiotlock.libs.fingerprintcompat.AonFingerChangeCallback;
+import com.yc.yfiotlock.libs.fingerprintcompat.FingerManager;
+import com.yc.yfiotlock.libs.fingerprintcompat.SimpleFingerCheckCallback;
 import com.yc.yfiotlock.helper.PermissionHelper;
 
 import java.util.List;
@@ -58,6 +62,55 @@ public class MainActivity extends AppCompatActivity {
                 .setOperateTimeout(5000).init(getApplication());
     }
 
+    private void initFingerprint() {
+        switch (FingerManager.checkSupport(MainActivity.this)) {
+            case DEVICE_UNSUPPORTED:
+                showToast("您的设备不支持指纹");
+                scan();
+                break;
+            case SUPPORT_WITHOUT_DATA:
+                showToast("请在系统录入指纹后再验证");
+                break;
+            case SUPPORT:
+                FingerManager.build().setApplication(getApplication())
+                        .setTitle("指纹验证")
+                        .setDes("请按下指纹")
+                        .setNegativeText("取消")
+                        .setFingerCheckCallback(new SimpleFingerCheckCallback() {
+
+                            @Override
+                            public void onSucceed() {
+                                showToast("验证成功");
+                                scan();
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                showToast("验证失败");
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                showToast("您取消了识别");
+                            }
+                        })
+                        .setFingerChangeCallback(new AonFingerChangeCallback() {
+
+                            @Override
+                            protected void onFingerDataChange() {
+                                showToast("指纹数据发生了变化");
+                            }
+                        })
+                        .create()
+                        .startListener(MainActivity.this);
+                break;
+        }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
@@ -74,7 +127,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.demo_activity_main);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+
+        permissionHelper = new PermissionHelper();
+        initFingerprint();
 
         initBle();
 
@@ -89,10 +148,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        permissionHelper = new PermissionHelper();
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
 
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +192,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+
+    }
+
+
+    private void scan(){
         permissionHelper.checkAndRequestPermission(MainActivity.this, new PermissionHelper.OnRequestPermissionsCallback() {
             @Override
             public void onRequestPermissionSuccess() {
@@ -162,8 +222,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "授权失败, 无法扫描蓝牙设备", Toast.LENGTH_LONG).show();
             }
         });
-    }
 
+    }
 
     private void connect(final BleDevice bleDevice) {
         hideSoftKeyboard();

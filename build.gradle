@@ -3,6 +3,17 @@ buildscript {
     repositories {
         google()
         jcenter()
+
+        maven {
+            url  "http://dl.bintray.com/piasy/maven"
+        }
+        maven {url 'https://raw.githubusercontent.com/YangChengTeam/androiduuuid/master/lib/AAR'}
+        maven { url 'https://dl.bintray.com/umsdk/release' }
+        maven { url "https://jitpack.io" }
+
+        maven { url 'https://maven.aliyun.com/repository/google/' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
+
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.0.0"
@@ -16,6 +27,17 @@ allprojects {
     repositories {
         google()
         jcenter()
+
+        maven {
+            url  "http://dl.bintray.com/piasy/maven"
+        }
+        maven {url 'https://raw.githubusercontent.com/YangChengTeam/androiduuuid/master/lib/AAR'}
+        maven { url 'https://dl.bintray.com/umsdk/release' }
+        maven { url "https://jitpack.io" }
+
+        maven { url 'https://maven.aliyun.com/repository/google/' }
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
+
     }
 }
 

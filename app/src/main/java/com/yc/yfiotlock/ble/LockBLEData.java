@@ -25,12 +25,14 @@ public class LockBLEData {
     }
 
     public byte[] build(Context context) {
+
         byte[] data = null;
         short length = 0;
         if (body != null && body.length() > 0) {
             data = body.getBytes();
             length += data.length;
         }
+
         int seq = (int) (System.currentTimeMillis() / 1000);
 
         int precrcLen = 2 + 4 + 1 + 1;
@@ -53,6 +55,7 @@ public class LockBLEData {
                     .put(scmd)
                     .array();
         }
+
         short crc16 = (short) LockBLEUtil.crc16(bytes, len);
         ByteBuffer packageBuffer = ByteBuffer.allocate(len + 2).order(ByteOrder.LITTLE_ENDIAN);
         byte[] dataBytes = packageBuffer

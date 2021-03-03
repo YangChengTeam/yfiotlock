@@ -28,7 +28,6 @@ public class LockBLEUtil {
         return decode(context, key, bytes);
     }
 
-
     public static String toHexString(byte[] byteArray) {
         final StringBuilder hexString = new StringBuilder("");
         if (byteArray == null || byteArray.length <= 0)
@@ -54,5 +53,5 @@ public class LockBLEUtil {
             return false;
         return locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
     }
-    
+
 }

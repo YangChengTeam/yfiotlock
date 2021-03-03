@@ -50,7 +50,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_operation);
+        setContentView(R.layout.demo_activity_operation);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
