@@ -7,9 +7,12 @@ import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.UserInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,6 +38,19 @@ public class LoginActivity extends BaseActivity {
         setFullScreen();
     }
 
+    private long lastTime = 0;
+
+    @Override
+    public void onBackPressed() {
+
+        if (System.currentTimeMillis() - lastTime > 2000) {
+            ToastCompat.show(getContext(), "再按一次退出");
+            lastTime = System.currentTimeMillis();
+        } else {
+            System.exit(0);
+        }
+
+    }
 
     @OnClick({R.id.stv_fast_login, R.id.stv_other, R.id.tv_user_agreement, R.id.tv_privacy_policy})
     public void onViewClicked(View view) {
@@ -47,6 +63,7 @@ public class LoginActivity extends BaseActivity {
                 userInfo.setNickName("阿彪");
                 userInfo.setFace("http://p.6ll.com/Upload/Picture/face/2021/601cbd15d323a.jpg");
                 UserInfoCache.setUserInfo(userInfo);
+                EventBus.getDefault().post(userInfo);
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
                 break;

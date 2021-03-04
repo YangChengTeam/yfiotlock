@@ -37,7 +37,7 @@ public class BackNavBar extends BaseView {
             mTitleTV.setText(title);
         }
         CharSequence position = a.getText(R.styleable.tab_item_textPosition);
-        if (title != null && mTitleTV != null) {
+        if (position != null && mTitleTV != null) {
             if (position.equals("0x1")) {
                 mTitleTV.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
             } else {

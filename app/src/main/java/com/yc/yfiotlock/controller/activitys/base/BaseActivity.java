@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.base;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -12,10 +13,17 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
+import com.yc.yfiotlock.controller.activitys.user.MainActivity;
+import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
+import com.yc.yfiotlock.model.bean.EventStub;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.ButterKnife;
 
@@ -35,6 +43,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getLayoutId());
         setTranslucentStatus();
         ButterKnife.bind(this);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
         mPermissionHelper = new PermissionHelper();
         initViews();
     }
@@ -43,6 +54,20 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!App.isLogin() && this.getClass() != LoginActivity.class
+                && this.getClass() != SplashActivity.class) {
+            startActivity(new Intent(this, LoginActivity.class));
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void stub(EventStub stub) {
+
     }
 
     @Override

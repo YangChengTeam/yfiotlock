@@ -2,7 +2,6 @@ package com.yc.yfiotlock.controller.fragments.user;
 
 import android.content.Intent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,7 +12,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.activitys.user.AboutUsActivity;
-import com.yc.yfiotlock.controller.activitys.user.EditUserInfoActivity;
+import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.SuggestActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
@@ -22,6 +21,9 @@ import com.yc.yfiotlock.model.bean.UserInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.adapters.PersonalAdapter;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +58,9 @@ public class MyFragment extends BaseFragment {
     private void loadUserInfo() {
         UserInfo userInfo = UserInfoCache.getUserInfo();
         if (userInfo == null) {
-            ToastCompat.show(getContext(), "登陆信息失效，请重新登陆");
-            startActivity(new Intent(getContext(), LoginActivity.class));
-            getActivity().finish();
+            mStvFace.setUrlImage("");
+            mTvUserName.setText("");
+            mTvDeviceNumber.setText("");
             return;
         }
         mStvFace.setUrlImage(userInfo.getFace());
@@ -95,11 +97,16 @@ public class MyFragment extends BaseFragment {
             case R.id.stv_face:
             case R.id.tv_user_name:
             case R.id.tv_device_number:
-                startActivity(new Intent(getContext(), EditUserInfoActivity.class));
+                startActivity(new Intent(getContext(), PersonalInfoActivity.class));
                 break;
             case R.id.iv_111:
                 startActivity(new Intent(getContext(), VisitorManageActivity.class));
                 break;
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLogin(UserInfo userInfo){
+        loadUserInfo();
     }
 }

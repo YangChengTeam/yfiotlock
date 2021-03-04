@@ -53,5 +53,8 @@
     <string name="commit">提交</string>
     <string name="yc_ai">扬飞智能</string>
     <string name="check_version_update">检查版本更新</string>
+    <string name="logout">退出登录</string>
+    <string name="sure">确定</string>
+    <string name="edit_name_hint">请输入昵称...</string>
 
 </resources>

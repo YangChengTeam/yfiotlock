@@ -1,12 +1,10 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.IntRange;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -16,8 +14,9 @@ import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
 import com.yc.yfiotlock.controller.fragments.user.MyFragment;
 
+import java.lang.ref.WeakReference;
+
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity {
@@ -36,31 +35,39 @@ public class MainActivity extends BaseActivity {
     private int selectedIndex = -1;
     private BaseFragment[] mContentFragments;
 
+    private static WeakReference<MainActivity> instance;
+
+    public static WeakReference<MainActivity> getInstance() {
+        return instance;
+    }
+
     @Override
     protected void initViews() {
         setFullScreen();
+        instance = new WeakReference<>(this);
         mContentFragments = new BaseFragment[]{
                 new IndexFragment(), new MyFragment()
         };
         onSelected(0);
     }
 
-    private BaseFragment getFragment(int idx) {
-        if (idx == -1) return null;
+
+    private BaseFragment getFragment(@IntRange(from = 0) int idx) {
         return mContentFragments[idx];
     }
 
-    private void onSelected(int index) {
+    private void onSelected(@IntRange(from = 0) int index) {
         if (selectedIndex == index) return;
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         BaseFragment fragment = getFragment(index);
-        BaseFragment currentFragment = getFragment(selectedIndex);
-        selectedIndex = index;
 
-        if (currentFragment == null) {
+        if (selectedIndex == -1) {
             transaction.add(R.id.fl_content, fragment).commitAllowingStateLoss();
+            selectedIndex = index;
             return;
         }
+        BaseFragment currentFragment = getFragment(selectedIndex);
+        selectedIndex = index;
 
         if (!fragment.isAdded() && getSupportFragmentManager().findFragmentByTag("" + selectedIndex) == null) {
             transaction.hide(currentFragment).add(R.id.fl_content, fragment, "" + selectedIndex).commitAllowingStateLoss();
