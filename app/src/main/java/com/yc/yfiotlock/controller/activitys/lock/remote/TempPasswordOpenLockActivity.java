@@ -7,7 +7,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 
 import butterknife.BindView;
 
-public class VisitorManageActivity extends BaseActivity {
+public class TempPasswordOpenLockActivity extends BaseActivity {
 
     @BindView(R.id.cl_open_lock)
     ConstraintLayout mContentFL;
