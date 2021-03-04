@@ -18,7 +18,7 @@ public class IndexDeviceAdapter<DeviceInfo> extends BaseAdapter<DeviceInfo, Base
 
     @Override
     protected void convert(@NotNull BaseViewHolder holder, DeviceInfo deviceInfo) {
-        if (holder.getAdapterPosition() == 0) {
+        if (holder.getAdapterPosition() == getData().size() - 1) {
             holder.setVisible(R.id.ll_default_add, true);
             holder.setVisible(R.id.ll_device_info, false);
         } else {

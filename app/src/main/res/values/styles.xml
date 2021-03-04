@@ -27,4 +27,5 @@
         <item name="colorPrimary">@color/transparent</item>
         <item name="colorPrimaryDark">@color/transparent</item>
     </style>
+
 </resources>
