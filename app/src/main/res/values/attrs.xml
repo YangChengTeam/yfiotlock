@@ -3,6 +3,7 @@
     <declare-styleable name="tab_item">
         <attr name="src" format="reference" />
         <attr name="text" format="string" />
+        <attr name="hindLine" format="boolean" />
         <attr name="textPosition" format="string">
             <flag name="left" value="1" />
             <flag name="center" value="2" />

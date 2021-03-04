@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">扬飞智能锁</string>
+    <string name="app_name">扬飞智家</string>
 
     <string name="notifyTitle">提示</string>
     <string name="gpsNotifyMsg">当前手机扫描蓝牙需要打开定位功能。</string>
@@ -56,5 +56,6 @@
     <string name="logout">退出登录</string>
     <string name="sure">确定</string>
     <string name="edit_name_hint">请输入昵称...</string>
+    <string name="add_open_type">添加</string>
 
 </resources>

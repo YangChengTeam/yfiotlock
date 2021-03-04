@@ -1,6 +1,8 @@
 package com.yc.yfiotlock.model.bean;
 
-public class PassWordInfo {
+import java.io.Serializable;
+
+public class PassWordInfo implements Serializable {
     private String name;
     private String validity;
     private String stateDes;

@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.activitys.user.AboutUsActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
@@ -91,16 +90,13 @@ public class MyFragment extends BaseFragment {
         mPersonalAdapter.setNewInstance(personalInfos);
     }
 
-    @OnClick({R.id.stv_face, R.id.tv_user_name, R.id.tv_device_number, R.id.iv_111})
+    @OnClick({R.id.stv_face, R.id.tv_user_name, R.id.tv_device_number})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.stv_face:
             case R.id.tv_user_name:
             case R.id.tv_device_number:
                 startActivity(new Intent(getContext(), PersonalInfoActivity.class));
-                break;
-            case R.id.iv_111:
-                startActivity(new Intent(getContext(), VisitorManageActivity.class));
                 break;
         }
     }

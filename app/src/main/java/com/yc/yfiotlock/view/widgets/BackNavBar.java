@@ -20,9 +20,10 @@ public class BackNavBar extends BaseView {
 
     @BindView(R.id.tv_title)
     TextView mTitleTV;
-
     @BindView(R.id.iv_back)
     ImageView mBackIv;
+    @BindView(R.id.view_line)
+    View viewLine;
 
     @Override
     public int getLayoutId() {
@@ -35,6 +36,10 @@ public class BackNavBar extends BaseView {
         CharSequence title = a.getText(R.styleable.tab_item_text);
         if (title != null && mTitleTV != null) {
             mTitleTV.setText(title);
+        }
+        boolean hindLine = a.getBoolean(R.styleable.tab_item_hindLine, false);
+        if (viewLine != null && hindLine) {
+            viewLine.setVisibility(GONE);
         }
         CharSequence position = a.getText(R.styleable.tab_item_textPosition);
         if (position != null && mTitleTV != null) {
