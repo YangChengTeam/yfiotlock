@@ -3,6 +3,7 @@ package com.yc.yfiotlock.view.widgets;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,6 +36,14 @@ public class BackNavBar extends BaseView {
         if (title != null && mTitleTV != null) {
             mTitleTV.setText(title);
         }
+        CharSequence position = a.getText(R.styleable.tab_item_textPosition);
+        if (title != null && mTitleTV != null) {
+            if (position.equals("0x1")) {
+                mTitleTV.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+            } else {
+                mTitleTV.setGravity(Gravity.CENTER);
+            }
+        }
 
         if (mBackIv != null) {
             RxView.clicks(mBackIv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
@@ -54,7 +63,6 @@ public class BackNavBar extends BaseView {
     public void setBackListener(BackListener backListener) {
         this.backListener = backListener;
     }
-
 
 
 }

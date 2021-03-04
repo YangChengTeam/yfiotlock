@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.base;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -51,6 +52,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
+    }
+
+    public Context getContext() {
+        return this;
     }
 
     protected abstract int getLayoutId();
