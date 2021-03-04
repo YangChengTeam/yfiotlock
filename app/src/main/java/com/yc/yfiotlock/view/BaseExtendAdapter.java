@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 /*
  * Created by　Dullyoung on 2021/3/4
  */
-public abstract class BaseAdapter<T> extends BaseQuickAdapter<T, BaseViewHolder> {
-    public BaseAdapter(int layoutResId, @Nullable List<T> data) {
+public abstract class BaseExtendAdapter<T> extends BaseQuickAdapter<T, BaseViewHolder> {
+    public BaseExtendAdapter(int layoutResId, @Nullable List<T> data) {
         super(layoutResId, data);
     }
 
