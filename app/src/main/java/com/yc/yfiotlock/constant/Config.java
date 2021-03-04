@@ -18,7 +18,4 @@ public class Config {
     public static String getBaseUrl() {
         return (DEBUG ? debugBaseUrl : baseUrl);
     }
-
-
-
 }
