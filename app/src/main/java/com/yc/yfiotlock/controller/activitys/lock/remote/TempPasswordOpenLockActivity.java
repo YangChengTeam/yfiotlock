@@ -50,7 +50,7 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
         tempPwdAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-
+                TempPwdDetailActivity.start(TempPasswordOpenLockActivity.this, tempPwdAdapter.getItem(position));
             }
         });
     }
