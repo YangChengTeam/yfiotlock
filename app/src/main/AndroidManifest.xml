@@ -61,6 +61,9 @@
             android:name=".controller.activitys.lock.remote.LockLogActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
+            android:name=".controller.activitys.lock.remote.TempPwdDetailActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
             android:name=".controller.activitys.lock.remote.OpenLockActivty"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity

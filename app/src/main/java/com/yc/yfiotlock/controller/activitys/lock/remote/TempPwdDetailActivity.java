@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
+
+import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
@@ -12,28 +14,36 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.NextTextInfo;
+import com.yc.yfiotlock.model.bean.PassWordInfo;
 import com.yc.yfiotlock.view.adapters.NextTextExtendAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 
-public class VisitorManageActivity extends BaseActivity {
+public class TempPwdDetailActivity extends BaseActivity {
+
+    public static void start(Context context, PassWordInfo passWordInfo) {
+        Intent intent = new Intent(context, TempPwdDetailActivity.class);
+        intent.putExtra("password_info", passWordInfo);
+        context.startActivity(intent);
+    }
 
     @BindView(R.id.bnb_title)
     BackNavBar mBnbTitle;
-    @BindView(R.id.visitor_manage_recycler_view)
+    @BindView(R.id.rv_temp_pwd_detail)
     RecyclerView recyclerView;
 
     private NextTextExtendAdapter nextTextExtendAdapter;
 
     @Override
     protected int getLayoutId() {
-        return R.layout.activity_visitor_manage;
+        return R.layout.activity_temp_pwd_detail;
     }
 
     @Override
@@ -56,10 +66,7 @@ public class VisitorManageActivity extends BaseActivity {
                 NextTextInfo nextTextInfo = nextTextExtendAdapter.getData().get(position);
                 switch (nextTextInfo.getId()) {
                     case 1:
-                        startActivity(new Intent(VisitorManageActivity.this, OpenLockActivty.class));
-                        break;
-                    case 2:
-                        startActivity(new Intent(VisitorManageActivity.this, TempPasswordOpenLockActivity.class));
+                        startActivity(new Intent(TempPwdDetailActivity.this, OpenLockActivty.class));
                         break;
                 }
             }
@@ -68,8 +75,12 @@ public class VisitorManageActivity extends BaseActivity {
 
     private void loadData() {
         List<NextTextInfo> list = new ArrayList<>();
-        list.add(new NextTextInfo("远程开锁", "", 1));
-        list.add(new NextTextInfo("临时密码", "", 2));
-        nextTextExtendAdapter.setNewInstance(list);
+        Serializable serializable = getIntent().getSerializableExtra("password_info");
+        if (serializable instanceof PassWordInfo) {
+            PassWordInfo passWordInfo = (PassWordInfo) serializable;
+            list.add(new NextTextInfo(passWordInfo.getName(), "", passWordInfo.getId()));
+            nextTextExtendAdapter.setNewInstance(list);
+        }
+
     }
 }

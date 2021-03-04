@@ -4,10 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.yc.yfiotlock.view.widgets.BackNavBar
+        android:id="@+id/bnb_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:hindLine="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="远程开锁"
+        app:textPosition="center" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_open_lock"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bnb_title">
 
         <ImageView
             android:id="@+id/iv_open_lock"
@@ -37,8 +48,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_open_fail"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bnb_title">
 
         <ImageView
             android:id="@+id/iv_open_fail"
