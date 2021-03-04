@@ -12,6 +12,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.PassWordInfo;
 import com.yc.yfiotlock.view.adapters.TempPwdAdapter;
+import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +22,9 @@ import java.util.List;
 import butterknife.BindView;
 
 public class TempPasswordOpenLockActivity extends BaseActivity {
-    @BindView(R.id.visitor_manage_recycler_view)
+    @BindView(R.id.bnb_title)
+    BackNavBar mBnbTitle;
+    @BindView(R.id.rv_temp_pwd)
     RecyclerView recyclerView;
     private TempPwdAdapter tempPwdAdapter;
 
@@ -32,7 +35,7 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-
+        mBnbTitle.setBackListener(view -> onBackPressed());
         initRv();
 
         loadData();

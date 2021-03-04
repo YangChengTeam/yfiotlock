@@ -24,7 +24,6 @@ public class SuggestActivity extends BaseActivity {
     @Override
     protected void initViews() {
         mBnbTitle.setBackListener(view -> finish());
-
     }
 
 
