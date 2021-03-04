@@ -1,9 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
-import android.content.Intent;
-import android.text.Html;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,9 +10,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.NextTextInfo;
 import com.yc.yfiotlock.model.bean.PassWordInfo;
-import com.yc.yfiotlock.view.adapters.NextTextExtendAdapter;
 import com.yc.yfiotlock.view.adapters.TempPwdAdapter;
 
 import org.jetbrains.annotations.NotNull;
