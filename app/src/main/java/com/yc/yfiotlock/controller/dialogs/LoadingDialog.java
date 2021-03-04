@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.controller.dialogs;
 
 import android.content.Context;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.yc.yfiotlock.R;

@@ -2,7 +2,9 @@ package com.yc.yfiotlock;
 
 import android.app.Application;
 
+import com.coorchice.library.ImageEngine;
 import com.tencent.mmkv.MMKV;
+import com.yc.yfiotlock.model.engin.GlideEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 
@@ -26,5 +28,6 @@ public class App extends Application {
 
     private void initSdk() {
         MMKV.initialize(this);
+        ImageEngine.install(new GlideEngine(this));
     }
 }

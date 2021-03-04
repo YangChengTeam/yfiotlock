@@ -47,5 +47,9 @@
     <string name="comma">、</string>
     <string name="privacy_policy">《隐私政策》</string>
     <string name="user_agreement">《用户协议》</string>
+    <string name="suggest_hint">请输入您的意见，扬飞感谢您的使用。</string>
+    <string name="contact_details">联系方式</string>
+    <string name="contact_hint">请输入联系方式（非必填）</string>
+    <string name="commit">提交</string>
 
 </resources>
