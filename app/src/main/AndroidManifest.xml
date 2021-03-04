@@ -28,7 +28,6 @@
         <activity android:name=".controller.activitys.base.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -41,6 +40,15 @@
 
         </activity>
         <activity android:name=".demo.MainActivity" />
+        <activity
+            android:name=".controller.activitys.lock.ble.AddDeviceActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"></activity>
+        <activity
+            android:name=".controller.activitys.lock.ble.LockIndexActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"></activity>
+        <activity
+            android:name=".controller.activitys.lock.ble.MyFamilyActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"></activity>
         <activity
             android:name=".demo.OperationActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
