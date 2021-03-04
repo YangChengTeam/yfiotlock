@@ -32,6 +32,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.ble.LockBLEUtil;
+import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
 import com.yc.yfiotlock.libs.fingerprintcompat.AonFingerChangeCallback;
 import com.yc.yfiotlock.libs.fingerprintcompat.FingerManager;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     ProgressDialog progressDialog;
     FloatingActionButton fab;
+    FloatingActionButton fab2;
 
     public static final int mtu = 512;
 
@@ -157,6 +159,13 @@ public class MainActivity extends AppCompatActivity {
                 startScan();
             }
         });
+        fab2 = findViewById(R.id.fab2);
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, VisitorManageActivity.class));
+            }
+        });
 
         listView = findViewById(R.id.rv_devices);
         mDeviceAdapter = new DeviceAdapter(this);
@@ -196,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void scan(){
+    private void scan() {
         permissionHelper.checkAndRequestPermission(MainActivity.this, new PermissionHelper.OnRequestPermissionsCallback() {
             @Override
             public void onRequestPermissionSuccess() {
