@@ -2,14 +2,14 @@ package com.yc.yfiotlock.view.adapters;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.view.BaseAdapter;
+import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class IndexDeviceAdapter<DeviceInfo> extends BaseAdapter<DeviceInfo, BaseViewHolder> {
+public class IndexDeviceAdapter<DeviceInfo> extends BaseExtendAdapter<DeviceInfo> {
 
     public IndexDeviceAdapter(@Nullable List<DeviceInfo> data) {
         super(R.layout.lock_ble_item_index_device, data);

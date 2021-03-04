@@ -9,8 +9,6 @@ import butterknife.BindView;
 
 public class LockLogActivity  extends BaseActivity {
 
-    @BindView(R.id.cl_open_lock)
-    ConstraintLayout mContentFL;
 
     @Override
     protected int getLayoutId() {
