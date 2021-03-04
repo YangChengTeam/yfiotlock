@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <com.yc.yfiotlock.view.widgets.BackNavBar
+        android:id="@+id/bnb_title"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:layout_constraintTop_toTopOf="parent"
