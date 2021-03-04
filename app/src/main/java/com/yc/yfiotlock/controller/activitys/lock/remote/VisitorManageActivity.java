@@ -13,6 +13,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.NextTextInfo;
 import com.yc.yfiotlock.view.adapters.NextTextExtendAdapter;
+import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,8 +24,11 @@ import butterknife.BindView;
 
 public class VisitorManageActivity extends BaseActivity {
 
+    @BindView(R.id.bnb_title)
+    BackNavBar mBnbTitle;
     @BindView(R.id.visitor_manage_recycler_view)
     RecyclerView recyclerView;
+
     private NextTextExtendAdapter nextTextExtendAdapter;
 
     @Override
@@ -34,7 +38,7 @@ public class VisitorManageActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-
+        mBnbTitle.setBackListener(view -> onBackPressed());
         initRv();
 
         loadData();
