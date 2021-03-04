@@ -21,4 +21,6 @@ public class NextTextExtendAdapter extends BaseExtendAdapter<NextTextInfo> {
         baseViewHolder.setText(R.id.tv_next_name, nextTextInfo.getName())
                 .setText(R.id.tv_next_des, nextTextInfo.getDes());
     }
+
+
 }

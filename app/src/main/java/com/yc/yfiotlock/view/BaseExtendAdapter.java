@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class BaseExtendAdapter<T> extends BaseQuickAdapter<T, BaseViewHolder> {
     public BaseExtendAdapter(int layoutResId, @Nullable List<T> data) {
-public abstract class BaseAdapter<T, B extends RecyclerView.ViewHolder> extends BaseQuickAdapter<T, BaseViewHolder> {
-    public BaseAdapter(int layoutResId, @Nullable List<T> data) {
         super(layoutResId, data);
     }
 
