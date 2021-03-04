@@ -39,5 +39,7 @@
     <string name="enter">进入操作</string>
     <string name="download_again_tip">更新文件不完整，正在重新下载</string>
     <string name="downloaded">更新已下载完成</string>
+    <string name="index">首页</string>
+    <string name="mine">我的</string>
 
 </resources>

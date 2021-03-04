@@ -5,17 +5,66 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grayBg"
-    tools:context=".controller.activitys.base.MainActivity">
+    tools:context=".controller.activitys.user.MainActivity">
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
+        android:id="@+id/fl_content"
         android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/ll_bottom"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/ll_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
         android:background="@color/white"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_height="48dp">
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:id="@+id/ll_index"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_index"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingTop="7dp"
+                android:text="@string/index"
+                android:textColor="#222222"
+                android:textSize="11dp"
+                app:drawableTopCompat="@mipmap/icon_home_sel" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_mine"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_mine"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingTop="7dp"
+                android:text="@string/mine"
+                android:textColor="#222222"
+                android:textSize="11dp"
+                app:drawableTopCompat="@mipmap/icon_personal_default" />
+
+        </LinearLayout>
 
 
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
