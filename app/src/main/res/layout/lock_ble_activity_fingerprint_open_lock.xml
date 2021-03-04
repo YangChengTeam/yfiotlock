@@ -9,5 +9,5 @@
         android:layout_height="50dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:text="添加智能设备"></com.yc.yfiotlock.view.widgets.BackNavBar>
+        app:text="指纹"></com.yc.yfiotlock.view.widgets.BackNavBar>
 </androidx.constraintlayout.widget.ConstraintLayout>
