@@ -1,15 +1,34 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
+import android.content.Intent;
 import android.text.Html;
+import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.model.bean.NextTextInfo;
+import com.yc.yfiotlock.model.bean.PassWordInfo;
+import com.yc.yfiotlock.view.adapters.NextTextExtendAdapter;
+import com.yc.yfiotlock.view.adapters.TempPwdAdapter;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 
 public class TempPasswordOpenLockActivity extends BaseActivity {
-
+    @BindView(R.id.visitor_manage_recycler_view)
+    RecyclerView recyclerView;
+    private TempPwdAdapter tempPwdAdapter;
 
     @Override
     protected int getLayoutId() {
@@ -19,5 +38,30 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
     @Override
     protected void initViews() {
 
+        initRv();
+
+        loadData();
+    }
+
+
+    private void initRv() {
+        tempPwdAdapter = new TempPwdAdapter(null);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView.setAdapter(tempPwdAdapter);
+
+        tempPwdAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
+
+            }
+        });
+    }
+
+    private void loadData() {
+        List<PassWordInfo> list = new ArrayList<>();
+        list.add(new PassWordInfo("密码1", "一次性", 0, 1));
+        list.add(new PassWordInfo("密码2", "一次性", 1, 2));
+        list.add(new PassWordInfo("密码3", "一次性", 2, 3));
+        tempPwdAdapter.setNewInstance(list);
     }
 }
