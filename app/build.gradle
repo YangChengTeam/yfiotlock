@@ -46,7 +46,7 @@ android {
 
     defaultConfig {
         applicationId "com.yc.yfiotlock"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 30
         versionCode 65
         versionName "3.0.5"
