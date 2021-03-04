@@ -101,4 +101,9 @@ dependencies {
     implementation 'com.liulishuo.okdownload:sqlite:1.0.7'
     implementation 'com.liulishuo.okdownload:okhttp:1.0.7'
 
+    implementation 'top.zibin:Luban:1.1.8'
+    implementation 'com.github.chenBingX:SuperTextView:v3.2.1'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
+
 }
