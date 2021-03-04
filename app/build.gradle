@@ -104,6 +104,8 @@ dependencies {
     implementation 'top.zibin:Luban:1.1.8'
     implementation 'com.github.chenBingX:SuperTextView:v3.2.1'
 
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
+
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 
 }
