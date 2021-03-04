@@ -87,6 +87,9 @@
         <activity
             android:name=".demo.CharacteristicActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.LockSettingActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"></activity>
 
         <provider
             android:name=".download.DownloadProvider"
@@ -97,6 +100,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
     </application>
 
 </manifest>

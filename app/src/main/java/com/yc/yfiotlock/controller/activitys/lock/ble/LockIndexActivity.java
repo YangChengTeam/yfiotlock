@@ -19,7 +19,7 @@ public class LockIndexActivity extends BaseActivity {
     @BindView(R.id.iv_back)
     View backBtn;
     @BindView(R.id.iv_setting)
-    View SettingBtn;
+    View settingBtn;
 
     @BindView(R.id.cd_open_lock)
     View openLockBtn;
@@ -36,6 +36,14 @@ public class LockIndexActivity extends BaseActivity {
     @Override
     protected void initViews() {
         setFullScreen();
+
+        RxView.clicks(backBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            finish();
+        });
+
+        RxView.clicks(settingBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            nav2setting();
+        });
 
         RxView.clicks(openLockBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             nav2OpenLock();
@@ -62,6 +70,11 @@ public class LockIndexActivity extends BaseActivity {
 
     private void nav2Log() {
         Intent intent = new Intent(this, LockLogActivity.class);
+        startActivity(intent);
+    }
+
+    private void nav2setting(){
+        Intent intent = new Intent(this, LockSettingActivity.class);
         startActivity(intent);
     }
 }

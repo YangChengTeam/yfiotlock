@@ -51,5 +51,6 @@
     <string name="contact_details">联系方式</string>
     <string name="contact_hint">请输入联系方式（非必填）</string>
     <string name="commit">提交</string>
+    <string name="add_open_type">添加</string>
 
 </resources>
