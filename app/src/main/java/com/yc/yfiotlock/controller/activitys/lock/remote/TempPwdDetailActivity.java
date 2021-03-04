@@ -49,6 +49,8 @@ public class TempPwdDetailActivity extends BaseActivity {
     @Override
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
+
+
         initRv();
 
         loadData();
@@ -78,7 +80,10 @@ public class TempPwdDetailActivity extends BaseActivity {
         Serializable serializable = getIntent().getSerializableExtra("password_info");
         if (serializable instanceof PassWordInfo) {
             PassWordInfo passWordInfo = (PassWordInfo) serializable;
-            list.add(new NextTextInfo(passWordInfo.getName(), "", passWordInfo.getId()));
+
+            mBnbTitle.setTitle(passWordInfo.getName());
+
+            list.add(new NextTextInfo("修改密码", "", passWordInfo.getId()));
             nextTextExtendAdapter.setNewInstance(list);
         }
 
