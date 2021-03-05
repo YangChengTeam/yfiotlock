@@ -75,6 +75,10 @@
     <string name="mid">中</string>
     <string name="high">高</string>
     <string name="del_open_type">删除</string>
+    <string name="_86">+86</string>
+    <string name="please_input_phone_number">请输入手机号</string>
+    <string name="get_sms_code">获取短信验证码</string>
+    <string name="get_code_tip">未注册的手机号验证号后自动创建账号</string>
     <string name="finish_open_type">完成</string>
 
     <string-array name="lock_log_array">
