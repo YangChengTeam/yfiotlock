@@ -55,8 +55,15 @@
     <string name="check_version_update">检查版本更新</string>
     <string name="logout">退出登录</string>
     <string name="sure">确定</string>
-    <string name="edit_name_hint">请输入昵称...</string>
+    <string name="edit_name_hint">请输入昵称…</string>
     <string name="add_open_type">添加</string>
+    <string name="camera">相机</string>
+    <string name="choose_from_pics">从手机相册选择</string>
+    <string name="door_lock_sound_size">门锁音量</string>
+    <string name="door_lock_sound_size_desp">包含门锁唤醒音量、按键音量、错况提示音量等</string>
+    <string name="low">低</string>
+    <string name="mid">中</string>
+    <string name="high">高</string>
     <string name="del_open_type">删除</string>
 
 </resources>

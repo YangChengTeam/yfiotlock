@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="152dp"
+        android:background="@drawable/shape_top_round_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tv_camera"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:paddingTop="13dp"
+            android:text="@string/camera"
+            android:textColor="#222222"
+            android:textSize="15dp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_pics"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_pics"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/choose_from_pics"
+            android:textColor="#222222"
+            android:textSize="15dp"
+            app:layout_constraintBottom_toTopOf="@+id/view_line"
+            app:layout_constraintTop_toBottomOf="@id/tv_camera" />
+
+        <View
+            android:id="@+id/view_line"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/grayBg"
+            app:layout_constraintBottom_toTopOf="@+id/tv_cancel" />
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textColor="#222222"
+            android:textSize="15dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
