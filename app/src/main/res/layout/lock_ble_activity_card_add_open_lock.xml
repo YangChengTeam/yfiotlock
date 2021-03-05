@@ -16,41 +16,38 @@
         android:id="@+id/iv_bg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:src="@mipmap/nfc_bg"
-        app:layout_constraintTop_toBottomOf="@+id/view_nav_bar"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         android:layout_margin="16dp"
         android:scaleType="fitXY"
-        ></ImageView>
+        android:src="@mipmap/nfc_bg"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_nav_bar"></ImageView>
 
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
         android:text="NFC门卡01"
         android:textColor="@color/white"
         android:textSize="17dp"
-        app:layout_constraintTop_toTopOf="@+id/iv_bg"
         app:layout_constraintLeft_toLeftOf="@+id/iv_bg"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        />
+        app:layout_constraintTop_toTopOf="@+id/iv_bg" />
 
     <TextView
         android:id="@+id/tv_op_desp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawableLeft="@mipmap/nfc_notice"
+        android:drawablePadding="6dp"
         android:text="请按照门锁提示新增门卡将门卡贴到门锁键盘5-8
 区域"
         android:textColor="#999999"
-        app:layout_constraintTop_toBottomOf="@+id/iv_bg"
+        android:textSize="14dp"
         app:layout_constraintLeft_toLeftOf="@+id/iv_bg"
         app:layout_constraintRight_toRightOf="@+id/iv_bg"
-        android:drawableLeft="@mipmap/nfc_notice"
-        android:drawablePadding="6dp"
-        android:textSize="14dp"
-        android:layout_marginTop="16dp"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/iv_bg" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
