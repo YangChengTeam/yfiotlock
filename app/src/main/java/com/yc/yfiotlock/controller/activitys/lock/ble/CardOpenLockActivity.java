@@ -7,6 +7,10 @@ import androidx.annotation.NonNull;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.jakewharton.rxbinding4.view.RxView;
+import com.yc.yfiotlock.constant.Config;
+
+import java.util.concurrent.TimeUnit;
 
 public class CardOpenLockActivity extends BaseOpenLockActivity {
 
@@ -14,6 +18,11 @@ public class CardOpenLockActivity extends BaseOpenLockActivity {
     protected void initViews() {
         setTitle("NFC门卡");
         super.initViews();
+
+        RxView.clicks(addTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            Intent intent = new Intent(CardOpenLockActivity.this, CardAddOpenLockActivity.class);
+            startActivity(intent);
+        });
 
         openLockAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override

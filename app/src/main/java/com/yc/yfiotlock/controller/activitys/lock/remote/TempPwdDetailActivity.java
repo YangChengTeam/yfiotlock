@@ -65,11 +65,9 @@ public class TempPwdDetailActivity extends BaseActivity {
         nextTextExtendAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-                NextTextInfo nextTextInfo = nextTextExtendAdapter.getData().get(position);
-                switch (nextTextInfo.getId()) {
-                    case 1:
-                        startActivity(new Intent(TempPwdDetailActivity.this, OpenLockActivty.class));
-                        break;
+                Serializable serializable = getIntent().getSerializableExtra("password_info");
+                if (serializable instanceof PassWordInfo) {
+                    CreatPwdActivity.start(TempPwdDetailActivity.this, (PassWordInfo) serializable);
                 }
             }
         });

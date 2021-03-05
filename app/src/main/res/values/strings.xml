@@ -57,6 +57,16 @@
     <string name="sure">确定</string>
     <string name="edit_name_hint">请输入昵称…</string>
     <string name="add_open_type">添加</string>
+    <string name="pwd_name">密码名称</string>
+    <string name="pwd_name_hint">请输入密码名称</string>
+    <string name="pwd_type">密码时效</string>
+    <string name="valid_date">有效日期</string>
+    <string name="valid_time">有效时段</string>
+    <string name="start_time">开始时间</string>
+    <string name="end_time">结束时间</string>
+    <string name="start_date">开始时段</string>
+    <string name="end_date">结束时段</string>
+    <string name="pwd_seting">设置密码</string>
     <string name="camera">相机</string>
     <string name="choose_from_pics">从手机相册选择</string>
     <string name="door_lock_sound_size">门锁音量</string>
@@ -69,5 +79,6 @@
     <string name="please_input_phone_number">请输入手机号</string>
     <string name="get_sms_code">获取短信验证码</string>
     <string name="get_code_tip">未注册的手机号验证号后自动创建账号</string>
+    <string name="finish_open_type">完成</string>
 
 </resources>

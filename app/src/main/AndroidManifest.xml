@@ -56,6 +56,24 @@
             android:name=".controller.activitys.lock.ble.AddDeviceActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
+            android:name=".controller.activitys.lock.ble.PasswordAddOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.PasswordAddNextOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintAddOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintAddNextOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintAddSelectHandOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintAddSelectHandNextOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
             android:name=".controller.activitys.lock.ble.LockIndexActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
@@ -86,6 +104,9 @@
             android:name=".controller.activitys.lock.ble.FingerprintOpenLockActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
+            android:name=".controller.activitys.lock.ble.CardAddOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
             android:name=".controller.activitys.lock.ble.MyFamilyActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
@@ -96,6 +117,9 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.remote.CreatPwdActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.remote.CreatPwdSuccessActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.remote.TempPwdDetailActivity"
@@ -153,6 +177,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
     </application>
 
 </manifest>
