@@ -45,6 +45,7 @@ public class LockSettingActivity extends BaseBackActivity {
                 return false;
             }
         });
+
         mRvSetting.setAdapter(mSettingAdapter);
         mSettingAdapter.setOnItemClickListener((adapter, view, position) -> {
             SettingInfo settingInfo = mSettingAdapter.getData().get(position);
