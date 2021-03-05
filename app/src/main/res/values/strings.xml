@@ -76,4 +76,10 @@
     <string name="high">高</string>
     <string name="del_open_type">删除</string>
 
+    <string-array name="lock_log_array">
+        <item>日志</item>
+        <item>报警</item>
+    </string-array>
+
+
 </resources>

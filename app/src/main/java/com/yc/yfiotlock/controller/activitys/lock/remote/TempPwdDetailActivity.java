@@ -50,9 +50,7 @@ public class TempPwdDetailActivity extends BaseActivity {
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
 
-
         initRv();
-
         loadData();
     }
 
