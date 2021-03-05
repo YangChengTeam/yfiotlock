@@ -3,6 +3,7 @@
     <declare-styleable name="tab_item">
         <attr name="src" format="reference" />
         <attr name="text" format="string" />
+        <attr name="des" format="string" />
         <attr name="hindLine" format="boolean" />
         <attr name="showNext" format="boolean" />
         <attr name="textPosition" format="string">
