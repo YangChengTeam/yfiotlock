@@ -7,12 +7,21 @@ import androidx.annotation.NonNull;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.jakewharton.rxbinding4.view.RxView;
+import com.yc.yfiotlock.constant.Config;
+
+import java.util.concurrent.TimeUnit;
 
 public class PasswordOpenLockActivity extends BaseOpenLockActivity {
     @Override
     protected void initViews() {
         setTitle("密码");
         super.initViews();
+
+        RxView.clicks(addTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            Intent intent = new Intent(PasswordOpenLockActivity.this, PasswordAddOpenLockActivity.class);
+            startActivity(intent);
+        });
 
         openLockAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
