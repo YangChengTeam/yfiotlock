@@ -75,6 +75,7 @@
     <string name="mid">中</string>
     <string name="high">高</string>
     <string name="del_open_type">删除</string>
+    <string name="finish_open_type">完成</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>

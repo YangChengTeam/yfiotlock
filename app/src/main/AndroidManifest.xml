@@ -62,6 +62,18 @@
             android:name=".controller.activitys.lock.ble.PasswordAddNextOpenLockActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
+            android:name=".controller.activitys.lock.ble.FingerprintAddOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintAddNextOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintAddSelectHandOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintAddSelectHandNextOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
             android:name=".controller.activitys.lock.ble.LockIndexActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
