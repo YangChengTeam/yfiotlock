@@ -20,6 +20,7 @@ import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.EventStub;
+import com.yc.yfiotlock.utils.CommonUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -61,7 +62,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onResume();
         if (!App.isLogin() && this.getClass() != LoginActivity.class
                 && this.getClass() != SplashActivity.class) {
-            startActivity(new Intent(this, LoginActivity.class));
+            CommonUtils.startLogin(this);
         }
     }
 

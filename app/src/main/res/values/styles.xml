@@ -16,6 +16,16 @@
         <item name="colorPrimaryDark">@color/white</item>
     </style>
 
+    <style name="fullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="colorPrimaryDark">@color/white</item>
+
+    </style>
+
     <style name="AppTheme" parent="@style/BaseAppTheme">
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowIsTranslucent">false</item>
@@ -33,5 +43,8 @@
         <item name="android:windowEnterAnimation">@anim/enter_from_bottom</item>
     </style>
 
+    <style name="TextAppearance">
+        <item name="android:textSize">17dp</item>
+    </style>
 
 </resources>
