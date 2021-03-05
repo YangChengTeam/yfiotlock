@@ -10,6 +10,7 @@
     <color name="red_f84c3e">#F84C3E</color>
     <color name="blue_2F90F7">#2F90F7</color>
     <color name="pressedColor">#55ffffff</color>
+    <color name="blue_no_input">#75BAFE</color>
 
     <color name="transparent">#00000000</color>
 </resources>
