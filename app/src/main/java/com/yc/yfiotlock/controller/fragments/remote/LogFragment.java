@@ -48,14 +48,6 @@ public class LogFragment extends BaseFragment {
         logAdapter = new LogAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(logAdapter);
-
-        logAdapter.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-
-            }
-        });
     }
 
 
