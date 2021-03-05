@@ -41,7 +41,6 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
         loadData();
     }
 
-
     private void initRv() {
         tempPwdAdapter = new TempPwdAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));

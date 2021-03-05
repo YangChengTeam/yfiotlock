@@ -57,5 +57,6 @@
     <string name="sure">确定</string>
     <string name="edit_name_hint">请输入昵称...</string>
     <string name="add_open_type">添加</string>
+    <string name="del_open_type">删除</string>
 
 </resources>
