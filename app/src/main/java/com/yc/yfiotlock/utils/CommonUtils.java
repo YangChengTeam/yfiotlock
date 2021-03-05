@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
 import com.kk.securityhttp.utils.LogUtil;
@@ -35,9 +36,12 @@ import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.model.bean.PhoneTokenInfo;
 import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.view.widgets.MyItemDivider;
 
 import org.greenrobot.eventbus.EventBus;
+
+import rx.Observer;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -152,7 +156,7 @@ public class CommonUtils {
                             EventBus.getDefault().post(tokenInfo);
                             break;
                         case "600000":
-                            startLoginWithToken(context,this,tokenInfo.getToken());
+                            startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
                     }
                 } catch (Exception e) {
@@ -189,7 +193,7 @@ public class CommonUtils {
                         case "600001"://"唤起授权页成功"
                             break;
                         case "600000":
-                            startLoginWithToken(context,this,tokenInfo.getToken());
+                            startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
                     }
                 } catch (Exception e) {
@@ -214,18 +218,31 @@ public class CommonUtils {
     }
 
     private static void startLoginWithToken(Context context, TokenResultListener listener, String token) {
-        PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
-        PhoneNumberAuthHelper.getInstance(context, listener).quitLoginPage();
+        LoginEngin engin = new LoginEngin(context);
+        engin.aliFastLogin(token).subscribe(new Observer<ResultInfo<UserInfo>>() {
+            @Override
+            public void onCompleted() {
+                PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
 
-        UserInfo userInfo = new UserInfo();
-        userInfo.setName("阿彪66666");
-        userInfo.setNickName("阿彪6啊");
-        userInfo.setDeviceNumber("88");
-        userInfo.setFace("http://p.6ll.com/Upload/Picture/face/2021/601cbd15d323a.jpg");
-        userInfo.setAccount("88888888");
-        UserInfoCache.setUserInfo(userInfo);
-        EventBus.getDefault().post(userInfo);
-        context.startActivity(new Intent(context, MainActivity.class));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
+            }
+
+            @Override
+            public void onNext(ResultInfo<UserInfo> info) {
+                if (info != null && info.getCode() == 1 && info.getData() != null) {
+                    UserInfoCache.setUserInfo(info.getData());
+                    EventBus.getDefault().post(info.getData());
+                    context.startActivity(new Intent(context, MainActivity.class));
+                } else {
+                    ToastCompat.show(context, info == null ? "登陆失败失败" : info.getMsg());
+                }
+            }
+        });
+
     }
 
 
