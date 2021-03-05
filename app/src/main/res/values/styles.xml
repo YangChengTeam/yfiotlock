@@ -43,5 +43,8 @@
         <item name="android:windowEnterAnimation">@anim/enter_from_bottom</item>
     </style>
 
+    <style name="TextAppearance">
+        <item name="android:textSize">17dp</item>
+    </style>
 
 </resources>

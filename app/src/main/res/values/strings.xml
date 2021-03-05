@@ -82,4 +82,10 @@
     <string name="finish_open_type">完成</string>
     <string name="please_input_sign_code">请输入验证码</string>
 
+    <string-array name="lock_log_array">
+        <item>日志</item>
+        <item>报警</item>
+    </string-array>
+
+
 </resources>
