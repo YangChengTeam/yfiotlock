@@ -23,7 +23,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     RecyclerView openLockRecyclerView;
 
     @BindView(R.id.stv_add)
-    SuperTextView addTv;
+    protected SuperTextView addTv;
 
     protected OpenLockAdapter openLockAdapter;
 

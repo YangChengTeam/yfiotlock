@@ -81,6 +81,9 @@
             android:name=".controller.activitys.lock.ble.FingerprintOpenLockActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
+            android:name=".controller.activitys.lock.ble.CardAddOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
             android:name=".controller.activitys.lock.ble.MyFamilyActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
