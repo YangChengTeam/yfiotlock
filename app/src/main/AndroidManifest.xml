@@ -15,6 +15,9 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC permission" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 检查wifi网络状态 -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" /> <!-- 切换网络通道 -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
         android:name=".App"
@@ -25,7 +28,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".controller.activitys.user.EditNameActivity"></activity>
+        <activity android:name=".controller.activitys.lock.ble.DeviceInfoActivity"></activity>
+        <activity android:name=".controller.activitys.lock.ble.EditDeviceNameActivity" />
+        <activity android:name=".controller.activitys.user.EditNameActivity" />
         <activity android:name=".controller.activitys.user.AboutUsActivity" />
         <activity android:name=".controller.activitys.user.SuggestActivity" />
         <activity android:name=".controller.activitys.user.PersonalInfoActivity" />
@@ -44,14 +49,32 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.user.MainActivity"
-            android:launchMode="singleTask"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:launchMode="singleTask" />
         <activity android:name=".demo.MainActivity" />
         <activity
             android:name=".controller.activitys.lock.ble.AddDeviceActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.ble.LockIndexActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.PasswordDetailOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintDetailOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.CardDetailOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.PasswordModifyOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.FingerprintModifyOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.CardModifyOpenLockActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.ble.PasswordOpenLockActivity"
@@ -61,6 +84,9 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.ble.FingerprintOpenLockActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.CardAddOpenLockActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.ble.MyFamilyActivity"
@@ -94,7 +120,7 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.ble.LockSettingActivity"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize"></activity>
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
 
         <provider
             android:name=".download.DownloadProvider"
@@ -105,7 +131,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>

@@ -13,6 +13,7 @@ import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.dialogs.user.UpdateIconDialog;
 import com.yc.yfiotlock.model.bean.PersonalInfo;
 import com.yc.yfiotlock.model.bean.UserInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
@@ -59,6 +60,21 @@ public class PersonalInfoActivity extends BaseActivity {
         mAdapter = new PersonalEditAdapter(null);
         mAdapter.setOnItemClickListener((adapter, view, position) -> {
             switch (position) {
+                case 0:
+                    UpdateIconDialog updateIconDialog = new UpdateIconDialog(this);
+                    updateIconDialog.setOnTvClickListener(new UpdateIconDialog.OnTvClickListener() {
+                        @Override
+                        public void camera() {
+
+                        }
+
+                        @Override
+                        public void pics() {
+
+                        }
+                    });
+                    updateIconDialog.show();
+                    break;
                 case 2:
                     startActivity(new Intent(getContext(), EditNameActivity.class));
                     break;
@@ -67,6 +83,14 @@ public class PersonalInfoActivity extends BaseActivity {
         mRvInfo.setAdapter(mAdapter);
         mRvInfo.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtils.setItemDivider(getContext(), mRvInfo);
+    }
+
+    private void onUseCamera() {
+
+    }
+
+    private void onUsePic() {
+
     }
 
     private void loadUserInfo() {
