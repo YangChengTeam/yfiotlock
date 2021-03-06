@@ -89,8 +89,9 @@ public class LoginActivity extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_get_code:
-                LoginDialog loginDialog=new LoginDialog(getContext());
-                loginDialog.show("66666666");
+//                LoginDialog loginDialog=new LoginDialog(getContext());
+                setLocalInfo();
+//                loginDialog.show("66666666");
                 break;
             case R.id.tv_fast_login:
                 CommonUtils.isVerifyEnable(this);
