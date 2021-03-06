@@ -27,10 +27,14 @@ public class Config {
     public final static String PRIVACY_POLICY = "https://www.baidu.com";
     public final static String USER_AGREEMENT = "https://www.baidu.com";
 
-    public final static String ALI_FAST_LOGIN = getBaseUrl() + "/userapp/v1.User/oneClickLogin";
 
+    //登陆
+    public final static String ALI_FAST_LOGIN = getBaseUrl() + "/userapp/v1.User/oneClickLogin" + isRsa();
+    public final static String LOGIN_SEND_CODE_URL = getBaseUrl() + "/userapp/v1.Sms/send" + isRsa();
+    public final static String SMS_CODE_LOGIN_URL = getBaseUrl() + "/userapp/v1.User/codeLogin" + isRsa();
 
-    public final static String LOGIN_SEND_CODE_URL = "https://www.baidu.com";
+    //FAQ
+    public final static String FQA_LIST_URL = getBaseUrl() + "/userapp/v1.faq/faqList" + isRsa();
 
     public static final String INIT_URL = getBaseUrl() + "/v1/Index/init" + isRsa();
 

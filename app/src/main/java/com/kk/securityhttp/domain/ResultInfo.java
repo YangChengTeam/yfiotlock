@@ -1,11 +1,14 @@
 package com.kk.securityhttp.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * Created by zhangkai on 16/9/19.
  */
 
 public class ResultInfo<T> {
     private int code;
+    @JSONField(name = "msg")
     private String message;
     private T data;
     private transient boolean isCache;

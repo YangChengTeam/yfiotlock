@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
@@ -23,6 +24,8 @@ public class ToastCompat {
             sField_TN_Handler = sField_TN.getType().getDeclaredField("mHandler");
             sField_TN_Handler.setAccessible(true);
         } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("aaaa", "static initializer: "+e);
         }
     }
 
@@ -32,13 +35,13 @@ public class ToastCompat {
             Handler preHandler = (Handler) sField_TN_Handler.get(tn);
             sField_TN_Handler.set(tn, new SafelyHandlerWarpper(preHandler));
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     public static void show(Context context, CharSequence cs, int length) {
         if (CommonUtils.isActivityDestory(context)) return;
 
-        CharSequence text;
         Toast toast = Toast.makeText(context, cs, length);
         hook(toast);
         toast.show();

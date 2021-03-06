@@ -33,4 +33,25 @@ public class LoginEngin extends BaseEngin {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
+
+    public Observable<ResultInfo<String>> sendSmsCode(String phone) {
+        Map<String, String> map = new HashMap<>();
+        map.put("mobile", phone);
+        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
+        return httpCoreEngin.rxpost(Config.LOGIN_SEND_CODE_URL, new TypeReference<ResultInfo<String>>() {
+                }.getType(),
+                map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    public Observable<ResultInfo<UserInfo>> smsCodeLogin(String phone, String code) {
+        Map<String, String> map = new HashMap<>();
+        map.put("mobile", phone);
+        map.put("code", code);
+        HttpCoreEngin<ResultInfo<UserInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
+        return httpCoreEngin.rxpost(Config.SMS_CODE_LOGIN_URL, new TypeReference<ResultInfo<UserInfo>>() {
+                }.getType(),
+                map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+
 }

@@ -81,6 +81,8 @@
     <string name="get_code_tip">未注册的手机号验证号后自动创建账号</string>
     <string name="finish_open_type">完成</string>
     <string name="please_input_sign_code">请输入验证码</string>
+    <string name="common_problem">常见问题</string>
+    <string name="feed_back_question">反馈问题</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>

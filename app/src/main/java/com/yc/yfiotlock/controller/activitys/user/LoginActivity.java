@@ -7,12 +7,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.user.LoginDialog;
 import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
@@ -22,6 +24,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rx.Observer;
 
 public class LoginActivity extends BaseActivity {
 
@@ -65,7 +68,6 @@ public class LoginActivity extends BaseActivity {
                 }
             }
         });
-        mTvGetCode.setClickable(true);
     }
 
 
@@ -89,9 +91,7 @@ public class LoginActivity extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_get_code:
-//                LoginDialog loginDialog=new LoginDialog(getContext());
-                setLocalInfo();
-//                loginDialog.show("66666666");
+                sendSmsCode();
                 break;
             case R.id.tv_fast_login:
                 CommonUtils.isVerifyEnable(this);
@@ -101,6 +101,48 @@ public class LoginActivity extends BaseActivity {
             case R.id.tv_privacy_policy:
                 break;
         }
+    }
+
+    LoginDialog mLoginDialog;
+
+    public void sendSmsCode() {
+        if (mLoginDialog == null) {
+            mLoginDialog = new LoginDialog(this);
+            mLoginDialog.setLoginResult(new LoginDialog.LoginResult() {
+                @Override
+                public void onSuccess() {
+                    finish();
+                }
+
+                @Override
+                public void onSendSmsCode() {
+                    sendSmsCode();
+                }
+            });
+        }
+        LoginEngin engin = new LoginEngin(getContext());
+        engin.sendSmsCode(mEtPhone.getText().toString()).subscribe(new Observer<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(ResultInfo<String> info) {
+                if (info != null && info.getCode() == 1) {
+                    mLoginDialog.show(mEtPhone.getText().toString());
+                    mLoginDialog.setSendSmsCodeCache();
+                } else {
+                    ToastCompat.showCenter(getContext(), info == null ? "验证码发送失败" : info.getMsg());
+                    setLocalInfo();
+                }
+            }
+        });
     }
 
     private void setLocalInfo() {

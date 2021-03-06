@@ -28,7 +28,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".controller.activitys.lock.ble.DeviceInfoActivity"></activity>
+        <activity android:name=".controller.activitys.lock.ble.FAQDetailActivity"></activity>
+        <activity android:name=".controller.activitys.lock.ble.FeedBackActivity" />
+        <activity android:name=".controller.activitys.lock.ble.FAQActivity" />
+        <activity android:name=".controller.activitys.lock.ble.DeviceInfoActivity" />
         <activity android:name=".controller.activitys.lock.ble.EditDeviceNameActivity" />
         <activity android:name=".controller.activitys.user.EditNameActivity" />
         <activity android:name=".controller.activitys.user.AboutUsActivity" />
@@ -43,7 +46,8 @@
         </activity>
         <activity
             android:name=".controller.activitys.user.LoginActivity"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".controller.activitys.lock.ble.OpenLockManagerActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
@@ -141,32 +145,25 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.ble.LockSettingActivity"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
-
-
-        <!--联通电信授权页-->
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" /> <!-- 联通电信授权页 -->
         <activity
             android:name="com.mobile.auth.gatewayauth.LoginAuthActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:launchMode="singleTop"
-            android:theme="@style/fullScreen" />
-        <!--            使用弹窗模式必须添加  android:theme="@style/authsdk_activity_dialog"   ！！！-->
-
-        <!--协议页面webview-->
+            android:theme="@style/fullScreen" /> <!-- 使用弹窗模式必须添加  android:theme="@style/authsdk_activity_dialog"   ！！！ -->
+        <!-- 协议页面webview -->
         <activity
             android:name="com.mobile.auth.gatewayauth.activity.AuthWebVeiwActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:launchMode="singleTop"
-            android:screenOrientation="behind" />
-        <!--移动授权页-->
+            android:screenOrientation="behind" /> <!-- 移动授权页 -->
         <activity
             android:name="com.cmic.sso.sdk.activity.LoginAuthActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:launchMode="singleTop" />
-
 
         <provider
             android:name=".download.DownloadProvider"
@@ -177,7 +174,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>
