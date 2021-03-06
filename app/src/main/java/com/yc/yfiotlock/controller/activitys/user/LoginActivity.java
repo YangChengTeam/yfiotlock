@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
+import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -10,10 +11,12 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.dialogs.user.LoginDialog;
 import com.yc.yfiotlock.model.bean.UserInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -62,6 +65,7 @@ public class LoginActivity extends BaseActivity {
                 }
             }
         });
+        mTvGetCode.setClickable(true);
     }
 
 
@@ -85,7 +89,8 @@ public class LoginActivity extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_get_code:
-                setLocalInfo();
+                LoginDialog loginDialog=new LoginDialog(getContext());
+                loginDialog.show("66666666");
                 break;
             case R.id.tv_fast_login:
                 CommonUtils.isVerifyEnable(this);
@@ -105,6 +110,7 @@ public class LoginActivity extends BaseActivity {
         userInfo.setFace("http://p.6ll.com/Upload/Picture/face/2021/601cbd15d323a.jpg");
         userInfo.setAccount("88888888");
         UserInfoCache.setUserInfo(userInfo);
+        startActivity(new Intent(this, MainActivity.class));
     }
 
 }
