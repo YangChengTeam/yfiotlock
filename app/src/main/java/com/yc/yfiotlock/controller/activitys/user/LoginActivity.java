@@ -111,6 +111,7 @@ public class LoginActivity extends BaseActivity {
         userInfo.setFace("http://p.6ll.com/Upload/Picture/face/2021/601cbd15d323a.jpg");
         userInfo.setAccount("88888888");
         UserInfoCache.setUserInfo(userInfo);
+        EventBus.getDefault().post(userInfo);
         startActivity(new Intent(this, MainActivity.class));
     }
 
