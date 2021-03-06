@@ -3,14 +3,13 @@ package com.kk.securityhttp.utils;
 import com.kk.securityhttp.utils.security.Base64;
 import com.kk.securityhttp.utils.security.Md5;
 import com.kk.securityhttp.utils.security.Rsa;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -24,36 +23,13 @@ public class EncryptUtil {
         String key = publickey;
         LogUtil.msg("publickey->" + Md5.md5(key));
         String result = null;
-        String[] strs = sectionStr(jsonStr);
-        result = Rsa.encrypt(jsonStr, key);
+        try {
+            result = Base64.encode(Rsa.encryptByPublicKey(jsonStr.getBytes(), key));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         LogUtil.msg("客户端请求加密数据->" + result);
         return result;
-    }
-
-    ///< rsa字符分段
-    @SuppressWarnings("null")
-    public static String[] sectionStr(String str) {
-        if (str == null || str.isEmpty()) {
-            return null;
-        }
-        String[] strs = null;
-        int length = str.length();
-        if (length > 256) {
-            int len = length / 256 + (length % 256 > 0 ? 1 : 0);
-            strs = new String[len];
-            for (int i = 0, j = 0; i < length; i += 1) {
-                int start = i * 128;
-                int last = (i + 1) * 128;
-                if (last > length) {
-                    last = length;
-                }
-                if (j >= len) {
-                    break;
-                }
-                strs[j++] = str.substring(start, last);
-            }
-        }
-        return strs;
     }
 
     ///< 数据压缩
