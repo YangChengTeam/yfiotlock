@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Intent;
-import android.os.Bundle;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class LockSettingActivity extends BaseBackActivity {
     @BindView(R.id.rv_setting)
@@ -33,7 +31,6 @@ public class LockSettingActivity extends BaseBackActivity {
         super.initViews();
         setRvSetting();
     }
-
 
     private SettingAdapter mSettingAdapter;
 
@@ -51,7 +48,7 @@ public class LockSettingActivity extends BaseBackActivity {
             SettingInfo settingInfo = mSettingAdapter.getData().get(position);
             switch (position) {
                 case 1:
-                    startActivity(new Intent(this,DeviceInfoActivity.class));
+                    startActivity(new Intent(this, DeviceInfoActivity.class));
                     break;
                 case 2:
                     Intent intent = new Intent(this, EditDeviceNameActivity.class);
