@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity=""
-    android:background="#f5f5f5">
+    android:background="@color/grayBg">
 
     <com.yc.yfiotlock.view.widgets.BackNavBar
         android:id="@+id/bnb_title"
@@ -14,23 +14,39 @@
         app:layout_constraintTop_toTopOf="parent"
         app:text="新建家庭" />
 
-    <TextView
-        android:id="@+id/tv_my_family_des"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="7dp"
-        android:padding="8dp"
-        android:text="我的家庭"
-        android:textColor="#ff999999"
-        android:textSize="13sp"
-        app:layout_constraintTop_toBottomOf="@id/bnb_title" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_my_family"
+    <com.yc.yfiotlock.view.widgets.RightNextTextView
+        android:id="@+id/tv_family_add_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:layout_constraintTop_toBottomOf="@id/tv_my_family_des" />
+        android:textColor="#ff999999"
+        android:textSize="13sp"
+        app:des="请输入家庭名称"
+        app:layout_constraintTop_toBottomOf="@id/bnb_title"
+        app:text="家庭名称" />
+
+    <com.yc.yfiotlock.view.widgets.RightNextTextView
+        android:id="@+id/tv_family_add_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:textColor="#ff999999"
+        android:textSize="13sp"
+        app:des="请选择家庭位置"
+        app:layout_constraintTop_toBottomOf="@id/tv_family_add_name"
+        app:text="家庭位置" />
+
+    <com.yc.yfiotlock.view.widgets.RightNextTextView
+        android:id="@+id/tv_family_add_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:textColor="#ff999999"
+        android:textSize="13sp"
+        app:des="请输入详细地址（非必填）"
+        app:hindLine="true"
+        app:layout_constraintTop_toBottomOf="@id/tv_family_add_location"
+        app:text="详细地址" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
