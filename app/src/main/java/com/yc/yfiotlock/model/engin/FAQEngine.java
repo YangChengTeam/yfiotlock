@@ -5,8 +5,10 @@ import android.content.Context;
 import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.engin.BaseEngin;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.FAQInfo;
+import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,9 @@ public class FAQEngine extends BaseEngin {
         Map<String, String> map = new HashMap<>();
         map.put("page", p + "");
         map.put("page_size", "10");
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
         return rxpost(new TypeReference<ResultInfo<List<FAQInfo>>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);

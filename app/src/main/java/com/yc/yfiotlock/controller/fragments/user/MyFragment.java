@@ -2,17 +2,17 @@ package com.yc.yfiotlock.controller.fragments.user;
 
 import android.content.Intent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.user.AboutUsActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
-import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.SuggestActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.model.bean.PersonalInfo;
@@ -42,6 +42,8 @@ public class MyFragment extends BaseFragment {
     TextView mTvDeviceNumber;
     @BindView(R.id.rv_my)
     RecyclerView mRvMy;
+    @BindView(R.id.iv_face)
+    ImageView mIvFace;
 
     @Override
     protected int getLayoutId() {
@@ -57,12 +59,22 @@ public class MyFragment extends BaseFragment {
     private void loadUserInfo() {
         UserInfo userInfo = UserInfoCache.getUserInfo();
         if (userInfo == null) {
-            mStvFace.setUrlImage("");
+            Glide.with(getContext())
+                    .load("")
+                    .placeholder(R.mipmap.head_default)
+                    .error(R.mipmap.head_default)
+                    .circleCrop()
+                    .into(mIvFace);
             mTvUserName.setText("");
             mTvDeviceNumber.setText("");
             return;
         }
-        mStvFace.setUrlImage(userInfo.getFace());
+        Glide.with(getContext())
+                .load(userInfo.getFace())
+                .placeholder(R.mipmap.head_default)
+                .error(R.mipmap.head_default)
+                .circleCrop()
+                .into(mIvFace);
         mTvUserName.setText(userInfo.getName());
         mTvDeviceNumber.setText(userInfo.getDeviceNumber().concat("个智能设备"));
     }
@@ -102,7 +114,7 @@ public class MyFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLogin(UserInfo userInfo){
+    public void onLogin(UserInfo userInfo) {
         loadUserInfo();
     }
 }

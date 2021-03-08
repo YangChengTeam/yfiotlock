@@ -13,7 +13,7 @@ android {
             keyPassword "123456"
         }
         ycR {
-            storeFile file('lock.jks')
+            storeFile file('yfiotlock.jks')
             storePassword "123456"
             keyAlias "yfiotlock"
             keyPassword "123456"

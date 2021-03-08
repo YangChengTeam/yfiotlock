@@ -56,6 +56,7 @@ public class PictureUtils {
 
                     @Override
                     public void onError(Throwable e) {
+                        callback.onFailure(new Response("" + e));
                     }
                 }).launch();
     }

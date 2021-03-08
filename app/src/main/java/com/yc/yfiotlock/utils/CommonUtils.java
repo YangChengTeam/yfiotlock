@@ -241,6 +241,7 @@ public class CommonUtils {
 
             @Override
             public void onNext(ResultInfo<UserInfo> info) {
+                Log.i("aaaa", "onNext: "+info);
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
                     UserInfoCache.setUserInfo(info.getData());
                     EventBus.getDefault().post(info.getData());

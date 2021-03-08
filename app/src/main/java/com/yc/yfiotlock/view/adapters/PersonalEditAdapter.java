@@ -33,6 +33,8 @@ public class PersonalEditAdapter extends BaseExtendAdapter<PersonalInfo> {
                 Glide.with(getContext())
                         .load(personalInfo.getImg())
                         .circleCrop()
+                        .placeholder(R.mipmap.head_default)
+                        .error(R.mipmap.head_default)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .into((ImageView) holder.getView(R.id.iv_pic));
@@ -40,6 +42,8 @@ public class PersonalEditAdapter extends BaseExtendAdapter<PersonalInfo> {
                 Glide.with(getContext())
                         .load(personalInfo.getImg())
                         .circleCrop()
+                        .placeholder(R.mipmap.head_default)
+                        .error(R.mipmap.head_default)
                         .into((ImageView) holder.getView(R.id.iv_pic));
             }
 
