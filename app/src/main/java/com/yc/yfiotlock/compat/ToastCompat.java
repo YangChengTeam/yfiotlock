@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.yc.yfiotlock.utils.CommonUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ToastCompat {
     private static Field sField_TN;
@@ -42,7 +43,9 @@ public class ToastCompat {
     public static void show(Context context, CharSequence cs, int length) {
         if (CommonUtils.isActivityDestory(context)) return;
 
-        Toast toast = Toast.makeText(context, cs, length);
+        CharSequence text = cs + "";
+        Toast toast = Toast.makeText(context, text, length);
+
         hook(toast);
         toast.show();
     }

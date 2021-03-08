@@ -219,7 +219,7 @@ public final class OKHttpUtil {
             LogUtil.msg("当前公钥->" + GoagalInfo.get().getPublicKeyString());
             jsonStr = EncryptUtil.rsa(GoagalInfo.get().getPublicKeyString(), jsonStr);
         }
-        return EncryptUtil.compress(jsonStr);
+        return jsonStr.getBytes();
     }
 
     //< 不加密参数 正常请求正文
