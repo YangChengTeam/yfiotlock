@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
+import com.yc.yfiotlock.controller.activitys.base.ILoadData;
 import com.yc.yfiotlock.model.bean.EventStub;
 import com.yc.yfiotlock.utils.CommonUtils;
 
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseFragment extends Fragment   {
+public abstract class BaseFragment extends Fragment  implements ILoadData {
 
 
     protected View mRootView;
@@ -121,4 +122,18 @@ public abstract class BaseFragment extends Fragment   {
         }
     }
 
+    @Override
+    public void success(Object data) {
+
+    }
+
+    @Override
+    public void fail() {
+
+    }
+
+    @Override
+    public void empty() {
+
+    }
 }
