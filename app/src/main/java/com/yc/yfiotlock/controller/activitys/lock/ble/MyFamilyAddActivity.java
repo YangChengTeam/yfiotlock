@@ -57,10 +57,10 @@ public class MyFamilyAddActivity extends BaseActivity {
             MyFamilyNameActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
         RxView.clicks(tvLocation).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            MyFamilyPositionActivity.start(MyFamilyAddActivity.this, familyInfo);
+            MyFamilyLocationActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
         RxView.clicks(tvAddress).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            MyFamilyPositionActivity.start(MyFamilyAddActivity.this, familyInfo);
+            MyFamilyAddressActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
     }
 
@@ -70,7 +70,7 @@ public class MyFamilyAddActivity extends BaseActivity {
             FamilyInfo familyInfo = (FamilyInfo) serializable;
             this.familyInfo = familyInfo;
             tvName.setTvDes(familyInfo.getName(), Color.parseColor("#000000"));
-            tvLocation.setTvDes(familyInfo.getName(), Color.parseColor("#000000"));
+            tvLocation.setTvDes(familyInfo.getLocation(), Color.parseColor("#000000"));
             tvAddress.setTvDes(familyInfo.getHomAddress(), Color.parseColor("#000000"));
 
             mBnbTitle.setTitle(familyInfo.getName());

@@ -10,10 +10,10 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import butterknife.BindView;
 
-public class MyFamilyPositionActivity extends BaseActivity {
+public class MyFamilyLocationActivity extends BaseActivity {
 
     public static void start(Context context, FamilyInfo familyInfo) {
-        Intent intent = new Intent(context, MyFamilyPositionActivity.class);
+        Intent intent = new Intent(context, MyFamilyLocationActivity.class);
         if (familyInfo != null) {
             intent.putExtra("family_info", familyInfo);
         }
@@ -25,7 +25,7 @@ public class MyFamilyPositionActivity extends BaseActivity {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.lock_ble_activity_family_position;
+        return R.layout.lock_ble_activity_family_location;
     }
 
     @Override

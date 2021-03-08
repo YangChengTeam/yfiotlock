@@ -123,7 +123,7 @@
             android:name=".controller.activitys.lock.ble.MyFamilyNameActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
-            android:name=".controller.activitys.lock.ble.MyFamilyPositionActivity"
+            android:name=".controller.activitys.lock.ble.MyFamilyLocationActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".demo.OperationActivity"
