@@ -28,7 +28,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements ILoadData{
 
     private PermissionHelper mPermissionHelper;
 
@@ -109,5 +109,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(1280 | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
     }
 
+    @Override
+    public void success(Object data) {
 
+    }
+
+    @Override
+    public void fail() {
+
+    }
+
+    @Override
+    public void empty() {
+
+    }
 }

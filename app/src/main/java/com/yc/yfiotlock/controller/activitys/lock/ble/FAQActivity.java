@@ -73,11 +73,20 @@ public class FAQActivity extends BaseActivity {
             @Override
             public void onError(Throwable e) {
                 mSrlRefresh.setRefreshing(false);
+                fail();
             }
 
             @Override
-            public void onNext(ResultInfo<List<FAQInfo>> listResultInfo) {
-
+            public void onNext(ResultInfo<List<FAQInfo>> info) {
+                if (info != null && info.getCode() == 1) {
+                    if (info.getData() == null || info.getData().size() == 0) {
+                        empty();
+                    } else {
+                        success(info);
+                    }
+                } else {
+                    fail();
+                }
             }
         });
     }
@@ -94,5 +103,20 @@ public class FAQActivity extends BaseActivity {
     @OnClick(R.id.stv_feed_back)
     public void onViewClicked() {
         startActivity(new Intent(getContext(), FeedBackActivity.class));
+    }
+
+    @Override
+    public void success(Object data) {
+        super.success(data);
+    }
+
+    @Override
+    public void fail() {
+        super.fail();
+    }
+
+    @Override
+    public void empty() {
+        super.empty();
     }
 }
