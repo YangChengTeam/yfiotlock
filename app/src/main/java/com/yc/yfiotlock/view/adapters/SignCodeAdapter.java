@@ -18,6 +18,16 @@ public class SignCodeAdapter extends BaseExtendAdapter<String> {
     }
 
     @Override
+    public void onBindViewHolder(@NotNull BaseViewHolder holder, int position, @NotNull List<Object> payloads) {
+
+        if (payloads.size() > 0) {
+            holder.setText(R.id.tv_number, getData().get(position));
+        } else {
+            super.onBindViewHolder(holder, position);
+        }
+    }
+
+    @Override
     protected void convert(@NotNull BaseViewHolder holder, String s) {
         holder.setText(R.id.tv_number, s + "");
     }

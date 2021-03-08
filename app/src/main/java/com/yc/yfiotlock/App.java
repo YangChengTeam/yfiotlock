@@ -3,13 +3,16 @@ package com.yc.yfiotlock;
 import android.app.Application;
 import android.os.Build;
 
+import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.model.engin.GlideEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
+import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +35,12 @@ public class App extends Application {
         app = this;
         initSdk();
         initHttp();
+        initCommonConfig();
+    }
+
+    private void initCommonConfig(){
+        LoadMoreModuleConfig.setDefLoadMoreView(new CustomLoadMoreView());
+        Reflection.unseal(this);
     }
 
     private void initHttp(){

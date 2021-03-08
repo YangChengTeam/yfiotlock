@@ -55,6 +55,9 @@ public class LockSettingActivity extends BaseBackActivity {
                     intent.putExtra("name", settingInfo.getValue());
                     startActivity(intent);
                     break;
+                case 5:
+                    startActivity(new Intent(this, FAQActivity.class));
+                    break;
             }
         });
         CommonUtils.setItemDivider(getContext(), mRvSetting);

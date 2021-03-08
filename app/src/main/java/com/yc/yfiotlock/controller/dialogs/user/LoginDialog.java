@@ -1,11 +1,15 @@
 package com.yc.yfiotlock.controller.dialogs.user;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -15,8 +19,10 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.dialogs.BaseDialog;
 import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.utils.CommonUtils;
@@ -27,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
@@ -34,7 +41,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 /*
  * Created by　Dullyoung on 2021/3/5
  */
-public class LoginDialog extends BaseDialog {
+public class LoginDialog extends Dialog {
     @BindView(R.id.iv_cancel)
     ImageView mIvCancel;
     @BindView(R.id.et_sms_code)
@@ -46,21 +53,29 @@ public class LoginDialog extends BaseDialog {
     @BindView(R.id.tv_timer)
     TextView mTvTimer;
 
-    public LoginDialog(Context context) {
+    LoginActivity mLoginActivity;
+
+    public LoginDialog(LoginActivity context) {
         super(context);
+        mLoginActivity = context;
+        View view = LayoutInflater.from(context).inflate(
+                getLayoutId(), null);
+        ButterKnife.bind(this, view);
+        setContentView(view);
+        setCancelable(true);
     }
 
-    @Override
+
     protected int getLayoutId() {
         return R.layout.user_dialog_login;
     }
 
-    @Override
+
     protected void initViews() {
         setCanceledOnTouchOutside(false);
-//        if (CacheUtils.getCache(Config.LOGIN_SEND_CODE_URL + phone, long.class) != null) {
-//            setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTimerTv);
-//        }
+        if (CacheUtils.getCache(Config.LOGIN_SEND_CODE_URL + phone, long.class) != null) {
+            setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTvTimer);
+        }
         mEtSmsCode.setOnLongClickListener(v -> true);
         showInput();
         setRvCode();
@@ -78,11 +93,16 @@ public class LoginDialog extends BaseDialog {
             @Override
             public void afterTextChanged(Editable s) {
                 String[] strings = s.toString().split("");
+                Log.i("aaaa", "afterTextChanged: " + s.toString());
                 List<String> stringList = mSignCodeAdapter.getData();
-                for (int i = 0; i < strings.length; i++) {
-                    stringList.set(i, strings[i]);
+                for (int i = 0; i < stringList.size(); i++) {
+                    if (i < strings.length) {
+                        stringList.set(i, strings[i]);
+                    } else {
+                        stringList.set(i, "");
+                    }
+                    mSignCodeAdapter.notifyItemChanged(i, "");
                 }
-                mSignCodeAdapter.setNewInstance(stringList);
             }
         });
     }
@@ -105,7 +125,6 @@ public class LoginDialog extends BaseDialog {
         for (int i = 0; i < 6; i++) {
             strings1.add("");
         }
-        strings1.add("");
         mSignCodeAdapter.setNewInstance(strings1);
     }
 
@@ -113,7 +132,12 @@ public class LoginDialog extends BaseDialog {
         phone = phoneNumber;
         show();
         mEtSmsCode.setText("");
+        mEtSmsCode.setOnLongClickListener(v -> true);
         initViews();
+        mTvSentCode.setText("验证码已发送至".concat("+").concat(phoneNumber));
+        if (CacheUtils.getCache(Config.LOGIN_SEND_CODE_URL + phone, long.class) != null) {
+            setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTvTimer);
+        }
     }
 
     private String phone;
@@ -160,7 +184,7 @@ public class LoginDialog extends BaseDialog {
         }
         if (System.currentTimeMillis() - sendTime > 60000) {  //如果当前时间距离上次发送时间大于60s 就可以再次发送
             textView.setText("重新发送");
-            textView.setTextColor(Color.parseColor("#ff9b27"));
+            textView.setTextColor(Color.parseColor("#3395FD"));
             textView.setClickable(true);
             return;
         }
@@ -168,7 +192,7 @@ public class LoginDialog extends BaseDialog {
         //  当前时间和发送时间小于60s 则 更新UI时间 不改变TV的可点击状态
         int remainingTime = 60 - (int) (System.currentTimeMillis() - sendTime) / 1000;
 
-        String countString = "<font color=\"#ff9b27\">" + remainingTime + "</font>"
+        String countString = "<font color=\"#3395FD\">" + remainingTime + "</font>"
                 + "<font color=\"#9a9a9a\">秒后可重新发送</font>";
 
         textView.setText(Html.fromHtml(countString));
@@ -182,7 +206,7 @@ public class LoginDialog extends BaseDialog {
         mLoginResult = loginResult;
     }
 
-    @OnClick({R.id.iv_cancel, R.id.et_sms_code, R.id.tv_sent_code, R.id.tv_timer})
+    @OnClick({R.id.iv_cancel, R.id.et_sms_code, R.id.tv_timer})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_cancel:
@@ -190,10 +214,6 @@ public class LoginDialog extends BaseDialog {
                 break;
             case R.id.tv_timer:
                 mLoginResult.onSendSmsCode();
-                break;
-            case R.id.et_sms_code:
-                break;
-            case R.id.tv_sent_code:
                 break;
 
         }

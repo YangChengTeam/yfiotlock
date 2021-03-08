@@ -48,7 +48,12 @@ public abstract class BaseActivity extends AppCompatActivity {
             EventBus.getDefault().register(this);
         }
         mPermissionHelper = new PermissionHelper();
+        initVars();
         initViews();
+    }
+
+    protected void initVars(){
+
     }
 
     @Override
