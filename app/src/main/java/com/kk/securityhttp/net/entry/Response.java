@@ -7,4 +7,11 @@ public class Response {
     public int code;
     public String body;
     public okhttp3.Response response;
+
+    public Response(String body) {
+        this.body = body;
+    }
+
+    public Response() {
+    }
 }

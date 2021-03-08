@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_bg"
+        android:layout_width="248dp"
+        android:layout_height="302.33dp"
+        android:src="@mipmap/update_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:src="@mipmap/icon_cancle"
+        app:layout_constraintEnd_toEndOf="@id/iv_bg"
+        app:layout_constraintStart_toStartOf="@id/iv_bg"
+        app:layout_constraintTop_toBottomOf="@id/iv_bg" />
+
+    <TextView
+        android:id="@+id/tv_new_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="49dp"
+        android:text="@string/find_new_version"
+        android:textColor="@color/white"
+        android:textSize="23dp"
+        app:layout_constraintStart_toStartOf="@id/iv_bg"
+        app:layout_constraintTop_toTopOf="@id/iv_bg" />
+
+    <com.coorchice.library.SuperTextView
+        android:id="@+id/stv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:paddingStart="5.67dp"
+        android:paddingEnd="5.67dp"
+        android:text="v1.1.1"
+        android:textColor="#3395FD"
+        android:textSize="8.67dp"
+        app:layout_constraintStart_toStartOf="@id/tv_new_version"
+        app:layout_constraintTop_toBottomOf="@id/tv_new_version"
+        app:stv_corner="16dp"
+        app:stv_solid="@color/white" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="135dp"
+        android:text="#新功能#"
+        android:textColor="#000000"
+        android:textSize="14dp"
+        app:layout_constraintStart_toStartOf="@id/iv_bg"
+        app:layout_constraintTop_toTopOf="@id/iv_bg" />
+
+    <ScrollView
+        android:id="@+id/sv_contont"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="22dp"
+        app:layout_constraintEnd_toEndOf="@id/iv_bg"
+        app:layout_constraintStart_toStartOf="@id/iv_bg"
+        app:layout_constraintTop_toBottomOf="@id/tv_title">
+
+        <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#999999"
+            android:textSize="13dp" />
+
+    </ScrollView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="204dp"
+        android:layout_height="34dp"
+        android:layout_marginTop="7dp"
+        app:cardCornerRadius="17dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="@id/iv_bg"
+        app:layout_constraintStart_toStartOf="@id/iv_bg"
+        app:layout_constraintTop_toBottomOf="@id/sv_contont">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ProgressBar
+                android:id="@+id/pb_process"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:max="100"
+                android:progress="100"
+                android:progressDrawable="@drawable/layer_list_progress_drawable" />
+
+            <TextView
+                android:id="@+id/tv_update"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="15dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

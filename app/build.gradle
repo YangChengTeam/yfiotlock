@@ -112,6 +112,8 @@ dependencies {
 
     implementation "androidx.cardview:cardview:1.0.0"
 
+    implementation 'com.zhy:okhttputils:2.6.2'
+    implementation "com.zhihu.android:matisse:0.5.3-beta3"
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 

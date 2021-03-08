@@ -83,6 +83,9 @@
     <string name="please_input_sign_code">请输入验证码</string>
     <string name="common_problem">常见问题</string>
     <string name="feed_back_question">反馈问题</string>
+    <string name="no_data_now">暂无数据</string>
+    <string name="connect_fail_swipe_refresh_retry">网络出错了,下拉刷新重试</string>
+    <string name="find_new_version">发现新版本</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>

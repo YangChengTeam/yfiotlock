@@ -44,4 +44,14 @@ public class ResultInfo<T> {
     public void setCache(boolean cache) {
         isCache = cache;
     }
+
+    @Override
+    public String toString() {
+        return "ResultInfo{" +
+                "code=" + code +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                ", isCache=" + isCache +
+                '}';
+    }
 }

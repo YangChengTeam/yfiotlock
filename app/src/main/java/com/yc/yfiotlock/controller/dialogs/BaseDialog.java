@@ -13,8 +13,13 @@ import android.view.WindowManager;
 
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.model.bean.EventStub;
 import com.yc.yfiotlock.utils.CommonUtils;
 
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.ButterKnife;
 
@@ -28,6 +33,9 @@ public abstract class BaseDialog extends Dialog {
                 getLayoutId(), null);
         ButterKnife.bind(this, view);
         setContentView(view);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
 
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
         try {
@@ -39,6 +47,11 @@ public abstract class BaseDialog extends Dialog {
         view.setLayoutParams(layoutParams);
 
         setCancelable(true);
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void stub(EventStub stub){
 
     }
 
@@ -96,6 +109,9 @@ public abstract class BaseDialog extends Dialog {
 
     @Override
     public void dismiss() {
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
         if (this.isShowing() && !CommonUtils.isActivityDestory(getContext())) {
             super.dismiss();
         }

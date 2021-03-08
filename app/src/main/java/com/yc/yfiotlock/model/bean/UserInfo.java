@@ -1,15 +1,51 @@
 package com.yc.yfiotlock.model.bean;
 
+import android.text.TextUtils;
+
+import com.alibaba.fastjson.annotation.JSONField;
+
 public class UserInfo {
 
     private String id;
     private String name;
+    @JSONField(name = "nickname")
     private String nickName;
     private String face;
-    private String account;
+    private String sign;
+    private String scene;
+    private String model;
+
+    private String mobile;
     private String deviceNumber;
 
+    public String getSign() {
+        return sign;
+    }
+
+    public void setSign(String sign) {
+        this.sign = sign;
+    }
+
+    public String getScene() {
+        return scene;
+    }
+
+    public void setScene(String scene) {
+        this.scene = scene;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     public String getName() {
+        if (TextUtils.isEmpty(name)) {
+            return getMobile();
+        }
         return name;
     }
 
@@ -25,6 +61,14 @@ public class UserInfo {
         this.nickName = nickName;
     }
 
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
     public String getFace() {
         return face;
     }
@@ -33,16 +77,10 @@ public class UserInfo {
         this.face = face;
     }
 
-    public String getAccount() {
-        return account;
-    }
 
-    public void setAccount(String account) {
-        this.account = account;
-    }
 
     public String getDeviceNumber() {
-        return deviceNumber;
+        return deviceNumber == null ? "1" : deviceNumber;
     }
 
     public void setDeviceNumber(String deviceNumber) {
