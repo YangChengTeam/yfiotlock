@@ -137,12 +137,8 @@ public class OKHttpRequest implements IHttpRequest {
         Call call = client.newCall(request);
         Response response = call.execute();
         if (response.isSuccessful()) {
-            String body = "";
-            if (isEncryptResponse) {
-                body = OKHttpUtil.decodeBody(response.body().byteStream());
-            } else {
-                body = response.body().string();
-            }
+            String   body = response.body().string();
+
             nresponse = OKHttpUtil.setResponse(response.code(), body);
             LogUtil.msg("服务器返回数据->" + body);
         }
