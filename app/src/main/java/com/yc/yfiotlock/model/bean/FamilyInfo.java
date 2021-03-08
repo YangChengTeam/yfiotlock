@@ -10,6 +10,9 @@ public class FamilyInfo implements Serializable {
     private int deviceNum;
     private int id;
 
+    public FamilyInfo() {
+    }
+
     public FamilyInfo(String name, String location, String homAddress, boolean isDefault, int deviceNum, int id) {
         this.name = name;
         this.location = location;

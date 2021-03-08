@@ -12,10 +12,14 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.TempPwdDetailActivity;
+import com.yc.yfiotlock.model.bean.EventStub;
 import com.yc.yfiotlock.model.bean.FamilyInfo;
 import com.yc.yfiotlock.model.bean.PassWordInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.RightNextTextView;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
@@ -75,5 +79,14 @@ public class MyFamilyAddActivity extends BaseActivity {
 
             mBnbTitle.setTitle(familyInfo.getName());
         }
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFamilyInfo(FamilyInfo familyInfo) {
+        this.familyInfo = familyInfo;
+        tvName.setTvDes(familyInfo.getName(), Color.parseColor("#000000"));
+        tvLocation.setTvDes(familyInfo.getLocation(), Color.parseColor("#000000"));
+        tvAddress.setTvDes(familyInfo.getHomAddress(), Color.parseColor("#000000"));
     }
 }
