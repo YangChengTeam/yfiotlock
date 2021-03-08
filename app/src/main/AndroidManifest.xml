@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.yc.yfiotlock">
 
     <uses-feature
@@ -29,7 +30,8 @@
         android:roundIcon="@mipmap/us_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+       >
         <activity android:name=".controller.activitys.lock.ble.FAQDetailActivity" />
         <activity android:name=".controller.activitys.lock.ble.FeedBackActivity" />
         <activity android:name=".controller.activitys.lock.ble.FAQActivity" />
@@ -49,6 +51,7 @@
         <activity
             android:name=".controller.activitys.user.LoginActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".controller.activitys.lock.ble.OpenLockManagerActivity"

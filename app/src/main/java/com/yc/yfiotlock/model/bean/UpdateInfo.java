@@ -2,6 +2,8 @@ package com.yc.yfiotlock.model.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import java.text.SimpleDateFormat;
+
 /*
  * Created by　Dullyoung on 2021/3/3
  */
@@ -18,6 +20,11 @@ public class UpdateInfo {
     private boolean isDownloading;
     private int downloadStatus;
     private boolean isMust;
+
+    public int getProgress() {
+        return (int) (offsetSize * 100 / totalSize);
+    }
+
 
     public String getVersion() {
         return version;
@@ -114,7 +121,6 @@ public class UpdateInfo {
     public void setMust(boolean must) {
         isMust = must;
     }
-
 
 
 }

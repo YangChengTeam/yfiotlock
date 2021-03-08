@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.ArrayMap;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.annotation.NonNull;
@@ -43,8 +45,6 @@ import java.util.List;
 import java.util.Map;
 
 
-
-
 public class DownloadManager {
     private static String parentDir;
     private static WeakReference<Context> mContext;
@@ -74,7 +74,7 @@ public class DownloadManager {
         if (!TextUtils.isEmpty(parentDir) || context == null) return;
         OkDownload.with();
         DownloadDispatcher.setMaxParallelRunningCount(3);
-        parentDir = PathUtil.createDir(context.get(), "/apks");
+        parentDir = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
     }
 
     private static void redownload(DownloadTask task, UpdateInfo updateInfo) {
@@ -103,6 +103,8 @@ public class DownloadManager {
 
     private static int requestPermissionCount = 0;
 
+    public static final String TAG = "DownloadManager";
+
     public static void updateApp(UpdateInfo upgradeInfo) {
         requestPermissionCount++;
         BaseActivity baseActivity = (BaseActivity) CommonUtils.findActivity(getContext());
@@ -128,26 +130,28 @@ public class DownloadManager {
                     mDownloadListener = new DownloadListener4WithSpeed() {
                         @Override
                         public void taskStart(@NonNull DownloadTask task) {
-
+                            Log.i("DownloadManager", "taskStart: ");
                         }
 
                         @Override
                         public void connectStart(@NonNull DownloadTask task, int blockIndex, @NonNull Map<String, List<String>> requestHeaderFields) {
-
+                            Log.i(TAG, "connectStart: ");
                         }
 
                         @Override
                         public void connectEnd(@NonNull DownloadTask task, int blockIndex, int responseCode, @NonNull Map<String, List<String>> responseHeaderFields) {
-
+                            Log.i(TAG, "connectEnd: ");
                         }
 
                         @Override
                         public void infoReady(@NonNull DownloadTask task, @NonNull BreakpointInfo info, boolean fromBreakpoint, @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
+
                             if (task.getTag() instanceof UpdateInfo) {
                                 UpdateInfo upgradeInfo = (UpdateInfo) task.getTag();
                                 upgradeInfo.setTotalSize(info.getTotalLength());
                                 upgradeInfo.setOffsetSize(info.getTotalOffset());
                                 upgradeInfo.setDownloading(true);
+                                Log.i(TAG, "infoReady: " + upgradeInfo.getProgress());
                                 EventBus.getDefault().post(upgradeInfo);
                             }
                         }
@@ -159,6 +163,7 @@ public class DownloadManager {
 
                         @Override
                         public void progress(@NonNull DownloadTask task, long currentOffset, @NonNull SpeedCalculator taskSpeed) {
+                            Log.i(TAG, "progress: " + currentOffset);
                             if (task.getTag() instanceof UpdateInfo) {
                                 UpdateInfo upgradeInfo = (UpdateInfo) task.getTag();
                                 upgradeInfo.setSpeed(taskSpeed.speed());
@@ -170,11 +175,12 @@ public class DownloadManager {
 
                         @Override
                         public void blockEnd(@NonNull DownloadTask task, int blockIndex, BlockInfo info, @NonNull SpeedCalculator blockSpeed) {
-
+                            Log.i(TAG, "blockEnd: ");
                         }
 
                         @Override
                         public void taskEnd(@NonNull DownloadTask task, @NonNull EndCause cause, @Nullable Exception realCause, @NonNull SpeedCalculator taskSpeed) {
+                            Log.i(TAG, "taskEnd: " + cause);
                             UpdateInfo updateInfo = (UpdateInfo) task.getTag();
                             if (cause == EndCause.COMPLETED) {
                                 File file = new File(parentDir, getUpdateFileName(updateInfo));

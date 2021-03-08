@@ -33,6 +33,8 @@ public class Config {
 
     public static final String INIT_URL = getBaseUrl() + "/v1/Index/init" + isRsa();
 
+    public final static String UPDATE_URL = "http://a.6ll.com/v1/Index/aboutme" + isRsa();
+
     public final static int CLICK_LIMIT = 500;
 
     public static String isRsa() {

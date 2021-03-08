@@ -1,6 +1,7 @@
 package com.kk.securityhttp.engin;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -102,6 +103,7 @@ public abstract class BaseEngin<T> {
         } catch (Exception e) {
             String body = "{\"code\":500, \"message\":\"" + e.getMessage().replaceAll("\"", "'") + "\"}";
             resultInfo = getResultInfo(body, type);
+            Log.i("securityhttp", "post: resultInfo"+resultInfo.toString());
             LogUtil.msg("异常->" + e, LogUtil.W);
         }
         return resultInfo;

@@ -257,15 +257,14 @@ public class PersonalInfoActivity extends BaseActivity {
             onCrop(mImageUri);
         }
         if (requestCode == USE_PIC && resultCode == RESULT_OK) {
-            String path = PathUtil.getRealPathFromUri(getContext(), data.getData(), mCropIcon);
+            File file = PathUtil.copyFileToPath(getContext(), data.getData(),mFilePath+ mCropIcon);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 //如果是7.0及以上的系统使用FileProvider的方式创建一个Uri
                 mImageUri = FileProvider.getUriForFile(getContext(),
-                        getApplicationContext().getPackageName() + ".DownloadProvider",
-                        new File(path));
+                        getApplicationContext().getPackageName() + ".DownloadProvider", file);
             } else {
                 //7.0以下使用这种方式创建一个Uri
-                mImageUri = Uri.fromFile(new File(path));
+                mImageUri = Uri.fromFile(file);
             }
             onCrop(mImageUri);
         }
@@ -300,7 +299,7 @@ public class PersonalInfoActivity extends BaseActivity {
         }
         List<PersonalInfo> personalInfos = new ArrayList<>();
         personalInfos.add(new PersonalInfo("头像", "", userInfo.getFace(), 0));
-        personalInfos.add(new PersonalInfo("账号", userInfo.getAccount(), "", 1).setShowArrow(false));
+        personalInfos.add(new PersonalInfo("账号", userInfo.getMobile(), "", 1).setShowArrow(false));
         personalInfos.add(new PersonalInfo("昵称", userInfo.getName(), "", 1));
         mAdapter.setNewInstance(personalInfos);
     }
