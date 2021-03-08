@@ -14,4 +14,5 @@
     <color name="blue_no_input">#75BAFE</color>
 
     <color name="transparent">#00000000</color>
+    <color name="view_line">#EDEDED</color>
 </resources>

@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Intent;
+import android.graphics.ImageFormat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,8 +17,11 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.FAQInfo;
 import com.yc.yfiotlock.model.engin.FAQEngine;
+import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.adapters.FAQAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
+import com.yc.yfiotlock.view.widgets.NoDataView;
+import com.yc.yfiotlock.view.widgets.NoWifiView;
 
 import java.util.List;
 
@@ -51,10 +55,15 @@ public class FAQActivity extends BaseActivity {
     protected void initViews() {
         mBnbTitle.setBackListener(view -> finish());
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
-        mSrlRefresh.setOnRefreshListener(this::loadData);
+        mSrlRefresh.setOnRefreshListener(() -> {
+            p = 1;
+            loadData();
+        });
         setRvQuestion();
         loadData();
     }
+
+    private int p = 1;
 
     @Override
     protected void initVars() {
@@ -64,7 +73,7 @@ public class FAQActivity extends BaseActivity {
     private FAQEngine mFAQEngine;
 
     private void loadData() {
-        mFAQEngine.getList(0).subscribe(new Observer<ResultInfo<List<FAQInfo>>>() {
+        mFAQEngine.getList(p).subscribe(new Observer<ResultInfo<List<FAQInfo>>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);
@@ -97,6 +106,14 @@ public class FAQActivity extends BaseActivity {
         mFAQAdapter = new FAQAdapter(null);
         mRvQuestion.setAdapter(mFAQAdapter);
         mRvQuestion.setLayoutManager(new LinearLayoutManager(getContext()));
+        CommonUtils.setItemDivider(getContext(), mRvQuestion);
+        mFAQAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
+            p++;
+            loadData();
+        });
+        mFAQAdapter.setOnItemClickListener((adapter, view, position) -> {
+            FAQDetailActivity.start(getContext(), mFAQAdapter.getData().get(position));
+        });
     }
 
 
@@ -107,16 +124,34 @@ public class FAQActivity extends BaseActivity {
 
     @Override
     public void success(Object data) {
-        super.success(data);
+        List<FAQInfo> infos = ((ResultInfo<List<FAQInfo>>) data).getData();
+        if (p == 1) {
+            mFAQAdapter.setNewInstance(infos);
+        } else {
+            mFAQAdapter.addData(infos);
+        }
+        if (infos.size() < 10) {
+            mFAQAdapter.getLoadMoreModule().loadMoreEnd();
+        } else {
+            mFAQAdapter.getLoadMoreModule().loadMoreComplete();
+        }
     }
 
     @Override
     public void fail() {
-        super.fail();
+        if (mFAQAdapter.getData().size() == 0) {
+            mFAQAdapter.setEmptyView(new NoWifiView(getContext()));
+        } else {
+            mFAQAdapter.getLoadMoreModule().loadMoreFail();
+        }
     }
 
     @Override
     public void empty() {
-        super.empty();
+        if (mFAQAdapter.getData().size() == 0) {
+            mFAQAdapter.setEmptyView(new NoDataView(getContext()));
+        } else {
+            mFAQAdapter.getLoadMoreModule().loadMoreEnd();
+        }
     }
 }
