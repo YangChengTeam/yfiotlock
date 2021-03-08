@@ -40,5 +40,19 @@ public abstract class BaseExtendAdapter<T> extends BaseQuickAdapter<T, BaseViewH
             position -= getHeaderLayoutCount();
             setOnItemLongClick(viewHolder.itemView, position);
         });
+
+        if (getOnItemChildClickListener() != null) {
+            for (int id : getChildClickViewIds()
+            ) {
+                RxView.clicks(viewHolder.getView(id)).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+                    int position = viewHolder.getAdapterPosition();
+                    if (position == RecyclerView.NO_POSITION) {
+                        return;
+                    }
+                    position -= getHeaderLayoutCount();
+                    setOnItemChildClick(viewHolder.getView(id), position);
+                });
+            }
+        }
     }
 }

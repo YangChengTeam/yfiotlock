@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/tv_my_family_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="15dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="15dp"
+        android:text="@string/app_name"
+        android:textColor="#222222"
+        android:textSize="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_my_family_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:paddingBottom="6dp"
+        android:text="@string/app_name"
+        android:textColor="#999999"
+        android:textSize="13dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_my_family_name" />
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:src="@mipmap/icon_arrow"
+        app:layout_constraintBottom_toBottomOf="@id/tv_my_family_number"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_my_family_name" />
+
+    <View
+        android:id="@+id/view_line_my_family_item"
+        android:layout_width="match_parent"
+        android:layout_height="1sp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:background="#EDEDED"
+        app:layout_constraintTop_toBottomOf="@id/tv_my_family_number" />
+
+    <ImageView
+        android:id="@+id/iv_family_number_default"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:paddingStart="15dp"
+        android:src="@mipmap/sel"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view_line_my_family_item" />
+
+    <TextView
+        android:id="@+id/tv_family_number_default"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:text="默认家庭"
+        android:textColor="#ff666666"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_family_number_default"
+        app:layout_constraintLeft_toRightOf="@id/iv_family_number_default"
+        app:layout_constraintTop_toTopOf="@id/iv_family_number_default" />
+
+    <View
+        android:id="@+id/view_line_my_family"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/grayBg"
+        app:layout_constraintTop_toBottomOf="@id/iv_family_number_default" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
