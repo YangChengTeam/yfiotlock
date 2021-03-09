@@ -79,7 +79,7 @@
 -keep public class com.yc.yfiotlock.controller.activitys.** {*;}
 -keep public class com.yc.yfiotlock.views.** {*;}
 
-```````````````````````````````````Umeng
+
 -dontshrink
 -dontoptimize
 -dontwarn com.google.android.maps.**

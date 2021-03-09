@@ -68,15 +68,17 @@
             android:id="@+id/iv_loading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/lock_ble_white_circle_bg"></ImageView>
+            android:src="@mipmap/two"></ImageView>
 
         <View
+            android:id="@+id/iv_tap"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_gravity="center"
             android:background="@drawable/lock_ble_inner_circle_bg"></View>
 
         <View
+            android:id="@+id/iv_tap2"
             android:layout_width="108dp"
             android:layout_height="108dp"
             android:layout_gravity="center"

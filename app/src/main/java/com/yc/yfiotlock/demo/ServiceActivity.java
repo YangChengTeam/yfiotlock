@@ -47,7 +47,7 @@ public class ServiceActivity extends AppCompatActivity {
         setContentView(R.layout.demo_activity_service);
         serviceActivity = this;
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         BleManager.getInstance().setMtu(bleDevice, 512, new BleMtuChangedCallback() {

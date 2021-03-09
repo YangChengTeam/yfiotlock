@@ -3,6 +3,8 @@ package com.yc.yfiotlock.demo;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -22,7 +24,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleGattCallback;
+import com.clj.fastble.callback.BleIndicateCallback;
 import com.clj.fastble.callback.BleNotifyCallback;
+import com.clj.fastble.callback.BleReadCallback;
 import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
@@ -30,6 +34,7 @@ import com.clj.fastble.utils.HexUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
+import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
@@ -42,48 +47,102 @@ import static com.yc.yfiotlock.demo.MainActivity.SERVICE_UUID;
 
 public class OperationActivity extends AppCompatActivity implements View.OnClickListener {
     BleDevice bleDevice;
-    ProgressDialog progressDialog;
+    BluetoothGattService service;
+    BluetoothGattCharacteristic characteristic;
 
-    public static final String WRITE_CHARACTERISTIC_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
-    public static final String NOTIFY_CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
+    ProgressDialog progressDialog;
+    byte[] bytes = new byte[]{(byte) 0xAA, (byte) 0x00, (byte) 0x00, (byte) 0x12, (byte) 0x00, (byte) 0x0B, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x00, (byte) 0x23, (byte) 0x0B, (byte) 0xC3, (byte) 0x8B, (byte) 0xBB};
+
+    public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
+    public static final String NOTIFY_CHARACTERISTIC_UUID = "5833ff03-9b8b-5191-6142-22a4536ef123";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.demo_activity_operation);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         progressDialog = new ProgressDialog(this);
 
-        bleDevice = getIntent().getParcelableExtra("bleDevice");
+        bleDevice = ServiceActivity.getInstance().getBleDevice();;
         TextView blenameTv = findViewById(R.id.tv_blename);
         blenameTv.setText("蓝牙名称:" + bleDevice.getName());
 
+        service = CharacteristicActivity.getInstance().getService();
+        characteristic = (BluetoothGattCharacteristic)getIntent().getParcelableExtra("characteristic");
+
         TextView notifyTv = findViewById(R.id.tv_notify);
 
-        BleManager.getInstance().notify(
-                bleDevice,
-                SERVICE_UUID,
-                NOTIFY_CHARACTERISTIC_UUID,
-                new BleNotifyCallback() {
-                    @Override
-                    public void onNotifySuccess() {
-                        //Toast.makeText(OperationActivity.this, "Notify成功", Toast.LENGTH_LONG).show();
-                    }
+        int charaProp = characteristic.getProperties();
+        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+            BleManager.getInstance().read(
+                    bleDevice,
+                    service.getUuid().toString(),
+                    characteristic.getUuid().toString(),
+                    new BleReadCallback() {
+                        @Override
+                        public void onReadSuccess(byte[] data) {
+                            Toast.makeText(OperationActivity.this, "Read成功:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
+                        }
 
-                    @Override
-                    public void onNotifyFailure(BleException exception) {
-                        Toast.makeText(OperationActivity.this, "Notify失败:" + exception.getDescription(), Toast.LENGTH_LONG).show();
-                    }
+                        @Override
+                        public void onReadFailure(BleException exception) {
+                            Toast.makeText(OperationActivity.this, "Read失败:" + exception.getDescription(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }
 
-                    @Override
-                    public void onCharacteristicChanged(byte[] data) {
-                        notifyTv.setText(LockBLEUtil.toHexString(data) + "");
-                        Toast.makeText(OperationActivity.this, "Notify响应:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
-                    }
-                });
+        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0) {
 
+        }
+
+        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0) {
+
+        }
+
+        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+            BleManager.getInstance().notify(
+                    bleDevice,
+                    service.getUuid().toString(),
+                    characteristic.getUuid().toString(),
+                    new BleNotifyCallback() {
+                        @Override
+                        public void onNotifySuccess() {
+                            Toast.makeText(OperationActivity.this, "Notify成功", Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onNotifyFailure(BleException exception) {
+                            Toast.makeText(OperationActivity.this, "Notify失败:" + exception.getDescription(), Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onCharacteristicChanged(byte[] data) {
+                            Toast.makeText(OperationActivity.this, "Notify响应:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }
+        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
+            BleManager.getInstance().indicate(
+                    bleDevice,
+                    service.getUuid().toString(),
+                    characteristic.getUuid().toString(),
+                    new BleIndicateCallback() {
+                        @Override
+                        public void onIndicateSuccess() {
+                            Toast.makeText(OperationActivity.this, "Indicate成功", Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onIndicateFailure(BleException exception) {
+                            Toast.makeText(OperationActivity.this, "Indicate失败", Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onCharacteristicChanged(byte[] data) {
+                            Toast.makeText(OperationActivity.this, "Indicate响应:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }
 
         CheckBox checkBox = findViewById(R.id.ck_aes);
         checkBox.setChecked(LockBLEData.isAesData);
@@ -101,6 +160,19 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 ClipData clip = ClipData.newPlainText("ble-notify", notifyTv.getText().toString());
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(OperationActivity.this, "复制成功", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        findViewById(R.id.btn_ansy).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LockBLEData data = LockBLEPackage.getData(bytes);
+                if (data != null) {
+                    notifyTv.setText(LockBLEUtil.toHexString(new byte[]{data.getMcmd(), data.getScmd(), data.getStatus()})
+                            + "");
+                    Toast.makeText(OperationActivity.this, "解析结果:" + LockBLEUtil.toHexString(new byte[]{data.getMcmd(), data.getScmd(), data.getStatus()}), Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -110,6 +182,10 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.btn_verid).setOnClickListener(this);
         findViewById(R.id.btn_synctime).setOnClickListener(this);
         findViewById(R.id.btn_setkey).setOnClickListener(this);
+        findViewById(R.id.btn_cancel_ble).setOnClickListener(this);
+        findViewById(R.id.btn_cancel_wifi).setOnClickListener(this);
+        findViewById(R.id.btn_change_volume).setOnClickListener(this);
+
 
         findViewById(R.id.btn_open).setOnClickListener(this);
         findViewById(R.id.btn_add_pwd).setOnClickListener(this);
@@ -120,6 +196,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.btn_del_card).setOnClickListener(this);
         findViewById(R.id.btn_add_fp).setOnClickListener(this);
         findViewById(R.id.btn_mod_fp).setOnClickListener(this);
+        findViewById(R.id.btn_del_fp).setOnClickListener(this);
+        findViewById(R.id.btn_wake_up).setOnClickListener(this);
     }
 
     private void op(byte[] bytes) {
@@ -132,8 +210,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             public void onClick(DialogInterface dialog, int which) {
                 BleManager.getInstance().write(
                         bleDevice,
-                        SERVICE_UUID,
-                        WRITE_CHARACTERISTIC_UUID,
+                        service.getUuid().toString(),
+                        characteristic.getUuid().toString(),
                         bytes,
                         new BleWriteCallback() {
                             @Override
@@ -224,11 +302,11 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 layout.setOrientation(LinearLayout.VERTICAL);
 
                 final EditText ssidET = new EditText(this);
-                ssidET.setHint("输入ssid");
+                ssidET.setText("YFHome");
                 layout.addView(ssidET);
 
                 final EditText pwdEt = new EditText(this);
-                pwdEt.setHint("输入密码");
+                pwdEt.setText("YFHome168");
                 layout.addView(pwdEt);
                 dialog.setView(layout);
 
@@ -264,40 +342,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 break;
             }
             case R.id.btn_synctime: {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                dialog.setTitle("同步时间:");
-                LinearLayout layout = new LinearLayout(this);
-                layout.setOrientation(LinearLayout.VERTICAL);
-
-                final EditText timeET = new EditText(this);
-                timeET.setText("2021-02-20 15:21:20");
-                layout.addView(timeET);
-
-                dialog.setView(layout);
-                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        String time = timeET.getText().toString();
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        try {
-                            Date date = format.parse(time);
-                            byte[] bytes = LockBLESettingCmd.syncTime(OperationActivity.this, (int) (date.getTime() / 1000));
-                            op(bytes);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-                dialog.show();
+                byte[] bytes = LockBLESettingCmd.syncTime(OperationActivity.this);
+                op(bytes);
                 break;
             }
 
@@ -308,7 +354,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 layout.setOrientation(LinearLayout.VERTICAL);
 
                 final EditText keyET = new EditText(this);
-                keyET.setText("12345678");
+                keyET.setText("2345678");
                 layout.addView(keyET);
 
                 dialog.setView(layout);
@@ -324,7 +370,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         String key = keyET.getText().toString();
-                        byte[] bytes = LockBLESettingCmd.setAesKey(OperationActivity.this, key);
+                        byte[] bytes = LockBLESettingCmd.setAesKey(OperationActivity.this, key, "12345678");
                         op(bytes);
                     }
                 });
@@ -333,9 +379,53 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 break;
             }
 
+            case R.id.btn_cancel_wifi: {
+                byte[] bytes = LockBLESettingCmd.cancelWifi(OperationActivity.this);
+                op(bytes);
+                break;
+            }
+
+            case R.id.btn_cancel_ble: {
+                byte[] bytes = LockBLESettingCmd.cancelBle(OperationActivity.this);
+                op(bytes);
+                break;
+            }
+
             case R.id.btn_open: {
                 byte[] bytes = LockBLEOpCmd.open(OperationActivity.this);
                 op(bytes);
+                break;
+            }
+
+            case R.id.btn_change_volume: {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setTitle("设置音量:");
+                LinearLayout layout = new LinearLayout(this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText volumeET = new EditText(this);
+                volumeET.setText("1");
+                layout.addView(volumeET);
+
+                dialog.setView(layout);
+                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        String volume = volumeET.getText().toString();
+                        byte[] bytes = LockBLESettingCmd.changeVolume(OperationActivity.this, Integer.valueOf(volume));
+                        op(bytes);
+                    }
+                });
+
+                dialog.show();
                 break;
             }
 
@@ -367,7 +457,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         dialog.dismiss();
                         String type = typeET.getText().toString();
                         String pwd = pwdEt.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.addPwd(OperationActivity.this, Byte.valueOf(type), pwd);
+                        byte[] bytes = LockBLEOpCmd.addPwd(OperationActivity.this, Byte.valueOf(type), "00000001", pwd, new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
                         op(bytes);
                     }
                 });
@@ -382,21 +472,20 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
-                final EditText pwdEt = new EditText(this);
-                pwdEt.setText("123456");
-                layout.addView(pwdEt);
-
-                final EditText idET = new EditText(this);
-                idET.setText("1");
-                layout.addView(idET);
 
                 final EditText typeET = new EditText(this);
                 typeET.setText("0");
                 layout.addView(typeET);
 
+                final EditText idET = new EditText(this);
+                idET.setText("1");
+                layout.addView(idET);
+
+                final EditText pwdEt = new EditText(this);
+                pwdEt.setText("123456");
+                layout.addView(pwdEt);
+
                 dialog.setView(layout);
-
-
                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -411,7 +500,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         String pwd = pwdEt.getText().toString();
                         String id = idET.getText().toString();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.modPwd(OperationActivity.this, Byte.valueOf(id), Byte.valueOf(type), pwd);
+                        byte[] bytes = LockBLEOpCmd.modPwd(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id), pwd, new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
                         op(bytes);
                     }
                 });
@@ -426,13 +515,13 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
-                final EditText idET = new EditText(this);
-                idET.setText("1");
-                layout.addView(idET);
-
                 final EditText typeET = new EditText(this);
                 typeET.setText("0");
                 layout.addView(typeET);
+
+                final EditText idET = new EditText(this);
+                idET.setText("1");
+                layout.addView(idET);
 
                 dialog.setView(layout);
 
@@ -450,7 +539,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         dialog.dismiss();
                         String id = idET.getText().toString();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.delPwd(OperationActivity.this, Byte.valueOf(id), Byte.valueOf(type));
+                        byte[] bytes = LockBLEOpCmd.delPwd(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id));
                         op(bytes);
                     }
                 });
@@ -484,7 +573,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.addCard(OperationActivity.this, Byte.valueOf(type));
+                        byte[] bytes = LockBLEOpCmd.addCard(OperationActivity.this, Byte.valueOf(type), "00000001");
                         op(bytes);
                     }
                 });
@@ -499,13 +588,13 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
-                final EditText idET = new EditText(this);
-                idET.setText("1");
-                layout.addView(idET);
-
                 final EditText typeET = new EditText(this);
                 typeET.setText("0");
                 layout.addView(typeET);
+
+                final EditText idET = new EditText(this);
+                idET.setText("1");
+                layout.addView(idET);
 
                 dialog.setView(layout);
 
@@ -523,7 +612,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         dialog.dismiss();
                         String id = idET.getText().toString();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.modCard(OperationActivity.this, Byte.valueOf(id), Byte.valueOf(type));
+                        byte[] bytes = LockBLEOpCmd.modCard(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id));
                         op(bytes);
                     }
                 });
@@ -538,13 +627,13 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
-                final EditText idET = new EditText(this);
-                idET.setText("1");
-                layout.addView(idET);
-
                 final EditText typeET = new EditText(this);
                 typeET.setText("0");
                 layout.addView(typeET);
+
+                final EditText idET = new EditText(this);
+                idET.setText("1");
+                layout.addView(idET);
 
                 dialog.setView(layout);
 
@@ -562,7 +651,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         dialog.dismiss();
                         String id = idET.getText().toString();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.delCard(OperationActivity.this, Byte.valueOf(id), Byte.valueOf(type));
+                        byte[] bytes = LockBLEOpCmd.delCard(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id));
                         op(bytes);
                     }
                 });
@@ -597,7 +686,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.addFingerprint(OperationActivity.this, Byte.valueOf(type));
+                        byte[] bytes = LockBLEOpCmd.addFingerprint(OperationActivity.this, Byte.valueOf(type), "00000001");
                         op(bytes);
                     }
                 });
@@ -612,13 +701,13 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
-                final EditText idET = new EditText(this);
-                idET.setText("1");
-                layout.addView(idET);
-
                 final EditText typeET = new EditText(this);
                 typeET.setText("0");
                 layout.addView(typeET);
+
+                final EditText idET = new EditText(this);
+                idET.setText("1");
+                layout.addView(idET);
 
                 dialog.setView(layout);
 
@@ -635,12 +724,57 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         dialog.dismiss();
                         String id = idET.getText().toString();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.modFingerprint(OperationActivity.this, Byte.valueOf(id), Byte.valueOf(type));
+                        byte[] bytes = LockBLEOpCmd.modFingerprint(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id));
                         op(bytes);
                     }
                 });
 
                 dialog.show();
+                break;
+            }
+
+            case R.id.btn_del_fp: {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setTitle("删除指纹:");
+                LinearLayout layout = new LinearLayout(this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText typeET = new EditText(this);
+                typeET.setText("0");
+                layout.addView(typeET);
+
+                final EditText idET = new EditText(this);
+                idET.setText("1");
+                layout.addView(idET);
+
+                dialog.setView(layout);
+
+
+                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        String id = idET.getText().toString();
+                        String type = typeET.getText().toString();
+                        byte[] bytes = LockBLEOpCmd.delFingerprint(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id));
+                        op(bytes);
+                    }
+                });
+
+                dialog.show();
+                break;
+            }
+
+            case R.id.btn_wake_up: {
+                byte[] bytes = LockBLEOpCmd.wakeup(OperationActivity.this);
+                op(bytes);
                 break;
             }
         }
