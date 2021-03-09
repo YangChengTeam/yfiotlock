@@ -2,6 +2,7 @@ package com.yc.yfiotlock.compat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -19,18 +20,21 @@ public class ToastCompat {
     private static Field sField_TN_Handler;
 
     static {
-        try {
-            sField_TN = Toast.class.getDeclaredField("mTN");
-            sField_TN.setAccessible(true);
-            sField_TN_Handler = sField_TN.getType().getDeclaredField("mHandler");
-            sField_TN_Handler.setAccessible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.i("aaaa", "static initializer: "+e);
+        if (Build.VERSION.SDK_INT <= 24) {
+            try {
+                sField_TN = Toast.class.getDeclaredField("mTN");
+                sField_TN.setAccessible(true);
+                sField_TN_Handler = sField_TN.getType().getDeclaredField("mHandler");
+                sField_TN_Handler.setAccessible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("aaaa", "static initializer: " + e);
+            }
         }
     }
 
     private static void hook(Toast toast) {
+        if (Build.VERSION.SDK_INT > 24) return;
         try {
             Object tn = sField_TN.get(toast);
             Handler preHandler = (Handler) sField_TN_Handler.get(tn);
