@@ -75,7 +75,7 @@ public class MyFragment extends BaseFragment {
                 .error(R.mipmap.head_default)
                 .circleCrop()
                 .into(mIvFace);
-        mTvUserName.setText(userInfo.getName());
+        mTvUserName.setText(userInfo.getNickName());
         mTvDeviceNumber.setText(userInfo.getDeviceNumber().concat("个智能设备"));
     }
 

@@ -36,6 +36,7 @@ import com.yc.yfiotlock.model.bean.user.PersonalInfo;
 import com.yc.yfiotlock.model.bean.user.PicInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.UploadFileEngine;
+import com.yc.yfiotlock.model.engin.UserEngine;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.PathUtil;
 import com.yc.yfiotlock.utils.PictureUtils;
@@ -57,6 +58,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import rx.Observable;
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -254,6 +256,7 @@ public class PersonalInfoActivity extends BaseActivity {
     protected void initVars() {
         super.initVars();
         mUploadFileEngine = new UploadFileEngine();
+        mUserEngine = new UserEngine(getContext());
     }
 
     private UploadFileEngine mUploadFileEngine;
@@ -268,7 +271,7 @@ public class PersonalInfoActivity extends BaseActivity {
      * 压缩完成后上传
      */
     private void upLoadUserIcon(File file) {
-        mLoadingDialog.show("上传中...");
+        mLoadingDialog.show("上传头像中...");
         mUploadFileEngine.uploadWithFile(Config.UPLOAD_PIC_URL, new HashMap<>(), "file", file, new Callback<String>() {
                     @Override
                     public void onSuccess(String resultInfo) {
@@ -277,13 +280,9 @@ public class PersonalInfoActivity extends BaseActivity {
                             }.getType());
                             if (info.getCode() == 1) {
                                 Log.i("aaaa", "onSuccess: " + info.getData().getPath());
-                                PersonalInfo personalInfo = mAdapter.getData().get(0);
-                                personalInfo.setImg(info.getData().getUrl());
-                                mAdapter.setData(0, personalInfo);
-                                mAdapter.notifyItemChanged(0);
-                                mLoadingDialog.dismiss();
-                            }else {
-                                ToastCompat.show(getContext(),info.getMsg());
+                                changeUserFace(info.getData().getUrl(), info.getData().getPath());
+                            } else {
+                                ToastCompat.show(getContext(), info.getMsg());
                             }
                         } catch (Exception e) {
                             this.onFailure(new Response("" + e));
@@ -298,6 +297,37 @@ public class PersonalInfoActivity extends BaseActivity {
                     }
                 }
         );
+    }
+
+    private UserEngine mUserEngine;
+
+    private void changeUserFace(String face, String faceNoHost) {
+        mLoadingDialog.show("提交中...");
+        mUserEngine.changeFace(faceNoHost).subscribe(new Observer<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onNext(ResultInfo<String> info) {
+                if (info != null && info.getCode() == 1) {
+                    UserInfo userInfo = UserInfoCache.getUserInfo();
+                    userInfo.setFace(face);
+                    UserInfoCache.setUserInfo(userInfo);
+                    EventBus.getDefault().post(userInfo);
+                    ToastCompat.showCenter(getContext(), "修改成功");
+                } else {
+                    ToastCompat.showCenter(getContext(), info == null ? "修改失败" : info.getMsg());
+                }
+
+            }
+        });
     }
 
     @Override
@@ -350,7 +380,7 @@ public class PersonalInfoActivity extends BaseActivity {
         List<PersonalInfo> personalInfos = new ArrayList<>();
         personalInfos.add(new PersonalInfo("头像", "", userInfo.getFace(), 0));
         personalInfos.add(new PersonalInfo("账号", userInfo.getMobile(), "", 1).setShowArrow(false));
-        personalInfos.add(new PersonalInfo("昵称", userInfo.getName(), "", 1));
+        personalInfos.add(new PersonalInfo("昵称", userInfo.getNickName(), "", 1));
         mAdapter.setNewInstance(personalInfos);
     }
 
@@ -377,5 +407,12 @@ public class PersonalInfoActivity extends BaseActivity {
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.colorAccent));
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mUserEngine != null) mUserEngine.cancel();
+        if (mUploadFileEngine != null) mUploadFileEngine.cancel();
     }
 }

@@ -106,7 +106,6 @@ public class AboutUsActivity extends BaseActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "数据获取失败");
             }
 
             @Override

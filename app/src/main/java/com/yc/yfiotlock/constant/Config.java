@@ -42,6 +42,11 @@ public class Config {
     //反馈 建议
     public static final String FEEDBACK_SUGGEST_URL = getBaseUrl() + "/userapp/v1.Feedback/feedbackAdd" + isRsa();
 
+    //用户信息更改
+    public static final String USER_NAME_UPD_URL = getBaseUrl() + "/userapp/v1.User/nicknameUpd" + isRsa();
+    public static final String USER_FACE_UPD_URL = getBaseUrl() + "/userapp/v1.User/faceUpd" + isRsa();
+
+
     public static final int CLICK_LIMIT = 500;
 
     public static String isRsa() {
