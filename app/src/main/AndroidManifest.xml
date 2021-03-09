@@ -31,6 +31,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="uoKAxhRzWoIE8yW6MPErz3VkM4Q3uVyr" />
         <activity android:name=".controller.activitys.lock.ble.FAQDetailActivity" />
         <activity
             android:name=".controller.activitys.lock.ble.FeedBackActivity"
