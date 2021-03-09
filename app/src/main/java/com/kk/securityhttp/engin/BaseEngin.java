@@ -40,7 +40,7 @@ public abstract class BaseEngin<T> {
     }
 
     public Context getContext() {
-        if(mContext != null){
+        if (mContext != null) {
             return mContext.get();
         }
         return null;
@@ -99,11 +99,12 @@ public abstract class BaseEngin<T> {
         T resultInfo = null;
         try {
             Response response = OKHttpRequest.getImpl().post(getUrl() + "&key=" + key, params, headers, isrsa, iszip, isEncryptResponse);
+           // Log.i("securityhttp", "response body:--------> " + response.body);
             resultInfo = getResultInfo(response.body, type);
         } catch (Exception e) {
+            Log.i("securityhttp", "Exception: " + e.getMessage());
             String body = "{\"code\":500, \"message\":\"" + e.getMessage().replaceAll("\"", "'") + "\"}";
             resultInfo = getResultInfo(body, type);
-            Log.i("securityhttp", "post: resultInfo"+resultInfo.toString());
             LogUtil.msg("异常->" + e, LogUtil.W);
         }
         return resultInfo;

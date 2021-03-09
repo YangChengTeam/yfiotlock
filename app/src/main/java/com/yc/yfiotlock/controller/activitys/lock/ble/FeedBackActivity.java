@@ -77,6 +77,7 @@ public class FeedBackActivity extends BaseActivity {
     FeedBackAdapter mFeedBackAdapter;
 
     private void setRvPic() {
+        mBnbTitle.setBackListener(view -> finish());
         mFeedBackAdapter = new FeedBackAdapter(null);
         mRvPic.setAdapter(mFeedBackAdapter);
         mRvPic.setLayoutManager(new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false));

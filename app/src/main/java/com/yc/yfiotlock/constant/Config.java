@@ -39,10 +39,13 @@ public class Config {
     //上传图片
     public static final String UPLOAD_PIC_URL = getBaseUrl() + "/userapp/v1.User/uploads" + "?rea=5";
 
+    //反馈 建议
+    public static final String FEEDBACK_SUGGEST_URL = getBaseUrl() + "/userapp/v1.Feedback/feedbackAdd" + isRsa();
+
     public static final int CLICK_LIMIT = 500;
 
     public static String isRsa() {
-        return "?rsa=" + (RESQUEST_FLAG ? 1 : 0);
+        return RESQUEST_FLAG ? "" : "?rea=5";
     }
 
     public static String getBaseUrl() {
