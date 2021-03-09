@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.kk.securityhttp.domain.GoagalInfo;
 
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.builder.PostFormBuilder;
@@ -16,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
+import okhttp3.Response;
+
 public class UploadFileEngine {
 
     private RequestCall mRequestCall;
@@ -25,14 +29,15 @@ public class UploadFileEngine {
         mRequestCall.execute(callback);
     }
 
-    public void uploadWithFile(String url, Map<String, String> params, String name, File file, Callback callback) {
-        String fileName = "gb" + System.currentTimeMillis() + "-" + (int) (Math.random() * 10000);
+    public void uploadWithFile(String url, Map<String, String> params, String name, File file,
+                               com.kk.securityhttp.listeners.Callback<String> callback) {
+        String fileName = "pic" + System.currentTimeMillis() + "-" + (int) (Math.random() * 10000);
         if (name.equals("face")) {
             fileName = fileName.concat(".jpg");
         } else if (name.equals("game")) {
             fileName = fileName.concat(".apk");
         } else {
-            fileName = fileName.concat("a.png");
+            fileName = fileName.concat(".png");
         }
         //设置http默认参数
         String agent_id = "1";
@@ -40,6 +45,9 @@ public class UploadFileEngine {
             params.put("from_id", GoagalInfo.get().channelInfo.from_id + "");
             params.put("author", GoagalInfo.get().channelInfo.author + "");
             agent_id = GoagalInfo.get().channelInfo.agent_id;
+        }
+        if (App.isLogin()) {
+            params.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         params.put("agent_id", agent_id);
         params.put("ts", System.currentTimeMillis() + "");
@@ -53,15 +61,38 @@ public class UploadFileEngine {
         if (GoagalInfo.get().getPackageInfo() != null) {
             params.put("app_version", GoagalInfo.get().getPackageInfo().versionCode + "");
         }
-        String paramString = "{";
+        StringBuilder paramString = new StringBuilder("{");
         for (String s : params.keySet()) {
-            paramString += "\"" + s + "\":" + "\"" + params.get(s) + "\",";
+            paramString.append("\"").append(s).append("\":").append("\"").append(params.get(s)).append("\",");
         }
-        paramString += "}";
-        Log.i("securityhttp", "UploadWithFile:请求地址 :" + url);
-        Log.i("securityhttp", "UploadWithFile:请求参数 :" + paramString + "\nfilePath:" + file.getAbsolutePath() + "\nSize:" + file.length());
+        paramString.append("}");
+        Log.i("securityhttp", "UploadWithFile:请求地址 ------>" + url);
+        Log.i("securityhttp", "UploadWithFile:请求参数 ------>" + paramString.toString() +
+                "\n本地绝对路径:" + file.getAbsolutePath() + "\n大小:" + file.length() / 1024 + "kb");
         mRequestCall = OkHttpUtils.post().params(params).addFile(name, fileName, file).url(url).build();
-        mRequestCall.execute(callback);
+        mRequestCall.execute(new Callback() {
+            @Override
+            public Object parseNetworkResponse(Response response, int id) throws Exception {
+                String s = response.body().string();
+                Log.i("securityhttp", "UploadWithFile:返回数据------> " + s);
+                return s;
+            }
+
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                if (callback != null) {
+                    callback.onFailure(new com.kk.securityhttp.net.entry.Response(e + ""));
+                }
+            }
+
+            @Override
+            public void onResponse(Object response, int id) {
+                if (callback != null) {
+                    callback.onSuccess(response.toString());
+                }
+                file.delete();
+            }
+        });
     }
 
     public void uploadBg(String url, Map<String, String> params, String name, File file, Callback callback) {
@@ -142,7 +173,6 @@ public class UploadFileEngine {
         mRequestCall = formBuilder.url(url).build();
         mRequestCall.execute(callback);
     }
-
 
 
 }

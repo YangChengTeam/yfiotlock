@@ -6,7 +6,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.engin.BaseEngin;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.model.bean.UpgradeInfo;
+import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 
 import rx.Observable;
 

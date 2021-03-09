@@ -1,4 +1,4 @@
-package com.yc.yfiotlock.model.bean;
+package com.yc.yfiotlock.model.bean.user;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

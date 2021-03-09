@@ -1,4 +1,4 @@
-package com.yc.yfiotlock.model.bean;
+package com.yc.yfiotlock.model.bean.user;
 
 /*
  * Created by　Dullyoung on 2021/3/8

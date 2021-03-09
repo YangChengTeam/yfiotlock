@@ -1,20 +1,17 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
-import android.os.Bundle;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class EditNameActivity extends BaseActivity {

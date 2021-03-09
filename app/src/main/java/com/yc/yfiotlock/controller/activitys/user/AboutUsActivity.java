@@ -1,7 +1,5 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
-import android.os.Bundle;
-import android.util.Log;
 import android.widget.LinearLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,10 +13,9 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
 import com.yc.yfiotlock.download.DownloadManager;
-import com.yc.yfiotlock.download.DownloadUtils;
-import com.yc.yfiotlock.model.bean.AboutInfo;
-import com.yc.yfiotlock.model.bean.UpdateInfo;
-import com.yc.yfiotlock.model.bean.UpgradeInfo;
+import com.yc.yfiotlock.model.bean.user.AboutInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.adapters.AboutAdapter;
@@ -29,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observer;
 

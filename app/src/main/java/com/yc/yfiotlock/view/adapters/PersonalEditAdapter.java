@@ -4,12 +4,11 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
-import com.yc.yfiotlock.model.bean.PersonalInfo;
+import com.yc.yfiotlock.model.bean.user.PersonalInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.jetbrains.annotations.NotNull;

@@ -28,6 +28,16 @@ public class CacheUtils {
         return null;
     }
 
+    public static long getSendCodeTime(String key) {
+        int sv = GoagalInfo.get().getPackageInfo().versionCode;
+        return MMKV.defaultMMKV().getLong(key + sv, 0L);
+    }
+
+    public static void setSendCodeTime(String key, long time) {
+        int sv = GoagalInfo.get().getPackageInfo().versionCode;
+        MMKV.defaultMMKV().putLong(key + sv, time);
+    }
+
     private static <T> T getResultInfo(String body, Type type) {
         T resultInfo = null;
         try {

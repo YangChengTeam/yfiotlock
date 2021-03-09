@@ -1,16 +1,12 @@
 package com.yc.yfiotlock.controller.activitys.base;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.os.Bundle;
 
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.download.DownloadManager;
-import com.yc.yfiotlock.model.bean.PhoneTokenInfo;
+import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
 
 import org.greenrobot.eventbus.Subscribe;

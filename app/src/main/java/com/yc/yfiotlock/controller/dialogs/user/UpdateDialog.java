@@ -11,7 +11,7 @@ import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.dialogs.BaseDialog;
 import com.yc.yfiotlock.download.DownloadManager;
-import com.yc.yfiotlock.model.bean.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;

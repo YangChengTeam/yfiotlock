@@ -11,10 +11,12 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.user.LoginDialog;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.LoginEngin;
+import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
@@ -68,6 +70,7 @@ public class LoginActivity extends BaseActivity {
                 }
             }
         });
+        mTvGetCode.setClickable(false);
     }
 
 
@@ -103,15 +106,23 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mLoginEngin = new LoginEngin(getContext());
+    }
+
     LoginDialog mLoginDialog;
+    LoginEngin mLoginEngin;
+
 
     public void sendSmsCode() {
         if (mLoginDialog == null) {
             mLoginDialog = new LoginDialog(this);
             mLoginDialog.setLoginResult(new LoginDialog.LoginResult() {
                 @Override
-                public void onSuccess() {
-                    finish();
+                public void onSuccess(String code, String phone) {
+                    onSmsCodeLogin(code, phone);
                 }
 
                 @Override
@@ -120,16 +131,22 @@ public class LoginActivity extends BaseActivity {
                 }
             });
         }
-        LoginEngin engin = new LoginEngin(getContext());
-        engin.sendSmsCode(mEtPhone.getText().toString()).subscribe(new Observer<ResultInfo<String>>() {
+
+        long lastTime = CacheUtils.getSendCodeTime(Config.LOGIN_SEND_CODE_URL + mEtPhone.getText().toString());
+        if (System.currentTimeMillis() - lastTime < 60000) {
+            mLoginDialog.show(mEtPhone.getText().toString());
+            return;
+        }
+        mLoadingDialog.show("发送中...");
+        mLoginEngin.sendSmsCode(mEtPhone.getText().toString()).subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
-
+                mLoadingDialog.dismiss();
             }
 
             @Override
             public void onError(Throwable e) {
-
+                mLoadingDialog.dismiss();
             }
 
             @Override
@@ -139,30 +156,44 @@ public class LoginActivity extends BaseActivity {
                     mLoginDialog.setSendSmsCodeCache();
                 } else {
                     ToastCompat.showCenter(getContext(), info == null ? "验证码发送失败" : info.getMsg());
-                    setLocalInfo();
+                }
+            }
+        });
+    }
+
+    private void onSmsCodeLogin(String code, String phone) {
+
+        mLoadingDialog.show("登陆中...");
+        mLoginEngin.smsCodeLogin(phone, code).subscribe(new Observer<ResultInfo<UserInfo>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), e.getMessage());
+            }
+
+            @Override
+            public void onNext(ResultInfo<UserInfo> info) {
+                if (info != null && info.getCode() == 1) {
+                    UserInfoCache.setUserInfo(info.getData());
+                    EventBus.getDefault().post(info.getData());
+                } else {
+                    ToastCompat.show(getContext(), info == null ? "登陆失败" : info.getMsg());
                 }
             }
         });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLogin(UserInfo userInfo){
-        if (App.isLogin()){
+    public void onLogin(UserInfo userInfo) {
+        if (App.isLogin()) {
+            startActivity(new Intent(this, MainActivity.class));
             finish();
         }
-    }
-
-    private void setLocalInfo() {
-        UserInfo userInfo = new UserInfo();
-        userInfo.setName("阿彪66666");
-        userInfo.setNickName("阿彪6啊");
-        userInfo.setDeviceNumber("88");
-        userInfo.setFace("http://p.6ll.com/Upload/Picture/face/2021/601cbd15d323a.jpg");
-
-        UserInfoCache.setUserInfo(userInfo);
-        EventBus.getDefault().post(userInfo);
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
     }
 
 }

@@ -16,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.kk.securityhttp.utils.LogUtil;
-import com.kk.securityhttp.utils.PathUtil;
 import com.kk.securityhttp.utils.VUiKit;
 import com.liulishuo.okdownload.DownloadTask;
 import com.liulishuo.okdownload.OkDownload;
@@ -34,7 +33,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
-import com.yc.yfiotlock.model.bean.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
 
 import org.greenrobot.eventbus.EventBus;

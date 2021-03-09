@@ -38,12 +38,12 @@ public class App extends Application {
         initCommonConfig();
     }
 
-    private void initCommonConfig(){
+    private void initCommonConfig() {
         LoadMoreModuleConfig.setDefLoadMoreView(new CustomLoadMoreView());
         Reflection.unseal(this);
     }
 
-    private void initHttp(){
+    private void initHttp() {
         GoagalInfo.get().init(getApplicationContext());
         HttpConfig.setPublickey(Config.PUBLIC_KEY);
         String agent_id = "1";

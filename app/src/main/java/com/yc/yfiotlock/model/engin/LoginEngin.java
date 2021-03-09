@@ -7,7 +7,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.engin.BaseEngin;
 import com.kk.securityhttp.engin.HttpCoreEngin;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 
 import java.util.HashMap;
 import java.util.Map;
