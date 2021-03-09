@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
-                .setServiceUuids(new UUID[]{UUID.fromString(SERVICE_UUID)})
+                .setServiceUuids(new UUID[]{ UUID.fromString(SERVICE_UUID)})
                 .setScanTimeOut(10000);
 
         EditText nameEt = findViewById(R.id.et_name);
@@ -159,13 +159,8 @@ public class MainActivity extends AppCompatActivity {
                 startScan();
             }
         });
-        fab2 = findViewById(R.id.fab2);
-        fab2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, VisitorManageActivity.class));
-            }
-        });
+
+
 
         listView = findViewById(R.id.rv_devices);
         mDeviceAdapter = new DeviceAdapter(this);
@@ -201,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        scan();
 
     }
 

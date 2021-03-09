@@ -67,6 +67,11 @@ android {
     lintOptions {
         checkReleaseBuilds false
     }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
+    }
 }
 
 dependencies {

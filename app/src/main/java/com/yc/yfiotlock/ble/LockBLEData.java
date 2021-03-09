@@ -2,6 +2,8 @@ package com.yc.yfiotlock.ble;
 
 import android.content.Context;
 
+import com.kk.utils.LogUtil;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -10,7 +12,25 @@ public class LockBLEData {
 
     private byte mcmd;
     private byte scmd;
+    private byte status;
+
     private String body;
+
+    public byte getMcmd() {
+        return mcmd;
+    }
+
+    public byte getScmd() {
+        return scmd;
+    }
+
+    public byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(byte status) {
+        this.status = status;
+    }
 
     public void setMcmd(byte mcmd) {
         this.mcmd = mcmd;
@@ -33,14 +53,19 @@ public class LockBLEData {
             length += data.length;
         }
 
-        int seq = (int) (System.currentTimeMillis() / 1000);
+        int seq = (int) (0x01000000);
 
+        // LENGTH = 2 Seq = 4 MCMD = 1 SCMD = 1
         int precrcLen = 2 + 4 + 1 + 1;
+
+        // CRC16 = 2
+        length += precrcLen + 2;
+
         int len = precrcLen;
         byte[] bytes;
         if (data != null) {
             len += data.length;
-            ByteBuffer byteBuffer = ByteBuffer.allocate(len).order(ByteOrder.LITTLE_ENDIAN);
+            ByteBuffer byteBuffer = ByteBuffer.allocate(len).order(ByteOrder.BIG_ENDIAN);
             bytes = byteBuffer.putShort(length)
                     .putInt(seq)
                     .put(mcmd)
@@ -48,7 +73,7 @@ public class LockBLEData {
                     .put(data)
                     .array();
         } else {
-            ByteBuffer byteBuffer = ByteBuffer.allocate(len).order(ByteOrder.LITTLE_ENDIAN);
+            ByteBuffer byteBuffer = ByteBuffer.allocate(len).order(ByteOrder.BIG_ENDIAN);
             bytes = byteBuffer.putShort(length)
                     .putInt(seq)
                     .put(mcmd)
@@ -56,8 +81,11 @@ public class LockBLEData {
                     .array();
         }
 
-        short crc16 = (short) LockBLEUtil.crc16(bytes, len);
-        ByteBuffer packageBuffer = ByteBuffer.allocate(len + 2).order(ByteOrder.LITTLE_ENDIAN);
+        LogUtil.msg("--------------------" +  LockBLEUtil.toHexString(bytes));
+        short crc16 = (short) LockBLEUtil.crc16(bytes);
+
+        // CRC16 = 2
+        ByteBuffer packageBuffer = ByteBuffer.allocate(len + 2).order(ByteOrder.BIG_ENDIAN);
         byte[] dataBytes = packageBuffer
                 .put(bytes)
                 .putShort(crc16)

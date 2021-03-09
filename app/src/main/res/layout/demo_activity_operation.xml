@@ -53,6 +53,12 @@
             android:layout_height="44dp"
             android:text="复制数据"></androidx.appcompat.widget.AppCompatButton>
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_ansy"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:text="解析数据"></androidx.appcompat.widget.AppCompatButton>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -104,6 +110,27 @@
             android:layout_height="44dp"
             android:layout_marginTop="10dp"
             android:text="设置AES密钥"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_cancel_wifi"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="取消WIFI配网"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_change_volume"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="设置音量"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_cancel_ble"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="取消蓝牙绑定"></androidx.appcompat.widget.AppCompatButton>
 
         <TextView
             android:layout_width="match_parent"
@@ -178,5 +205,19 @@
             android:layout_height="44dp"
             android:layout_marginTop="10dp"
             android:text="修改指纹"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_del_fp"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="删除指纹"></androidx.appcompat.widget.AppCompatButton>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_wake_up"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="唤醒门锁"></androidx.appcompat.widget.AppCompatButton>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

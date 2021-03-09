@@ -19,6 +19,10 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" /> <!-- 切换网络通道 -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
+    <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -55,7 +59,6 @@
             android:name=".controller.activitys.user.MainActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
             android:launchMode="singleTask" />
-        <activity android:name=".demo.MainActivity" />
         <activity
             android:name=".controller.activitys.lock.ble.AddDeviceActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
