@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -20,8 +21,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.ScreenUtil;
@@ -34,8 +35,9 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
-import com.yc.yfiotlock.model.bean.PhoneTokenInfo;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.view.widgets.MyItemDivider;
 
@@ -142,6 +144,7 @@ public class CommonUtils {
     }
 
     public static void startLogin(Context context) {
+        context.startActivity(new Intent(context, LoginActivity.class));
         PhoneNumberAuthHelper phoneNumberAuthHelper = PhoneNumberAuthHelper.getInstance(context, new TokenResultListener() {
             @Override
             public void onTokenSuccess(String s) {
@@ -168,7 +171,6 @@ public class CommonUtils {
             @Override
             public void onTokenFailed(String s) {
                 Log.i("aaaa", "onTokenFailed: " + s);
-                context.startActivity(new Intent(context, LoginActivity.class));
                 PhoneTokenInfo phoneTokenInfo = new PhoneTokenInfo();
                 phoneTokenInfo.setCode("600001");
                 EventBus.getDefault().post(phoneTokenInfo);
@@ -176,6 +178,7 @@ public class CommonUtils {
         });
 
         phoneNumberAuthHelper.setAuthSDKInfo(Config.ALI_PHONE_SDK_APPID);
+        phoneNumberAuthHelper.getReporter().setLoggerEnable(true);
         phoneNumberAuthHelper.checkEnvAvailable(2);
     }
 
@@ -214,6 +217,7 @@ public class CommonUtils {
         });
 
         phoneNumberAuthHelper.setAuthSDKInfo(Config.ALI_PHONE_SDK_APPID);
+        phoneNumberAuthHelper.getReporter().setLoggerEnable(true);
         phoneNumberAuthHelper.checkEnvAvailable(2);
     }
 
@@ -223,16 +227,20 @@ public class CommonUtils {
             @Override
             public void onCompleted() {
                 PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
-
+                PhoneNumberAuthHelper.getInstance(context, listener).quitLoginPage();
+                PhoneNumberAuthHelper.getInstance(context, listener).setAuthListener(null);
             }
 
             @Override
             public void onError(Throwable e) {
                 PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
+                ToastCompat.show(context,e+"");
+                Log.i("aaaa", "onError: "+e);
             }
 
             @Override
             public void onNext(ResultInfo<UserInfo> info) {
+                Log.i("aaaa", "onNext: "+info);
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
                     UserInfoCache.setUserInfo(info.getData());
                     EventBus.getDefault().post(info.getData());
@@ -312,5 +320,23 @@ public class CommonUtils {
         helper.getLoginToken(context, 3000);
     }
 
+    public static UpdateInfo getNeedUpgradeInfo(UpdateInfo updateInfo) {
+
+        if (updateInfo == null) {
+            return null;
+        }
+
+        PackageInfo packageInfo = GoagalInfo.get().getPackageInfo();
+        int versionCode = 0;
+        if (packageInfo != null) {
+            versionCode = packageInfo.versionCode;
+        }
+
+        if (versionCode != 0 && updateInfo.getVersionCode() > versionCode) {
+            return updateInfo;
+        }
+
+        return null;
+    }
 
 }

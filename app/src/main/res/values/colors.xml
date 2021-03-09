@@ -11,7 +11,10 @@
     <color name="blue_2F90F7">#2F90F7</color>
     <color name="blue_3091F8">#3091F8</color>
     <color name="pressedColor">#55ffffff</color>
+    <color name="color_start">#34A2FF</color>
+    <color name="color_end">#338DFC</color>
     <color name="blue_no_input">#75BAFE</color>
 
     <color name="transparent">#00000000</color>
+    <color name="view_line">#EDEDED</color>
 </resources>

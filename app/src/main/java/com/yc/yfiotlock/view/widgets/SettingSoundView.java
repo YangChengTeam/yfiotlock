@@ -45,16 +45,16 @@ public class SettingSoundView extends BaseView {
         onSelect(0);
     }
 
-    @OnClick({R.id.tv_low, R.id.tv_mid, R.id.tv_high})
+    @OnClick({R.id.ll_low, R.id.ll_mid, R.id.ll_high})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.tv_low:
+            case R.id.ll_low:
                 onSelect(0);
                 break;
-            case R.id.tv_mid:
+            case R.id.ll_mid:
                 onSelect(1);
                 break;
-            case R.id.tv_high:
+            case R.id.ll_high:
                 onSelect(2);
                 break;
         }

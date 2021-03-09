@@ -1,6 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
-import android.os.Bundle;
+import android.graphics.Color;
 import android.widget.LinearLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,20 +8,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.GoagalInfo;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.AboutInfo;
+import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
+import com.yc.yfiotlock.download.DownloadManager;
+import com.yc.yfiotlock.model.bean.user.AboutInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
+import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.adapters.AboutAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observer;
 
 public class AboutUsActivity extends BaseActivity {
     @BindView(R.id.bnb_title)
@@ -40,6 +47,7 @@ public class AboutUsActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
+        DownloadManager.setContext(new WeakReference<>(this));
         mBnbTitle.setBackListener(view -> finish());
         setRvAbout();
     }
@@ -61,7 +69,6 @@ public class AboutUsActivity extends BaseActivity {
                     CommonUtils.copyWithToast(getContext(), aboutInfo.getValue(), "邮箱已复制");
                     break;
                 case 3:
-                    checkVersion();
                     break;
             }
         });
@@ -80,12 +87,61 @@ public class AboutUsActivity extends BaseActivity {
         mAboutAdapter.setNewInstance(aboutInfos);
     }
 
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mUpdateEngine = new UpdateEngine(getContext());
+    }
+
+    UpdateEngine mUpdateEngine;
+
     private void checkVersion() {
-        ToastCompat.show(getContext(), "已是最新版本！");
+        mLoadingDialog.show("获取更新中...");
+        mUpdateEngine.getUpdateInfo().subscribe(new Observer<ResultInfo<UpgradeInfo>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onNext(ResultInfo<UpgradeInfo> info) {
+                if (info != null && info.getCode() == 1) {
+
+                    UpdateInfo updateInfo = CommonUtils.getNeedUpgradeInfo(info.getData().getUpgrade());
+                    if (updateInfo != null) {
+                        UpdateDialog updateDialog = new UpdateDialog(getContext());
+                        updateDialog.show(updateInfo);
+                    } else {
+                        ToastCompat.showCenter(getContext(), "已是最新版本");
+                        mStvCheck.setSolid(getResources().getColor(R.color.blue_no_input));
+                        mStvCheck.setClickable(false);
+                        mStvCheck.setPressBgColor(Color.TRANSPARENT);
+                        mStvCheck.setShaderEnable(false);
+                        mStvCheck.setText("已是最新版本");
+                    }
+
+                } else {
+                    ToastCompat.show(getContext(), info == null ? "数据获取失败" : info.getMsg());
+                }
+            }
+        });
     }
 
     @OnClick(R.id.stv_check)
     public void onViewClicked() {
         checkVersion();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mUpdateEngine != null) {
+            mUpdateEngine.cancel();
+        }
     }
 }

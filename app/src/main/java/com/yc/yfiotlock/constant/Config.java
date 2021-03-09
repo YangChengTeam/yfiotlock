@@ -29,14 +29,28 @@ public class Config {
     public final static String SMS_CODE_LOGIN_URL = getBaseUrl() + "/userapp/v1.User/codeLogin" + isRsa();
 
     //FAQ
-    public final static String FQA_LIST_URL = getBaseUrl() + "/userapp/v1.faq/faqList" + isRsa();
+    public static final String FQA_LIST_URL = getBaseUrl() + "/userapp/v1.faq/faqList" + isRsa();
 
     public static final String INIT_URL = getBaseUrl() + "/v1/Index/init" + isRsa();
 
-    public final static int CLICK_LIMIT = 500;
+    //更新
+    public static final String UPDATE_URL = "http://a.6ll.com/v1/Index/aboutme" + isRsa();
+
+    //上传图片
+    public static final String UPLOAD_PIC_URL = getBaseUrl() + "/userapp/v1.User/uploads" + "?rea=5";
+
+    //反馈 建议
+    public static final String FEEDBACK_SUGGEST_URL = getBaseUrl() + "/userapp/v1.Feedback/feedbackAdd" + isRsa();
+
+    //用户信息更改
+    public static final String USER_NAME_UPD_URL = getBaseUrl() + "/userapp/v1.User/nicknameUpd" + isRsa();
+    public static final String USER_FACE_UPD_URL = getBaseUrl() + "/userapp/v1.User/faceUpd" + isRsa();
+
+
+    public static final int CLICK_LIMIT = 500;
 
     public static String isRsa() {
-        return "?rsa=" + (RESQUEST_FLAG ? 1 : 0);
+        return RESQUEST_FLAG ? "" : "?rea=5";
     }
 
     public static String getBaseUrl() {

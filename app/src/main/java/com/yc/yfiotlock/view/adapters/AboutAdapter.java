@@ -2,7 +2,7 @@ package com.yc.yfiotlock.view.adapters;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.model.bean.AboutInfo;
+import com.yc.yfiotlock.model.bean.user.AboutInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.jetbrains.annotations.NotNull;

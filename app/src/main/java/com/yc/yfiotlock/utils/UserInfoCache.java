@@ -2,7 +2,7 @@ package com.yc.yfiotlock.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.tencent.mmkv.MMKV;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 
 /*
  * Created by　Dullyoung on 2021/3/4

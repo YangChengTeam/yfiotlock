@@ -23,6 +23,16 @@
         app:stv_stroke_color="@color/white"
         app:stv_stroke_width="1dp" />
 
+    <ImageView
+        android:id="@+id/iv_face"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="1dp"
+        app:layout_constraintBottom_toBottomOf="@id/stv_face"
+        app:layout_constraintEnd_toEndOf="@id/stv_face"
+        app:layout_constraintStart_toStartOf="@id/stv_face"
+        app:layout_constraintTop_toTopOf="@id/stv_face" />
+
     <TextView
         android:id="@+id/tv_user_name"
         android:layout_width="wrap_content"
@@ -61,7 +71,6 @@
             android:layout_height="wrap_content" />
 
     </androidx.cardview.widget.CardView>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

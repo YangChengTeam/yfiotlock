@@ -14,10 +14,16 @@ import java.util.List;
 
 public class PermissionHelper {
     private String[] mustPermissions = new String[]{
-          Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+            Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
 
     public void setMustPermissions(String[] mustPermissions) {
         this.mustPermissions = mustPermissions;
+    }
+
+    public PermissionHelper justStoragePermission() {
+        this.mustPermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE};
+        return this;
     }
 
     public void checkAndRequestPermission(Activity activity, OnRequestPermissionsCallback onRequestPermissionsCallback) {
@@ -59,7 +65,7 @@ public class PermissionHelper {
     }
 
     public void onRequestPermissionsResult(Activity activity, int requestCode) {
-        if(!(activity instanceof Activity)){
+        if (!(activity instanceof Activity)) {
             return;
         }
         if (requestCode == 1024 && checkMustPermissions(activity)) {

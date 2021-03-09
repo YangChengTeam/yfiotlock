@@ -48,9 +48,11 @@
     <string name="privacy_policy">《隐私政策》</string>
     <string name="user_agreement">《用户协议》</string>
     <string name="suggest_hint">请输入您的意见，扬飞感谢您的使用。</string>
+    <string name="family_name_hint">请输入家庭名称...</string>
     <string name="contact_details">联系方式</string>
     <string name="contact_hint">请输入联系方式（非必填）</string>
     <string name="commit">提交</string>
+    <string name="commit_with_log">发送问题日志并提交</string>
     <string name="yc_ai">扬飞智能</string>
     <string name="check_version_update">检查版本更新</string>
     <string name="logout">退出登录</string>
@@ -83,6 +85,16 @@
     <string name="please_input_sign_code">请输入验证码</string>
     <string name="common_problem">常见问题</string>
     <string name="feed_back_question">反馈问题</string>
+    <string name="no_data_now">暂无数据</string>
+    <string name="connect_fail_swipe_refresh_retry">网络出错了,下拉刷新重试</string>
+    <string name="find_new_version">发现新版本</string>
+    <string name="yf_smart_door_lock">扬飞智能门锁</string>
+    <string name="upload_pic">上传图片</string>
+    <string name="contact_way">联系方式</string>
+    <string name="feed_back_contact_et_hint">为快速解决问题，请留下联系方式</string>
+    <string name="input_router_hint">请输入路由器型号（可选）</string>
+    <string name="et_question_hint">请描述您遇到的问题...</string>
+    <string name="router_model">路由器型号</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>
