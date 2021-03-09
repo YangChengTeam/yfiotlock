@@ -128,6 +128,9 @@ public class MainActivity extends BaseActivity {
      * check local apk file when start every time
      * if the exist apk file is already installed,then delete it to free storage zoom
      * better way is run on a new thread to not influences performance
+     * packageManager.getPackageInfo(pkgName,flag),
+     * should use accurate flag instead 0
+     * flag-0 may make the packageInfo too large that cause {@link PackageManager} throws PackageManagerDeadException
      */
     private void deleteLowerVersionApkFile() {
         if (getPermissionHelper().justStoragePermission().checkMustPermissions(this)) {
