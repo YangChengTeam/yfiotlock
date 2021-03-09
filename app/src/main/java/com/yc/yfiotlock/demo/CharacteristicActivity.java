@@ -45,7 +45,7 @@ public class CharacteristicActivity extends AppCompatActivity {
         setContentView(R.layout.demo_activity_charateristic);
         characteristicActivity = this;
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         bleDevice = ServiceActivity.getInstance().getBleDevice();
         service = getIntent().getParcelableExtra("service");
