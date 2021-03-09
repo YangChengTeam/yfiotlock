@@ -1,6 +1,5 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
-import android.Manifest;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -20,9 +19,7 @@ import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
 import com.yc.yfiotlock.controller.fragments.user.MyFragment;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -66,7 +63,9 @@ public class MainActivity extends BaseActivity {
     }
 
     private void onSelected(@IntRange(from = 0) int index) {
-        if (selectedIndex == index) return;
+        if (selectedIndex == index) {
+            return;
+        }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         BaseFragment fragment = getFragment(index);
 
@@ -99,6 +98,8 @@ public class MainActivity extends BaseActivity {
                 mTvMine.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
                         ContextCompat.getDrawable(this, R.mipmap.icon_personal_sel), null, null);
                 break;
+            default:
+                break;
         }
     }
 
@@ -120,6 +121,8 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.ll_mine:
                 onSelected(1);
+                break;
+            default:
                 break;
         }
     }
@@ -146,7 +149,9 @@ public class MainActivity extends BaseActivity {
             File downloadDir = new File(path);
             if (downloadDir.exists()) {
                 File[] files = downloadDir.listFiles((dir, name) -> name.contains(fileNameFilter));
-                if (files == null) return;
+                if (files == null) {
+                    return;
+                }
                 for (File file : files) {
                     PackageInfo packageInfo = packageManager.getPackageArchiveInfo(file.getAbsolutePath(),
                             PackageManager.GET_CONFIGURATIONS);

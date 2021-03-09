@@ -34,7 +34,7 @@ public class Config {
     public static final String INIT_URL = getBaseUrl() + "/v1/Index/init" + isRsa();
 
     //更新
-    public static final String UPDATE_URL = "http://a.6ll.com/v1/Index/aboutme" + isRsa();
+    public static final String UPDATE_URL = getBaseUrl() + "/userapp/v1.User/aboutUs" + isRsa();
 
     //上传图片
     public static final String UPLOAD_PIC_URL = getBaseUrl() + "/userapp/v1.User/uploads" + "?rea=5";
