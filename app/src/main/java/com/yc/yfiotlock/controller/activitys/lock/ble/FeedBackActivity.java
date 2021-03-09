@@ -3,7 +3,6 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -12,16 +11,23 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
+import com.yc.yfiotlock.model.bean.user.PersonalInfo;
+import com.yc.yfiotlock.model.bean.user.PicInfo;
+import com.yc.yfiotlock.model.engin.FeedBackEngine;
+import com.yc.yfiotlock.model.engin.UploadFileEngine;
 import com.yc.yfiotlock.utils.PictureUtils;
 import com.yc.yfiotlock.view.adapters.FeedBackAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -32,11 +38,12 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observer;
 
 public class FeedBackActivity extends BaseActivity {
 
@@ -151,7 +158,7 @@ public class FeedBackActivity extends BaseActivity {
         }
     }
 
-    private void uploadPic() {
+    private void zipPic() {
         List<Uri> uris = mFeedBackAdapter.getData();
         uris.remove(Uri.parse("default"));
         if (uris.size() == 0) {
@@ -161,6 +168,7 @@ public class FeedBackActivity extends BaseActivity {
             @Override
             public void onSuccess(List<File> resultInfo) {
                 Log.i("aaaa", "onSuccess: " + resultInfo.size());
+                uploadPic(resultInfo);
             }
 
             @Override
@@ -168,7 +176,96 @@ public class FeedBackActivity extends BaseActivity {
                 ToastCompat.show(getContext(), response.body);
             }
         });
+    }
 
+    private List<String> backImgs = new ArrayList<>();
+
+    private void uploadPic(List<File> files) {
+        if (backImgs.size() < files.size()) {
+            mLoadingDialog.show("上传第" + (backImgs.size() + 1) + "张图片");
+            mUploadFileEngine.uploadWithFile(Config.UPLOAD_PIC_URL, new HashMap<>(), "file",
+                    files.get(backImgs.size()), new Callback<String>() {
+                        public void onSuccess(String resultInfo) {
+                            try {
+                                ResultInfo<PicInfo> info = JSONObject.parseObject(resultInfo, new TypeReference<ResultInfo<PicInfo>>() {
+                                }.getType());
+                                if (info.getCode() == 1) {
+                                    Log.i("aaaa", "onSuccess: " + info.getData().getPath());
+                                    backImgs.add(info.getData().getUrl());
+                                    uploadPic(files);
+                                } else {
+                                    ToastCompat.show(getContext(), info.getMsg());
+                                }
+                            } catch (Exception e) {
+                                this.onFailure(new Response("" + e));
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Response response) {
+                            mLoadingDialog.dismiss();
+                            ToastCompat.show(getContext(), response.body);
+                        }
+                    });
+        } else {
+            mLoadingDialog.show("提交中...");
+            commit();
+        }
+    }
+
+    private String getImgString(List<String> strings) {
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < strings.size(); i++) {
+            s.append(strings.get(i));
+            if (i != strings.size() - 1) {
+                s.append(",");
+            }
+        }
+        return s.toString();
+    }
+
+    private void commit() {
+        mFeedBackEngine.addInfo(mEtContact.getText().toString(),
+                mEtQuestion.getText().toString(),
+                mEtRouter.getText().toString(),
+                getImgString(backImgs)).subscribe(new Observer<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onNext(ResultInfo<String> info) {
+                if (info != null && info.getCode() == 1) {
+                    ToastCompat.showCenter(getContext(), "提交成功");
+                    finish();
+                } else {
+                    ToastCompat.showCenter(getContext(), info == null ? "提交失败" : info.getMsg());
+                }
+            }
+        });
+    }
+
+    private UploadFileEngine mUploadFileEngine;
+    private FeedBackEngine mFeedBackEngine;
+
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mUploadFileEngine = new UploadFileEngine();
+        mFeedBackEngine = new FeedBackEngine(getContext());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mFeedBackEngine != null) mFeedBackEngine.cancel();
+        if (mUploadFileEngine != null) mUploadFileEngine.cancel();
     }
 
     @OnClick({R.id.stv_send_with_log, R.id.stv_send})
@@ -177,7 +274,7 @@ public class FeedBackActivity extends BaseActivity {
             case R.id.stv_send_with_log:
                 break;
             case R.id.stv_send:
-                uploadPic();
+                zipPic();
                 break;
         }
     }
