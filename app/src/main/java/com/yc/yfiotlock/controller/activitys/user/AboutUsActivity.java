@@ -122,9 +122,11 @@ public class AboutUsActivity extends BaseActivity {
                     mAboutAdapter.notifyDataSetChanged();
 
                     UpdateInfo updateInfo = CommonUtils.getNeedUpgradeInfo(info.getData().getUpgrade());
-                    if (updateInfo != null && showDialog) {
-                        UpdateDialog updateDialog = new UpdateDialog(getContext());
-                        updateDialog.show(updateInfo);
+                    if (updateInfo != null) {
+                        if (showDialog) {
+                            UpdateDialog updateDialog = new UpdateDialog(getContext());
+                            updateDialog.show(updateInfo);
+                        }
                     } else {
                         ToastCompat.showCenter(getContext(), "已是最新版本");
                         mStvCheck.setSolid(getResources().getColor(R.color.blue_no_input));
