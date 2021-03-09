@@ -1,6 +1,11 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
+import android.Manifest;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,7 +19,10 @@ import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
 import com.yc.yfiotlock.controller.fragments.user.MyFragment;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -49,6 +57,7 @@ public class MainActivity extends BaseActivity {
                 new IndexFragment(), new MyFragment()
         };
         onSelected(0);
+        new Thread(this::deleteLowerVersionApkFile).start();
     }
 
 
@@ -114,4 +123,36 @@ public class MainActivity extends BaseActivity {
                 break;
         }
     }
+
+    /**
+     * check local apk file when start every time
+     * if the exist apk file is already installed,then delete it to free storage zoom
+     * better way is run on a new thread to not influences performance
+     */
+    private void deleteLowerVersionApkFile() {
+        if (getPermissionHelper().justStoragePermission().checkMustPermissions(this)) {
+            String fileNameFilter = getContext().getResources().getString(R.string.app_name);
+            String path = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+            PackageManager packageManager = getPackageManager();
+            int versionCode = 0;
+            try {
+                versionCode = packageManager.getPackageInfo(getPackageName(), PackageManager.GET_CONFIGURATIONS).versionCode;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+            File downloadDir = new File(path);
+            if (downloadDir.exists()) {
+                File[] files = downloadDir.listFiles((dir, name) -> name.contains(fileNameFilter));
+                if (files == null) return;
+                for (File file : files) {
+                    PackageInfo packageInfo = packageManager.getPackageArchiveInfo(file.getAbsolutePath(),
+                            PackageManager.GET_CONFIGURATIONS);
+                    if (packageInfo != null && versionCode > packageInfo.versionCode && file.delete()) {
+                        Log.i("aaaa", "deleteLowerVersionApkFile: " + file.getAbsolutePath());
+                    }
+                }
+            }
+        }
+    }
+
 }

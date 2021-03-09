@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
+import android.graphics.Color;
 import android.widget.LinearLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -68,7 +69,6 @@ public class AboutUsActivity extends BaseActivity {
                     CommonUtils.copyWithToast(getContext(), aboutInfo.getValue(), "邮箱已复制");
                     break;
                 case 3:
-                    checkVersion();
                     break;
             }
         });
@@ -117,6 +117,13 @@ public class AboutUsActivity extends BaseActivity {
                     if (updateInfo != null) {
                         UpdateDialog updateDialog = new UpdateDialog(getContext());
                         updateDialog.show(updateInfo);
+                    } else {
+                        ToastCompat.showCenter(getContext(), "已是最新版本");
+                        mStvCheck.setSolid(getResources().getColor(R.color.blue_no_input));
+                        mStvCheck.setClickable(false);
+                        mStvCheck.setPressBgColor(Color.TRANSPARENT);
+                        mStvCheck.setShaderEnable(false);
+                        mStvCheck.setText("已是最新版本");
                     }
 
                 } else {
