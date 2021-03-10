@@ -51,14 +51,13 @@ public class MyFamilyAddressActivity extends BaseActivity {
         Serializable serializable = getIntent().getSerializableExtra("family_info");
         if (serializable instanceof FamilyInfo) {
             this.familyInfo = (FamilyInfo) serializable;
+            editText.setText(familyInfo.getDetail_address());
         }
 
         RxView.clicks(tvSure).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             String trim = editText.getText().toString().trim();
-            if (!TextUtils.isEmpty(trim)) {
-                familyInfo.setHomAddress(trim);
-                EventBus.getDefault().post(familyInfo);
-            }
+            familyInfo.setDetail_address(trim);
+            EventBus.getDefault().post(familyInfo);
             finish();
         });
     }
