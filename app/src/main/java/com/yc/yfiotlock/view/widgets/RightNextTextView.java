@@ -58,6 +58,13 @@ public class RightNextTextView extends BaseView {
         }
     }
 
+    public String getDesText() {
+        if (tvDes != null) {
+            return tvDes.getText().toString().trim();
+        }
+        return "";
+    }
+
     public void setTvDes(String des, int color) {
         if (des != null && tvDes != null) {
             tvDes.setText(des);

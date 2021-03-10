@@ -18,19 +18,17 @@ public class MyFamilyAdapter extends BaseExtendAdapter<FamilyInfo> {
     public MyFamilyAdapter(@Nullable List data) {
         super(R.layout.item_my_family, data);
 
-        addChildClickViewIds(R.id.iv_family_number_default, R.id.tv_family_number_default);
-
+        addChildClickViewIds(R.id.iv_family_number_default, R.id.tv_family_number_default, R.id.tv_family_delete);
     }
-
 
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, FamilyInfo familyInfo) {
         baseViewHolder.setText(R.id.tv_my_family_name, familyInfo.getName())
                 .setText(R.id.tv_my_family_name, familyInfo.getName())
-                .setText(R.id.tv_my_family_number, familyInfo.getDeviceNum() + "个设备");
+                .setText(R.id.tv_my_family_number, familyInfo.getNum() + "个设备");
 
-        boolean aDefault = familyInfo.isDefault();
-        if (aDefault) {
+        int aDefault = familyInfo.isIs_def();
+        if (aDefault == 0) {
             baseViewHolder.setImageResource(R.id.iv_family_number_default, R.mipmap.sel);
         } else {
             baseViewHolder.setImageResource(R.id.iv_family_number_default, R.mipmap.sel_no);
@@ -49,17 +47,16 @@ public class MyFamilyAdapter extends BaseExtendAdapter<FamilyInfo> {
             for (int i = 0; i < data.size(); i++) {
                 View viewByPosition = getViewByPosition(i, R.id.iv_family_number_default);
                 if (index == i) {
-                    data.get(i).setDefault(true);
+                    data.get(i).setIs_def(0);
                     if (viewByPosition instanceof ImageView) {
                         ((ImageView) viewByPosition).setImageResource(R.mipmap.sel);
                     }
                 } else {
-                    data.get(i).setDefault(false);
+                    data.get(i).setIs_def(1);
                     if (viewByPosition instanceof ImageView) {
                         ((ImageView) viewByPosition).setImageResource(R.mipmap.sel_no);
                     }
                 }
-                data.get(i).setDefault(index == i);
             }
         }
 
