@@ -1,17 +1,24 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
+import android.provider.Settings;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.TempPwdDetailActivity;
+import com.yc.yfiotlock.demo.MainActivity;
+import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.EventStub;
 import com.yc.yfiotlock.model.bean.FamilyInfo;
 import com.yc.yfiotlock.model.bean.PassWordInfo;
@@ -61,12 +68,31 @@ public class MyFamilyAddActivity extends BaseActivity {
             MyFamilyNameActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
         RxView.clicks(tvLocation).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            MyFamilyLocationActivity.start(MyFamilyAddActivity.this, familyInfo);
+
+            location();
         });
         RxView.clicks(tvAddress).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             MyFamilyAddressActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
+
     }
+
+    private void location() {
+        permissionHelper = new PermissionHelper();
+        permissionHelper.checkAndRequestPermission(MyFamilyAddActivity.this, new PermissionHelper.OnRequestPermissionsCallback() {
+            @Override
+            public void onRequestPermissionSuccess() {
+                MyFamilyLocationActivity.start(MyFamilyAddActivity.this, familyInfo);
+            }
+
+            @Override
+            public void onRequestPermissionError() {
+                Toast.makeText(MyFamilyAddActivity.this, "授权失败, 无法获取到当前位置", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    PermissionHelper permissionHelper;
 
     private void initData() {
         Serializable serializable = getIntent().getSerializableExtra("family_info");

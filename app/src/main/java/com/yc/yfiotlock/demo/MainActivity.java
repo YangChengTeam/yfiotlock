@@ -225,7 +225,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "授权失败, 无法扫描蓝牙设备", Toast.LENGTH_LONG).show();
             }
         });
-
     }
 
     private void connect(final BleDevice bleDevice) {

@@ -3,6 +3,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.util.Log;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,7 +43,6 @@ import butterknife.BindView;
 
 public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.OnMapStatusChangeListener, OnGetGeoCoderResultListener {
 
-    private LocationAdapter locationAdapter;
 
     public static void start(Context context, FamilyInfo familyInfo) {
         Intent intent = new Intent(context, MyFamilyLocationActivity.class);
@@ -64,7 +64,18 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
     // 默认逆地理编码半径范围
     private static final int sDefaultRGCRadius = 500;
     private GeoCoder mGeoCoder = null;
+    private LocationAdapter locationAdapter;
+    private LocationClient locationClient;
+    private boolean isInitMap;
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        locationClient.stop();
+        mGeoCoder.destroy();
+        mBaiduMap.clear();
+    }
 
     @Override
     protected int getLayoutId() {
@@ -95,7 +106,7 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
 
     private void initLocationOption() {
         //定位服务的客户端。宿主程序在客户端声明此类，并调用，目前只支持在主线程中启动
-        LocationClient locationClient = new LocationClient(getApplicationContext());
+        locationClient = new LocationClient(getApplicationContext());
         //声明LocationClient类实例并配置定位参数
         LocationClientOption locationOption = new LocationClientOption();
         MyLocationListener myLocationListener = new MyLocationListener();
@@ -104,7 +115,8 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
         //可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
         locationOption.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         //可选，默认gcj02，设置返回的定位结果坐标系，如果配合百度地图使用，建议设置为bd09ll;
-        locationOption.setCoorType("gcj02");
+//        locationOption.setCoorType("gcj02");
+        locationOption.setCoorType("bd09ll");
         //可选，默认0，即仅定位一次，设置发起连续定位请求的间隔需要大于等于1000ms才是有效的
         locationOption.setScanSpan(1000);
         //可选，设置是否需要地址信息，默认不需要
@@ -137,6 +149,7 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
         locationClient.start();
     }
 
+
     /**
      * 实现定位回调
      */
@@ -159,17 +172,26 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
             int errorCode = location.getLocType();
 
 
-            initMap(latitude, longitude);
+            VUiKit.post(new Runnable() {
+                @Override
+                public void run() {
+                    initMap(latitude, longitude);
+                    locationClient.stop();
+                }
+            });
         }
     }
 
     private void initMap(double latitude, double longitude) {
+        if (isInitMap)
+            return;
+        isInitMap = true;
+
         mBaiduMap = mMapView.getMap();
         if (null == mBaiduMap) {
             return;
         }
 
-        // 设置初始中心点为北京
         mCenter = new LatLng(latitude, longitude);
         MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngZoom(mCenter, 16);
         mBaiduMap.setMapStatus(mapStatusUpdate);
@@ -180,13 +202,27 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
                 createCenterMarker();
                 reverseRequest(mCenter);
             }
+
+            @Override
+            protected void finalize() throws Throwable {
+                super.finalize();
+                Log.d("00671", "finalize: ");
+            }
         });
+
+        createCenterMarker();
     }
+
+    private boolean isCreateCenterMarker = false;
 
     /**
      * 创建地图中心点marker
      */
     private void createCenterMarker() {
+        if (isCreateCenterMarker)
+            return;
+        isCreateCenterMarker = true;
+
         Projection projection = mBaiduMap.getProjection();
         if (null == projection) {
             return;
@@ -232,20 +268,28 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
 
     @Override
     public void onMapStatusChangeStart(MapStatus mapStatus) {
+        Log.d("00671", "onMapStatusChangeStart: " + mapStatus.toString());
     }
 
     @Override
     public void onMapStatusChangeStart(MapStatus mapStatus, int i) {
+        Log.d("00671", "onMapStatusChangeStart:  " + mapStatus.toString() + "  " + i);
     }
 
     @Override
     public void onMapStatusChange(MapStatus mapStatus) {
+        Log.d("00671", "onMapStatusChange: " + mapStatus.toString());
+        if (locationAdapter.getData().size() == 0) {
+            onMapStatusChangeFinish(mapStatus);
+        }
     }
 
     private boolean mStatusChangeByItemClick = false;
 
     @Override
     public void onMapStatusChangeFinish(MapStatus mapStatus) {
+        Log.d("00671", "onMapStatusChangeFinish: " + mapStatus.toString());
+
         LatLng newCenter = mapStatus.target;
         // 如果是点击poi item导致的地图状态更新，则不用做后面的逆地理请求，
         if (mStatusChangeByItemClick) {
