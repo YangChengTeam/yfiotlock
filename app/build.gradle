@@ -48,7 +48,7 @@ android {
         applicationId "com.yc.yfiotlock"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 99
+        versionCode 66
         versionName "3.0.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -82,6 +82,7 @@ dependencies {
     implementation files('libs/logger-2.0.1-release.aar')
     implementation files('libs/main-2.0.1-release.aar')
     implementation files('libs/phoneNumber-L-AuthSDK-2.12.0.1.aar')
+    implementation files('libs/BaiduLBS_AndroidSDK_Lib.aar')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

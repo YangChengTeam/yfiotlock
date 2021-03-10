@@ -102,10 +102,12 @@ public class CommonUtils {
         if (TextUtils.isEmpty(url)) {
             return;
         }
+        if (!url.contains("http://") && !url.contains("https://")) {
+            url = "http://".concat(url);
+        }
         Intent intent = new Intent();
         intent.setAction("android.intent.action.VIEW");
-        Uri content_url = Uri.parse(url);
-        intent.setData(content_url);
+        intent.setData(Uri.parse(url));
         try {
             context.startActivity(intent);
         } catch (Exception e) {
@@ -161,6 +163,8 @@ public class CommonUtils {
                         case "600000":
                             startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
+                        default:
+                            break;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -198,6 +202,8 @@ public class CommonUtils {
                         case "600000":
                             startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
+                        default:
+                            break;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -234,13 +240,13 @@ public class CommonUtils {
             @Override
             public void onError(Throwable e) {
                 PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
-                ToastCompat.show(context,e+"");
-                Log.i("aaaa", "onError: "+e);
+                ToastCompat.show(context, e + "");
+                Log.i("aaaa", "onError: " + e);
             }
 
             @Override
             public void onNext(ResultInfo<UserInfo> info) {
-                Log.i("aaaa", "onNext: "+info);
+                Log.i("aaaa", "onNext: " + info);
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
                     UserInfoCache.setUserInfo(info.getData());
                     EventBus.getDefault().post(info.getData());
@@ -285,7 +291,7 @@ public class CommonUtils {
 
     private static void startVerify(Context context, TokenResultListener tokenResultListener) {
         PhoneNumberAuthHelper helper = PhoneNumberAuthHelper.getInstance(context, tokenResultListener);
-        AuthUIConfig authUIConfig = new AuthUIConfig.Builder()
+        AuthUIConfig uiConfig = new AuthUIConfig.Builder()
                 .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_FULLSCREEN)
                 .setSloganText("")
                 .setNavText("")
@@ -316,7 +322,7 @@ public class CommonUtils {
                 .setPrivacyBefore("登陆代表同意")
                 .setCheckboxHidden(true)
                 .create();
-        helper.setAuthUIConfig(authUIConfig);
+        helper.setAuthUIConfig(uiConfig);
         helper.getLoginToken(context, 3000);
     }
 

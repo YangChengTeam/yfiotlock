@@ -34,6 +34,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="uoKAxhRzWoIE8yW6MPErz3VkM4Q3uVyr" />
         <activity android:name=".controller.activitys.lock.ble.FAQDetailActivity" />
         <activity
             android:name=".controller.activitys.lock.ble.FeedBackActivity"
@@ -194,6 +197,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote"> </service>
     </application>
 
 </manifest>

@@ -20,6 +20,10 @@ public class PermissionHelper {
         this.mustPermissions = mustPermissions;
     }
 
+    public void setMustPermissions2(String... mustPermissions) {
+        this.mustPermissions = mustPermissions;
+    }
+
     public PermissionHelper justStoragePermission() {
         this.mustPermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE};
