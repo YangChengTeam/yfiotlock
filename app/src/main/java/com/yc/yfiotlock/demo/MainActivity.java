@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+    public static final String SERVICE_UUID = "0000180a-0000-1000-8000-00805f9b34fb";
 
     PermissionHelper permissionHelper;
 
@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     ProgressDialog progressDialog;
     FloatingActionButton fab;
-    FloatingActionButton fab2;
 
     public static final int mtu = 512;
 
@@ -116,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
-                .setServiceUuids(new UUID[]{UUID.fromString(SERVICE_UUID)})
                 .setScanTimeOut(10000);
 
         EditText nameEt = findViewById(R.id.et_name);
@@ -159,13 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 startScan();
             }
         });
-        fab2 = findViewById(R.id.fab2);
-        fab2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, VisitorManageActivity.class));
-            }
-        });
+
+
 
         listView = findViewById(R.id.rv_devices);
         mDeviceAdapter = new DeviceAdapter(this);
@@ -187,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDetail(BleDevice bleDevice) {
                 if (BleManager.getInstance().isConnected(bleDevice)) {
-                    Intent intent = new Intent(MainActivity.this, OperationActivity.class);
+                    Intent intent = new Intent(MainActivity.this, ServiceActivity.class);
                     intent.putExtra("bleDevice", bleDevice);
                     startActivity(intent);
                 }
@@ -201,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        scan();
 
     }
 
@@ -355,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
             public void onScanning(BleDevice bleDevice) {
                 mDeviceAdapter.addDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
-                connect(bleDevice);
+
             }
 
             @Override

@@ -1,4 +1,4 @@
-package com.yc.yfiotlock.model.bean;
+package com.yc.yfiotlock.model.bean.user;
 
 import android.text.TextUtils;
 
@@ -43,9 +43,6 @@ public class UserInfo {
     }
 
     public String getName() {
-        if (TextUtils.isEmpty(name)) {
-            return getMobile();
-        }
         return name;
     }
 
@@ -54,6 +51,9 @@ public class UserInfo {
     }
 
     public String getNickName() {
+        if (TextUtils.isEmpty(nickName)) {
+            return getMobile();
+        }
         return nickName;
     }
 

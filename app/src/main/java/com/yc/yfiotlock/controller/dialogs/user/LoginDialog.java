@@ -3,6 +3,7 @@ package com.yc.yfiotlock.controller.dialogs.user;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -65,6 +66,11 @@ public class LoginDialog extends Dialog {
         setCancelable(true);
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initViews();
+    }
 
     protected int getLayoutId() {
         return R.layout.user_dialog_login;
@@ -103,6 +109,10 @@ public class LoginDialog extends Dialog {
                     }
                     mSignCodeAdapter.notifyItemChanged(i, "");
                 }
+                if (strings.length == 6) {
+                    mLoginResult.onSuccess(s.toString(), phone);
+                    dismiss();
+                }
             }
         });
     }
@@ -133,18 +143,15 @@ public class LoginDialog extends Dialog {
         show();
         mEtSmsCode.setText("");
         mEtSmsCode.setOnLongClickListener(v -> true);
-        initViews();
         mTvSentCode.setText("验证码已发送至".concat("+").concat(phoneNumber));
-        if (CacheUtils.getCache(Config.LOGIN_SEND_CODE_URL + phone, long.class) != null) {
-            setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTvTimer);
-        }
+        setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTvTimer);
     }
 
     private String phone;
 
 
     public void setSendSmsCodeCache() {
-        CacheUtils.setCache(Config.LOGIN_SEND_CODE_URL + phone, System.currentTimeMillis());
+        CacheUtils.setSendCodeTime(Config.LOGIN_SEND_CODE_URL + phone, System.currentTimeMillis());
         setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTvTimer);
     }
 
@@ -159,12 +166,6 @@ public class LoginDialog extends Dialog {
     }
 
 
-    @Override
-    public void dismiss() {
-        super.dismiss();
-
-    }
-
     /**
      * @param url      发送验证码的接口地址
      * @param textView 发送验证码的textview
@@ -176,9 +177,9 @@ public class LoginDialog extends Dialog {
         //设置不可点击 就不能请求发送验证码
         textView.setClickable(false);
         //获取上一次的发送时间
-        long sendTime = CacheUtils.getCache(url, long.class) == null ? -1 : CacheUtils.getCache(url, long.class);
+        long sendTime = CacheUtils.getSendCodeTime(url);
         if (sendTime == 0) { //如果发送时间为0 说明从未发送过验证码
-            CacheUtils.setCache(url, System.currentTimeMillis()); // 保存一下当前时间作为上一次发送验证码的时间
+            CacheUtils.setSendCodeTime(url, System.currentTimeMillis()); // 保存一下当前时间作为上一次发送验证码的时间
             textView.postDelayed(() -> setSendSmsTvText(url, textView), 1000);//递归设置UI显示
             return;
         }
@@ -220,7 +221,7 @@ public class LoginDialog extends Dialog {
     }
 
     public interface LoginResult {
-        void onSuccess();
+        void onSuccess(String code, String phone);
 
         void onSendSmsCode();
     }

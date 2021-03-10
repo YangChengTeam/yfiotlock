@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-uint16_t crc16tablefast(uint8_t *ptr, uint16_t len);
+unsigned int  crc16tablefast(uint8_t *ptr, uint16_t len);
 
 
 #endif //YF_IOT_LOCK_CRC16_H

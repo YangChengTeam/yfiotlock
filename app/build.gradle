@@ -46,9 +46,9 @@ android {
 
     defaultConfig {
         applicationId "com.yc.yfiotlock"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 30
-        versionCode 65
+        versionCode 66
         versionName "3.0.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -66,6 +66,11 @@ android {
 
     lintOptions {
         checkReleaseBuilds false
+    }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
     }
 }
 
@@ -115,6 +120,8 @@ dependencies {
 
     implementation 'com.zhy:okhttputils:2.6.2'
     implementation "com.zhihu.android:matisse:0.5.3-beta3"
+
+
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 

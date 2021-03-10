@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.download;
 
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,11 +14,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
-import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.model.bean.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
 
 import java.io.File;

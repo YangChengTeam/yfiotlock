@@ -1,21 +1,23 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
-import android.os.Bundle;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.domain.ResultInfo;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
+import com.yc.yfiotlock.model.engin.UserEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observer;
 
 public class EditNameActivity extends BaseActivity {
 
@@ -37,19 +39,52 @@ public class EditNameActivity extends BaseActivity {
         mBnbTitle.setBackListener(view -> finish());
         String name = "";
         if (UserInfoCache.getUserInfo() != null) {
-            name = UserInfoCache.getUserInfo().getName();
+            name = UserInfoCache.getUserInfo().getNickName();
         }
         mEtName.setText(name);
         mEtName.setSelection(name.length());
     }
 
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mUserEngine = new UserEngine(getContext());
+    }
+
+    UserEngine mUserEngine;
 
     @OnClick(R.id.stv_sure)
     public void onViewClicked() {
-        UserInfo userInfo = UserInfoCache.getUserInfo();
-        userInfo.setName(mEtName.getText().toString());
-        UserInfoCache.setUserInfo(userInfo);
-        EventBus.getDefault().post(userInfo);
-        finish();
+        if (mEtName.getText().toString().length() == 0) {
+            ToastCompat.showCenter(getContext(), "用户名不能为空");
+            return;
+        }
+        mLoadingDialog.show("提交中...");
+        mUserEngine.changeNickName(mEtName.getText().toString()).subscribe(new Observer<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onNext(ResultInfo<String> info) {
+                if (info.getCode() == 1 && App.isLogin()) {
+                    mLoadingDialog.dismiss();
+                    UserInfo userInfo = UserInfoCache.getUserInfo();
+                    userInfo.setNickName(mEtName.getText().toString());
+                    UserInfoCache.setUserInfo(userInfo);
+                    EventBus.getDefault().post(userInfo);
+                    ToastCompat.showCenter(getContext(), "修改成功");
+                    finish();
+                } else {
+                    ToastCompat.showCenter(getContext(), info.getMsg());
+                }
+            }
+        });
     }
 }

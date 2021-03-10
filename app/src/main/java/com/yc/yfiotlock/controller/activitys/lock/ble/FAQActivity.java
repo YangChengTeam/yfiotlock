@@ -130,7 +130,7 @@ public class FAQActivity extends BaseActivity {
         } else {
             mFAQAdapter.addData(infos);
         }
-        if (infos.size() < 10) {
+        if (infos.size() < 20) {
             mFAQAdapter.getLoadMoreModule().loadMoreEnd();
         } else {
             mFAQAdapter.getLoadMoreModule().loadMoreComplete();

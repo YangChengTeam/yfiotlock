@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alibaba.fastjson.JSONObject;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.ScreenUtil;
@@ -36,9 +35,9 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
-import com.yc.yfiotlock.model.bean.PhoneTokenInfo;
-import com.yc.yfiotlock.model.bean.UpdateInfo;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.view.widgets.MyItemDivider;
 
@@ -103,10 +102,12 @@ public class CommonUtils {
         if (TextUtils.isEmpty(url)) {
             return;
         }
+        if (!url.contains("http://") && !url.contains("https://")) {
+            url = "http://".concat(url);
+        }
         Intent intent = new Intent();
         intent.setAction("android.intent.action.VIEW");
-        Uri content_url = Uri.parse(url);
-        intent.setData(content_url);
+        intent.setData(Uri.parse(url));
         try {
             context.startActivity(intent);
         } catch (Exception e) {
@@ -162,6 +163,8 @@ public class CommonUtils {
                         case "600000":
                             startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
+                        default:
+                            break;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -199,6 +202,8 @@ public class CommonUtils {
                         case "600000":
                             startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
+                        default:
+                            break;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -235,13 +240,13 @@ public class CommonUtils {
             @Override
             public void onError(Throwable e) {
                 PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
-                ToastCompat.show(context,e+"");
-                Log.i("aaaa", "onError: "+e);
+                ToastCompat.show(context, e + "");
+                Log.i("aaaa", "onError: " + e);
             }
 
             @Override
             public void onNext(ResultInfo<UserInfo> info) {
-                Log.i("aaaa", "onNext: "+info);
+                Log.i("aaaa", "onNext: " + info);
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
                     UserInfoCache.setUserInfo(info.getData());
                     EventBus.getDefault().post(info.getData());
@@ -286,7 +291,7 @@ public class CommonUtils {
 
     private static void startVerify(Context context, TokenResultListener tokenResultListener) {
         PhoneNumberAuthHelper helper = PhoneNumberAuthHelper.getInstance(context, tokenResultListener);
-        AuthUIConfig authUIConfig = new AuthUIConfig.Builder()
+        AuthUIConfig uiConfig = new AuthUIConfig.Builder()
                 .setStatusBarUIFlag(View.SYSTEM_UI_FLAG_FULLSCREEN)
                 .setSloganText("")
                 .setNavText("")
@@ -317,7 +322,7 @@ public class CommonUtils {
                 .setPrivacyBefore("登陆代表同意")
                 .setCheckboxHidden(true)
                 .create();
-        helper.setAuthUIConfig(authUIConfig);
+        helper.setAuthUIConfig(uiConfig);
         helper.getLoginToken(context, 3000);
     }
 

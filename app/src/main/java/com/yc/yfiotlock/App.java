@@ -64,6 +64,7 @@ public class App extends Application {
             params.put("author", GoagalInfo.get().channelInfo.author + "");
             agent_id = GoagalInfo.get().channelInfo.agent_id;
         }
+
         params.put("agent_id", agent_id);
         params.put("ts", System.currentTimeMillis() + "");
         params.put("device_type", "2");
@@ -72,6 +73,7 @@ public class App extends Application {
                 .os.Build.VERSION.RELEASE : Build.BRAND + " " + android
                 .os.Build.MODEL + " " + android.os.Build.VERSION.RELEASE;
         params.put("sv", sv);
+
         if (GoagalInfo.get().getPackageInfo() != null) {
             params.put("av", GoagalInfo.get().getPackageInfo().versionCode + "");
         }

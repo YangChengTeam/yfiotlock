@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -19,19 +18,25 @@ import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
-import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateIconDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
-import com.yc.yfiotlock.model.bean.PersonalInfo;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.PersonalInfo;
+import com.yc.yfiotlock.model.bean.user.PicInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
+import com.yc.yfiotlock.model.engin.UploadFileEngine;
+import com.yc.yfiotlock.model.engin.UserEngine;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.PathUtil;
 import com.yc.yfiotlock.utils.PictureUtils;
@@ -47,12 +52,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -246,8 +252,82 @@ public class PersonalInfoActivity extends BaseActivity {
                 });
     }
 
-    private void upLoadUserIcon(File file) {
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mUploadFileEngine = new UploadFileEngine();
+        mUserEngine = new UserEngine(getContext());
+    }
 
+    private UploadFileEngine mUploadFileEngine;
+
+
+    /**
+     * 上传图片的逻辑
+     * 先选择是相机{@link #onUseCamera()}
+     * 还是相册{@link #onUsePic()}}
+     * 均指定目录 然后再剪切 {@link #onCrop(Uri)} 剪切是同一地址 #mFilePath + mCropPath
+     * 最后压缩{@link #zipPic(File)}}
+     * 压缩完成后上传
+     */
+    private void upLoadUserIcon(File file) {
+        mLoadingDialog.show("上传头像中...");
+        mUploadFileEngine.uploadWithFile(Config.UPLOAD_PIC_URL, new HashMap<>(), "file", file, new Callback<String>() {
+                    @Override
+                    public void onSuccess(String resultInfo) {
+                        try {
+                            ResultInfo<PicInfo> info = JSONObject.parseObject(resultInfo, new TypeReference<ResultInfo<PicInfo>>() {
+                            }.getType());
+                            if (info.getCode() == 1) {
+                                Log.i("aaaa", "onSuccess: " + info.getData().getPath());
+                                changeUserFace(info.getData().getUrl(), info.getData().getPath());
+                            } else {
+                                ToastCompat.show(getContext(), info.getMsg());
+                            }
+                        } catch (Exception e) {
+                            this.onFailure(new Response("" + e));
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Response response) {
+                        mLoadingDialog.dismiss();
+                        ToastCompat.show(getContext(), response.body);
+                    }
+                }
+        );
+    }
+
+    private UserEngine mUserEngine;
+
+    private void changeUserFace(String face, String faceNoHost) {
+        mLoadingDialog.show("提交中...");
+        mUserEngine.changeFace(faceNoHost).subscribe(new Observer<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onNext(ResultInfo<String> info) {
+                if (info != null && info.getCode() == 1) {
+                    UserInfo userInfo = UserInfoCache.getUserInfo();
+                    userInfo.setFace(face);
+                    UserInfoCache.setUserInfo(userInfo);
+                    EventBus.getDefault().post(userInfo);
+                    ToastCompat.showCenter(getContext(), "修改成功");
+                } else {
+                    ToastCompat.showCenter(getContext(), info == null ? "修改失败" : info.getMsg());
+                }
+
+            }
+        });
     }
 
     @Override
@@ -257,7 +337,7 @@ public class PersonalInfoActivity extends BaseActivity {
             onCrop(mImageUri);
         }
         if (requestCode == USE_PIC && resultCode == RESULT_OK) {
-            File file = PathUtil.copyFileToPath(getContext(), data.getData(),mFilePath+ mCropIcon);
+            File file = PathUtil.copyFileToPath(getContext(), data.getData(), mFilePath + mCropIcon);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 //如果是7.0及以上的系统使用FileProvider的方式创建一个Uri
                 mImageUri = FileProvider.getUriForFile(getContext(),
@@ -269,26 +349,26 @@ public class PersonalInfoActivity extends BaseActivity {
             onCrop(mImageUri);
         }
         if (requestCode == USE_CROP && resultCode == RESULT_OK) {
-            mLoadingDialog.show("压缩中...");
-            PictureUtils.zipPic(getContext(), new File(mFilePath, mCropIcon), new Callback<File>() {
-                @Override
-                public void onSuccess(File resultInfo) {
-                    mLoadingDialog.dismiss();
-                    PersonalInfo personalInfo = mAdapter.getData().get(0);
-                    personalInfo.setImg(resultInfo.getAbsolutePath());
-                    mAdapter.setData(0, personalInfo);
-                    mAdapter.notifyItemChanged(0);
-                }
-
-                @Override
-                public void onFailure(Response response) {
-                    mLoadingDialog.dismiss();
-                    ToastCompat.show(getContext(), response.body);
-                }
-            });
+            zipPic(new File(mFilePath, mCropIcon));
         }
 
+    }
 
+    private void zipPic(File file) {
+        mLoadingDialog.show("压缩中...");
+        PictureUtils.zipPic(getContext(), file, new Callback<File>() {
+            @Override
+            public void onSuccess(File resultInfo) {
+                mLoadingDialog.dismiss();
+                upLoadUserIcon(resultInfo);
+            }
+
+            @Override
+            public void onFailure(Response response) {
+                mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), response.body);
+            }
+        });
     }
 
     private void loadUserInfo() {
@@ -300,7 +380,7 @@ public class PersonalInfoActivity extends BaseActivity {
         List<PersonalInfo> personalInfos = new ArrayList<>();
         personalInfos.add(new PersonalInfo("头像", "", userInfo.getFace(), 0));
         personalInfos.add(new PersonalInfo("账号", userInfo.getMobile(), "", 1).setShowArrow(false));
-        personalInfos.add(new PersonalInfo("昵称", userInfo.getName(), "", 1));
+        personalInfos.add(new PersonalInfo("昵称", userInfo.getNickName(), "", 1));
         mAdapter.setNewInstance(personalInfos);
     }
 
@@ -327,5 +407,12 @@ public class PersonalInfoActivity extends BaseActivity {
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.colorAccent));
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mUserEngine != null) mUserEngine.cancel();
+        if (mUploadFileEngine != null) mUploadFileEngine.cancel();
     }
 }

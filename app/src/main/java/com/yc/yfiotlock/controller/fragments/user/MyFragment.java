@@ -15,8 +15,8 @@ import com.yc.yfiotlock.controller.activitys.user.AboutUsActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.controller.activitys.user.SuggestActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
-import com.yc.yfiotlock.model.bean.PersonalInfo;
-import com.yc.yfiotlock.model.bean.UserInfo;
+import com.yc.yfiotlock.model.bean.user.PersonalInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.adapters.PersonalAdapter;
@@ -75,7 +75,7 @@ public class MyFragment extends BaseFragment {
                 .error(R.mipmap.head_default)
                 .circleCrop()
                 .into(mIvFace);
-        mTvUserName.setText(userInfo.getName());
+        mTvUserName.setText(userInfo.getNickName());
         mTvDeviceNumber.setText(userInfo.getDeviceNumber().concat("个智能设备"));
     }
 

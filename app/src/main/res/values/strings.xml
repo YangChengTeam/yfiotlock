@@ -94,6 +94,7 @@
     <string name="feed_back_contact_et_hint">为快速解决问题，请留下联系方式</string>
     <string name="input_router_hint">请输入路由器型号（可选）</string>
     <string name="et_question_hint">请描述您遇到的问题...</string>
+    <string name="router_model">路由器型号</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>

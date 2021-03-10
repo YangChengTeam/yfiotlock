@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
-import android.os.Bundle;
-import android.util.Log;
+import android.graphics.Color;
 import android.widget.LinearLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,10 +14,9 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
 import com.yc.yfiotlock.download.DownloadManager;
-import com.yc.yfiotlock.download.DownloadUtils;
-import com.yc.yfiotlock.model.bean.AboutInfo;
-import com.yc.yfiotlock.model.bean.UpdateInfo;
-import com.yc.yfiotlock.model.bean.UpgradeInfo;
+import com.yc.yfiotlock.model.bean.user.AboutInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.adapters.AboutAdapter;
@@ -29,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observer;
 
@@ -53,6 +50,7 @@ public class AboutUsActivity extends BaseActivity {
         DownloadManager.setContext(new WeakReference<>(this));
         mBnbTitle.setBackListener(view -> finish());
         setRvAbout();
+        checkVersion(false);
     }
 
     private AboutAdapter mAboutAdapter;
@@ -72,7 +70,8 @@ public class AboutUsActivity extends BaseActivity {
                     CommonUtils.copyWithToast(getContext(), aboutInfo.getValue(), "邮箱已复制");
                     break;
                 case 3:
-                    checkVersion();
+                    break;
+                default:
                     break;
             }
         });
@@ -80,9 +79,9 @@ public class AboutUsActivity extends BaseActivity {
         mRvAbout.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtils.setItemDivider(getContext(), mRvAbout);
         List<AboutInfo> aboutInfos = new ArrayList<>();
-        aboutInfos.add(new AboutInfo("官方网站", "http://www.6ll.com"));
-        aboutInfos.add(new AboutInfo("官方QQ群", "945084787"));
-        aboutInfos.add(new AboutInfo("客服邮箱", "1652728207@qq.com"));
+        aboutInfos.add(new AboutInfo("官方网站", ""));
+        aboutInfos.add(new AboutInfo("官方QQ群", ""));
+        aboutInfos.add(new AboutInfo("客服邮箱", ""));
         String versionCode = "";
         if (GoagalInfo.get() != null && GoagalInfo.get().getPackageInfo() != null) {
             versionCode = GoagalInfo.get().getPackageInfo().versionName;
@@ -99,7 +98,7 @@ public class AboutUsActivity extends BaseActivity {
 
     UpdateEngine mUpdateEngine;
 
-    private void checkVersion() {
+    private void checkVersion(boolean showDialog) {
         mLoadingDialog.show("获取更新中...");
         mUpdateEngine.getUpdateInfo().subscribe(new Observer<ResultInfo<UpgradeInfo>>() {
             @Override
@@ -110,17 +109,31 @@ public class AboutUsActivity extends BaseActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "数据获取失败");
             }
 
             @Override
             public void onNext(ResultInfo<UpgradeInfo> info) {
                 if (info != null && info.getCode() == 1) {
 
+                    UpgradeInfo upgradeInfo = info.getData();
+                    mAboutAdapter.getData().get(0).setValue(upgradeInfo.getOfficialWeb());
+                    mAboutAdapter.getData().get(1).setValue(upgradeInfo.getKfQqQun());
+                    mAboutAdapter.getData().get(2).setValue(upgradeInfo.getKfEmail());
+                    mAboutAdapter.notifyDataSetChanged();
+
                     UpdateInfo updateInfo = CommonUtils.getNeedUpgradeInfo(info.getData().getUpgrade());
                     if (updateInfo != null) {
-                        UpdateDialog updateDialog = new UpdateDialog(getContext());
-                        updateDialog.show(updateInfo);
+                        if (showDialog) {
+                            UpdateDialog updateDialog = new UpdateDialog(getContext());
+                            updateDialog.show(updateInfo);
+                        }
+                    } else {
+                        ToastCompat.showCenter(getContext(), "已是最新版本");
+                        mStvCheck.setSolid(getResources().getColor(R.color.blue_no_input));
+                        mStvCheck.setClickable(false);
+                        mStvCheck.setPressBgColor(Color.TRANSPARENT);
+                        mStvCheck.setShaderEnable(false);
+                        mStvCheck.setText("已是最新版本");
                     }
 
                 } else {
@@ -132,7 +145,7 @@ public class AboutUsActivity extends BaseActivity {
 
     @OnClick(R.id.stv_check)
     public void onViewClicked() {
-        checkVersion();
+        checkVersion(true);
     }
 
     @Override

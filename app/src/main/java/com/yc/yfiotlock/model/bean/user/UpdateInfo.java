@@ -1,25 +1,29 @@
-package com.yc.yfiotlock.model.bean;
+package com.yc.yfiotlock.model.bean.user;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.text.SimpleDateFormat;
 
-/*
+/**
+ * @author Dullyoung
  * Created by　Dullyoung on 2021/3/3
  */
 public class UpdateInfo {
     private String version;
+    @JSONField(name = "version_code")
     private int versionCode;
+    @JSONField(name = "down_url")
     private String downUrl;
     private String desc;
-    private String url;//官网地址
+    //官网地址
+    private String url;
     private String speed;
     private String size;
     private long totalSize;
     private long offsetSize;
     private boolean isDownloading;
     private int downloadStatus;
-    private boolean isMust;
+    private int isMust;
 
     public int getProgress() {
         return (int) (offsetSize * 100 / totalSize);
@@ -115,10 +119,10 @@ public class UpdateInfo {
     }
 
     public boolean isMust() {
-        return isMust;
+        return isMust == 1;
     }
 
-    public void setMust(boolean must) {
+    public void setMust(int must) {
         isMust = must;
     }
 

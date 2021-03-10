@@ -5,8 +5,13 @@ import android.content.Context;
 import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.engin.BaseEngin;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.model.bean.UpgradeInfo;
+import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
+import com.yc.yfiotlock.utils.UserInfoCache;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import rx.Observable;
 
@@ -25,8 +30,12 @@ public class UpdateEngine extends BaseEngin {
     }
 
     public Observable<ResultInfo<UpgradeInfo>> getUpdateInfo() {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
         return rxpost(new TypeReference<ResultInfo<UpgradeInfo>>() {
                 }.getType(),
-                null, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+                map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }
