@@ -3,6 +3,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothGatt;
 import android.content.Intent;
+import android.hardware.SensorEvent;
 import android.os.Build;
 import android.provider.Settings;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.clj.fastble.scan.BleScanRuleConfig;
 import com.clj.fastble.utils.HexUtil;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
@@ -35,18 +37,19 @@ import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
 import com.yc.yfiotlock.helper.PermissionHelper;
+import com.yc.yfiotlock.helper.ShakeSensor;
 import com.yc.yfiotlock.model.bean.DeviceInfo;
-import com.yc.yfiotlock.model.bean.EventStub;
+import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtils;
 import com.yc.yfiotlock.utils.CacheUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -54,8 +57,8 @@ import rx.Subscriber;
 
 public class LockIndexActivity extends BaseActivity {
 
-    public static final String SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
-    public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
+    public static final String SERVICE_UUID = "00001530-0000-3512-2118-0009af100700";
+    public static final String WRITE_CHARACTERISTIC_UUID = "00001531-0000-3512-2118-0009af100700";
     public static final String NOTIFY_CHARACTERISTIC_UUID = "5833ff03-9b8b-5191-6142-22a4536ef123";
 
     @BindView(R.id.iv_back)
@@ -88,17 +91,35 @@ public class LockIndexActivity extends BaseActivity {
 
 
     private LockEngine lockEngine;
+
     private DeviceInfo lockInfo;
+
+    public DeviceInfo getLockInfo() {
+        return lockInfo;
+    }
+
+    private BleDevice bleDevice;
+
+    public BleDevice getBleDevice() {
+        return bleDevice;
+    }
 
     private CONNECT_STATUS connectStatus;
 
     enum CONNECT_STATUS {
         CONNECTING,
         CONNECT_FAILED,
-        CONNECT_SUCC
+        CONNECT_SUCC,
+        CONNECT_OPING
     }
 
-    private BleDevice bleDevice;
+    private static LockIndexActivity mInstance;
+
+    public static LockIndexActivity getInstance() {
+        return mInstance;
+    }
+
+    private ShakeSensor shakeSensor;
 
     @Override
     protected int getLayoutId() {
@@ -108,6 +129,7 @@ public class LockIndexActivity extends BaseActivity {
     @Override
     protected void initViews() {
         setFullScreen();
+        mInstance = this;
 
         initConfig();
 
@@ -146,6 +168,33 @@ public class LockIndexActivity extends BaseActivity {
             }
         });
         scan();
+
+        shakeSensor = new ShakeSensor(this);
+        shakeSensor.setShakeListener(new ShakeSensor.OnShakeListener() {
+            @Override
+            public void onShakeComplete(SensorEvent event) {
+                if (connectStatus == CONNECT_STATUS.CONNECT_SUCC) {
+                    // 开门
+                    open();
+                }
+            }
+        });
+    }
+
+
+    @Override
+    protected void onResume() {
+        shakeSensor.register();
+        super.onResume();
+        if (bleDevice != null && connectStatus == CONNECT_STATUS.CONNECT_FAILED) {
+            scan();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        shakeSensor.unregister();
+        super.onStop();
     }
 
     private void stopAnimations() {
@@ -163,17 +212,36 @@ public class LockIndexActivity extends BaseActivity {
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
-                .setServiceUuids(new UUID[]{UUID.fromString(SERVICE_UUID)})
+                .setDeviceName(false, "Mi Smart Band 5")
                 .setScanTimeOut(10000);
         BleManager.getInstance().initScanRule(builder.build());
     }
 
+    private boolean opStatus = false;
+
     private void open() {
+        connectStatus = CONNECT_STATUS.CONNECT_OPING;
+
         startAnimations();
         loadingIv.setImageResource(R.mipmap.three);
+        statusTitleTv.setText("正在开锁...");
 
         byte[] bytes = LockBLEOpCmd.open(LockIndexActivity.this);
         op(bytes);
+        VUiKit.postDelayed(5000, new Runnable() {
+            @Override
+            public void run() {
+                if (!opStatus && connectStatus == CONNECT_STATUS.CONNECT_OPING) {
+                    connectStatus = CONNECT_STATUS.CONNECT_SUCC;
+
+                    LockBLEData lockBLEData = new LockBLEData();
+                    lockBLEData.setMcmd((byte) 0x02);
+                    lockBLEData.setScmd((byte) 0x01);
+                    lockBLEData.setStatus((byte) 0x06);  // 响应超时
+                    processNotify(lockBLEData);
+                }
+            }
+        });
     }
 
     private void op(byte[] bytes) {
@@ -195,10 +263,17 @@ public class LockIndexActivity extends BaseActivity {
 
                     @Override
                     public void onWriteFailure(final BleException exception) {
+                        LockBLEData lockBLEData = new LockBLEData();
+                        lockBLEData.setMcmd((byte) 0x02);
+                        lockBLEData.setScmd((byte) 0x01);
+                        lockBLEData.setStatus((byte) 0x05);  // 写入失败
+                        EventBus.getDefault().post(lockBLEData);
                         Toast.makeText(LockIndexActivity.this, "Write失败: " + exception.getDescription(), Toast.LENGTH_LONG).show();
                     }
                 });
+
     }
+
 
     private static final int REQUEST_GPS = 4;
 
@@ -230,6 +305,58 @@ public class LockIndexActivity extends BaseActivity {
         });
     }
 
+    // 开始扫描
+    private void startScan() {
+        if (!BleManager.getInstance().isBlueEnable()) {
+            Toast.makeText(LockIndexActivity.this, "请先打开蓝牙", Toast.LENGTH_LONG).show();
+            BleManager.getInstance().enableBluetooth();
+            return;
+        }
+
+        // 设置搜索状态
+        connectStatus = CONNECT_STATUS.CONNECTING;
+        loadingIv.setImageResource(R.mipmap.two);
+        statusIv.setImageResource(R.mipmap.icon_bluetooth);
+        statusTitleTv.setText("搜索门锁中...");
+        opDespTv.setText("请打开手机蓝牙贴近门锁");
+        startAnimations();
+
+        // 开始搜索
+        BleManager.getInstance().scan(new BleScanCallback() {
+            @Override
+            public void onScanStarted(boolean success) {
+
+            }
+
+            @Override
+            public void onLeScan(BleDevice bleDevice) {
+                super.onLeScan(bleDevice);
+            }
+
+            @Override
+            public void onScanning(BleDevice bleDevice) {
+                // 搜索到后开始连接
+                Toast.makeText(LockIndexActivity.this, bleDevice.getName(), Toast.LENGTH_LONG).show();
+
+                connect(bleDevice);
+            }
+
+            @Override
+            public void onScanFinished(List<BleDevice> scanResultList) {
+                Toast.makeText(LockIndexActivity.this, scanResultList.size() + "", Toast.LENGTH_LONG).show();
+                if (scanResultList.size() == 0) {
+                    // 搜索完成未发现设备
+                    connectStatus = CONNECT_STATUS.CONNECT_FAILED;
+                    stopAnimations();
+                    statusTitleTv.setText("未搜索到门锁");
+                    opDespTv.setText("请打开手机蓝牙贴近门锁");
+                    statusIv.setImageResource(R.mipmap.icon_nolink);
+                    loadingIv.setImageResource(R.mipmap.one);
+                }
+            }
+        });
+    }
+
     // 连接蓝牙
     private void connect(final BleDevice bleDevice) {
         statusTitleTv.setText("连接门锁中...");
@@ -245,7 +372,7 @@ public class LockIndexActivity extends BaseActivity {
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
                 connectStatus = CONNECT_STATUS.CONNECT_FAILED;
                 stopAnimations();
-                statusTitleTv.setText("门锁未连接");
+                statusTitleTv.setText("门锁连接失败");
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
                 statusIv.setImageResource(R.mipmap.icon_nolink);
                 loadingIv.setImageResource(R.mipmap.one);
@@ -302,55 +429,6 @@ public class LockIndexActivity extends BaseActivity {
         });
     }
 
-    // 开始扫描
-    private void startScan() {
-        if (!BleManager.getInstance().isBlueEnable()) {
-            Toast.makeText(LockIndexActivity.this, "请先打开蓝牙", Toast.LENGTH_LONG).show();
-            BleManager.getInstance().enableBluetooth();
-            return;
-        }
-
-        // 设置搜索状态
-        connectStatus = CONNECT_STATUS.CONNECTING;
-        loadingIv.setImageResource(R.mipmap.two);
-        statusIv.setImageResource(R.mipmap.icon_bluetooth);
-        statusTitleTv.setText("搜索门锁中...");
-        opDespTv.setText("请打开手机蓝牙贴近门锁");
-        startAnimations();
-
-        // 开始搜索
-        BleManager.getInstance().scan(new BleScanCallback() {
-            @Override
-            public void onScanStarted(boolean success) {
-
-            }
-
-            @Override
-            public void onLeScan(BleDevice bleDevice) {
-                super.onLeScan(bleDevice);
-            }
-
-            @Override
-            public void onScanning(BleDevice bleDevice) {
-                // 搜索到后开始连接
-                connect(bleDevice);
-            }
-
-            @Override
-            public void onScanFinished(List<BleDevice> scanResultList) {
-                if (scanResultList.size() == 0) {
-                    // 搜索完成未发现设备
-                    connectStatus = CONNECT_STATUS.CONNECT_FAILED;
-                    stopAnimations();
-                    statusTitleTv.setText("未搜索到门锁");
-                    opDespTv.setText("请打开手机蓝牙贴近门锁");
-                    statusIv.setImageResource(R.mipmap.icon_nolink);
-                    loadingIv.setImageResource(R.mipmap.one);
-                }
-            }
-        });
-    }
-
     // 蓝牙响应
     private void bleNotify() {
         BleManager.getInstance().notify(
@@ -394,10 +472,20 @@ public class LockIndexActivity extends BaseActivity {
                         if (lockBLEData.getStatus() == (byte) 0x00) {
                             stopAnimations();
                             loadingIv.setImageResource(R.mipmap.three);
+                            statusTitleTv.setText("已打开门锁");
                             statusIv.setImageResource(R.mipmap.icon_lock_open);
                         } else {
-
+                            stopAnimations();
+                            statusTitleTv.setText("已连接门锁");
+                            loadingIv.setImageResource(R.mipmap.one);
+                            if (lockBLEData.getStatus() == (byte) 0x06) {
+                                Toast.makeText(LockIndexActivity.this, "开锁Notify响应超时", Toast.LENGTH_LONG).show();
+                            }
                         }
+                        break;
+                    }
+                    case (byte) 0x02: {
+                        EventBus.getDefault().post(lockBLEData);
                         break;
                     }
                 }
@@ -430,10 +518,17 @@ public class LockIndexActivity extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onOpenLockCountInfo(OpenLockCountInfo countInfo) {
+    public void onRefresh(OpenLockRefreshEvent object) {
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
         if (countInfo != null) {
             openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
-            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onWrite(byte[] bytes) {
+        if (bytes != null) {
+            op(bytes);
         }
     }
 
@@ -443,7 +538,7 @@ public class LockIndexActivity extends BaseActivity {
         if (countInfo != null) {
             openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
         }
-        lockEngine.getOpenLockInfoCount(lockInfo.getId()).subscribe(new Subscriber<ResultInfo<OpenLockCountInfo>>() {
+        lockEngine.getOpenLockInfoCount("1").subscribe(new Subscriber<ResultInfo<OpenLockCountInfo>>() {
             @Override
             public void onCompleted() {
 
@@ -464,7 +559,6 @@ public class LockIndexActivity extends BaseActivity {
             }
         });
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

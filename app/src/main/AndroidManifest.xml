@@ -74,9 +74,6 @@
             android:name=".controller.activitys.lock.ble.PasswordAddOpenLockActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
-            android:name=".controller.activitys.lock.ble.PasswordAddNextOpenLockActivity"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
-        <activity
             android:name=".controller.activitys.lock.ble.FingerprintAddOpenLockActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity

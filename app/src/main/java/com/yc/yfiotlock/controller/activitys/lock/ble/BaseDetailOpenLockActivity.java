@@ -5,19 +5,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
+import com.jakewharton.rxbinding4.view.RxView;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.BaseDetailOpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.BaseOpenLockInfo;
+import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import rx.Subscriber;
 
 public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     @BindView(R.id.rv_open_lock)
@@ -26,8 +37,10 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     SuperTextView delTv;
 
     protected OpenLockAdapter openLockAdapter;
+    protected LockEngine lockEngine;
+    protected BaseOpenLockInfo openLockInfo;
 
-    private String title;
+    protected String title;
 
     public void setTitle(String title) {
         this.title = title;
@@ -39,13 +52,60 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     }
 
     @Override
+    protected void initVars() {
+        super.initVars();
+        lockEngine = new LockEngine(this);
+    }
+
+    @Override
     protected void initViews() {
         super.initViews();
         setNavTitle(title + "详情");
         delTv.setText(delTv.getText() + title);
 
         setRv();
+        openLockInfo = (BaseOpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
+        RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            cloudDel(openLockInfo.getId()+"");
+        });
     }
+
+
+    protected boolean opStatus = false;
+    protected abstract void bleDel();
+    protected abstract void cloudDel();
+    protected abstract void processData(LockBLEData bleData);
+
+    protected void cloudDel(String id) {
+        lockEngine.delOpenLockWay(id).subscribe(new Subscriber<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(ResultInfo<String> stringResultInfo) {
+                if (stringResultInfo.getCode() == 1) {
+                    finish();
+                    cloudDel();
+                    EventBus.getDefault().post(new OpenLockRefreshEvent());
+                }
+            }
+        });
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onProcess(LockBLEData bleData) {
+        opStatus = true;
+        processData(bleData);
+    }
+
 
     private void setRv() {
         List<BaseDetailOpenLockInfo> openLockTypeInfos = new ArrayList<>();

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.yc.yfiotlock.ble.LockBLEData;
 
 public class FingerprintDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     @Override
@@ -21,5 +22,20 @@ public class FingerprintDetailOpenLockActivity extends BaseDetailOpenLockActivit
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void bleDel() {
+
+    }
+
+    @Override
+    protected void cloudDel() {
+
+    }
+
+    @Override
+    protected void processData(LockBLEData bleData) {
+
     }
 }

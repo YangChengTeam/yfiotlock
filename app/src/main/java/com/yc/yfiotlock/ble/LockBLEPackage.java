@@ -133,6 +133,10 @@ public class LockBLEPackage {
         lockBLEData.setMcmd(response[10]);
         lockBLEData.setScmd(response[11]);
         lockBLEData.setStatus(response[12]);
+        // LENGHT = 2 SEQ = 4 MCMD = 1 SCMD = 1 DATA STATUS = 1 CRC16 = 2
+        if (len - 11 > 0) {
+            lockBLEData.setOther(Arrays.copyOfRange(response, 11, len - 12));
+        }
         return lockBLEData;
     }
 }

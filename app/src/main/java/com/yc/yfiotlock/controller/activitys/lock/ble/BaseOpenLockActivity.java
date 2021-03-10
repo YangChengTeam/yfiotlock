@@ -1,22 +1,38 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.content.Intent;
+import android.view.View;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.TypeReference;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.BaseOpenLockInfo;
+import com.yc.yfiotlock.model.engin.LockEngine;
+import com.yc.yfiotlock.utils.BleUtils;
+import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import rx.Subscriber;
 
 public abstract class BaseOpenLockActivity extends BaseBackActivity {
     @BindView(R.id.rv_open_lock)
@@ -26,6 +42,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     protected SuperTextView addTv;
 
     protected OpenLockAdapter openLockAdapter;
+    protected LockEngine lockEngine;
 
     private String title;
 
@@ -38,22 +55,63 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         return R.layout.lock_ble_activity_base_open_lock;
     }
 
+
+    @Override
+    protected void initVars() {
+        super.initVars();
+        lockEngine = new LockEngine(this);
+    }
+
     @Override
     protected void initViews() {
         super.initViews();
         setNavTitle(title);
         addTv.setText(addTv.getText() + title);
         setRv();
+
+        loadData();
     }
 
     private void setRv() {
-        List<BaseOpenLockInfo> openLockTypeInfos = new ArrayList<>();
-        openLockTypeInfos.add(new BaseOpenLockInfo());
-
-        openLockAdapter = new OpenLockAdapter(openLockTypeInfos);
+        openLockAdapter = new OpenLockAdapter(null);
         openLockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         openLockRecyclerView.setAdapter(openLockAdapter);
 
+    }
+
+    private void loadData() {
+        String type = BleUtils.getType(title) + "";
+        List<BaseOpenLockInfo> lockInfos = CacheUtils.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, new TypeReference<List<BaseOpenLockInfo>>() {
+        }.getType());
+        if (lockInfos != null) {
+            openLockAdapter.setNewInstance(lockInfos);
+        }
+        DeviceInfo deviceInfo = LockIndexActivity.getInstance().getLockInfo();
+        lockEngine.getOpenLockWayList("1", type).subscribe(new Subscriber<ResultInfo<List<BaseOpenLockInfo>>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(ResultInfo<List<BaseOpenLockInfo>> listResultInfo) {
+                if (listResultInfo.getCode() == 1 && listResultInfo.getData() != null) {
+                    List<BaseOpenLockInfo> lockInfos = listResultInfo.getData();
+                    openLockAdapter.setNewInstance(lockInfos);
+                    CacheUtils.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, lockInfos);
+                }
+            }
+        });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(OpenLockRefreshEvent object) {
+        loadData();
     }
 
     public static class OpenLockAdapter extends BaseExtendAdapter<BaseOpenLockInfo> {
