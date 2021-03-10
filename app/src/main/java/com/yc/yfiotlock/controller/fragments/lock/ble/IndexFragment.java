@@ -34,7 +34,6 @@ public class IndexFragment extends BaseFragment {
     RecyclerView devicesRecyclerView;
 
     IndexDeviceAdapter indexDeviceAdapter;
-    IMyAidlInterface iRemoteService;
 
     @Override
     protected int getLayoutId() {
@@ -68,7 +67,7 @@ public class IndexFragment extends BaseFragment {
             if (position == adapter.getData().size() - 1) {
                 nav2AddDevice();
             } else {
-                nav2LockIndex();
+                nav2LockIndex((DeviceInfo) adapter.getData().get(position));
             }
         });
     }
@@ -78,8 +77,9 @@ public class IndexFragment extends BaseFragment {
         startActivity(intent);
     }
 
-    private void nav2LockIndex() {
+    private void nav2LockIndex(DeviceInfo deviceInfo) {
         Intent intent = new Intent(getActivity(), LockIndexActivity.class);
+        intent.putExtra("device", deviceInfo);
         startActivity(intent);
     }
 

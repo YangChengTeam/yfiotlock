@@ -13,9 +13,15 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
+import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,30 +45,11 @@ public class OpenLockManagerActivity extends BaseActivity {
     @Override
     protected void initViews() {
         setRv();
+        loadData();
     }
 
     private void setRv() {
-        List<OpenLockTypeInfo> openLockTypeInfos = new ArrayList<>();
-
-        OpenLockTypeInfo openLockTypeInfo = new OpenLockTypeInfo();
-        openLockTypeInfo.setIcon(R.mipmap.icon_fingerprint);
-        openLockTypeInfo.setName("指纹");
-        openLockTypeInfo.setDesp("0个指纹");
-        openLockTypeInfos.add(openLockTypeInfo);
-
-        OpenLockTypeInfo openLockTypeInfo2 = new OpenLockTypeInfo();
-        openLockTypeInfo2.setIcon(R.mipmap.icon_serct);
-        openLockTypeInfo2.setName("密码");
-        openLockTypeInfo2.setDesp("0个密码");
-        openLockTypeInfos.add(openLockTypeInfo2);
-
-        OpenLockTypeInfo openLockTypeInfo3 = new OpenLockTypeInfo();
-        openLockTypeInfo3.setIcon(R.mipmap.icon_nfc);
-        openLockTypeInfo3.setName("NFC门卡");
-        openLockTypeInfo3.setDesp("0个门卡");
-        openLockTypeInfos.add(openLockTypeInfo3);
-
-        openLockAdapter = new OpenLockAdapter(openLockTypeInfos);
+        openLockAdapter = new OpenLockAdapter(null);
         openLockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         openLockRecyclerView.setAdapter(openLockAdapter);
         openLockAdapter.setOnItemClickListener(new OnItemClickListener() {
@@ -80,6 +67,48 @@ public class OpenLockManagerActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
+
+
+    }
+
+    private void loadData(){
+        int fingerprintCount = 0;
+        int passwordCount = 0;
+        int cardCount = 0;
+
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+        if(countInfo != null){
+            fingerprintCount = countInfo.getFingerprintCount();
+            passwordCount = countInfo.getPasswordCount();
+            cardCount = countInfo.getCardCount();
+        }
+
+        List<OpenLockTypeInfo> openLockTypeInfos = new ArrayList<>();
+
+        OpenLockTypeInfo fingerprintOpenLockTypeInfo = new OpenLockTypeInfo();
+        fingerprintOpenLockTypeInfo.setIcon(R.mipmap.icon_fingerprint);
+        fingerprintOpenLockTypeInfo.setName("指纹");
+        fingerprintOpenLockTypeInfo.setDesp(fingerprintCount+"个指纹");
+        openLockTypeInfos.add(fingerprintOpenLockTypeInfo);
+
+        OpenLockTypeInfo passwordOpenLockTypeInfo = new OpenLockTypeInfo();
+        passwordOpenLockTypeInfo.setIcon(R.mipmap.icon_serct);
+        passwordOpenLockTypeInfo.setName("密码");
+        passwordOpenLockTypeInfo.setDesp(passwordCount+"个密码");
+        openLockTypeInfos.add(passwordOpenLockTypeInfo);
+
+        OpenLockTypeInfo cardOpenLockTypeInfo = new OpenLockTypeInfo();
+        cardOpenLockTypeInfo.setIcon(R.mipmap.icon_nfc);
+        cardOpenLockTypeInfo.setName("NFC门卡");
+        cardOpenLockTypeInfo.setDesp(cardCount+"个门卡");
+        openLockTypeInfos.add(cardOpenLockTypeInfo);
+
+        openLockAdapter.setNewInstance(openLockTypeInfos);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(OpenLockRefreshEvent object) {
+        loadData();
     }
 
     private class OpenLockTypeInfo {

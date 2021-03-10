@@ -4,6 +4,9 @@ public class Config {
     public static boolean DEBUG = false;
     public static boolean RESQUEST_FLAG = true;
 
+    public static String GROUP_TYPE = "0";
+    public static int OP_TIMEOUT = 5000;
+
     private final static String baseUrl = "http://locker.yf5g.cn";
     private final static String debugBaseUrl = "http://box.wuhanup.com/api";
 
@@ -66,6 +69,7 @@ public class Config {
     public static final String OPEN_LOCK_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdList" + isRsa();
     public static final String OPEN_LOCK_SINGLE_TYPE_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/pwdTypeList" + isRsa();
     public static final String OPEN_LOCK_MODIFY_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpd" + isRsa();
+    public static final String OPEN_LOCK_DEL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDel" + isRsa();
 
 
     public static final int CLICK_LIMIT = 500;

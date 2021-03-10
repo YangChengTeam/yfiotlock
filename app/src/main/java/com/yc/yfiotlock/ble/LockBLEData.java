@@ -13,6 +13,7 @@ public class LockBLEData {
     private byte mcmd;
     private byte scmd;
     private byte status;
+    private byte[] other;
 
     private String body;
 
@@ -22,6 +23,14 @@ public class LockBLEData {
 
     public byte getScmd() {
         return scmd;
+    }
+
+    public byte[] getOther() {
+        return other;
+    }
+
+    public void setOther(byte[] other) {
+        this.other = other;
     }
 
     public byte getStatus() {

@@ -10,6 +10,7 @@ import com.kk.securityhttp.engin.BaseEngin;
 import com.kk.securityhttp.engin.HttpCoreEngin;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.model.bean.lock.ble.BaseOpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
@@ -86,7 +87,7 @@ public class LockEngine extends BaseEngin {
      * @param pwdType  1:finger 2:psw 3:door-card
      * @return list of single openLockWay's info
      */
-    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String pwdType) {
+    public Observable<ResultInfo<List<BaseOpenLockInfo>>> getOpenLockWayList(String lockerId, String pwdType) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
@@ -94,8 +95,8 @@ public class LockEngine extends BaseEngin {
         }
         map.put("locker_id", lockerId);
         map.put("pwd_type", pwdType);
-        return new HttpCoreEngin<ResultInfo<List<OpenLockInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
-                new TypeReference<ResultInfo<List<OpenLockInfo>>>() {
+        return new HttpCoreEngin<ResultInfo<List<BaseOpenLockInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
+                new TypeReference<ResultInfo<List<BaseOpenLockInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -118,4 +119,15 @@ public class LockEngine extends BaseEngin {
     }
 
 
+    // 删除开门方式
+    public Observable<ResultInfo<String>> delOpenLockWay(String id) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("id", id);
+        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_DEL_PSW_URL,
+                new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
 }
