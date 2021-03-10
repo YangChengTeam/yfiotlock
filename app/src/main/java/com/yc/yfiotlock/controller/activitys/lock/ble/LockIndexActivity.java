@@ -23,6 +23,7 @@ import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 import com.clj.fastble.utils.HexUtil;
 import com.jakewharton.rxbinding4.view.RxView;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
@@ -34,13 +35,22 @@ import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
 import com.yc.yfiotlock.helper.PermissionHelper;
+import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.EventStub;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
+import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtils;
+import com.yc.yfiotlock.utils.CacheUtils;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import rx.Subscriber;
 
 public class LockIndexActivity extends BaseActivity {
 
@@ -73,6 +83,13 @@ public class LockIndexActivity extends BaseActivity {
     @BindView(R.id.tv_op_desp)
     TextView opDespTv;
 
+    @BindView(R.id.tv_open_count)
+    TextView openCountTv;
+
+
+    private LockEngine lockEngine;
+    private DeviceInfo lockInfo;
+
     private CONNECT_STATUS connectStatus;
 
     enum CONNECT_STATUS {
@@ -93,6 +110,12 @@ public class LockIndexActivity extends BaseActivity {
         setFullScreen();
 
         initConfig();
+
+        lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
+        lockEngine = new LockEngine(this);
+        if (lockInfo != null) {
+            loadLockOpenCountInfo();
+        }
 
         RxView.clicks(backBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             finish();
@@ -178,6 +201,7 @@ public class LockIndexActivity extends BaseActivity {
     }
 
     private static final int REQUEST_GPS = 4;
+
     private void scan() {
         mPermissionHelper.checkAndRequestPermission(LockIndexActivity.this, new PermissionHelper.OnRequestPermissionsCallback() {
             @Override
@@ -403,6 +427,42 @@ public class LockIndexActivity extends BaseActivity {
     private void nav2setting() {
         Intent intent = new Intent(this, LockSettingActivity.class);
         startActivity(intent);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onOpenLockCountInfo(OpenLockCountInfo countInfo) {
+        if (countInfo != null) {
+            openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
+            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+        }
+    }
+
+    // 开门方式数量
+    private void loadLockOpenCountInfo() {
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+        if (countInfo != null) {
+            openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
+        }
+        lockEngine.getOpenLockInfoCount(lockInfo.getId()).subscribe(new Subscriber<ResultInfo<OpenLockCountInfo>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(ResultInfo<OpenLockCountInfo> openLockCountInfoResultInfo) {
+                if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
+                    OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
+                    openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
+                    CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+                }
+            }
+        });
     }
 
 

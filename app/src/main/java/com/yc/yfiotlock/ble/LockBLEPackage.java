@@ -81,7 +81,7 @@ public class LockBLEPackage {
                     .putShort(crc16)
                     .put(end).array());
         }
-        
+
         return packagesBuffer.array();
     }
 

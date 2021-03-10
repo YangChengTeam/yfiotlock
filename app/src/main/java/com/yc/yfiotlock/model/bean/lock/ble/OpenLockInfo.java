@@ -17,9 +17,6 @@ public class OpenLockInfo {
     @JSONField(name = "group_type")
     private String groupType;
     private String pwd;
-    private String finger;
-    private String nfc;
-    private String model;
 
     public String getLockerId() {
         return lockerId;
@@ -67,29 +64,5 @@ public class OpenLockInfo {
 
     public void setPwd(String pwd) {
         this.pwd = pwd;
-    }
-
-    public String getFinger() {
-        return finger;
-    }
-
-    public void setFinger(String finger) {
-        this.finger = finger;
-    }
-
-    public String getNfc() {
-        return nfc;
-    }
-
-    public void setNfc(String nfc) {
-        this.nfc = nfc;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
     }
 }
