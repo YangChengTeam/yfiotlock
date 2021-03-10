@@ -23,6 +23,10 @@ public class LockBLEPackage {
     // START = 1 PID = 1 LENGTH = 2 CRC16 = 2 END = 1  total = 7
     private int nodataLen = 7;  //非数据区长度
 
+    public static int getMtu() {
+        return mtu;
+    }
+
     public static void setMtu(int mtu) {
         LockBLEPackage.mtu = mtu;
     }
@@ -37,6 +41,7 @@ public class LockBLEPackage {
         data = bleData.build(context);
 
         int maxdataLen = (mtu - nodataLen);
+        // 分包操作 目前数据量应该都是1个包
         int packageCount = data.length / maxdataLen + ((data.length % maxdataLen) > 0 ? 1 : 0);
         int totalLen = 0;
         for (int i = 0; i < packageCount; i++) {
@@ -62,6 +67,7 @@ public class LockBLEPackage {
             // START = 1 CRC16 = 2 END = 1
             length = (short) (1 + precrcLen + len + 2 + 1);
 
+            // make crc16 bytes
             ByteBuffer byteBuffer = ByteBuffer.allocate(len + precrcLen).order(ByteOrder.BIG_ENDIAN);
             byte[] bytes = byteBuffer.put(pid)
                     .putShort(length)
@@ -75,6 +81,7 @@ public class LockBLEPackage {
                     .putShort(crc16)
                     .put(end).array());
         }
+
         return packagesBuffer.array();
     }
 

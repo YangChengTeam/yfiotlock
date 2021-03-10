@@ -1,19 +1,12 @@
 package com.yc.yfiotlock.controller.fragments.lock.ble;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.view.View;
 
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.rxbinding4.view.RxView;
-import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.IMyAidlInterface;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
@@ -21,7 +14,6 @@ import com.yc.yfiotlock.controller.activitys.lock.ble.AddDeviceActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
-import com.yc.yfiotlock.demo.RemoteService;
 import com.yc.yfiotlock.model.bean.DeviceInfo;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
 

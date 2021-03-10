@@ -24,27 +24,48 @@ public class Config {
 
 
     //登陆
+
     public final static String ALI_FAST_LOGIN = getBaseUrl() + "/userapp/v1.User/oneClickLogin" + isRsa();
     public final static String LOGIN_SEND_CODE_URL = getBaseUrl() + "/userapp/v1.Sms/send" + isRsa();
     public final static String SMS_CODE_LOGIN_URL = getBaseUrl() + "/userapp/v1.User/codeLogin" + isRsa();
 
     //FAQ
+
     public static final String FQA_LIST_URL = getBaseUrl() + "/userapp/v1.faq/faqList" + isRsa();
 
     public static final String INIT_URL = getBaseUrl() + "/v1/Index/init" + isRsa();
 
     //更新
+
     public static final String UPDATE_URL = getBaseUrl() + "/userapp/v1.User/aboutUs" + isRsa();
 
     //上传图片
+
     public static final String UPLOAD_PIC_URL = getBaseUrl() + "/userapp/v1.User/uploads" + "?rea=5";
 
     //反馈 建议
+
     public static final String FEEDBACK_SUGGEST_URL = getBaseUrl() + "/userapp/v1.Feedback/feedbackAdd" + isRsa();
 
     //用户信息更改
+
     public static final String USER_NAME_UPD_URL = getBaseUrl() + "/userapp/v1.User/nicknameUpd" + isRsa();
     public static final String USER_FACE_UPD_URL = getBaseUrl() + "/userapp/v1.User/faceUpd" + isRsa();
+
+    //家庭相关
+
+    public static final String HOME_LIST_URL = getBaseUrl() + "/userapp/v1.family/familyList" + isRsa();
+    public static final String HOME_INFO_MODIFY_URL = getBaseUrl() + "/userapp/v1.family/familyUpd" + isRsa();
+    public static final String HOME_INFO_ADD_URL = getBaseUrl() + "/userapp/v1.family/familyAdd" + isRsa();
+    public static final String HOME_SET_DEFAULT_URL = getBaseUrl() + "/userapp/v1.family/familyDefSet" + isRsa();
+    public static final String HOME_INFO_DELETE_URL = getBaseUrl() + "/userapp/v1.family/familyDel" + isRsa();
+
+    //开锁管理相关
+
+    public static final String OPEN_LOCK_ADD_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdAdd" + isRsa();
+    public static final String OPEN_LOCK_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdList" + isRsa();
+    public static final String OPEN_LOCK_SINGLE_TYPE_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/pwdTypeList" + isRsa();
+    public static final String OPEN_LOCK_MODIFY_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpd" + isRsa();
 
 
     public static final int CLICK_LIMIT = 500;
