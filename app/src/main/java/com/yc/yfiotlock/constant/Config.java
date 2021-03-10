@@ -72,6 +72,9 @@ public class Config {
     public static final String OPEN_LOCK_DEL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDel" + isRsa();
 
 
+    public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();
+
+
     public static final int CLICK_LIMIT = 500;
 
     public static String isRsa() {
