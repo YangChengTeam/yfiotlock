@@ -141,7 +141,9 @@ public class FeedBackActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 333 && resultCode == RESULT_OK) {
-            if (data == null) return;
+            if (data == null){
+                return;
+            }
             List<Uri> photoUris = Matisse.obtainResult(data);
             List<Uri> beforeUris = mFeedBackAdapter.getData();
             beforeUris.remove(Uri.parse("default"));
@@ -185,6 +187,7 @@ public class FeedBackActivity extends BaseActivity {
             mLoadingDialog.show("上传第" + (backImgs.size() + 1) + "张图片");
             mUploadFileEngine.uploadWithFile(Config.UPLOAD_PIC_URL, new HashMap<>(), "file",
                     files.get(backImgs.size()), new Callback<String>() {
+                        @Override
                         public void onSuccess(String resultInfo) {
                             try {
                                 ResultInfo<PicInfo> info = JSONObject.parseObject(resultInfo, new TypeReference<ResultInfo<PicInfo>>() {
@@ -204,6 +207,7 @@ public class FeedBackActivity extends BaseActivity {
                         @Override
                         public void onFailure(Response response) {
                             mLoadingDialog.dismiss();
+                            backImgs.clear();
                             ToastCompat.show(getContext(), response.body);
                         }
                     });
