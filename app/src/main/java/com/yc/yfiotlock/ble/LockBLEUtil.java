@@ -2,6 +2,14 @@ package com.yc.yfiotlock.ble;
 
 import android.content.Context;
 import android.location.LocationManager;
+import android.widget.Toast;
+
+import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleWriteCallback;
+import com.clj.fastble.data.BleDevice;
+import com.clj.fastble.exception.BleException;
+import com.clj.fastble.utils.HexUtil;
+import com.yc.yfiotlock.demo.OperationActivity;
 
 public class LockBLEUtil {
     static {
@@ -107,7 +115,5 @@ public class LockBLEUtil {
             return false;
         return locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
     }
-
-
 
 }

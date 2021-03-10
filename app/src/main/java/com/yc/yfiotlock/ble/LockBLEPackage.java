@@ -23,6 +23,10 @@ public class LockBLEPackage {
     // START = 1 PID = 1 LENGTH = 2 CRC16 = 2 END = 1  total = 7
     private int nodataLen = 7;  //非数据区长度
 
+    public static int getMtu() {
+        return mtu;
+    }
+
     public static void setMtu(int mtu) {
         LockBLEPackage.mtu = mtu;
     }

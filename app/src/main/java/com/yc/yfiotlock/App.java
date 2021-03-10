@@ -4,10 +4,12 @@ import android.app.Application;
 import android.os.Build;
 
 import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
+import com.clj.fastble.BleManager;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
 import com.tencent.mmkv.MMKV;
+import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.model.engin.GlideEngine;
@@ -32,7 +34,9 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Reflection.unseal(this);
         app = this;
+        initBle();
         initSdk();
         initHttp();
         initCommonConfig();
@@ -40,7 +44,15 @@ public class App extends Application {
 
     private void initCommonConfig() {
         LoadMoreModuleConfig.setDefLoadMoreView(new CustomLoadMoreView());
-        Reflection.unseal(this);
+    }
+
+    private void initBle() {
+        BleManager.getInstance()
+                .enableLog(true)
+                .setReConnectCount(1, 1000)
+                .setSplitWriteNum(LockBLEPackage.getMtu())
+                .setConnectOverTime(10000)
+                .setOperateTimeout(5000).init(this);
     }
 
     private void initHttp() {

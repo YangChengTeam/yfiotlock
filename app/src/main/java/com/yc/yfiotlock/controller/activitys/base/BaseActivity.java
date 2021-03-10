@@ -31,7 +31,7 @@ import butterknife.ButterKnife;
 
 public abstract class BaseActivity extends AppCompatActivity implements ILoadData {
 
-    private PermissionHelper mPermissionHelper;
+    protected PermissionHelper mPermissionHelper;
 
     public PermissionHelper getPermissionHelper() {
         return mPermissionHelper;
