@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.view.View;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +19,7 @@ import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.BleUtils;
 import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
+import com.yc.yfiotlock.view.widgets.NoDataView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -31,9 +34,12 @@ import rx.Subscriber;
 public abstract class BaseOpenLockActivity extends BaseBackActivity {
     @BindView(R.id.rv_open_lock)
     RecyclerView openLockRecyclerView;
+    @BindView(R.id.view_no_data)
+    NoDataView nodataView;
 
     @BindView(R.id.stv_add)
     protected SuperTextView addTv;
+
 
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
@@ -80,15 +86,16 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             openLockAdapter.setNewInstance(lockInfos);
         }
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        lockEngine.getOpenLockWayList("1", type).subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
+        mLoadingDialog.show("加载中...");
+        lockEngine.getOpenLockWayList(lockInfo.getId(), type).subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {
-
+                mLoadingDialog.dismiss();
             }
 
             @Override
             public void onError(Throwable e) {
-
+                mLoadingDialog.dismiss();
             }
 
             @Override
@@ -97,6 +104,12 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                     List<OpenLockInfo> lockInfos = listResultInfo.getData();
                     openLockAdapter.setNewInstance(lockInfos);
                     CacheUtils.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, lockInfos);
+                    if (lockInfos.size() == 0) {
+                        nodataView.setVisibility(View.VISIBLE);
+                        nodataView.setMessage("暂无" + title + "数据");
+                    } else {
+                        nodataView.setVisibility(View.GONE);
+                    }
                 }
             }
         });

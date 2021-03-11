@@ -27,6 +27,7 @@ public class NoDataView extends BaseView {
         this.msg = msg;
     }
 
+
     public NoDataView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -34,6 +35,12 @@ public class NoDataView extends BaseView {
     @Override
     public int getLayoutId() {
         return R.layout.view_nodata;
+    }
+
+    public void setMessage(String msg) {
+        if (!TextUtils.isEmpty(msg)) {
+            mTvMessage.setText(msg);
+        }
     }
 
     @Override

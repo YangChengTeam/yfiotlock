@@ -90,7 +90,6 @@ public class LockBLEData {
                     .array();
         }
 
-        LogUtil.msg("--------------------" +  LockBLEUtil.toHexString(bytes));
         short crc16 = (short) LockBLEUtil.crc16(bytes);
 
         // CRC16 = 2

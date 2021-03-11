@@ -6,12 +6,11 @@ import android.os.Build;
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
-import com.clj.fastble.BleManager;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
 import com.tencent.mmkv.MMKV;
-import com.yc.yfiotlock.ble.LockBLEPackage;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.model.engin.GlideEngine;
@@ -38,7 +37,7 @@ public class App extends Application {
         super.onCreate();
         Reflection.unseal(this);
         app = this;
-        initBle();
+        LockBLEManager.initBle(this);
         initSdk();
         initHttp();
         initCommonConfig();
@@ -57,14 +56,7 @@ public class App extends Application {
         LoadMoreModuleConfig.setDefLoadMoreView(new CustomLoadMoreView());
     }
 
-    private void initBle() {
-        BleManager.getInstance()
-                .enableLog(true)
-                .setReConnectCount(1, 1000)
-                .setSplitWriteNum(LockBLEPackage.getMtu())
-                .setConnectOverTime(10000)
-                .setOperateTimeout(5000).init(this);
-    }
+
 
     private void initHttp() {
         GoagalInfo.get().init(getApplicationContext());

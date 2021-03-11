@@ -33,9 +33,9 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     }
 
     @Override
-    protected void bleDelSucc() {
+    protected void bleDel() {
         opStatus = false;
-        byte[] bytes = LockBLEOpCmd.delPwd(this, (byte) 0x01, (byte) openLockInfo.getKeyid());
+        byte[] bytes = LockBLEOpCmd.delPwd(this, (byte) Config.GROUP_TYPE, (byte) openLockInfo.getKeyid());
         EventBus.getDefault().post(bytes);
         VUiKit.postDelayed(Config.OP_TIMEOUT, new Runnable() {
             @Override
@@ -44,7 +44,7 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
                     LockBLEData lockBLEData = new LockBLEData();
                     lockBLEData.setMcmd((byte) 0x02);
                     lockBLEData.setScmd((byte) 0x03);
-                    lockBLEData.setStatus((byte) 0x06);
+                    lockBLEData.setStatus((byte) 0x06);  //超时
                     EventBus.getDefault().post(lockBLEData);
                 }
             }
@@ -54,13 +54,15 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     @Override
     protected void cloudDelSucc() {
         OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
-        countInfo.setPasswordCount(countInfo.getPasswordCount() - 1);
-        CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+        if (countInfo != null) {
+            countInfo.setPasswordCount(countInfo.getPasswordCount() - 1);
+            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+        }
     }
 
     @Override
     protected void processData(LockBLEData bleData) {
-        if (bleData != null && bleData.getMcmd() == (byte) 0x02 &&  bleData.getScmd() == (byte) 0x02) {
+        if (bleData != null && bleData.getMcmd() == (byte) 0x02 && bleData.getScmd() == (byte) 0x02) {
         }
     }
 }

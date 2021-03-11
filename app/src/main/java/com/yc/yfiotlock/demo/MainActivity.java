@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String SERVICE_UUID = "0000180a-0000-1000-8000-00805f9b34fb";
+    public static final String SERVICE_UUID = "5833ff01-9b8b-5191-6142-22a4536ef123";
 
     PermissionHelper permissionHelper;
 
@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
+                .setDeviceName(false, "YF-L1")
                 .setAutoConnect(false)
                 .setScanTimeOut(10000);
 
@@ -180,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDetail(BleDevice bleDevice) {
                 if (BleManager.getInstance().isConnected(bleDevice)) {
-                    Intent intent = new Intent(MainActivity.this, ServiceActivity.class);
+                    Intent intent = new Intent(MainActivity.this, OperationActivity.class);
                     intent.putExtra("bleDevice", bleDevice);
                     startActivity(intent);
                 }

@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.jakewharton.rxbinding4.view.RxView;
@@ -38,13 +39,17 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
     protected void initVars() {
         super.initVars();
         lockEngine = new LockEngine(this);
+        openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
     }
 
     @Override
     protected void initViews() {
         super.initViews();
 
-        openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
+        if (nameEt.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+
         RxView.clicks(commitBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             if (nameEt.length() < 2) {
                 ToastUtil.toast2(getContext(), "名称长度不能少于2位");
@@ -58,13 +63,14 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
 
     private void setInfo() {
         nameEt.setText(openLockInfo.getName());
+        nameEt.setSelection(nameEt.getText().length());
     }
 
     protected void cloudEdit() {
         mLoadingDialog.show("修改中...");
         String name = nameEt.getText().toString();
         openLockInfo.setName(name);
-        lockEngine.modifyPwsName(openLockInfo.getId(), name).subscribe(new Subscriber<ResultInfo<String>>() {
+        lockEngine.modifyOpenLockName(openLockInfo.getId(), name).subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();

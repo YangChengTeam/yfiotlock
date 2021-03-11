@@ -82,17 +82,16 @@ public class LockEngine extends BaseEngin {
 
     /**
      * @param lockerId -
-     * @param pwdType  1:finger 2:psw 3:door-card
      * @return list of single openLockWay's info
      */
-    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String pwdType) {
+    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String type) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", lockerId);
-        map.put("pwd_type", pwdType);
+        map.put("pwd_type", type);
         return new HttpCoreEngin<ResultInfo<List<OpenLockInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
                 new TypeReference<ResultInfo<List<OpenLockInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
@@ -103,7 +102,7 @@ public class LockEngine extends BaseEngin {
      * @param name new pws name
      * @return modify success or not
      */
-    public Observable<ResultInfo<String>> modifyPwsName(String id, String name) {
+    public Observable<ResultInfo<String>> modifyOpenLockName(String id, String name) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {

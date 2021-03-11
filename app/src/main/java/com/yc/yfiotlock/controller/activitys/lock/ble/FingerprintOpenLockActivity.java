@@ -9,6 +9,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 
 import java.util.concurrent.TimeUnit;
 
@@ -27,6 +28,7 @@ public class FingerprintOpenLockActivity extends BaseOpenLockActivity {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
                 Intent intent = new Intent(FingerprintOpenLockActivity.this, FingerprintDetailOpenLockActivity.class);
+                intent.putExtra("openlockinfo", (OpenLockInfo) adapter.getData().get(position));
                 startActivity(intent);
             }
         });

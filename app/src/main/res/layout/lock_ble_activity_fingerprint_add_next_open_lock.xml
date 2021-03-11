@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="2/8 录入成功"
+        android:text="2/6 录入成功"
         android:textColor="#999999"
         android:textSize="13dp"
         app:layout_constraintLeft_toLeftOf="parent"

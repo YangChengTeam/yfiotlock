@@ -117,15 +117,17 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
             passwordCount = countInfo.getPasswordCount();
         }
         passwordCount += 1;
-        cloudAdd("密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount), 2, keyid, passEt.getText() + "");
+        String name = "密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount);
+        cloudAdd(name, Config.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
     }
 
     @Override
     protected void cloudAddSucc() {
         OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
-        countInfo.setPasswordCount(countInfo.getPasswordCount() + 1);
-        CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
-        EventBus.getDefault().post(new OpenLockRefreshEvent());
+        if(countInfo != null){
+            countInfo.setPasswordCount(countInfo.getPasswordCount() + 1);
+            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+        }
     }
 
 

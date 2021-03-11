@@ -26,7 +26,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="70dp"
-            android:src="@mipmap/finger_default"></ImageView>
+            android:src="@mipmap/finger_default"
+            android:tag="小指"></ImageView>
 
         <ImageView
             android:id="@+id/iv_finger2"
@@ -34,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="50dp"
             android:layout_marginTop="20dp"
+            android:tag="无名指"
             android:src="@mipmap/finger_default"></ImageView>
 
         <ImageView
@@ -41,6 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="110dp"
+            android:tag="中指"
             android:src="@mipmap/finger_default"></ImageView>
 
         <ImageView
@@ -49,6 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="180dp"
             android:layout_marginTop="20dp"
+            android:tag="食指"
             android:src="@mipmap/finger_default"></ImageView>
 
         <ImageView
@@ -57,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="230dp"
             android:layout_marginTop="120dp"
+            android:tag="大拇指"
             android:src="@mipmap/finger_default"></ImageView>
 
         <ImageView

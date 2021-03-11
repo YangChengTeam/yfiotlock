@@ -3,8 +3,6 @@ package com.yc.yfiotlock.demo;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -24,9 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleGattCallback;
-import com.clj.fastble.callback.BleIndicateCallback;
 import com.clj.fastble.callback.BleNotifyCallback;
-import com.clj.fastble.callback.BleReadCallback;
 import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
@@ -47,12 +43,12 @@ import static com.yc.yfiotlock.demo.MainActivity.SERVICE_UUID;
 
 public class OperationActivity extends AppCompatActivity implements View.OnClickListener {
     BleDevice bleDevice;
-    BluetoothGattService service;
-    BluetoothGattCharacteristic characteristic;
 
     ProgressDialog progressDialog;
     byte[] bytes = new byte[]{(byte) 0xAA, (byte) 0x00, (byte) 0x00, (byte) 0x12, (byte) 0x00, (byte) 0x0B, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x00, (byte) 0x23, (byte) 0x0B, (byte) 0xC3, (byte) 0x8B, (byte) 0xBB};
 
+    public static final String WRITE_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
+    public static final String NOTIFY_SERVICE_UUID = "5833ff01-9b8b-5191-6142-22a4536ef123";
     public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
     public static final String NOTIFY_CHARACTERISTIC_UUID = "5833ff03-9b8b-5191-6142-22a4536ef123";
 
@@ -61,88 +57,37 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.demo_activity_operation);
 
+
         progressDialog = new ProgressDialog(this);
 
-        bleDevice = ServiceActivity.getInstance().getBleDevice();;
+        bleDevice = getIntent().getParcelableExtra("bleDevice");
         TextView blenameTv = findViewById(R.id.tv_blename);
         blenameTv.setText("蓝牙名称:" + bleDevice.getName());
 
-        service = CharacteristicActivity.getInstance().getService();
-        characteristic = (BluetoothGattCharacteristic)getIntent().getParcelableExtra("characteristic");
-
         TextView notifyTv = findViewById(R.id.tv_notify);
 
-        int charaProp = characteristic.getProperties();
-        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-            BleManager.getInstance().read(
-                    bleDevice,
-                    service.getUuid().toString(),
-                    characteristic.getUuid().toString(),
-                    new BleReadCallback() {
-                        @Override
-                        public void onReadSuccess(byte[] data) {
-                            Toast.makeText(OperationActivity.this, "Read成功:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
-                        }
+        BleManager.getInstance().notify(
+                bleDevice,
+                NOTIFY_SERVICE_UUID,
+                NOTIFY_CHARACTERISTIC_UUID,
+                new BleNotifyCallback() {
+                    @Override
+                    public void onNotifySuccess() {
+                        //Toast.makeText(OperationActivity.this, "Notify成功", Toast.LENGTH_LONG).show();
+                    }
 
-                        @Override
-                        public void onReadFailure(BleException exception) {
-                            Toast.makeText(OperationActivity.this, "Read失败:" + exception.getDescription(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-        }
+                    @Override
+                    public void onNotifyFailure(BleException exception) {
+                        Toast.makeText(OperationActivity.this, "Notify失败:" + exception.getDescription(), Toast.LENGTH_LONG).show();
+                    }
 
-        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0) {
-
-        }
-
-        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0) {
-
-        }
-
-        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-            BleManager.getInstance().notify(
-                    bleDevice,
-                    service.getUuid().toString(),
-                    characteristic.getUuid().toString(),
-                    new BleNotifyCallback() {
-                        @Override
-                        public void onNotifySuccess() {
-                            Toast.makeText(OperationActivity.this, "Notify成功", Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onNotifyFailure(BleException exception) {
-                            Toast.makeText(OperationActivity.this, "Notify失败:" + exception.getDescription(), Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onCharacteristicChanged(byte[] data) {
-                            Toast.makeText(OperationActivity.this, "Notify响应:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
-                        }
-                    });
-        }
-        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
-            BleManager.getInstance().indicate(
-                    bleDevice,
-                    service.getUuid().toString(),
-                    characteristic.getUuid().toString(),
-                    new BleIndicateCallback() {
-                        @Override
-                        public void onIndicateSuccess() {
-                            Toast.makeText(OperationActivity.this, "Indicate成功", Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onIndicateFailure(BleException exception) {
-                            Toast.makeText(OperationActivity.this, "Indicate失败", Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onCharacteristicChanged(byte[] data) {
-                            Toast.makeText(OperationActivity.this, "Indicate响应:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
-                        }
-                    });
-        }
+                    @Override
+                    public void onCharacteristicChanged(byte[] data) {
+                        bytes = data;
+                        notifyTv.setText(LockBLEUtil.toHexString(data) + "");
+                        Toast.makeText(OperationActivity.this, "Notify响应:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
+                    }
+                });
 
         CheckBox checkBox = findViewById(R.id.ck_aes);
         checkBox.setChecked(LockBLEData.isAesData);
@@ -210,8 +155,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             public void onClick(DialogInterface dialog, int which) {
                 BleManager.getInstance().write(
                         bleDevice,
-                        service.getUuid().toString(),
-                        characteristic.getUuid().toString(),
+                        WRITE_SERVICE_UUID,
+                        WRITE_CHARACTERISTIC_UUID,
                         bytes,
                         new BleWriteCallback() {
                             @Override

@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.app.Dialog;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,6 +13,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
@@ -64,7 +67,16 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
 
         openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            cloudDel(openLockInfo.getId() + "");
+            GeneralDialog generalDialog = new GeneralDialog(BaseDetailOpenLockActivity.this);
+            generalDialog.setTitle("温馨提示");
+            generalDialog.setMsg("是否删除" + openLockInfo.getName());
+            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+                @Override
+                public void onClick(Dialog dialog) {
+                    cloudDel(openLockInfo.getId() + "");
+                }
+            });
+            generalDialog.show();
         });
 
         setRv();
@@ -73,8 +85,10 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
 
     protected boolean opStatus = false;
 
-    protected abstract void bleDelSucc();
+    protected abstract void bleDel();
+
     protected abstract void cloudDelSucc();
+
     protected abstract void processData(LockBLEData bleData);
 
     protected void cloudDel(String id) {
