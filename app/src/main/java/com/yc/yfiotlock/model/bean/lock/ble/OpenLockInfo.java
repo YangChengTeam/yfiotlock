@@ -1,29 +1,19 @@
 package com.yc.yfiotlock.model.bean.lock.ble;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import java.io.Serializable;
 
-/**
- * @author Dullyoung
- * Created by　Dullyoung on 2021/3/10
- **/
-public class OpenLockInfo {
-    @JSONField(name = "locker_id")
-    private String lockerId;
+public class OpenLockInfo implements Serializable {
+    private String id;
     private String name;
-    @JSONField(name = "keyid")
-    private String keyId;
-    @JSONField(name = "pwd_type")
-    private String pwdType;
-    @JSONField(name = "group_type")
-    private String groupType;
-    private String pwd;
+    private String model;
+    private int keyid;
 
-    public String getLockerId() {
-        return lockerId;
+    public String getId() {
+        return id;
     }
 
-    public void setLockerId(String lockerId) {
-        this.lockerId = lockerId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -34,35 +24,19 @@ public class OpenLockInfo {
         this.name = name;
     }
 
-    public String getKeyId() {
-        return keyId;
+    public String getModel() {
+        return model;
     }
 
-    public void setKeyId(String keyId) {
-        this.keyId = keyId;
+    public void setModel(String model) {
+        this.model = model;
     }
 
-    public String getPwdType() {
-        return pwdType;
+    public int getKeyid() {
+        return keyid;
     }
 
-    public void setPwdType(String pwdType) {
-        this.pwdType = pwdType;
-    }
-
-    public String getGroupType() {
-        return groupType;
-    }
-
-    public void setGroupType(String groupType) {
-        this.groupType = groupType;
-    }
-
-    public String getPwd() {
-        return pwd;
-    }
-
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
+    public void setKeyid(int keyid) {
+        this.keyid = keyid;
     }
 }

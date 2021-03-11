@@ -55,7 +55,9 @@ public class IndexFragment extends BaseFragment {
 
     private void setRv() {
         List<DeviceInfo> deviceInfos = new ArrayList<>();
-        deviceInfos.add(new DeviceInfo());
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setId("1");
+        deviceInfos.add(deviceInfo);
         deviceInfos.add(new DeviceInfo());
 
         indexDeviceAdapter = new IndexDeviceAdapter(deviceInfos);

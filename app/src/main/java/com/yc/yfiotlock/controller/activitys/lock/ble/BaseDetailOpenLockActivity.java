@@ -12,8 +12,7 @@ import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
-import com.yc.yfiotlock.model.bean.lock.ble.BaseDetailOpenLockInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.BaseOpenLockInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
@@ -38,7 +37,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
 
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
-    protected BaseOpenLockInfo openLockInfo;
+    protected OpenLockInfo openLockInfo;
 
     protected String title;
 
@@ -63,36 +62,39 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         setNavTitle(title + "详情");
         delTv.setText(delTv.getText() + title);
 
-        setRv();
-        openLockInfo = (BaseOpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
+        openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            cloudDel(openLockInfo.getId()+"");
+            cloudDel(openLockInfo.getId() + "");
         });
+
+        setRv();
+
     }
 
-
     protected boolean opStatus = false;
-    protected abstract void bleDel();
-    protected abstract void cloudDel();
+
+    protected abstract void bleDelSucc();
+    protected abstract void cloudDelSucc();
     protected abstract void processData(LockBLEData bleData);
 
     protected void cloudDel(String id) {
+        mLoadingDialog.show("删除中...");
         lockEngine.delOpenLockWay(id).subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
-
+                mLoadingDialog.dismiss();
             }
 
             @Override
             public void onError(Throwable e) {
-
+                mLoadingDialog.dismiss();
             }
 
             @Override
             public void onNext(ResultInfo<String> stringResultInfo) {
                 if (stringResultInfo.getCode() == 1) {
                     finish();
-                    cloudDel();
+                    cloudDelSucc();
                     EventBus.getDefault().post(new OpenLockRefreshEvent());
                 }
             }
@@ -106,23 +108,31 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         processData(bleData);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(OpenLockInfo openLockInfo) {
+        List<OpenLockInfo> openLockTypeInfos = new ArrayList<>();
+        openLockTypeInfos.add(openLockInfo);
+        openLockAdapter.setNewInstance(openLockTypeInfos);
+        EventBus.getDefault().post(new OpenLockRefreshEvent());
+    }
+
 
     private void setRv() {
-        List<BaseDetailOpenLockInfo> openLockTypeInfos = new ArrayList<>();
-        openLockTypeInfos.add(new BaseDetailOpenLockInfo());
+        List<OpenLockInfo> openLockTypeInfos = new ArrayList<>();
+        openLockTypeInfos.add(openLockInfo);
         openLockAdapter = new OpenLockAdapter(openLockTypeInfos);
         openLockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         openLockRecyclerView.setAdapter(openLockAdapter);
     }
 
-    public static class OpenLockAdapter extends BaseExtendAdapter<BaseDetailOpenLockInfo> {
-        public OpenLockAdapter(@Nullable List<BaseDetailOpenLockInfo> data) {
+    public static class OpenLockAdapter extends BaseExtendAdapter<OpenLockInfo> {
+        public OpenLockAdapter(@Nullable List<OpenLockInfo> data) {
             super(R.layout.lock_ble_item_base_open_lock, data);
         }
 
         @Override
-        protected void convert(@NotNull BaseViewHolder holder, BaseDetailOpenLockInfo openLockTypeInfo) {
-            holder.setText(R.id.tv_name, "修改名称");
+        protected void convert(@NotNull BaseViewHolder holder, OpenLockInfo openLockInfo) {
+            holder.setText(R.id.tv_name, openLockInfo.getName());
             if (holder.getAdapterPosition() == getData().size() - 1) {
                 holder.setVisible(R.id.view_line, false);
             } else {

@@ -7,7 +7,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.jakewharton.rxbinding4.view.RxView;
-import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
@@ -16,7 +15,6 @@ import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
-import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.CacheUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -28,9 +26,8 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
-import rx.Subscriber;
 
-public class PasswordAddOpenLockActivity extends PasswordBaseAddOpenLockActivity {
+public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     @BindView(R.id.iv_pass_show_status)
     ImageView statusIv;
 
@@ -41,17 +38,9 @@ public class PasswordAddOpenLockActivity extends PasswordBaseAddOpenLockActivity
 
     private String number;
 
-    private LockEngine lockEngine;
-
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_password_add_open_lock;
-    }
-
-    @Override
-    protected void initVars() {
-        super.initVars();
-        lockEngine = new LockEngine(this);
     }
 
     @Override
@@ -67,7 +56,7 @@ public class PasswordAddOpenLockActivity extends PasswordBaseAddOpenLockActivity
                 ToastUtil.toast2(getContext(), "密码必需是长度为6位数字");
                 return;
             }
-            cloudAddPwd(1 + "");
+            cloudAddPwd("1");
         });
 
         statusIv.setSelected(true);
@@ -107,38 +96,6 @@ public class PasswordAddOpenLockActivity extends PasswordBaseAddOpenLockActivity
         });
     }
 
-    private void cloudAddPwd(String keyid) {
-        int passwordCount = 0;
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
-        if (countInfo != null) {
-            passwordCount = countInfo.getPasswordCount();
-        }
-        passwordCount += 1;
-        lockEngine.addOpenLockWay("1", "密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount), keyid, 2, Config.GROUP_TYPE, passEt.getText() + "").subscribe(new Subscriber<ResultInfo<String>>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(ResultInfo<String> stringResultInfo) {
-                if (stringResultInfo.getCode() == 1) {
-                    finish();
-                    OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
-                    countInfo.setPasswordCount(countInfo.getPasswordCount() + 1);
-                    CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
-                    EventBus.getDefault().post(new OpenLockRefreshEvent());
-                }
-            }
-        });
-    }
-
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onProcess(LockBLEData bleData) {
         opStatus = true;
@@ -151,6 +108,24 @@ public class PasswordAddOpenLockActivity extends PasswordBaseAddOpenLockActivity
                 }
             }
         }
+    }
+
+    private void cloudAddPwd(String keyid) {
+        int passwordCount = 0;
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+        if (countInfo != null) {
+            passwordCount = countInfo.getPasswordCount();
+        }
+        passwordCount += 1;
+        cloudAdd("密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount), 2, keyid, passEt.getText() + "");
+    }
+
+    @Override
+    protected void cloudAddSucc() {
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+        countInfo.setPasswordCount(countInfo.getPasswordCount() + 1);
+        CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+        EventBus.getDefault().post(new OpenLockRefreshEvent());
     }
 
 
