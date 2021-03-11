@@ -25,12 +25,12 @@ public class CardDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     }
 
     @Override
-    protected void bleDel() {
+    protected void bleDelSucc() {
 
     }
 
     @Override
-    protected void cloudDel() {
+    protected void cloudDelSucc() {
 
     }
 

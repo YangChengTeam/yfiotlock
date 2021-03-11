@@ -26,13 +26,14 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
                 Intent intent = new Intent(PasswordDetailOpenLockActivity.this, PasswordModifyOpenLockActivity.class);
+                intent.putExtra("openlockinfo", openLockInfo);
                 startActivity(intent);
             }
         });
     }
 
     @Override
-    protected void bleDel() {
+    protected void bleDelSucc() {
         opStatus = false;
         byte[] bytes = LockBLEOpCmd.delPwd(this, (byte) 0x01, (byte) openLockInfo.getKeyid());
         EventBus.getDefault().post(bytes);
@@ -51,7 +52,7 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     }
 
     @Override
-    protected void cloudDel() {
+    protected void cloudDelSucc() {
         OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
         countInfo.setPasswordCount(countInfo.getPasswordCount() - 1);
         CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);

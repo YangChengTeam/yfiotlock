@@ -1,15 +1,9 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import android.content.Intent;
-import android.view.View;
-
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.TypeReference;
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
@@ -18,7 +12,7 @@ import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.BaseOpenLockInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.BleUtils;
 import com.yc.yfiotlock.utils.CacheUtils;
@@ -76,18 +70,17 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         openLockAdapter = new OpenLockAdapter(null);
         openLockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         openLockRecyclerView.setAdapter(openLockAdapter);
-
     }
 
     private void loadData() {
         String type = BleUtils.getType(title) + "";
-        List<BaseOpenLockInfo> lockInfos = CacheUtils.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, new TypeReference<List<BaseOpenLockInfo>>() {
+        List<OpenLockInfo> lockInfos = CacheUtils.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, new TypeReference<List<OpenLockInfo>>() {
         }.getType());
         if (lockInfos != null) {
             openLockAdapter.setNewInstance(lockInfos);
         }
-        DeviceInfo deviceInfo = LockIndexActivity.getInstance().getLockInfo();
-        lockEngine.getOpenLockWayList("1", type).subscribe(new Subscriber<ResultInfo<List<BaseOpenLockInfo>>>() {
+        DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        lockEngine.getOpenLockWayList("1", type).subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {
 
@@ -99,9 +92,9 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             }
 
             @Override
-            public void onNext(ResultInfo<List<BaseOpenLockInfo>> listResultInfo) {
+            public void onNext(ResultInfo<List<OpenLockInfo>> listResultInfo) {
                 if (listResultInfo.getCode() == 1 && listResultInfo.getData() != null) {
-                    List<BaseOpenLockInfo> lockInfos = listResultInfo.getData();
+                    List<OpenLockInfo> lockInfos = listResultInfo.getData();
                     openLockAdapter.setNewInstance(lockInfos);
                     CacheUtils.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, lockInfos);
                 }
@@ -114,13 +107,13 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         loadData();
     }
 
-    public static class OpenLockAdapter extends BaseExtendAdapter<BaseOpenLockInfo> {
-        public OpenLockAdapter(@Nullable List<BaseOpenLockInfo> data) {
+    public static class OpenLockAdapter extends BaseExtendAdapter<OpenLockInfo> {
+        public OpenLockAdapter(@Nullable List<OpenLockInfo> data) {
             super(R.layout.lock_ble_item_base_open_lock, data);
         }
 
         @Override
-        protected void convert(@NotNull BaseViewHolder holder, BaseOpenLockInfo openLockTypeInfo) {
+        protected void convert(@NotNull BaseViewHolder holder, OpenLockInfo openLockTypeInfo) {
             holder.setText(R.id.tv_name, openLockTypeInfo.getName());
             if (holder.getAdapterPosition() == getData().size() - 1) {
                 holder.setVisible(R.id.view_line, false);

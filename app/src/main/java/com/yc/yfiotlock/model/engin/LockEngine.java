@@ -10,11 +10,9 @@ import com.kk.securityhttp.engin.BaseEngin;
 import com.kk.securityhttp.engin.HttpCoreEngin;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.model.bean.lock.ble.BaseOpenLockInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
-import com.yc.yfiotlock.view.adapters.AboutAdapter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +85,7 @@ public class LockEngine extends BaseEngin {
      * @param pwdType  1:finger 2:psw 3:door-card
      * @return list of single openLockWay's info
      */
-    public Observable<ResultInfo<List<BaseOpenLockInfo>>> getOpenLockWayList(String lockerId, String pwdType) {
+    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String pwdType) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
@@ -95,8 +93,8 @@ public class LockEngine extends BaseEngin {
         }
         map.put("locker_id", lockerId);
         map.put("pwd_type", pwdType);
-        return new HttpCoreEngin<ResultInfo<List<BaseOpenLockInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
-                new TypeReference<ResultInfo<List<BaseOpenLockInfo>>>() {
+        return new HttpCoreEngin<ResultInfo<List<OpenLockInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
+                new TypeReference<ResultInfo<List<OpenLockInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 

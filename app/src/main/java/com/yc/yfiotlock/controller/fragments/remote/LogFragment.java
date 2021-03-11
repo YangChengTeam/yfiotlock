@@ -1,35 +1,35 @@
 package com.yc.yfiotlock.controller.fragments.remote;
 
-import android.content.Intent;
-import android.view.View;
-
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.controller.activitys.lock.remote.OpenLockActivty;
-import com.yc.yfiotlock.controller.activitys.lock.remote.TempPasswordOpenLockActivity;
-import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.model.bean.LogInfo;
-import com.yc.yfiotlock.model.bean.NextTextInfo;
+import com.yc.yfiotlock.model.bean.LogListInfo;
+import com.yc.yfiotlock.model.engin.LogEngine;
 import com.yc.yfiotlock.view.adapters.LogAdapter;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import rx.Observer;
 
 public class LogFragment extends BaseFragment {
 
     private LogAdapter logAdapter;
     @BindView(R.id.rv_log)
     RecyclerView recyclerView;
+    @BindView(R.id.srl_refresh)
+    SwipeRefreshLayout mSrlRefresh;
+
+    private LogEngine logEngine;
+
+    private int page = 1;
+    private int pageSize = 10;
+    private int lockerId = 3;
 
     @Override
     protected int getLayoutId() {
@@ -39,6 +39,14 @@ public class LogFragment extends BaseFragment {
     @Override
     protected void initViews() {
         initRv();
+
+        logEngine = new LogEngine(getActivity());
+
+        mSrlRefresh.setColorSchemeColors(0xff3091f8);
+        mSrlRefresh.setOnRefreshListener(() -> {
+            loadData();
+        });
+        mSrlRefresh.setRefreshing(true);
 
         loadData();
     }
@@ -52,11 +60,24 @@ public class LogFragment extends BaseFragment {
 
 
     private void loadData() {
-        List<LogInfo> logInfoList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            LogInfo logInfo = new LogInfo("密码开门成功", "2020-02-05 16:00:00", "张三", R.mipmap.icon_log, i);
-            logInfoList.add(logInfo);
-        }
-        logAdapter.setNewInstance(logInfoList);
+        logEngine.getOpenLog(lockerId, page, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
+            @Override
+            public void onCompleted() {
+                mSrlRefresh.setRefreshing(false);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mSrlRefresh.setRefreshing(false);
+            }
+
+            @Override
+            public void onNext(ResultInfo<LogListInfo> logListInfoResultInfo) {
+                if (logListInfoResultInfo.getData() != null && logListInfoResultInfo.getData().getItems() != null) {
+                    List<LogInfo> items = logListInfoResultInfo.getData().getItems();
+                    logAdapter.setNewInstance(items);
+                }
+            }
+        });
     }
 }
