@@ -109,6 +109,12 @@ public class GeneralDialog extends BaseDialog {
      * setting btn click listener
      */
     public interface OnBtnClickListener {
+
+        /**
+         * btn click listener
+         *
+         * @param dialog this dialog
+         */
         void onClick(Dialog dialog);
     }
 
