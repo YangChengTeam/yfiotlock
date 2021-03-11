@@ -3,22 +3,34 @@ package com.yc.yfiotlock.model.bean;
 import java.io.Serializable;
 
 public class FamilyInfo implements Serializable {
-    private String name;
-    private String location;
-    private String homAddress;
-    private boolean isDefault;
-    private int deviceNum;
     private int id;
+    private String name;
+    private double longitude;
+    private double latitude;
+    private String address;
+    private String detail_address;
+    private int is_def;
+    private int num;
+
+    private boolean isUpdateList;
+
+    public boolean isUpdateList() {
+        return isUpdateList;
+    }
+
+    public void setUpdateList(boolean updateList) {
+        isUpdateList = updateList;
+    }
 
     public FamilyInfo() {
     }
 
-    public FamilyInfo(String name, String location, String homAddress, boolean isDefault, int deviceNum, int id) {
-        this.name = name;
-        this.location = location;
-        this.homAddress = homAddress;
-        this.isDefault = isDefault;
-        this.deviceNum = deviceNum;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -30,43 +42,51 @@ public class FamilyInfo implements Serializable {
         this.name = name;
     }
 
-    public String getLocation() {
-        return location;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
-    public String getHomAddress() {
-        return homAddress;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setHomAddress(String homAddress) {
-        this.homAddress = homAddress;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
-    public boolean isDefault() {
-        return isDefault;
+    public String getAddress() {
+        return address;
     }
 
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public int getDeviceNum() {
-        return deviceNum;
+    public String getDetail_address() {
+        return detail_address;
     }
 
-    public void setDeviceNum(int deviceNum) {
-        this.deviceNum = deviceNum;
+    public void setDetail_address(String detail_address) {
+        this.detail_address = detail_address;
     }
 
-    public int getId() {
-        return id;
+    public int isIs_def() {
+        return is_def;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIs_def(int is_def) {
+        this.is_def = is_def;
+    }
+
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
     }
 }

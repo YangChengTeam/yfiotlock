@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.util.Log;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +30,8 @@ import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -36,13 +40,16 @@ import com.yc.yfiotlock.utils.MapUtils;
 import com.yc.yfiotlock.view.adapters.LocationAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
+import org.greenrobot.eventbus.EventBus;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 
 public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.OnMapStatusChangeListener, OnGetGeoCoderResultListener {
-
 
     public static void start(Context context, FamilyInfo familyInfo) {
         Intent intent = new Intent(context, MyFamilyLocationActivity.class);
@@ -68,13 +75,21 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
     private LocationClient locationClient;
     private boolean isInitMap;
 
+    private FamilyInfo familyInfo = new FamilyInfo();
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        locationClient.stop();
-        mGeoCoder.destroy();
-        mBaiduMap.clear();
+        if (locationClient != null) {
+            locationClient.stop();
+        }
+        if (mGeoCoder != null) {
+            mGeoCoder.destroy();
+        }
+        if (mBaiduMap != null) {
+            mBaiduMap.clear();
+        }
     }
 
     @Override
@@ -86,9 +101,18 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
 
+        Serializable serializable = getIntent().getSerializableExtra("family_info");
+        if (serializable instanceof FamilyInfo) {
+            this.familyInfo = (FamilyInfo) serializable;
+        }
+
         initRecyclerView();
 
-        initLocationOption();
+        if (familyInfo.getLongitude() <= 0 || familyInfo.getLatitude() <= 0) {
+            initLocationOption();
+        } else {
+            initMap(familyInfo.getLatitude(), familyInfo.getLongitude());
+        }
     }
 
     private void initRecyclerView() {
@@ -98,6 +122,18 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
 
         locationAdapter = new LocationAdapter(null);
         mRecyclerView.setAdapter(locationAdapter);
+        locationAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
+                PoiInfo poiInfo = locationAdapter.getData().get(position);
+                familyInfo.setAddress(poiInfo.getName());
+                familyInfo.setLatitude(poiInfo.getLocation().latitude);
+                familyInfo.setLongitude(poiInfo.getLocation().longitude);
+
+                EventBus.getDefault().post(familyInfo);
+                finish();
+            }
+        });
     }
 
     /**
@@ -202,15 +238,14 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
                 createCenterMarker();
                 reverseRequest(mCenter);
             }
-
-            @Override
-            protected void finalize() throws Throwable {
-                super.finalize();
-                Log.d("00671", "finalize: ");
-            }
         });
 
-        createCenterMarker();
+        VUiKit.postDelayed(1200, new Runnable() {
+            @Override
+            public void run() {
+                createCenterMarker();
+            }
+        });
     }
 
     private boolean isCreateCenterMarker = false;
@@ -221,12 +256,12 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
     private void createCenterMarker() {
         if (isCreateCenterMarker)
             return;
-        isCreateCenterMarker = true;
 
         Projection projection = mBaiduMap.getProjection();
         if (null == projection) {
             return;
         }
+        isCreateCenterMarker = true;
 
         Point point = projection.toScreenLocation(mCenter);
         BitmapDescriptor bitmapDescriptor =
@@ -268,17 +303,14 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
 
     @Override
     public void onMapStatusChangeStart(MapStatus mapStatus) {
-        Log.d("00671", "onMapStatusChangeStart: " + mapStatus.toString());
     }
 
     @Override
     public void onMapStatusChangeStart(MapStatus mapStatus, int i) {
-        Log.d("00671", "onMapStatusChangeStart:  " + mapStatus.toString() + "  " + i);
     }
 
     @Override
     public void onMapStatusChange(MapStatus mapStatus) {
-        Log.d("00671", "onMapStatusChange: " + mapStatus.toString());
         if (locationAdapter.getData().size() == 0) {
             onMapStatusChangeFinish(mapStatus);
         }
@@ -288,8 +320,6 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
 
     @Override
     public void onMapStatusChangeFinish(MapStatus mapStatus) {
-        Log.d("00671", "onMapStatusChangeFinish: " + mapStatus.toString());
-
         LatLng newCenter = mapStatus.target;
         // 如果是点击poi item导致的地图状态更新，则不用做后面的逆地理请求，
         if (mStatusChangeByItemClick) {

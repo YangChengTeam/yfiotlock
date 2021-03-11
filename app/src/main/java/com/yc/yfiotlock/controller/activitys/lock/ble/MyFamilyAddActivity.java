@@ -1,30 +1,25 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
-import android.provider.Settings;
-import android.widget.TextView;
+import android.text.TextUtils;
 import android.widget.Toast;
 
-import androidx.recyclerview.widget.RecyclerView;
-
+import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
+import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.activitys.lock.remote.TempPwdDetailActivity;
-import com.yc.yfiotlock.demo.MainActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
-import com.yc.yfiotlock.model.bean.EventStub;
 import com.yc.yfiotlock.model.bean.FamilyInfo;
-import com.yc.yfiotlock.model.bean.PassWordInfo;
+import com.yc.yfiotlock.model.engin.HomeEngine;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.RightNextTextView;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -32,6 +27,7 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import rx.Observer;
 
 public class MyFamilyAddActivity extends BaseActivity {
 
@@ -43,12 +39,17 @@ public class MyFamilyAddActivity extends BaseActivity {
     RightNextTextView tvLocation;
     @BindView(R.id.tv_family_add_address)
     RightNextTextView tvAddress;
+    @BindView(R.id.stv_add)
+    SuperTextView stvAdd;
 
     private FamilyInfo familyInfo;
+    private HomeEngine homeEngine;
 
     public static void start(Context context, FamilyInfo familyInfo) {
         Intent intent = new Intent(context, MyFamilyAddActivity.class);
-        intent.putExtra("family_info", familyInfo);
+        if (familyInfo != null) {
+            intent.putExtra("family_info", familyInfo);
+        }
         context.startActivity(intent);
     }
 
@@ -68,13 +69,74 @@ public class MyFamilyAddActivity extends BaseActivity {
             MyFamilyNameActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
         RxView.clicks(tvLocation).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-
             location();
         });
         RxView.clicks(tvAddress).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             MyFamilyAddressActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
+        RxView.clicks(stvAdd).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            if (familyInfo == null || TextUtils.isEmpty(familyInfo.getName())) {
+                ToastUtil.toast2(this, "家庭名称不能为空");
+                return;
+            }
+            if (TextUtils.isEmpty(familyInfo.getAddress())) {
+                ToastUtil.toast2(this, "家庭位置不能为空");
+                return;
+            }
+            submit();
+        });
 
+        homeEngine = new HomeEngine(this);
+    }
+
+    private void submit() {
+        int id = familyInfo.getId();
+        mLoadingDialog.show("提交中");
+        if (id <= 0) {
+            homeEngine.addFamily(familyInfo.getName(), familyInfo.getLongitude(),
+                    familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetail_address()).subscribe(new Observer<ResultInfo<String>>() {
+                @Override
+                public void onCompleted() {
+                    mLoadingDialog.dismiss();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    mLoadingDialog.dismiss();
+                }
+
+                @Override
+                public void onNext(ResultInfo<String> stringResultInfo) {
+                    ToastUtil.toast2(MyFamilyAddActivity.this, stringResultInfo.getMsg());
+
+                    familyInfo.setUpdateList(true);
+                    EventBus.getDefault().post(familyInfo);
+                    finish();
+                }
+            });
+        } else {
+            homeEngine.modifyFamily(id, familyInfo.getName(), familyInfo.getLongitude(),
+                    familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetail_address()).subscribe(new Observer<ResultInfo<String>>() {
+                @Override
+                public void onCompleted() {
+                    mLoadingDialog.dismiss();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    mLoadingDialog.dismiss();
+                }
+
+                @Override
+                public void onNext(ResultInfo<String> stringResultInfo) {
+                    ToastUtil.toast2(MyFamilyAddActivity.this, stringResultInfo.getMsg());
+
+                    familyInfo.setUpdateList(true);
+                    EventBus.getDefault().post(familyInfo);
+                    finish();
+                }
+            });
+        }
     }
 
     private void location() {
@@ -100,8 +162,8 @@ public class MyFamilyAddActivity extends BaseActivity {
             FamilyInfo familyInfo = (FamilyInfo) serializable;
             this.familyInfo = familyInfo;
             tvName.setTvDes(familyInfo.getName(), Color.parseColor("#000000"));
-            tvLocation.setTvDes(familyInfo.getLocation(), Color.parseColor("#000000"));
-            tvAddress.setTvDes(familyInfo.getHomAddress(), Color.parseColor("#000000"));
+            tvLocation.setTvDes(familyInfo.getAddress(), Color.parseColor("#000000"));
+            tvAddress.setTvDes(familyInfo.getDetail_address(), Color.parseColor("#000000"));
 
             mBnbTitle.setTitle(familyInfo.getName());
         }
@@ -112,7 +174,12 @@ public class MyFamilyAddActivity extends BaseActivity {
     public void onFamilyInfo(FamilyInfo familyInfo) {
         this.familyInfo = familyInfo;
         tvName.setTvDes(familyInfo.getName(), Color.parseColor("#000000"));
-        tvLocation.setTvDes(familyInfo.getLocation(), Color.parseColor("#000000"));
-        tvAddress.setTvDes(familyInfo.getHomAddress(), Color.parseColor("#000000"));
+        tvLocation.setTvDes(familyInfo.getAddress(), Color.parseColor("#000000"));
+        if (TextUtils.isEmpty(familyInfo.getDetail_address())) {
+            tvAddress.setTvDes("请输入详细地址（非必填）", Color.parseColor("#ff999999"));
+        } else {
+            tvAddress.setTvDes(familyInfo.getDetail_address(), Color.parseColor("#000000"));
+        }
+
     }
 }

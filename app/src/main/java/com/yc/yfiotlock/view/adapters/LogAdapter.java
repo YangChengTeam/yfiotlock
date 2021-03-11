@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.view.adapters;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.kk.securityhttp.utils.DateUtils;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.model.bean.LogInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
@@ -17,11 +18,9 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> {
 
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, LogInfo logInfo) {
-        baseViewHolder.setText(R.id.tv_location_name, logInfo.getName())
-                .setText(R.id.tv_log_des, logInfo.getDes())
-                .setText(R.id.tv_location_des, logInfo.getDate())
-                .setImageResource(R.id.iv_log_icon,logInfo.getIcon());
+        baseViewHolder.setText(R.id.tv_log_name, logInfo.getAction_name())
+                .setText(R.id.tv_log_des, logInfo.getDesp())
+                .setText(R.id.tv_log_date, DateUtils.timestamp2Date(logInfo.getAction_time()))
+                .setImageResource(R.id.iv_log_icon, logInfo.getIcon());
     }
-
-
 }

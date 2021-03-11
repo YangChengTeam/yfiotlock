@@ -10,7 +10,7 @@ import com.kk.securityhttp.engin.BaseEngin;
 import com.kk.securityhttp.engin.HttpCoreEngin;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.model.bean.HomeInfo;
+import com.yc.yfiotlock.model.bean.FamilyInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
@@ -37,14 +37,14 @@ public class HomeEngine extends BaseEngin {
     /**
      * @return list of families
      */
-    public Observable<ResultInfo<List<HomeInfo>>> getHomeList() {
+    public Observable<ResultInfo<List<FamilyInfo>>> getHomeList() {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("user_id", UserInfoCache.getUserInfo().getId());
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<List<HomeInfo>>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.HOME_LIST_URL, new TypeReference<ResultInfo<List<HomeInfo>>>() {
+        HttpCoreEngin<ResultInfo<List<FamilyInfo>>> httpCoreEngin = new HttpCoreEngin<>(getContext());
+        return httpCoreEngin.rxpost(Config.HOME_LIST_URL, new TypeReference<ResultInfo<List<FamilyInfo>>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -57,16 +57,17 @@ public class HomeEngine extends BaseEngin {
      * @param detailAddress can be null
      * @return modify success or not
      */
-    public Observable<ResultInfo<String>> modifyAddress(String id, String name, String longitude,
-                                                        String latitude, String address, @Nullable String detailAddress) {
+    public Observable<ResultInfo<String>> modifyFamily(int id, String name, Double longitude,
+                                                       Double latitude, String address, @Nullable String detailAddress) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
+            map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
-        map.put("id", id);
+        map.put("id", String.valueOf(id));
         map.put("name", name);
-        map.put("longitude", longitude);
-        map.put("latitude", latitude);
+        map.put("longitude", longitude.toString());
+        map.put("latitude", latitude.toString());
         map.put("address", address);
         map.put("detail_address", detailAddress == null ? "" : detailAddress);
         HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
@@ -75,7 +76,6 @@ public class HomeEngine extends BaseEngin {
     }
 
     /**
-     * @param id            home id
      * @param name          home name
      * @param longitude     -
      * @param latitude      -
@@ -84,16 +84,16 @@ public class HomeEngine extends BaseEngin {
      * @return add success or not
      * notice:  if param not changed should use original value
      */
-    public Observable<ResultInfo<String>> addFamily(String id, String name, String longitude,
-                                                    String latitude, String address, @Nullable String detailAddress) {
+    public Observable<ResultInfo<String>> addFamily(String name, Double longitude,
+                                                    Double latitude, String address, @Nullable String detailAddress) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
+            map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
-        map.put("id", id);
         map.put("name", name);
-        map.put("longitude", longitude);
-        map.put("latitude", latitude);
+        map.put("longitude", longitude.toString());
+        map.put("latitude", latitude.toString());
         map.put("address", address);
         map.put("detail_address", detailAddress == null ? "" : detailAddress);
         HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
@@ -105,13 +105,13 @@ public class HomeEngine extends BaseEngin {
      * @param familyId home id
      * @return set success or not
      */
-    public Observable<ResultInfo<String>> setDefaultFamily(String familyId) {
+    public Observable<ResultInfo<String>> setDefaultFamily(int familyId) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
             map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
-        map.put("family_id", familyId);
+        map.put("family_id", String.valueOf(familyId));
         HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
         return httpCoreEngin.rxpost(Config.HOME_SET_DEFAULT_URL, new TypeReference<ResultInfo<String>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
@@ -121,13 +121,13 @@ public class HomeEngine extends BaseEngin {
      * @param familyId home id
      * @return delete success or not
      */
-    public Observable<ResultInfo<String>> deleteFamily(String familyId) {
+    public Observable<ResultInfo<String>> deleteFamily(int familyId) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
             map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
-        map.put("family_id", familyId);
+        map.put("family_id", String.valueOf(familyId));
         HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
         return httpCoreEngin.rxpost(Config.HOME_INFO_DELETE_URL, new TypeReference<ResultInfo<String>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
