@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.dialogs;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -43,10 +44,16 @@ public class GeneralDialog extends BaseDialog {
 
     }
 
-    private OnBtnClickListener mOnBtnClickListener;
+    private OnBtnClickListener mOnPositiveClickListener;
+    private OnBtnClickListener mOnNegativeClickListener;
 
-    public GeneralDialog setOnBtnClickListener(OnBtnClickListener onBtnClickListener) {
-        mOnBtnClickListener = onBtnClickListener;
+    public GeneralDialog setOnPositiveClickListener(OnBtnClickListener onBtnClickListener) {
+        mOnPositiveClickListener = onBtnClickListener;
+        return this;
+    }
+
+    public GeneralDialog setOnNegativeClickListener(OnBtnClickListener onBtnClickListener) {
+        mOnNegativeClickListener = onBtnClickListener;
         return this;
     }
 
@@ -102,24 +109,21 @@ public class GeneralDialog extends BaseDialog {
      * setting btn click listener
      */
     public interface OnBtnClickListener {
-
-        void onPositiveClick();
-
-        void onNegativeClick();
+        void onClick(Dialog dialog);
     }
 
     @OnClick({R.id.tv_negative, R.id.tv_positive})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_negative:
-                if (mOnBtnClickListener != null) {
-                    mOnBtnClickListener.onNegativeClick();
+                if (mOnNegativeClickListener != null) {
+                    mOnNegativeClickListener.onClick(this);
                 }
                 dismiss();
                 break;
             case R.id.tv_positive:
-                if (mOnBtnClickListener != null) {
-                    mOnBtnClickListener.onPositiveClick();
+                if (mOnPositiveClickListener != null) {
+                    mOnPositiveClickListener.onClick(this);
                 }
                 dismiss();
                 break;
