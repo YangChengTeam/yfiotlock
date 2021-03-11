@@ -35,21 +35,10 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
 
     @Override
     protected void bleDel() {
-        opStatus = false;
+        this.mcmd = (byte)0x02;
+        this.scmd = (byte)0x04;
         byte[] bytes = LockBLEOpCmd.delPwd(this, (byte) LockBLEManager.GROUP_TYPE, (byte) openLockInfo.getKeyid());
-        EventBus.getDefault().post(bytes);
-        VUiKit.postDelayed(LockBLEManager.OP_TIMEOUT, new Runnable() {
-            @Override
-            public void run() {
-                if (!opStatus) {
-                    LockBLEData lockBLEData = new LockBLEData();
-                    lockBLEData.setMcmd((byte) 0x02);
-                    lockBLEData.setScmd((byte) 0x03);
-                    lockBLEData.setStatus((byte) 0x06);  //超时
-                    EventBus.getDefault().post(lockBLEData);
-                }
-            }
-        });
+        lockBleSend.send(mcmd, scmd, bytes);
     }
 
     @Override
@@ -61,9 +50,5 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
         }
     }
 
-    @Override
-    protected void processData(LockBLEData bleData) {
-        if (bleData != null && bleData.getMcmd() == (byte) 0x02 && bleData.getScmd() == (byte) 0x02) {
-        }
-    }
+
 }

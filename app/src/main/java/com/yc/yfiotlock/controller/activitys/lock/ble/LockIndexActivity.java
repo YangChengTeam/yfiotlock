@@ -84,14 +84,17 @@ public class LockIndexActivity extends BaseActivity {
 
     private LockEngine lockEngine;
     private DeviceInfo lockInfo;
+
     public DeviceInfo getLockInfo() {
         return lockInfo;
     }
 
     private BleDevice bleDevice;
+
     public BleDevice getBleDevice() {
         return bleDevice;
     }
+
     private LockBleSend lockBleSend;
 
     private CONNECT_STATUS connectStatus;
@@ -204,6 +207,10 @@ public class LockIndexActivity extends BaseActivity {
         if (lockBleSend != null) {
             lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this));
         }
+    }
+
+    public boolean isConnected() {
+        return connectStatus == CONNECT_STATUS.CONNECT_SUCC || connectStatus == CONNECT_STATUS.CONNECT_OPING;
     }
 
 

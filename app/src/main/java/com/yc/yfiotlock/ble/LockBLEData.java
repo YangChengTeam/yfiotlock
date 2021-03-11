@@ -2,8 +2,6 @@ package com.yc.yfiotlock.ble;
 
 import android.content.Context;
 
-import com.kk.utils.LogUtil;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 

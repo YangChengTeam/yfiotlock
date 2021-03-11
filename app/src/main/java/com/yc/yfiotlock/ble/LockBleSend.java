@@ -34,9 +34,12 @@ public class LockBleSend {
     public LockBleSend(Context context, BleDevice bleDevice) {
         this.context = context;
         this.bleDevice = bleDevice;
+
+        // 开始监听
         bleNotify();
     }
 
+    // 伪发送数据
     public void send(byte mcmd, byte scmd, byte[] cmdBytes) {
         if (!sendingStatus) {
             sendingStatus = true;
@@ -45,6 +48,7 @@ public class LockBleSend {
             this.cmdBytes = cmdBytes;
             wakeup();
 
+            // 操时处理
             VUiKit.postDelayed(LockBLEManager.OP_TIMEOUT, () -> {
                 if (sendingStatus) {
                     sendingStatus = false;
@@ -54,10 +58,12 @@ public class LockBleSend {
         }
     }
 
+    // 清除操作
     public void clear() {
         BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_CHARACTERISTIC_UUID);
     }
 
+    // 持续唤醒
     private void wakeup() {
         if (!waupStatus) {
             byte[] bytes = LockBLEOpCmd.wakeup(context);
@@ -69,6 +75,7 @@ public class LockBleSend {
         });
     }
 
+    // 监听
     private void bleNotify() {
         BleManager.getInstance().notify(
                 bleDevice,
@@ -103,27 +110,31 @@ public class LockBleSend {
             waupStatus = true;
             op(cmdBytes); // 唤醒成功后发送真正操作
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            // 操作响应
             EventBus.getDefault().post(lockBLEData);
             sendingStatus = false;
         }
     }
 
+    // 写入失败
     private void writeFailureResponse() {
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);
-        lockBLEData.setStatus((byte) 0x10);  // 写入失败
+        lockBLEData.setStatus((byte) 0x10);
         EventBus.getDefault().post(lockBLEData);
     }
 
+    // 响应超时
     private void notifyTimeoutResponse() {
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);
-        lockBLEData.setStatus((byte) 0x11);  // 响应超时
+        lockBLEData.setStatus((byte) 0x11);
         EventBus.getDefault().post(lockBLEData);
     }
 
+    // 写入操作
     private void op(byte[] bytes) {
         BleManager.getInstance().write(
                 bleDevice,

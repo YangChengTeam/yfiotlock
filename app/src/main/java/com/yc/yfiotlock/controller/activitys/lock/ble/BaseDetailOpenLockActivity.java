@@ -6,11 +6,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.clj.fastble.data.BleDevice;
 import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBleSend;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -26,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -41,9 +44,12 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
     protected OpenLockInfo openLockInfo;
+    protected LockBleSend lockBleSend;
+
+    protected byte mcmd;
+    protected byte scmd;
 
     protected String title;
-
     public void setTitle(String title) {
         this.title = title;
     }
@@ -57,6 +63,9 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     protected void initVars() {
         super.initVars();
         lockEngine = new LockEngine(this);
+        openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
+        BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
+        lockBleSend = new LockBleSend(this, bleDevice);
     }
 
     @Override
@@ -65,7 +74,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         setNavTitle(title + "详情");
         delTv.setText(delTv.getText() + title);
 
-        openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             GeneralDialog generalDialog = new GeneralDialog(BaseDetailOpenLockActivity.this);
             generalDialog.setTitle("温馨提示");
@@ -73,7 +81,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
-                    cloudDel(openLockInfo.getId() + "");
+                    cloudDel();
                 }
             });
             generalDialog.show();
@@ -83,17 +91,13 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
 
     }
 
-    protected boolean opStatus = false;
-
     protected abstract void bleDel();
-
     protected abstract void cloudDelSucc();
 
-    protected abstract void processData(LockBLEData bleData);
 
-    protected void cloudDel(String id) {
+    protected void cloudDel() {
         mLoadingDialog.show("删除中...");
-        lockEngine.delOpenLockWay(id).subscribe(new Subscriber<ResultInfo<String>>() {
+        lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
@@ -115,11 +119,19 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         });
     }
 
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onProcess(LockBLEData bleData) {
-        opStatus = true;
-        processData(bleData);
+        if (bleData != null && bleData.getMcmd() == mcmd && bleData.getScmd() == scmd) {
+            if (bleData.getStatus() == (byte) 0x00) {
+                cloudDel();
+            } else if (bleData.getStatus() == (byte) 0x01) {
+
+            } else if (bleData.getStatus() == (byte) 0x10) {
+
+            } else if (bleData.getStatus() == (byte) 0x11) {
+
+            }
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -129,7 +141,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         openLockAdapter.setNewInstance(openLockTypeInfos);
         EventBus.getDefault().post(new OpenLockRefreshEvent());
     }
-
 
     private void setRv() {
         List<OpenLockInfo> openLockTypeInfos = new ArrayList<>();

@@ -14,7 +14,6 @@ import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.CacheUtils;
 
@@ -37,7 +36,6 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     @BindView(R.id.et_pass)
     EditText passEt;
 
-    private String number;
 
     @Override
     protected int getLayoutId() {
@@ -57,7 +55,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
                 ToastUtil.toast2(getContext(), "密码必需是长度为6位数字");
                 return;
             }
-            cloudAddPwd("1");
+            cloudAdd("1");
         });
 
         statusIv.setSelected(true);
@@ -76,50 +74,11 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
         });
     }
 
-    private boolean opStatus = false;
     private void bleAddPwd() {
-        opStatus = false;
-        Random rand = new Random();
-        number = rand.nextInt(100000000) + "";
-        byte[] bytes = LockBLEOpCmd.addPwd(PasswordAddOpenLockActivity.this, (byte) 0x01, number, passEt.getText() + "", new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
-        EventBus.getDefault().post(bytes);
-        VUiKit.postDelayed(LockBLEManager.OP_TIMEOUT, new Runnable() {
-            @Override
-            public void run() {
-                if (!opStatus) {
-                    LockBLEData lockBLEData = new LockBLEData();
-                    lockBLEData.setMcmd((byte) 0x02);
-                    lockBLEData.setScmd((byte) 0x02);
-                    lockBLEData.setStatus((byte) 0x06);
-                    EventBus.getDefault().post(lockBLEData);
-                }
-            }
-        });
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onProcess(LockBLEData bleData) {
-        opStatus = true;
-        if (bleData != null && bleData.getMcmd() == (byte) 0x02 && bleData.getScmd() == (byte) 0x02) {
-            if (bleData.getOther() != null) {
-                String number = new String(Arrays.copyOfRange(bleData.getOther(), 0, 5));
-                byte keyId = bleData.getOther()[6];
-                if (this.number.equals(number)) { // 验证流水号
-                    cloudAddPwd(keyId + "");
-                }
-            }
-        }
-    }
-
-    private void cloudAddPwd(String keyid) {
-        int passwordCount = 0;
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
-        if (countInfo != null) {
-            passwordCount = countInfo.getPasswordCount();
-        }
-        passwordCount += 1;
-        String name = "密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount);
-        cloudAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
+        this.mcmd = (byte)0x02;
+        this.scmd = (byte)0x01;
+        byte[] bytes = LockBLEOpCmd.addPwd(this, LockBLEManager.GROUP_TYPE, number, passEt.getText() + "", new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
+        lockBleSend.send(mcmd, scmd, bytes);
     }
 
     @Override
@@ -129,6 +88,18 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
             countInfo.setPasswordCount(countInfo.getPasswordCount() + 1);
             CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
         }
+    }
+
+    @Override
+    protected void cloudAdd(String keyid) {
+        int passwordCount = 0;
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+        if (countInfo != null) {
+            passwordCount = countInfo.getPasswordCount();
+        }
+        passwordCount += 1;
+        String name = "密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount);
+        cloudAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
     }
 
 

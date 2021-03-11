@@ -81,9 +81,6 @@ public class App extends Application {
         if (GoagalInfo.get().getPackageInfo() != null) {
             params.put("av", GoagalInfo.get().getPackageInfo().versionCode + "");
         }
-//        params.put("deviceid", getDeviceId(getApplicationContext()));
-//        params.put("androidosv", Build.VERSION.SDK_INT + "");
-//        params.put("msaoaid", oaid);
         HttpConfig.setDefaultParams(params);
 
     }
