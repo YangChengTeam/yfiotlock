@@ -18,6 +18,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
+import com.yc.yfiotlock.controller.activitys.user.WebActivity;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.EventStub;
@@ -26,6 +27,9 @@ import com.yc.yfiotlock.utils.CommonUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 
@@ -71,11 +75,14 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
     @Override
     protected void onResume() {
         super.onResume();
-        if (!App.isLogin() && this.getClass() != LoginActivity.class
-                && this.getClass() != SplashActivity.class) {
+        if (!App.isLogin()
+                && this.getClass() != LoginActivity.class
+                && this.getClass() != SplashActivity.class
+                && this.getClass() != WebActivity.class) {
             CommonUtils.startLogin(this);
         }
     }
+
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
     public void stub(EventStub stub) {

@@ -9,6 +9,12 @@ import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 
 public class LockBLEManager {
+    public static byte GROUP_TYPE = 0;
+    public static int OP_TIMEOUT = 1000;
+    public static int OPEN_LOCK_FINGERPRINT = 1;
+    public static int OPEN_LOCK_PASSWORD = 2;
+    public static int OPEN_LOCK_CARD = 3;
+
     public static void initBle(Application context) {
         BleManager.getInstance()
                 .enableLog(true)

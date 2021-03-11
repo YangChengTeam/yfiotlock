@@ -30,6 +30,7 @@ import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.adapters.SignCodeAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -85,36 +86,7 @@ public class LoginDialog extends Dialog {
         mEtSmsCode.setOnLongClickListener(v -> true);
         showInput();
         setRvCode();
-        mEtSmsCode.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String[] strings = s.toString().split("");
-                Log.i("aaaa", "afterTextChanged: " + s.toString());
-                List<String> stringList = mSignCodeAdapter.getData();
-                for (int i = 0; i < stringList.size(); i++) {
-                    if (i < strings.length) {
-                        stringList.set(i, strings[i]);
-                    } else {
-                        stringList.set(i, "");
-                    }
-                    mSignCodeAdapter.notifyItemChanged(i, "");
-                }
-                if (strings.length == 6) {
-                    mLoginResult.onSuccess(s.toString(), phone);
-                    dismiss();
-                }
-            }
-        });
+        mEtSmsCode.addTextChangedListener(mTextWatcher);
     }
 
     SignCodeAdapter mSignCodeAdapter;
@@ -125,14 +97,14 @@ public class LoginDialog extends Dialog {
             showInput();
         });
         mRvCode.setAdapter(mSignCodeAdapter);
-        mRvCode.setLayoutManager(new GridLayoutManager(getContext(), 6, RecyclerView.VERTICAL, false) {
+        mRvCode.setLayoutManager(new GridLayoutManager(getContext(), Config.SMS_CODE_LENGTH, RecyclerView.VERTICAL, false) {
             @Override
             public boolean canScrollHorizontally() {
                 return false;
             }
         });
         List<String> strings1 = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < Config.SMS_CODE_LENGTH; i++) {
             strings1.add("");
         }
         mSignCodeAdapter.setNewInstance(strings1);
@@ -146,6 +118,36 @@ public class LoginDialog extends Dialog {
         mTvSentCode.setText("验证码已发送至".concat("+").concat(phoneNumber));
         setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTvTimer);
     }
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            char[] chars = s.toString().toCharArray();
+            List<String> stringList = mSignCodeAdapter.getData();
+            for (int i = 0; i < Config.SMS_CODE_LENGTH; i++) {
+                if (i < chars.length) {
+                    stringList.set(i, chars[i] + "");
+                } else {
+                    stringList.set(i, "");
+                }
+                mSignCodeAdapter.notifyItemChanged(i, "");
+            }
+            if (chars.length == Config.SMS_CODE_LENGTH) {
+                mLoginResult.onSuccess(s.toString(), phone);
+                dismiss();
+            }
+        }
+    };
 
     private String phone;
 

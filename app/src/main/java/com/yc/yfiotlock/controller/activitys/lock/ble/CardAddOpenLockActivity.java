@@ -3,6 +3,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.widget.TextView;
 
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
@@ -39,7 +40,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         cardCount += 1;
         String name = "NFC门卡" + ((cardCount) > 9 ? cardCount + "" : "0" + cardCount);
         nameTv.setText(name);
-        cloudAdd(name, Config.OPEN_LOCK_CARD, keyid, "");
+        cloudAdd(name, LockBLEManager.OPEN_LOCK_CARD, keyid, "");
     }
 
     @Override

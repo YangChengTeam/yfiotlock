@@ -45,7 +45,7 @@ public class LockBleSend {
             this.cmdBytes = cmdBytes;
             wakeup();
 
-            VUiKit.postDelayed(Config.OP_TIMEOUT, () -> {
+            VUiKit.postDelayed(LockBLEManager.OP_TIMEOUT, () -> {
                 if (sendingStatus) {
                     sendingStatus = false;
                     notifyTimeoutResponse();

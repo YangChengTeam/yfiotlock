@@ -9,6 +9,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
@@ -35,9 +36,9 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     @Override
     protected void bleDel() {
         opStatus = false;
-        byte[] bytes = LockBLEOpCmd.delPwd(this, (byte) Config.GROUP_TYPE, (byte) openLockInfo.getKeyid());
+        byte[] bytes = LockBLEOpCmd.delPwd(this, (byte) LockBLEManager.GROUP_TYPE, (byte) openLockInfo.getKeyid());
         EventBus.getDefault().post(bytes);
-        VUiKit.postDelayed(Config.OP_TIMEOUT, new Runnable() {
+        VUiKit.postDelayed(LockBLEManager.OP_TIMEOUT, new Runnable() {
             @Override
             public void run() {
                 if (!opStatus) {

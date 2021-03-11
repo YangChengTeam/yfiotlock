@@ -6,6 +6,7 @@ import android.view.View;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.jakewharton.rxbinding4.view.RxViewGroup;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
@@ -51,7 +52,7 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseAddOpenLoc
         }
         fingerprintCount += 1;
         name += fingerprintCount;
-        cloudAdd(name, Config.OPEN_LOCK_FINGERPRINT, keyid, "");
+        cloudAdd(name, LockBLEManager.OPEN_LOCK_FINGERPRINT, keyid, "");
     }
 
     @Override

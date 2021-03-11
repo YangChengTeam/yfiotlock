@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
@@ -27,7 +28,7 @@ public class FingerprintAddOpenLockActivity extends BaseAddOpenLockActivity {
     @Override
     protected void initViews() {
         super.initViews();
-        cloudAdd("左手无名指01", Config.OPEN_LOCK_FINGERPRINT, "3", "");
+        cloudAdd("左手无名指01", LockBLEManager.OPEN_LOCK_FINGERPRINT, "3", "");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

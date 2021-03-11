@@ -11,6 +11,7 @@ import com.kk.utils.ToastUtil;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
@@ -82,7 +83,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
         number = rand.nextInt(100000000) + "";
         byte[] bytes = LockBLEOpCmd.addPwd(PasswordAddOpenLockActivity.this, (byte) 0x01, number, passEt.getText() + "", new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
         EventBus.getDefault().post(bytes);
-        VUiKit.postDelayed(Config.OP_TIMEOUT, new Runnable() {
+        VUiKit.postDelayed(LockBLEManager.OP_TIMEOUT, new Runnable() {
             @Override
             public void run() {
                 if (!opStatus) {
@@ -118,7 +119,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
         }
         passwordCount += 1;
         String name = "密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount);
-        cloudAdd(name, Config.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
+        cloudAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
     }
 
     @Override

@@ -4,13 +4,6 @@ public class Config {
     public static boolean DEBUG = false;
     public static boolean RESQUEST_FLAG = true;
 
-    public static byte GROUP_TYPE = 0;
-    public static int OP_TIMEOUT = 1000;
-    public static int OPEN_LOCK_FINGERPRINT = 1;
-    public static int OPEN_LOCK_PASSWORD = 2;
-    public static int OPEN_LOCK_CARD = 3;
-
-
     private final static String baseUrl = "http://locker.yf5g.cn";
     private final static String debugBaseUrl = "http://box.wuhanup.com/api";
 
@@ -26,9 +19,10 @@ public class Config {
             "ZwIDAQAB\n" +
             "-----END PUBLIC KEY-----";
 
-    public final static String PRIVACY_POLICY = "https://www.baidu.com";
-    public final static String USER_AGREEMENT = "https://www.baidu.com";
+    public final static String PRIVACY_POLICY = getBaseUrl() + "/userapp/v1.api_file/privacy";
+    public final static String USER_AGREEMENT = getBaseUrl() + "/userapp/v1.api_file/serviceAgreement";
 
+    public final static int SMS_CODE_LENGTH = 6;
 
     //登陆
 
