@@ -212,7 +212,7 @@ public class LockIndexActivity extends BaseActivity {
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
-                .setDeviceName(false, "Mi Smart Band 5")
+                .setDeviceName(false, "MEIZU 17 PRO")
                 .setScanTimeOut(10000);
         BleManager.getInstance().initScanRule(builder.build());
     }

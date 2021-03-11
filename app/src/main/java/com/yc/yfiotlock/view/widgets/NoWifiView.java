@@ -31,6 +31,10 @@ public class NoWifiView extends BaseView {
 
     private String msg;
 
+    public void setMsg(String s){
+        this.mTvMessage.setText(s);
+    }
+
     @Override
     public int getLayoutId() {
         return R.layout.view_nowifi;

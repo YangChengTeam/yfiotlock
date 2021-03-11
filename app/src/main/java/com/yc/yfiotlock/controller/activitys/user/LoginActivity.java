@@ -100,8 +100,12 @@ public class LoginActivity extends BaseActivity {
                 CommonUtils.isVerifyEnable(this);
                 break;
             case R.id.tv_user_agreement:
+                WebActivity.start(getContext(), Config.USER_AGREEMENT, getResources().getString(R.string.user_agreement));
                 break;
             case R.id.tv_privacy_policy:
+                WebActivity.start(getContext(), Config.PRIVACY_POLICY, getResources().getString(R.string.privacy_policy));
+                break;
+            default:
                 break;
         }
     }

@@ -21,8 +21,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
-
-    <uses-permission android:name="android.permission.BLUETOOTH"></uses-permission>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
@@ -34,9 +33,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".controller.activitys.user.WebActivity"></activity>
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="uoKAxhRzWoIE8yW6MPErz3VkM4Q3uVyr" />
+
         <activity android:name=".controller.activitys.lock.ble.FAQDetailActivity" />
         <activity
             android:name=".controller.activitys.lock.ble.FeedBackActivity"
@@ -52,6 +54,7 @@
         <activity android:name=".controller.activitys.base.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -194,7 +197,11 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote"> </service>
+
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote"></service>
     </application>
 
 </manifest>

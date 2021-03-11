@@ -22,9 +22,10 @@ public class Config {
             "ZwIDAQAB\n" +
             "-----END PUBLIC KEY-----";
 
-    public final static String PRIVACY_POLICY = "https://www.baidu.com";
-    public final static String USER_AGREEMENT = "https://www.baidu.com";
+    public final static String PRIVACY_POLICY = getBaseUrl() + "/userapp/v1.api_file/privacy";
+    public final static String USER_AGREEMENT = getBaseUrl() + "/userapp/v1.api_file/serviceAgreement";
 
+    public final static int SMS_CODE_LENGTH = 6;
 
     //登陆
 
