@@ -1,45 +1,32 @@
 package com.yc.yfiotlock.model.bean;
 
-import android.graphics.drawable.Drawable;
+import com.yc.yfiotlock.R;
 
 public class LogInfo {
-    private String name;
-    private String date;
-    private String des;
     private int id;
+    private int pwd_type;
+    private int group_type;
+    private int is_local;
+    private int is_succ;
+    private long action_time;
     private int icon;
+    private String action_name;
+    private String desp;
 
-
-    public LogInfo(String name, String date, String des, int icon, int id) {
-        this.name = name;
-        this.date = date;
-        this.des = des;
-        this.icon = icon;
-        this.id = id;
+    public String getAction_name() {
+        return action_name;
     }
 
-    public String getName() {
-        return name;
+    public void setAction_name(String action_name) {
+        this.action_name = action_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getDesp() {
+        return desp;
     }
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getDes() {
-        return des;
-    }
-
-    public void setDes(String des) {
-        this.des = des;
+    public void setDesp(String desp) {
+        this.desp = desp;
     }
 
     public int getId() {
@@ -50,8 +37,48 @@ public class LogInfo {
         this.id = id;
     }
 
+    public int getPwd_type() {
+        return pwd_type;
+    }
+
+    public void setPwd_type(int pwd_type) {
+        this.pwd_type = pwd_type;
+    }
+
+    public int getGroup_type() {
+        return group_type;
+    }
+
+    public void setGroup_type(int group_type) {
+        this.group_type = group_type;
+    }
+
+    public int getIs_local() {
+        return is_local;
+    }
+
+    public void setIs_local(int is_local) {
+        this.is_local = is_local;
+    }
+
+    public int getIs_succ() {
+        return is_succ;
+    }
+
+    public void setIs_succ(int is_succ) {
+        this.is_succ = is_succ;
+    }
+
+    public long getAction_time() {
+        return action_time;
+    }
+
+    public void setAction_time(long action_time) {
+        this.action_time = action_time;
+    }
+
     public int getIcon() {
-        return icon;
+        return R.mipmap.icon_log;
     }
 
     public void setIcon(int icon) {

@@ -73,6 +73,7 @@ public class Config {
 
 
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();
+    public static final String LOG_OPEN_URL = getBaseUrl() + "/userapp/v1.locker_open_log/openLogList" + isRsa();
 
 
     public static final int CLICK_LIMIT = 500;
