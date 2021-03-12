@@ -47,6 +47,13 @@ public class SuggestActivity extends BaseActivity {
     protected void initVars() {
         super.initVars();
         mFeedBackEngine = new FeedBackEngine(getContext());
+        setClick(R.id.stv_commit, () -> {
+            if (mEtSuggest.getText().toString().length() < 10) {
+                ToastCompat.showCenter(getContext(), "请输入您的建议，不少于十个字");
+                return;
+            }
+            commit();
+        });
     }
 
 
@@ -78,18 +85,12 @@ public class SuggestActivity extends BaseActivity {
         });
     }
 
-    @OnClick(R.id.stv_commit)
-    public void onViewClicked() {
-        if (mEtSuggest.getText().toString().length() < 10) {
-            ToastCompat.showCenter(getContext(), "请输入您的建议，不少于十个字");
-            return;
-        }
-        commit();
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mFeedBackEngine != null) mFeedBackEngine.cancel();
+        if (mFeedBackEngine != null) {
+            mFeedBackEngine.cancel();
+        }
     }
 }

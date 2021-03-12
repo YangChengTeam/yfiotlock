@@ -53,8 +53,12 @@ public class EditNameActivity extends BaseActivity {
 
     UserEngine mUserEngine;
 
-    @OnClick(R.id.stv_sure)
-    public void onViewClicked() {
+    @Override
+    protected void bindClick() {
+        setClick(R.id.stv_sure, this::commit);
+    }
+    
+    public void commit() {
         if (mEtName.getText().toString().length() == 0) {
             ToastCompat.showCenter(getContext(), "用户名不能为空");
             return;

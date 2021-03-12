@@ -126,6 +126,8 @@ public class PersonalInfoActivity extends BaseActivity {
                 case 2:
                     startActivity(new Intent(getContext(), EditNameActivity.class));
                     break;
+                default:
+                    break;
             }
         });
         mRvInfo.setAdapter(mAdapter);
@@ -389,8 +391,12 @@ public class PersonalInfoActivity extends BaseActivity {
         loadUserInfo();
     }
 
-    @OnClick(R.id.stv_logout)
-    public void onViewClicked() {
+    @Override
+    protected void bindClick() {
+        setClick(R.id.stv_logout, this::showLogoutDialog);
+    }
+
+    private void showLogoutDialog() {
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())
                 .setTitle("提示")
                 .setMessage("是否确定退出？")
@@ -406,13 +412,17 @@ public class PersonalInfoActivity extends BaseActivity {
         alertDialog.show();
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.colorAccent));
-
     }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mUserEngine != null) mUserEngine.cancel();
-        if (mUploadFileEngine != null) mUploadFileEngine.cancel();
+        if (mUserEngine != null) {
+            mUserEngine.cancel();
+        }
+        if (mUploadFileEngine != null) {
+            mUploadFileEngine.cancel();
+        }
     }
 }
