@@ -47,6 +47,9 @@ public class LockSettingActivity extends BaseBackActivity {
         mSettingAdapter.setOnItemClickListener((adapter, view, position) -> {
             SettingInfo settingInfo = mSettingAdapter.getData().get(position);
             switch (position) {
+                case 0:
+                    startActivity(new Intent(this, AlarmOpenLockManagerActivity.class));
+                    break;
                 case 1:
                     startActivity(new Intent(this, DeviceInfoActivity.class));
                     break;

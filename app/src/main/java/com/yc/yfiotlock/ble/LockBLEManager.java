@@ -9,7 +9,10 @@ import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 
 public class LockBLEManager {
+
     public static byte GROUP_TYPE = 0;
+    public static final byte GROUP_ADMIN = 0;
+    public static final byte GROUP_HIJACK = 3;
     public static int OP_TIMEOUT = 1000;
     public static int OPEN_LOCK_FINGERPRINT = 1;
     public static int OPEN_LOCK_PASSWORD = 2;
@@ -28,7 +31,7 @@ public class LockBLEManager {
     private static void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
-                .setDeviceName(false, "Mi Smart Band 5")
+                .setDeviceMac("7D:B5:97:58:AB:92")
                 .setScanTimeOut(10000);
         BleManager.getInstance().initScanRule(builder.build());
     }

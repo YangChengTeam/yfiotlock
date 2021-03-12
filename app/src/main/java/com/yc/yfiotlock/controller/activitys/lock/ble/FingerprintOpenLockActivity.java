@@ -19,7 +19,7 @@ public class FingerprintOpenLockActivity extends BaseOpenLockActivity {
         setTitle("指纹");
         super.initViews();
 
-        RxView.clicks(addTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+        RxView.clicks(addBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             Intent intent = new Intent(FingerprintOpenLockActivity.this, FingerprintAddOpenLockActivity.class);
             startActivity(intent);
         });

@@ -66,7 +66,10 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".controller.activitys.lock.ble.OpenLockManagerActivity"
+            android:name=".controller.activitys.lock.ble.BaseOpenLockManagerActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
+            android:name=".controller.activitys.lock.ble.AlarmOpenLockManagerActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.user.MainActivity"

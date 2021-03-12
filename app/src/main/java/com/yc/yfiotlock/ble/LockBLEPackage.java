@@ -98,7 +98,7 @@ public class LockBLEPackage {
         }
 
         // position package LENGTH = 2,3
-        short len = ByteBuffer.wrap(new byte[]{response[2], response[3]}).getShort();
+        short len = ByteBuffer.wrap(new byte[]{response[2], response[3]}).order(ByteOrder.BIG_ENDIAN).getShort();
         if (len != response.length) {
             LogUtil.msg("LockBLEPackage-> LENGTH is not package length!");
             return null;

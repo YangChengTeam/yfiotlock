@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.location.LocationManager;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,6 +11,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
@@ -38,9 +40,9 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     NoDataView nodataView;
 
     @BindView(R.id.stv_add)
-    protected SuperTextView addTv;
+    protected SuperTextView addBtn;
 
-
+    protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
 
@@ -55,7 +57,6 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         return R.layout.lock_ble_activity_base_open_lock;
     }
 
-
     @Override
     protected void initVars() {
         super.initVars();
@@ -66,7 +67,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     protected void initViews() {
         super.initViews();
         setNavTitle(title);
-        addTv.setText(addTv.getText() + title);
+        addBtn.setText(addBtn.getText() + title);
         setRv();
 
         loadData();
@@ -79,7 +80,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     }
 
     private void loadData() {
-        String type = BleUtils.getType(title) + "";
+        String way = BleUtils.getType(title) + "";
         List<OpenLockInfo> lockInfos = CacheUtils.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, new TypeReference<List<OpenLockInfo>>() {
         }.getType());
         if (lockInfos != null) {
@@ -87,7 +88,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         }
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
         mLoadingDialog.show("加载中...");
-        lockEngine.getOpenLockWayList(lockInfo.getId(), type).subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
+        lockEngine.getOpenLockWayList(lockInfo.getId(), way, type + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();

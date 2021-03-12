@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.widget.TextView;
 
+import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -35,6 +36,8 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     protected void initViews() {
         super.initViews();
         cloudAdd("2");
+
+        LogUtil.msg("+++++++++++++++++++++++" + type);
     }
 
     private void bleAddCard() {
@@ -47,17 +50,17 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     protected void cloudAddSucc() {
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setCardCount(countInfo.getCardCount() + 1);
-            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
         }
     }
 
     @Override
     protected void cloudAdd(String keyid) {
         int cardCount = 0;
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             cardCount = countInfo.getCardCount();
         }

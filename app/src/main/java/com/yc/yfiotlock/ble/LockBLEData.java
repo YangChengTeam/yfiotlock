@@ -60,7 +60,7 @@ public class LockBLEData {
             length += data.length;
         }
 
-        int seq = (int) (0x01000000);
+        int seq = (int) (System.currentTimeMillis() / 1000);
 
         // LENGTH = 2 Seq = 4 MCMD = 1 SCMD = 1
         int precrcLen = 2 + 4 + 1 + 1;

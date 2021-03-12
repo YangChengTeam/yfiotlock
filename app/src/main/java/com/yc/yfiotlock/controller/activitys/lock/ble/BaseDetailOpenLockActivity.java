@@ -12,7 +12,8 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBleSend;
+import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -28,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +44,8 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
     protected OpenLockInfo openLockInfo;
-    protected LockBleSend lockBleSend;
+    protected LockBLESend lockBleSend;
+    protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
 
     protected byte mcmd;
     protected byte scmd;
@@ -65,7 +66,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         lockEngine = new LockEngine(this);
         openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBleSend = new LockBleSend(this, bleDevice);
+        lockBleSend = new LockBLESend(this, bleDevice);
     }
 
     @Override
@@ -140,6 +141,12 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         openLockTypeInfos.add(openLockInfo);
         openLockAdapter.setNewInstance(openLockTypeInfos);
         EventBus.getDefault().post(new OpenLockRefreshEvent());
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        lockBleSend.clear();
     }
 
     private void setRv() {
