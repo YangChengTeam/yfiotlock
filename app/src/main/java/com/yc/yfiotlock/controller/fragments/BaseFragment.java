@@ -7,13 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.alibaba.fastjson.JSONObject;
 
+import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.ILoadData;
 import com.yc.yfiotlock.model.bean.EventStub;
 import com.yc.yfiotlock.utils.CommonUtils;
@@ -26,10 +30,11 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseFragment extends Fragment  implements ILoadData {
+public abstract class BaseFragment extends Fragment implements ILoadData {
 
 
     protected View mRootView;
@@ -44,20 +49,20 @@ public abstract class BaseFragment extends Fragment  implements ILoadData {
         LogUtil.msg("onCreate");
 
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-       if (mRootView == null) {
+        if (mRootView == null) {
             mRootView = View.inflate(getActivity(), getLayoutId(), null);
             ButterKnife.bind(this, mRootView);
 
 
             initVars();
             initViews();
+            bindClick();
             if (!EventBus.getDefault().isRegistered(this)) {
                 EventBus.getDefault().register(this);
             }
-
 
 
         }
@@ -97,6 +102,7 @@ public abstract class BaseFragment extends Fragment  implements ILoadData {
         }
     }
 
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -108,7 +114,24 @@ public abstract class BaseFragment extends Fragment  implements ILoadData {
 
     }
 
-    protected boolean isLoadedCache;
+    /**
+     * 设置view的点击事件
+     * 最好结合{@link #setClick(int, Runnable)} 使用
+     */
+    protected void bindClick() {
+
+    }
+
+    /**
+     * @param id       view id
+     * @param runnable when click to do sth.
+     */
+    protected void setClick(@IdRes int id, @NonNull Runnable runnable) {
+        RxView.clicks(mRootView.findViewById(id)).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            runnable.run();
+        });
+    }
+
 
 
 
