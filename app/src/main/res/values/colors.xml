@@ -17,4 +17,6 @@
 
     <color name="transparent">#00000000</color>
     <color name="view_line">#EDEDED</color>
+<!--    ripper text color 85% alpha-->
+    <color name="ripper_bg">#21000000</color>
 </resources>

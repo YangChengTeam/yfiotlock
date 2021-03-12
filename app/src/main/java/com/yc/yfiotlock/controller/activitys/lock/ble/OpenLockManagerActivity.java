@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -19,6 +20,7 @@ import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
+import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class OpenLockManagerActivity extends BaseActivity {
 
@@ -36,6 +39,8 @@ public class OpenLockManagerActivity extends BaseActivity {
     RecyclerView openLockRecyclerView;
 
     OpenLockAdapter openLockAdapter;
+    @BindView(R.id.view_nav_bar)
+    BackNavBar mViewNavBar;
 
     @Override
     protected int getLayoutId() {
@@ -44,6 +49,7 @@ public class OpenLockManagerActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
+        mViewNavBar.setBackListener(view -> finish());
         setRv();
         loadData();
     }
@@ -71,13 +77,13 @@ public class OpenLockManagerActivity extends BaseActivity {
 
     }
 
-    private void loadData(){
+    private void loadData() {
         int fingerprintCount = 0;
         int passwordCount = 0;
         int cardCount = 0;
 
         OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
-        if(countInfo != null){
+        if (countInfo != null) {
             fingerprintCount = countInfo.getFingerprintCount();
             passwordCount = countInfo.getPasswordCount();
             cardCount = countInfo.getCardCount();
@@ -88,19 +94,19 @@ public class OpenLockManagerActivity extends BaseActivity {
         OpenLockTypeInfo fingerprintOpenLockTypeInfo = new OpenLockTypeInfo();
         fingerprintOpenLockTypeInfo.setIcon(R.mipmap.icon_fingerprint);
         fingerprintOpenLockTypeInfo.setName("指纹");
-        fingerprintOpenLockTypeInfo.setDesp(fingerprintCount+"个指纹");
+        fingerprintOpenLockTypeInfo.setDesp(fingerprintCount + "个指纹");
         openLockTypeInfos.add(fingerprintOpenLockTypeInfo);
 
         OpenLockTypeInfo passwordOpenLockTypeInfo = new OpenLockTypeInfo();
         passwordOpenLockTypeInfo.setIcon(R.mipmap.icon_serct);
         passwordOpenLockTypeInfo.setName("密码");
-        passwordOpenLockTypeInfo.setDesp(passwordCount+"个密码");
+        passwordOpenLockTypeInfo.setDesp(passwordCount + "个密码");
         openLockTypeInfos.add(passwordOpenLockTypeInfo);
 
         OpenLockTypeInfo cardOpenLockTypeInfo = new OpenLockTypeInfo();
         cardOpenLockTypeInfo.setIcon(R.mipmap.icon_nfc);
         cardOpenLockTypeInfo.setName("NFC门卡");
-        cardOpenLockTypeInfo.setDesp(cardCount+"个门卡");
+        cardOpenLockTypeInfo.setDesp(cardCount + "个门卡");
         openLockTypeInfos.add(cardOpenLockTypeInfo);
 
         openLockAdapter.setNewInstance(openLockTypeInfos);

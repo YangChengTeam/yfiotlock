@@ -33,7 +33,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".controller.activitys.user.WebActivity"></activity>
+        <activity android:name=".controller.activitys.lock.ble.SettingSafePwdActivity"></activity>
+        <activity android:name=".controller.activitys.user.WebActivity" />
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
@@ -201,7 +202,7 @@
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
-            android:process=":remote"></service>
+            android:process=":remote" />
     </application>
 
 </manifest>
