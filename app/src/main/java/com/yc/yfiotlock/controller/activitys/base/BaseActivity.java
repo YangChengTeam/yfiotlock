@@ -8,13 +8,16 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
@@ -27,9 +30,11 @@ import com.yc.yfiotlock.utils.CommonUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.intellij.lang.annotations.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
@@ -64,6 +69,16 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
 
     protected void initVars() {
 
+    }
+
+    /**
+     * @param id       view id
+     * @param runnable when click to do sth.
+     */
+    protected void setClick(@IdRes int id, @NonNull Runnable runnable) {
+        RxView.clicks(findViewById(id)).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            runnable.run();
+        });
     }
 
     @Override

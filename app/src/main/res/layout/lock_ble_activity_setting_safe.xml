@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grayBg"
-    tools:context=".controller.activitys.lock.ble.SettingSafePwdActivity">
+    tools:context=".controller.activitys.lock.ble.SafePwdSettingActivity">
 
     <com.yc.yfiotlock.view.widgets.BackNavBar
         android:id="@+id/bnb_title"

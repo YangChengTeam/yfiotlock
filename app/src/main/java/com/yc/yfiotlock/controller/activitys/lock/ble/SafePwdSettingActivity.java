@@ -1,10 +1,14 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Switch;
 
+import androidx.annotation.Nullable;
+
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
@@ -15,7 +19,7 @@ import butterknife.OnClick;
 /**
  * @author Dullyoung
  */
-public class SettingSafePwdActivity extends BaseActivity {
+public class SafePwdSettingActivity extends BaseActivity {
 
 
     @BindView(R.id.bnb_title)
@@ -35,10 +39,20 @@ public class SettingSafePwdActivity extends BaseActivity {
     @Override
     protected void initViews() {
         mBnbTitle.setBackListener(view -> finish());
+        setClick(R.id.tv_change_pwd, () -> {
+            startActivityForResult(new Intent(this, SafePwdCreateActivity.class), REQUEST_PWD_CODE);
+        });
     }
 
+    private final int REQUEST_PWD_CODE = 101;
 
-    @OnClick(R.id.tv_change_pwd)
-    public void onViewClicked() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_PWD_CODE) {
+            if (resultCode == RESULT_OK && data != null) {
+                ToastCompat.showCenter(getContext(), data.getStringExtra("pwd"));
+            }
+        }
     }
 }

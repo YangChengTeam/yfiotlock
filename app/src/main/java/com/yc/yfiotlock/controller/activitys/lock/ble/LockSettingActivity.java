@@ -51,12 +51,12 @@ public class LockSettingActivity extends BaseBackActivity {
                     startActivity(new Intent(this, DeviceInfoActivity.class));
                     break;
                 case 2:
-                    Intent intent = new Intent(this, EditDeviceNameActivity.class);
+                    Intent intent = new Intent(this, DeviceNameEditActivity.class);
                     intent.putExtra("name", settingInfo.getValue());
                     startActivity(intent);
                     break;
                 case 3:
-                    startActivity(new Intent(this, SettingSafePwdActivity.class));
+                    startActivity(new Intent(this, SafePwdSettingActivity.class));
                     break;
                 case 5:
                     startActivity(new Intent(this, FAQActivity.class));
