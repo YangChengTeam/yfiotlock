@@ -6,6 +6,7 @@ import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.domain.ResultInfo;
@@ -19,15 +20,17 @@ import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.CommonUtils;
-import com.yc.yfiotlock.view.adapters.AboutAdapter;
+import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 import rx.Observer;
 
 public class AboutUsActivity extends BaseActivity {
@@ -150,6 +153,18 @@ public class AboutUsActivity extends BaseActivity {
         super.onDestroy();
         if (mUpdateEngine != null) {
             mUpdateEngine.cancel();
+        }
+    }
+
+    private  class AboutAdapter extends BaseExtendAdapter<AboutInfo> {
+        public AboutAdapter(@Nullable List<AboutInfo> data) {
+            super(R.layout.item_about_us, data);
+        }
+
+        @Override
+        protected void convert(@NotNull BaseViewHolder holder, AboutInfo aboutInfo) {
+            holder.setText(R.id.tv_name, aboutInfo.getName());
+            holder.setText(R.id.tv_value, aboutInfo.getValue());
         }
     }
 }

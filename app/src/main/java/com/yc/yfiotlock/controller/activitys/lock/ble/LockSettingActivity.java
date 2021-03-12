@@ -5,12 +5,16 @@ import android.content.Intent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.SettingInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
-import com.yc.yfiotlock.view.adapters.SettingAdapter;
+import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.SettingSoundView;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +82,18 @@ public class LockSettingActivity extends BaseBackActivity {
         settingInfos.add(new SettingInfo("帮助与反馈", ""));
         mSettingAdapter.setNewInstance(settingInfos);
         mSettingAdapter.setHeaderView(new SettingSoundView(this));
+    }
+
+    private class SettingAdapter extends BaseExtendAdapter<SettingInfo> {
+        public SettingAdapter(@Nullable List<SettingInfo> data) {
+            super(R.layout.item_setting, data);
+        }
+
+        @Override
+        protected void convert(@NotNull BaseViewHolder holder, SettingInfo settingInfo) {
+            holder.setText(R.id.tv_name, settingInfo.getName());
+            holder.setText(R.id.tv_value, settingInfo.getValue());
+        }
     }
 
 }
