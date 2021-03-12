@@ -55,8 +55,13 @@ public class LockSettingActivity extends BaseBackActivity {
                     intent.putExtra("name", settingInfo.getValue());
                     startActivity(intent);
                     break;
+                case 3:
+                    startActivity(new Intent(this, SettingSafePwdActivity.class));
+                    break;
                 case 5:
                     startActivity(new Intent(this, FAQActivity.class));
+                    break;
+                default:
                     break;
             }
         });

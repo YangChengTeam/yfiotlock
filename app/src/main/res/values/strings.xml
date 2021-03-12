@@ -95,6 +95,14 @@
     <string name="input_router_hint">请输入路由器型号（可选）</string>
     <string name="et_question_hint">请描述您遇到的问题...</string>
     <string name="router_model">路由器型号</string>
+    <string name="pwd">密码</string>
+    <string name="safe_pwd">安全密码</string>
+    <string name="safe_pwd_desp">查看设备时需要验证密码</string>
+    <string name="change_safe_pwd">更改安全密码</string>
+    <string name="finger">指纹</string>
+    <string name="fingerprint_unlock">指纹解锁</string>
+    <string name="fingerprint_unlock_desp">查看设备时需要验证指纹</string>
+    <string name="pwd_tip">请牢记密码，忘记后将无法找回，仅能通过重新添加设备到扬飞智能APP中后清除密码</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>
