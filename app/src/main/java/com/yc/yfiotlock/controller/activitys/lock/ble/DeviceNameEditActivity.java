@@ -10,7 +10,7 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class EditDeviceNameActivity extends BaseActivity {
+public class DeviceNameEditActivity extends BaseActivity {
 
 
     @BindView(R.id.bnb_title)

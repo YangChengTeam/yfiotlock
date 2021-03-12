@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".controller.activitys.lock.ble.SafePwdCreateActivity">
+
+    <com.yc.yfiotlock.view.widgets.BackNavBar
+        android:id="@+id/bnb_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="创建安全密码" />
+
+    <TextView
+        android:id="@+id/tv_input_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:text="@string/input_new_pwd"
+        android:textColor="#222222"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bnb_title" />
+
+    <EditText
+        android:id="@+id/et_pwd"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="128dp"
+        android:layout_marginEnd="15dp"
+        android:background="@color/transparent"
+        android:cursorVisible="false"
+        android:inputType="number"
+        android:maxLength="6"
+        android:textColor="@color/transparent"
+        android:textCursorDrawable="@color/transparent"
+        android:textIsSelectable="false"
+        app:layout_constraintTop_toBottomOf="@id/bnb_title" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_pwd"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="@id/et_pwd"
+        app:layout_constraintStart_toStartOf="@id/et_pwd"
+        app:layout_constraintTop_toTopOf="@id/et_pwd" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:drawablePadding="5dp"
+        android:text="@string/_6_number_safe_pwd"
+        android:textColor="#999999"
+        android:textSize="13dp"
+        app:drawableEndCompat="@mipmap/icon_create_pwd_tip"
+        app:layout_constraintEnd_toEndOf="@id/rv_pwd"
+        app:layout_constraintTop_toBottomOf="@id/rv_pwd" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
