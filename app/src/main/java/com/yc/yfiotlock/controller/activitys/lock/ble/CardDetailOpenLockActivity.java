@@ -40,10 +40,10 @@ public class CardDetailOpenLockActivity extends BaseDetailOpenLockActivity {
 
     @Override
     protected void cloudDelSucc() {
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setCardCount(countInfo.getCardCount() - 1);
-            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
         }
     }
 }

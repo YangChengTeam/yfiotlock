@@ -2,10 +2,10 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import com.clj.fastble.data.BleDevice;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBleSend;
-import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.DeviceInfo;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
@@ -23,12 +23,14 @@ import rx.Subscriber;
 public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
     protected LockEngine lockEngine;
     protected DeviceInfo lockInfo;
-    protected LockBleSend lockBleSend;
+    protected LockBLESend lockBleSend;
 
     protected byte mcmd;
     protected byte scmd;
 
     protected String number;
+
+    protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
 
     @Override
     protected void initVars() {
@@ -36,7 +38,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
         lockEngine = new LockEngine(this);
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBleSend = new LockBleSend(this, bleDevice);
+        lockBleSend = new LockBLESend(this, bleDevice);
 
         Random rand = new Random();
         number = rand.nextInt(100000000) + "";
@@ -68,6 +70,12 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        lockBleSend.clear();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

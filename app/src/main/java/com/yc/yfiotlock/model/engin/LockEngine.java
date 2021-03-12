@@ -67,13 +67,14 @@ public class LockEngine extends BaseEngin {
      * @param lockerId -
      * @return finger count ,pwd count and nfc count
      */
-    public Observable<ResultInfo<OpenLockCountInfo>> getOpenLockInfoCount(String lockerId) {
+    public Observable<ResultInfo<OpenLockCountInfo>> getOpenLockInfoCount(String lockerId, String type) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", lockerId);
+        map.put("type", type);
         return new HttpCoreEngin<ResultInfo<OpenLockCountInfo>>(getContext()).rxpost(Config.OPEN_LOCK_LIST_URL,
                 new TypeReference<ResultInfo<OpenLockCountInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
@@ -84,14 +85,15 @@ public class LockEngine extends BaseEngin {
      * @param lockerId -
      * @return list of single openLockWay's info
      */
-    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String type) {
+    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String way, String type) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", lockerId);
-        map.put("pwd_type", type);
+        map.put("pwd_type", way);
+        map.put("type", type);
         return new HttpCoreEngin<ResultInfo<List<OpenLockInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
                 new TypeReference<ResultInfo<List<OpenLockInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);

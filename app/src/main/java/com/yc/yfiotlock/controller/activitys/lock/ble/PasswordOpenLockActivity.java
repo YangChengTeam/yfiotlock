@@ -19,7 +19,7 @@ public class PasswordOpenLockActivity extends BaseOpenLockActivity {
         setTitle("密码");
         super.initViews();
 
-        RxView.clicks(addTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+        RxView.clicks(addBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             Intent intent = new Intent(PasswordOpenLockActivity.this, PasswordAddOpenLockActivity.class);
             startActivity(intent);
         });

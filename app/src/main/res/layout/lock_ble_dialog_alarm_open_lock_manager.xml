@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+   >
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="240dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/shape_alarm_open_lock_manager"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="报警触发方式"
+            android:textColor="#999999"
+            android:textSize="13dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="当遇到危险如有人肋迫、跟踪等紧急情
+况时，您可使用报警专的密码/指纹/NF
+C方式开锁，系统会向管理员手机发求
+救信息，协助脱身。请牢记报警密码/
+指纹/NFC，同时为避免引起不必要麻
+烦，请只在最需要时刻使用"
+            android:textColor="#333333"
+            android:textSize="14dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="16dp"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <com.coorchice.library.SuperTextView
+                android:id="@+id/stv_ok"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textColor="#3395FD"
+                android:textSize="14dp"
+                android:text="好的"
+                android:gravity="center"
+                app:stv_left_top_corner="false"
+                app:stv_right_top_corner="false"
+                app:stv_corner="6dp"
+                app:stv_pressBgColor="#4e000000"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"></com.coorchice.library.SuperTextView>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#ededed"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/stv_ok"></View>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+         
+
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

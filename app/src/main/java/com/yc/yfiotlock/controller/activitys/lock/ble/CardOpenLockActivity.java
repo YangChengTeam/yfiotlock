@@ -20,7 +20,7 @@ public class CardOpenLockActivity extends BaseOpenLockActivity {
         setTitle("NFC门卡");
         super.initViews();
 
-        RxView.clicks(addTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+        RxView.clicks(addBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             Intent intent = new Intent(CardOpenLockActivity.this, CardAddOpenLockActivity.class);
             startActivity(intent);
         });

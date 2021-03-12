@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,7 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.utils.HexUtil;
+import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
@@ -48,9 +50,9 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     byte[] bytes = new byte[]{(byte) 0xAA, (byte) 0x00, (byte) 0x00, (byte) 0x12, (byte) 0x00, (byte) 0x0B, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x00, (byte) 0x23, (byte) 0x0B, (byte) 0xC3, (byte) 0x8B, (byte) 0xBB};
 
     public static final String WRITE_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
-    public static final String NOTIFY_SERVICE_UUID = "5833ff01-9b8b-5191-6142-22a4536ef123";
+    public static final String NOTIFY_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
     public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
-    public static final String NOTIFY_CHARACTERISTIC_UUID = "5833ff03-9b8b-5191-6142-22a4536ef123";
+    public static final String NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -380,14 +382,90 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
-                final EditText pwdEt = new EditText(this);
-                pwdEt.setText("123456");
-                layout.addView(pwdEt);
-                dialog.setView(layout);
+
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
 
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("流水号:");
+                numberlayout.addView(numberTV);
+
+                final EditText numberET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                numberET.setLayoutParams(numberParams);
+
+                numberET.setText("00000001");
+                numberlayout.addView(numberET);
+
+                layout.addView(numberlayout);
+
+                LinearLayout pwdlayout = new LinearLayout(this);
+                pwdlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView pwdTV = new TextView(this);
+                pwdTV.setText("密码:");
+                pwdlayout.addView(pwdTV);
+
+                final EditText pwdEt = new EditText(this);
+                LayoutParams pwdParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                pwdParams.weight = 1;
+                pwdEt.setLayoutParams(pwdParams);
+                pwdEt.setText("123456");
+                pwdlayout.addView(pwdEt);
+                layout.addView(pwdlayout);
+
+
+                LinearLayout stlayout = new LinearLayout(this);
+                stlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView stTV = new TextView(this);
+                stTV.setText("起始时间:");
+                stlayout.addView(stTV);
+
+                final EditText stEt = new EditText(this);
+                LayoutParams stParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                stParams.weight = 1;
+                stEt.setLayoutParams(stParams);
+                stEt.setText("00 00 00 00 00 00 00");
+                stlayout.addView(stEt);
+
+                layout.addView(stlayout);
+
+                LinearLayout etlayout = new LinearLayout(this);
+                etlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView etTV = new TextView(this);
+                etTV.setText("截止时间:");
+                etlayout.addView(etTV);
+
+                final EditText etEt = new EditText(this);
+                LayoutParams etParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                etParams.weight = 1;
+                etEt.setLayoutParams(etParams);
+                etEt.setText("00 00 00 00 00 00 00");
+                etlayout.addView(etEt);
+
+                layout.addView(etlayout);
+
+                dialog.setView(layout);
 
                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -402,7 +480,19 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         dialog.dismiss();
                         String type = typeET.getText().toString();
                         String pwd = pwdEt.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.addPwd(OperationActivity.this, Byte.valueOf(type), "00000001", pwd, new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
+                        String[] st = stEt.getText().toString().split(" ");
+                        byte[] stbs = new byte[st.length];
+
+                        for(int i=0;i<st.length;i++){
+                            stbs[i] =  Byte.valueOf(st[i]);
+                        }
+
+                        String[] et = etEt.getText().toString().split(" ");
+                        byte[] etbs = new byte[st.length];
+                        for(int i=0;i<et.length;i++){
+                            etbs[i] =  Byte.valueOf(et[i]);
+                        }
+                        byte[] bytes = LockBLEOpCmd.addPwd(OperationActivity.this, Byte.valueOf(type), numberET.getText()+"", pwd, stbs, etbs);
                         op(bytes);
                     }
                 });
@@ -418,17 +508,85 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 layout.setOrientation(LinearLayout.VERTICAL);
 
 
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
+
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("keyid:");
+                numberlayout.addView(numberTV);
 
                 final EditText idET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                idET.setLayoutParams(numberParams);
+
                 idET.setText("1");
-                layout.addView(idET);
+                numberlayout.addView(idET);
+
+                layout.addView(numberlayout);
+
+                LinearLayout pwdlayout = new LinearLayout(this);
+                pwdlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView pwdTV = new TextView(this);
+                pwdTV.setText("密码:");
+                pwdlayout.addView(pwdTV);
 
                 final EditText pwdEt = new EditText(this);
+                LayoutParams pwdParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                pwdParams.weight = 1;
+                pwdEt.setLayoutParams(pwdParams);
                 pwdEt.setText("123456");
-                layout.addView(pwdEt);
+                pwdlayout.addView(pwdEt);
+                layout.addView(pwdlayout);
+
+
+                LinearLayout stlayout = new LinearLayout(this);
+                stlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView stTV = new TextView(this);
+                stTV.setText("起始时间:");
+                stlayout.addView(stTV);
+
+                final EditText stEt = new EditText(this);
+                LayoutParams stParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                stParams.weight = 1;
+                stEt.setLayoutParams(stParams);
+                stEt.setText("00 00 00 00 00 00 00");
+                stlayout.addView(stEt);
+
+                layout.addView(stlayout);
+
+                LinearLayout etlayout = new LinearLayout(this);
+                etlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView etTV = new TextView(this);
+                etTV.setText("截止时间:");
+                etlayout.addView(etTV);
+
+                final EditText etEt = new EditText(this);
+                LayoutParams etParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                etParams.weight = 1;
+                etEt.setLayoutParams(etParams);
+                etEt.setText("00 00 00 00 00 00 00");
+                etlayout.addView(etEt);
 
                 dialog.setView(layout);
                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -445,7 +603,19 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         String pwd = pwdEt.getText().toString();
                         String id = idET.getText().toString();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.modPwd(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id), pwd, new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
+                        String[] st = stEt.getText().toString().split(" ");
+                        byte[] stbs = new byte[st.length];
+
+                        for(int i=0;i<st.length;i++){
+                            stbs[i] =  Byte.valueOf(st[i]);
+                        }
+
+                        String[] et = etEt.getText().toString().split(" ");
+                        byte[] etbs = new byte[st.length];
+                        for(int i=0;i<et.length;i++){
+                            etbs[i] =  Byte.valueOf(et[i]);
+                        }
+                        byte[] bytes = LockBLEOpCmd.modPwd(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id), pwd, stbs, etbs);
                         op(bytes);
                     }
                 });
@@ -460,13 +630,40 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
+
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("keyid:");
+                numberlayout.addView(numberTV);
 
                 final EditText idET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                idET.setLayoutParams(numberParams);
+
                 idET.setText("1");
-                layout.addView(idET);
+                numberlayout.addView(idET);
+
+                layout.addView(numberlayout);
+
 
                 dialog.setView(layout);
 
@@ -499,9 +696,39 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
+
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("流水号:");
+                numberlayout.addView(numberTV);
+
+                final EditText numberET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                numberET.setLayoutParams(numberParams);
+
+                numberET.setText("00000001");
+                numberlayout.addView(numberET);
+
+                layout.addView(numberlayout);
 
                 dialog.setView(layout);
 
@@ -518,7 +745,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.addCard(OperationActivity.this, Byte.valueOf(type), "00000001");
+                        String number = numberET.getText().toString();
+                        byte[] bytes = LockBLEOpCmd.addCard(OperationActivity.this, Byte.valueOf(type), number);
                         op(bytes);
                     }
                 });
@@ -533,13 +761,40 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
+
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("keyid:");
+                numberlayout.addView(numberTV);
 
                 final EditText idET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                idET.setLayoutParams(numberParams);
+
                 idET.setText("1");
-                layout.addView(idET);
+                numberlayout.addView(idET);
+
+                layout.addView(numberlayout);
+
 
                 dialog.setView(layout);
 
@@ -572,13 +827,40 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
+
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("keyid:");
+                numberlayout.addView(numberTV);
 
                 final EditText idET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                idET.setLayoutParams(numberParams);
+
                 idET.setText("1");
-                layout.addView(idET);
+                numberlayout.addView(idET);
+
+                layout.addView(numberlayout);
+
 
                 dialog.setView(layout);
 
@@ -612,9 +894,39 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
+
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("流水号:");
+                numberlayout.addView(numberTV);
+
+                final EditText numberET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                numberET.setLayoutParams(numberParams);
+
+                numberET.setText("00000001");
+                numberlayout.addView(numberET);
+
+                layout.addView(numberlayout);
 
                 dialog.setView(layout);
 
@@ -631,7 +943,9 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         String type = typeET.getText().toString();
-                        byte[] bytes = LockBLEOpCmd.addFingerprint(OperationActivity.this, Byte.valueOf(type), "00000001");
+                        String number = numberET.getText().toString();
+
+                        byte[] bytes = LockBLEOpCmd.addFingerprint(OperationActivity.this, Byte.valueOf(type), number);
                         op(bytes);
                     }
                 });
@@ -646,13 +960,40 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
+
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("keyid:");
+                numberlayout.addView(numberTV);
 
                 final EditText idET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                idET.setLayoutParams(numberParams);
+
                 idET.setText("1");
-                layout.addView(idET);
+                numberlayout.addView(idET);
+
+                layout.addView(numberlayout);
+
 
                 dialog.setView(layout);
 
@@ -684,13 +1025,40 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LinearLayout layout = new LinearLayout(this);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                LinearLayout typelayout = new LinearLayout(this);
+                typelayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView typeTV = new TextView(this);
+                typeTV.setText("用户类型:");
+                typelayout.addView(typeTV);
+
                 final EditText typeET = new EditText(this);
+                LayoutParams typeParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                typeParams.weight = 1;
+                typeET.setLayoutParams(typeParams);
+
                 typeET.setText("0");
-                layout.addView(typeET);
+                typelayout.addView(typeET);
+
+                layout.addView(typelayout);
+
+                LinearLayout numberlayout = new LinearLayout(this);
+                numberlayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                final TextView numberTV = new TextView(this);
+                numberTV.setText("keyid:");
+                numberlayout.addView(numberTV);
 
                 final EditText idET = new EditText(this);
+                LayoutParams numberParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
+                numberParams.weight = 1;
+                idET.setLayoutParams(numberParams);
+
                 idET.setText("1");
-                layout.addView(idET);
+                numberlayout.addView(idET);
+
+                layout.addView(numberlayout);
+
 
                 dialog.setView(layout);
 

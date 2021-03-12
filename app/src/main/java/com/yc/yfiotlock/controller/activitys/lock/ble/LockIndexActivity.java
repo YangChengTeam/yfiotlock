@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothGatt;
 import android.content.Intent;
 import android.hardware.SensorEvent;
@@ -15,7 +16,6 @@ import androidx.annotation.Nullable;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleGattCallback;
-import com.clj.fastble.callback.BleMtuChangedCallback;
 import com.clj.fastble.callback.BleScanCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
@@ -25,14 +25,13 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
-import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.ble.LockBLEUtil;
-import com.yc.yfiotlock.ble.LockBleSend;
+import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
-import com.yc.yfiotlock.demo.comm.ObserverManager;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.helper.ShakeSensor;
 import com.yc.yfiotlock.model.bean.DeviceInfo;
@@ -95,7 +94,7 @@ public class LockIndexActivity extends BaseActivity {
         return bleDevice;
     }
 
-    private LockBleSend lockBleSend;
+    private LockBLESend lockBleSend;
 
     private CONNECT_STATUS connectStatus;
 
@@ -153,7 +152,11 @@ public class LockIndexActivity extends BaseActivity {
         RxView.clicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             if (connectStatus == CONNECT_STATUS.CONNECT_FAILED) {
                 scan();
-            } else if (connectStatus == CONNECT_STATUS.CONNECT_SUCC) {
+            }
+        });
+
+        RxView.longClicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            if (connectStatus == CONNECT_STATUS.CONNECT_SUCC) {
                 open();
             }
         });
@@ -201,9 +204,10 @@ public class LockIndexActivity extends BaseActivity {
     private void open() {
         connectStatus = CONNECT_STATUS.CONNECT_OPING;
 
-        startAnimations();
         loadingIv.setImageResource(R.mipmap.three);
         statusTitleTv.setText("正在开锁...");
+        startAnimations();
+
         if (lockBleSend != null) {
             lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this));
         }
@@ -212,7 +216,6 @@ public class LockIndexActivity extends BaseActivity {
     public boolean isConnected() {
         return connectStatus == CONNECT_STATUS.CONNECT_SUCC || connectStatus == CONNECT_STATUS.CONNECT_OPING;
     }
-
 
     private static final int REQUEST_GPS = 4;
 
@@ -275,14 +278,11 @@ public class LockIndexActivity extends BaseActivity {
             @Override
             public void onScanning(BleDevice bleDevice) {
                 // 搜索到后开始连接
-                Toast.makeText(LockIndexActivity.this, bleDevice.getName(), Toast.LENGTH_LONG).show();
-
                 connect(bleDevice);
             }
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
-                Toast.makeText(LockIndexActivity.this, scanResultList.size() + "", Toast.LENGTH_LONG).show();
                 if (scanResultList.size() == 0) {
                     // 搜索完成未发现设备
                     connectStatus = CONNECT_STATUS.CONNECT_FAILED;
@@ -320,7 +320,7 @@ public class LockIndexActivity extends BaseActivity {
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
                 LockIndexActivity.this.bleDevice = bleDevice;
-                lockBleSend = new LockBleSend(LockIndexActivity.this, bleDevice);
+                lockBleSend = new LockBLESend(LockIndexActivity.this, bleDevice);
 
                 // 设置连接成功状态
                 connectStatus = CONNECT_STATUS.CONNECT_SUCC;
@@ -343,14 +343,23 @@ public class LockIndexActivity extends BaseActivity {
                 statusIv.setImageResource(R.mipmap.icon_nolink);
                 loadingIv.setImageResource(R.mipmap.one);
 
-                if (isActiveDisConnected) {
-                    Toast.makeText(LockIndexActivity.this, bleDevice.getName() + getString(R.string.active_disconnected), Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(LockIndexActivity.this, bleDevice.getName() + getString(R.string.disconnected), Toast.LENGTH_LONG).show();
-                    ObserverManager.getInstance().notifyObserver(bleDevice);
-                }
+                reconnect();
             }
         });
+    }
+
+    // 重新逻辑
+    private void reconnect() {
+        GeneralDialog generalDialog = new GeneralDialog(this);
+        generalDialog.setTitle("温馨提示");
+        generalDialog.setMsg("蓝牙连接已断开，请将手机靠近 门锁后重试");
+        generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+            @Override
+            public void onClick(Dialog dialog) {
+                connect(bleDevice);
+            }
+        });
+        generalDialog.show();
     }
 
     // 处理响应
@@ -362,6 +371,7 @@ public class LockIndexActivity extends BaseActivity {
             if (bleData.getStatus() == (byte) 0x00) {
                 statusTitleTv.setText("门锁已打开");
             } else {
+                statusTitleTv.setText("门锁已连接");
                 loadingIv.setImageResource(R.mipmap.one);
             }
         }
@@ -369,7 +379,7 @@ public class LockIndexActivity extends BaseActivity {
 
     // 进入开门方式管理
     private void nav2OpenLock() {
-        Intent intent = new Intent(this, OpenLockManagerActivity.class);
+        Intent intent = new Intent(this, BaseOpenLockManagerActivity.class);
         startActivity(intent);
     }
 
@@ -391,21 +401,24 @@ public class LockIndexActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRefresh(OpenLockRefreshEvent object) {
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
+    private int setCountInfo(){
+        int type = 1;
+        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL+ type, OpenLockCountInfo.class);
         if (countInfo != null) {
             openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
         }
+        return type;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(OpenLockRefreshEvent object) {
+        setCountInfo();
     }
 
     // 开门方式数量
     private void loadLockOpenCountInfo() {
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL, OpenLockCountInfo.class);
-        if (countInfo != null) {
-            openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
-        }
-        lockEngine.getOpenLockInfoCount("1").subscribe(new Subscriber<ResultInfo<OpenLockCountInfo>>() {
+        int type = setCountInfo();
+        lockEngine.getOpenLockInfoCount(lockInfo.getId(), type + "").subscribe(new Subscriber<ResultInfo<OpenLockCountInfo>>() {
             @Override
             public void onCompleted() {
 
@@ -421,7 +434,7 @@ public class LockIndexActivity extends BaseActivity {
                 if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
                     OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
                     openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
-                    CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL, countInfo);
+                    CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
                 }
             }
         });
