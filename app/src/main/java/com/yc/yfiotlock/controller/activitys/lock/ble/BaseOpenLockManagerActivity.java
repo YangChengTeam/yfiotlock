@@ -58,6 +58,7 @@ public class BaseOpenLockManagerActivity extends BaseBackActivity {
 
     @Override
     protected void initViews() {
+        super.initViews();
         setRv();
         loadData();
     }
