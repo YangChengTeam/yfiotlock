@@ -112,19 +112,10 @@ public class MainActivity extends BaseActivity {
                 ContextCompat.getDrawable(this, R.mipmap.icon_personal_default), null, null);
     }
 
-
-    @OnClick({R.id.ll_index, R.id.ll_mine})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.ll_index:
-                onSelected(0);
-                break;
-            case R.id.ll_mine:
-                onSelected(1);
-                break;
-            default:
-                break;
-        }
+    @Override
+    protected void bindClick() {
+        setClick(R.id.ll_index, () -> onSelected(0));
+        setClick(R.id.ll_mine, () -> onSelected(1));
     }
 
     /**

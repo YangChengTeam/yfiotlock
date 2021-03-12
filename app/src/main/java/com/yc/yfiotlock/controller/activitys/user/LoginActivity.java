@@ -89,25 +89,12 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-
-    @OnClick({R.id.tv_get_code, R.id.tv_user_agreement, R.id.tv_privacy_policy, R.id.tv_fast_login})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.tv_get_code:
-                sendSmsCode();
-                break;
-            case R.id.tv_fast_login:
-                CommonUtils.isVerifyEnable(this);
-                break;
-            case R.id.tv_user_agreement:
-                WebActivity.start(getContext(), Config.USER_AGREEMENT, getResources().getString(R.string.user_agreement));
-                break;
-            case R.id.tv_privacy_policy:
-                WebActivity.start(getContext(), Config.PRIVACY_POLICY, getResources().getString(R.string.privacy_policy));
-                break;
-            default:
-                break;
-        }
+    @Override
+    protected void bindClick() {
+        setClick(R.id.tv_get_code, this::sendSmsCode);
+        setClick(R.id.tv_fast_login, () -> CommonUtils.isVerifyEnable(this));
+        setClick(R.id.tv_user_agreement, () -> WebActivity.start(getContext(), Config.USER_AGREEMENT, getString(R.string.user_agreement)));
+        setClick(R.id.tv_privacy_policy, () -> WebActivity.start(getContext(), Config.PRIVACY_POLICY, getString(R.string.privacy_policy)));
     }
 
     @Override

@@ -94,6 +94,7 @@ public class AboutUsActivity extends BaseActivity {
     protected void initVars() {
         super.initVars();
         mUpdateEngine = new UpdateEngine(getContext());
+        setClick(R.id.stv_check, () -> checkVersion(true));
     }
 
     UpdateEngine mUpdateEngine;
@@ -143,10 +144,6 @@ public class AboutUsActivity extends BaseActivity {
         });
     }
 
-    @OnClick(R.id.stv_check)
-    public void onViewClicked() {
-        checkVersion(true);
-    }
 
     @Override
     protected void onDestroy() {

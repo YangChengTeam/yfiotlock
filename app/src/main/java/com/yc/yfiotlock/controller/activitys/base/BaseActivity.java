@@ -63,11 +63,20 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
         mPermissionHelper = new PermissionHelper();
         initVars();
         initViews();
+        bindClick();
     }
 
     public LoadingDialog mLoadingDialog;
 
     protected void initVars() {
+
+    }
+
+    /**
+     * 设置view的点击事件
+     * 最好结合{@link #setClick(int, Runnable)} 使用
+     */
+    protected void bindClick() {
 
     }
 
