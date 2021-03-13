@@ -17,6 +17,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
 import com.yc.yfiotlock.controller.fragments.user.MyFragment;
+import com.yc.yfiotlock.helper.ThreadPoolExecutorImpl;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -54,7 +55,7 @@ public class MainActivity extends BaseActivity {
                 new IndexFragment(), new MyFragment()
         };
         onSelected(0);
-        new Thread(this::deleteLowerVersionApkFile).start();
+        ThreadPoolExecutorImpl.getImpl().execute(this::deleteLowerVersionApkFile);
     }
 
 
