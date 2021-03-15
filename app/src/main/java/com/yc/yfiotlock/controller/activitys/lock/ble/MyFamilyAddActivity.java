@@ -109,6 +109,12 @@ public class MyFamilyAddActivity extends BaseActivity {
                 public void onNext(ResultInfo<String> stringResultInfo) {
                     ToastUtil.toast2(MyFamilyAddActivity.this, stringResultInfo.getMsg());
 
+                    String data = stringResultInfo.getData();
+
+                    if (!TextUtils.isEmpty(data)) {
+                        familyInfo.setId(Integer.parseInt(data));
+                    }
+
                     familyInfo.setUpdateList(true);
                     EventBus.getDefault().post(familyInfo);
                     finish();
@@ -180,6 +186,5 @@ public class MyFamilyAddActivity extends BaseActivity {
         } else {
             tvAddress.setTvDes(familyInfo.getDetail_address(), Color.parseColor("#000000"));
         }
-
     }
 }

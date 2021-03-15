@@ -6,10 +6,18 @@ public class WarnInfo {
     private int id;
     private String action_name;
     private long action_time;
+    private long add_time;
     private String desp;
     private String msg_conent;
     private int icon;
 
+    public long getAdd_time() {
+        return add_time;
+    }
+
+    public void setAdd_time(long add_time) {
+        this.add_time = add_time;
+    }
 
     public int getId() {
         return id;

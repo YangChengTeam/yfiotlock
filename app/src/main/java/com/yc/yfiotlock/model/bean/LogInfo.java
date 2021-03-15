@@ -11,7 +11,25 @@ public class LogInfo {
     private long action_time;
     private int icon;
     private String action_name;
+    private long add_time;
     private String desp;
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public long getAdd_time() {
+        return add_time;
+    }
+
+    public void setAdd_time(long add_time) {
+        this.add_time = add_time;
+    }
 
     public String getAction_name() {
         return action_name;

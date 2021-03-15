@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.app.Dialog;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.FamilyInfo;
 import com.yc.yfiotlock.model.engin.HomeEngine;
 import com.yc.yfiotlock.view.adapters.MyFamilyAdapter;
@@ -98,23 +100,32 @@ public class MyFamilyActivity extends BaseActivity {
 
             private void delete(int position) {
                 FamilyInfo familyInfo = myFamilyAdapter.getData().get(position);
-                mLoadingDialog.show("处理中...");
-                homeEngine.deleteFamily(familyInfo.getId()).subscribe(new Observer<ResultInfo<String>>() {
+                GeneralDialog generalDialog = new GeneralDialog(MyFamilyActivity.this);
+                generalDialog.setTitle("提示");
+                generalDialog.setMsg("确定删除家庭" + familyInfo.getName() + "?");
+                generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                     @Override
-                    public void onCompleted() {
-                        mLoadingDialog.dismiss();
-                    }
+                    public void onClick(Dialog dialog) {
+                        mLoadingDialog.show("处理中...");
+                        homeEngine.deleteFamily(familyInfo.getId()).subscribe(new Observer<ResultInfo<String>>() {
+                            @Override
+                            public void onCompleted() {
+                                mLoadingDialog.dismiss();
+                            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        mLoadingDialog.dismiss();
-                    }
+                            @Override
+                            public void onError(Throwable e) {
+                                mLoadingDialog.dismiss();
+                            }
 
-                    @Override
-                    public void onNext(ResultInfo<String> stringResultInfo) {
-                        myFamilyAdapter.removeAt(position);
+                            @Override
+                            public void onNext(ResultInfo<String> stringResultInfo) {
+                                myFamilyAdapter.removeAt(position);
+                            }
+                        });
                     }
                 });
+                generalDialog.show();
             }
 
             private void checkDefault(int position) {
@@ -174,10 +185,17 @@ public class MyFamilyActivity extends BaseActivity {
                     index = i;
                 }
             }
-            if (index > 0) {
+            if (index >= 0) {
                 myFamilyAdapter.setData(index, familyInfo);
             } else {
                 myFamilyAdapter.addData(0, familyInfo);
+
+                recyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        recyclerView.scrollToPosition(0);
+                    }
+                }, 500);
             }
         }
     }
