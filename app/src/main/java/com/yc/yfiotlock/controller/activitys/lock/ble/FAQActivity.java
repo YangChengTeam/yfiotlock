@@ -73,6 +73,7 @@ public class FAQActivity extends BaseActivity {
     private FAQEngine mFAQEngine;
 
     private void loadData() {
+        mSrlRefresh.setRefreshing(p == 1);
         mFAQEngine.getList(p).subscribe(new Observer<ResultInfo<List<FAQInfo>>>() {
             @Override
             public void onCompleted() {
