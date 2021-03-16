@@ -4,8 +4,13 @@ package com.yc.yfiotlock.demo;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -29,10 +34,11 @@ import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEPackage;
-import com.yc.yfiotlock.ble.LockBLEUtil;
-import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
+import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
 import com.yc.yfiotlock.libs.fingerprintcompat.AonFingerChangeCallback;
 import com.yc.yfiotlock.libs.fingerprintcompat.FingerManager;
@@ -40,7 +46,6 @@ import com.yc.yfiotlock.libs.fingerprintcompat.SimpleFingerCheckCallback;
 import com.yc.yfiotlock.helper.PermissionHelper;
 
 import java.util.List;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     public static final String SERVICE_UUID = "5833ff01-9b8b-5191-6142-22a4536ef123";
@@ -114,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
-                .setDeviceName(false, "YF-L1")
                 .setAutoConnect(false)
                 .setScanTimeOut(10000);
 
@@ -205,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRequestPermissionSuccess() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                        && !LockBLEUtil.checkGPSIsOpen(MainActivity.this)) {
+                        && !LockBLEUtils.checkGPSIsOpen(MainActivity.this)) {
                     new AlertDialog.Builder(MainActivity.this)
                             .setTitle("提示")
                             .setMessage("为了更精确的扫描到Bluetooth LE设备, 请打开GPS定位")
@@ -314,6 +318,7 @@ public class MainActivity extends AppCompatActivity {
                     getCurrentFocus().getWindowToken(), 0);
         } catch (Exception e) {
         }
+
     }
 
 
@@ -367,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_GPS) {
-            if (LockBLEUtil.checkGPSIsOpen(this)) {
+            if (LockBLEUtils.checkGPSIsOpen(this)) {
                 startScan();
             }
         }

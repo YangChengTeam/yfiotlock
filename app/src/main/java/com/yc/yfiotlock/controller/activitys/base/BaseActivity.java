@@ -109,9 +109,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
 
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void stub(EventStub stub) {
-
-    }
+    public void stub(EventStub stub) {}
 
     @Override
     protected void onDestroy() {

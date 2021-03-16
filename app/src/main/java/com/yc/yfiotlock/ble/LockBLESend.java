@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.ble;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
 
@@ -9,8 +10,14 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
+import com.yc.yfiotlock.model.bean.OpenLockReConnectEvent;
+import com.yc.yfiotlock.model.bean.OpenLockReSendEvent;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class LockBLESend {
     private static final String TAG = "LockBleSend";
@@ -22,7 +29,7 @@ public class LockBLESend {
 
     private Context context;
     private BleDevice bleDevice;
-
+    private LoadingDialog loadingDialog;
     private byte mcmd = 0x00;
     private byte scmd = 0x00;
     private byte[] cmdBytes;
@@ -33,13 +40,35 @@ public class LockBLESend {
     public LockBLESend(Context context, BleDevice bleDevice) {
         this.context = context;
         this.bleDevice = bleDevice;
-
+        loadingDialog = new LoadingDialog(context);
         // 开始监听
         bleNotify();
+        EventBus.getDefault().register(this);
+    }
+
+    private void send() {
+        if (mcmd == 0x00 || scmd == 0x00 || cmdBytes == null) {
+            return;
+        }
+        send(mcmd, scmd, cmdBytes);
     }
 
     // 伪发送数据
     public void send(byte mcmd, byte scmd, byte[] cmdBytes) {
+        if (!LockBLEManager.isConnected(bleDevice)) {
+            GeneralDialog generalDialog = new GeneralDialog(context);
+            generalDialog.setTitle("温馨提示");
+            generalDialog.setMsg("设备已断开, 重新连接");
+            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+                @Override
+                public void onClick(Dialog dialog) {
+                    EventBus.getDefault().post(new OpenLockReConnectEvent());
+                    loadingDialog.show("正在连接");
+                }
+            });
+            generalDialog.show();
+            return;
+        }
         if (!sendingStatus) {
             sendingStatus = true;
             this.mcmd = mcmd;
@@ -57,18 +86,25 @@ public class LockBLESend {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReSend(OpenLockReSendEvent object) {
+        loadingDialog.dismiss();
+        send();
+    }
+
     // 清除操作
     public void clear() {
         BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_CHARACTERISTIC_UUID);
+        EventBus.getDefault().unregister(this);
     }
 
     // 持续唤醒
     private void wakeup() {
-        if(waupStatus) return;
+        if (waupStatus) return;
         byte[] bytes = LockBLEOpCmd.wakeup(context);
         op(bytes);
         VUiKit.postDelayed(50, () -> {
-            if(waupStatus) return;
+            if (waupStatus) return;
             Log.d(TAG, "唤醒门锁中");
             wakeup();
         });
@@ -92,11 +128,13 @@ public class LockBLESend {
 
                     @Override
                     public void onCharacteristicChanged(byte[] data) {
-                        Log.d(TAG, "响应数据:" + LockBLEUtil.toHexString(data));
+                        Log.d(TAG, "响应数据:" + LockBLEUtils.toHexString(data));
                         // 解析响应
                         LockBLEData lockBLEData = LockBLEPackage.getData(data);
                         if (lockBLEData != null) {
                             processNotify(lockBLEData);
+                        } else {
+
                         }
                     }
                 });
@@ -111,7 +149,18 @@ public class LockBLESend {
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             // 操作响应
             EventBus.getDefault().post(lockBLEData);
+
+            if (lockBLEData.getStatus() == (byte) 0x01) {
+
+            } else if (lockBLEData.getStatus() == (byte) 0x10) {
+
+            } else if (lockBLEData.getStatus() == (byte) 0x11) {
+
+            }
             sendingStatus = false;
+            mcmd = 0x00;
+            scmd = 0x00;
+            cmdBytes = null;
         }
     }
 
@@ -143,7 +192,7 @@ public class LockBLESend {
                 new BleWriteCallback() {
                     @Override
                     public void onWriteSuccess(final int current, final int total, final byte[] justWrite) {
-                        Log.d(TAG, "写入数据:" + LockBLEUtil.toHexString(justWrite));
+                        Log.d(TAG, "写入数据:" + LockBLEUtils.toHexString(justWrite));
                     }
 
                     @Override

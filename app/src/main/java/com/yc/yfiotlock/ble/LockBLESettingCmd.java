@@ -36,8 +36,8 @@ public class LockBLESettingCmd {
     }
 
     // 1.3绑定蓝牙(0x03)
-    public static byte[] bindBle(Context context) {
-        return setting(context, (byte) 0x03, null);
+    public static byte[] bindBle(Context context, String code) {
+        return setting(context, (byte) 0x03, code);
     }
 
     // 1.4验证身份(0x04)
@@ -77,8 +77,13 @@ public class LockBLESettingCmd {
         return setting(context, (byte) 0x08, new String(new byte[]{(byte) volume}));
     }
 
-    // 1.7解绑蓝牙(0x09)
+    // 1.9解绑蓝牙(0x09)
     public static byte[] cancelBle(Context context) {
         return setting(context, (byte) 0x09, new String(new byte[]{((byte) 0x01)}));
+    }
+
+    //  1.10获取门锁属性（0x0A）
+    public static byte[] getAlDeviceName(Context context) {
+        return setting(context, (byte) 0x0A, new String(new byte[]{((byte) 0x01)}));
     }
 }

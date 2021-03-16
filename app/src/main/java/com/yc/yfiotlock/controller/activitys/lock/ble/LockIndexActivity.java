@@ -25,7 +25,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
-import com.yc.yfiotlock.ble.LockBLEUtil;
+import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -35,6 +35,7 @@ import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.helper.ShakeSensor;
 import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
@@ -178,8 +179,10 @@ public class LockIndexActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         shakeSensor.register();
+
+        // 重新连接
         if (bleDevice != null && connectStatus == CONNECT_STATUS.CONNECT_FAILED) {
-            scan();
+            reconnect();
         }
     }
 
@@ -224,7 +227,7 @@ public class LockIndexActivity extends BaseActivity {
             @Override
             public void onRequestPermissionSuccess() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                        && !LockBLEUtil.checkGPSIsOpen(LockIndexActivity.this)) {
+                        && !LockBLEUtils.checkGPSIsOpen(LockIndexActivity.this)) {
                     new AlertDialog.Builder(LockIndexActivity.this)
                             .setTitle("提示")
                             .setMessage("为了更精确的扫描到Bluetooth LE设备, 请打开GPS定位")
@@ -342,8 +345,6 @@ public class LockIndexActivity extends BaseActivity {
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
                 statusIv.setImageResource(R.mipmap.icon_nolink);
                 loadingIv.setImageResource(R.mipmap.one);
-
-                reconnect();
             }
         });
     }
@@ -415,6 +416,11 @@ public class LockIndexActivity extends BaseActivity {
         setCountInfo();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReConnect(OpenLockReConnectEvent object) {
+        connect(bleDevice);
+    }
+
     // 开门方式数量
     private void loadLockOpenCountInfo() {
         int type = setCountInfo();
@@ -445,7 +451,7 @@ public class LockIndexActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         // GPS授权回调
         if (requestCode == REQUEST_GPS) {
-            if (LockBLEUtil.checkGPSIsOpen(this)) {
+            if (LockBLEUtils.checkGPSIsOpen(this)) {
                 scan();
             }
         }

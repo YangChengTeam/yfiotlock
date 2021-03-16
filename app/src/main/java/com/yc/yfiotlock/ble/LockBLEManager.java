@@ -1,15 +1,26 @@
 package com.yc.yfiotlock.ble;
 
+import android.app.Activity;
 import android.app.Application;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleMtuChangedCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
+import com.kk.securityhttp.utils.LogUtil;
 
 public class LockBLEManager {
-
+    public static final String DEVICE_NAME = "YF-L1";
+    public static final String PIN_CODE = "123456";
     public static byte GROUP_TYPE = 0;
     public static final byte GROUP_ADMIN = 0;
     public static final byte GROUP_HIJACK = 3;
@@ -36,7 +47,13 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
-    public static void setMtu(BleDevice bleDevice){
+    public static boolean isConnected(BleDevice bleDevice){
+        return BleManager.getInstance().isConnected(bleDevice);
+    }
+
+
+
+    public static void setMtu(BleDevice bleDevice) {
         // 设置mtu
         BleManager.getInstance().setMtu(bleDevice, LockBLEPackage.getMtu(), new BleMtuChangedCallback() {
             @Override
@@ -50,4 +67,6 @@ public class LockBLEManager {
             }
         });
     }
+
+
 }
