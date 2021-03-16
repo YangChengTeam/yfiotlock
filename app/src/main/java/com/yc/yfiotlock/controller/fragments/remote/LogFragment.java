@@ -1,5 +1,8 @@
 package com.yc.yfiotlock.controller.fragments.remote;
 
+import android.view.View;
+import android.widget.TextView;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -19,13 +22,16 @@ import rx.Observer;
 
 public class LogFragment extends BaseFragment {
 
-    private LogAdapter logAdapter;
     @BindView(R.id.rv_log)
     RecyclerView recyclerView;
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
+    @BindView(R.id.tv_lock_log_loading)
+    TextView tvLoading;
 
     private LogEngine logEngine;
+    private LogAdapter logAdapter;
+
 
     private int page = 1;
     private int pageSize = 10;
@@ -44,6 +50,7 @@ public class LogFragment extends BaseFragment {
 
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setOnRefreshListener(() -> {
+            page = 1;
             loadData();
         });
         mSrlRefresh.setRefreshing(true);
@@ -56,6 +63,11 @@ public class LogFragment extends BaseFragment {
         logAdapter = new LogAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(logAdapter);
+
+        logAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
+            page++;
+            loadData();
+        });
     }
 
 
@@ -64,6 +76,7 @@ public class LogFragment extends BaseFragment {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);
+                tvLoading.setVisibility(View.GONE);
             }
 
             @Override
@@ -75,7 +88,18 @@ public class LogFragment extends BaseFragment {
             public void onNext(ResultInfo<LogListInfo> logListInfoResultInfo) {
                 if (logListInfoResultInfo.getData() != null && logListInfoResultInfo.getData().getItems() != null) {
                     List<LogInfo> items = logListInfoResultInfo.getData().getItems();
-                    logAdapter.setNewInstance(items);
+                    if (page == 1) {
+                        logAdapter.setNewInstance(items);
+                    } else {
+                        logAdapter.addData(items);
+                    }
+
+                    if (items.size() < pageSize) {
+                        logAdapter.getLoadMoreModule().loadMoreEnd();
+                    } else {
+                        logAdapter.getLoadMoreModule().loadMoreComplete();
+                    }
+
                 }
             }
         });

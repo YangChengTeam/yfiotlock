@@ -35,10 +35,12 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
+import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.LoginEngin;
+import com.yc.yfiotlock.model.engin.LoginEvent;
 import com.yc.yfiotlock.view.widgets.MyItemDivider;
 
 import org.greenrobot.eventbus.EventBus;
@@ -147,64 +149,34 @@ public class CommonUtils {
 
     public static void startLogin(Context context) {
         context.startActivity(new Intent(context, LoginActivity.class));
-        PhoneNumberAuthHelper phoneNumberAuthHelper = PhoneNumberAuthHelper.getInstance(context, new TokenResultListener() {
-            @Override
-            public void onTokenSuccess(String s) {
-                Log.i("aaaa", "onTokenSuccess: " + s);
-                try {
-                    PhoneTokenInfo tokenInfo = JSONObject.parseObject(s, PhoneTokenInfo.class);
-                    switch (tokenInfo.getCode()) {
-                        case "600024"://"终端支持认证"
-                            startVerify(context, this);
-                            break;
-                        case "600001"://"唤起授权页成功"
-                            EventBus.getDefault().post(tokenInfo);
-                            break;
-                        case "600000":
-                            startLoginWithToken(context, this, tokenInfo.getToken());
-                            break;
-                        default:
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    this.onTokenFailed("");
-                }
-            }
-
-            @Override
-            public void onTokenFailed(String s) {
-                Log.i("aaaa", "onTokenFailed: " + s);
-                PhoneTokenInfo phoneTokenInfo = new PhoneTokenInfo();
-                phoneTokenInfo.setCode("600001");
-                EventBus.getDefault().post(phoneTokenInfo);
-            }
-        });
-
-        phoneNumberAuthHelper.setAuthSDKInfo(Config.ALI_PHONE_SDK_APPID);
-        phoneNumberAuthHelper.getReporter().setLoggerEnable(true);
-        phoneNumberAuthHelper.checkEnvAvailable(2);
     }
 
-    public static void isVerifyEnable(Context context) {
+
+    public static void startFastLogin(Context context) {
+        LoginEvent loginEvent = new LoginEvent();
         PhoneNumberAuthHelper phoneNumberAuthHelper = PhoneNumberAuthHelper.getInstance(context, new TokenResultListener() {
             @Override
             public void onTokenSuccess(String s) {
-                Log.i("aaaa", "onTokenSuccess: " + s);
+                Log.i("onekeylogin", "onTokenSuccess: " + s);
                 try {
                     PhoneTokenInfo tokenInfo = JSONObject.parseObject(s, PhoneTokenInfo.class);
                     switch (tokenInfo.getCode()) {
                         case "600024"://"终端支持认证"
+                            loginEvent.setStateString(LoginEvent.State.WAITING);
+                            EventBus.getDefault().post(loginEvent);
                             startVerify(context, this);
                             break;
                         case "600001"://"唤起授权页成功"
+                            loginEvent.setStateString(LoginEvent.State.EVOKE_SUCCESS);
+                            EventBus.getDefault().post(loginEvent);
                             break;
-                        case "600000":
+                        case "600000"://授权成功
                             startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
                         default:
                             break;
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     this.onTokenFailed("");
@@ -213,9 +185,9 @@ public class CommonUtils {
 
             @Override
             public void onTokenFailed(String s) {
-                Log.i("aaaa", "onTokenFailed: " + s);
-                Response response = new Response();
-                response.body = s;
+                Log.i("onekeylogin", "onTokenFailed: " + s);
+                loginEvent.setStateString(LoginEvent.State.FAILED);
+                EventBus.getDefault().post(loginEvent);
                 PhoneTokenInfo tokenInfo = JSONObject.parseObject(s, PhoneTokenInfo.class);
                 showFailTip(context, tokenInfo.getCode());
                 PhoneNumberAuthHelper.getInstance(context, this).hideLoginLoading();
@@ -225,34 +197,42 @@ public class CommonUtils {
         phoneNumberAuthHelper.setAuthSDKInfo(Config.ALI_PHONE_SDK_APPID);
         phoneNumberAuthHelper.getReporter().setLoggerEnable(true);
         phoneNumberAuthHelper.checkEnvAvailable(2);
+        loginEvent.setStateString(LoginEvent.State.CHECKING);
+        EventBus.getDefault().post(loginEvent);
     }
+
 
     private static void startLoginWithToken(Context context, TokenResultListener listener, String token) {
         LoginEngin engin = new LoginEngin(context);
         engin.aliFastLogin(token).subscribe(new Observer<ResultInfo<UserInfo>>() {
             @Override
             public void onCompleted() {
-                PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
-                PhoneNumberAuthHelper.getInstance(context, listener).quitLoginPage();
-                PhoneNumberAuthHelper.getInstance(context, listener).setAuthListener(null);
+
             }
 
             @Override
             public void onError(Throwable e) {
                 PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
                 ToastCompat.show(context, e + "");
-                Log.i("aaaa", "onError: " + e);
+                Log.i("onekeylogin", "onError: " + e);
             }
 
             @Override
             public void onNext(ResultInfo<UserInfo> info) {
-                Log.i("aaaa", "onNext: " + info);
+                Log.i("onekeylogin", "onNext: " + info);
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
+                    //hide loading
+                    PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
+                    //close one-key login page
+                    PhoneNumberAuthHelper.getInstance(context, listener).quitLoginPage();
+                    //avoid memory leak
+                    PhoneNumberAuthHelper.getInstance(context, listener).setAuthListener(null);
+
                     UserInfoCache.setUserInfo(info.getData());
                     EventBus.getDefault().post(info.getData());
                     context.startActivity(new Intent(context, MainActivity.class));
                 } else {
-                    ToastCompat.show(context, info == null ? "登陆失败失败" : info.getMsg());
+                    ToastCompat.show(context, info == null ? "登陆失败" : info.getMsg());
                 }
             }
         });
@@ -277,11 +257,16 @@ public class CommonUtils {
             case "600008":
                 ToastCompat.show(context, "移动网络未开启,请开启移动网络后重试");
                 break;
-            case "700000"://点击返回，⽤户取消免密登录
-            case "700001"://点击切换按钮，⽤户取消免密登录
-            case "700002"://点击登录按钮事件
-            case "700003"://点击check box事件
-            case "700004"://点击协议富文本文字事件
+            //点击返回，⽤户取消免密登录
+            case "700000":
+                //点击切换按钮，⽤户取消免密登录
+            case "700001":
+                //点击登录按钮事件
+            case "700002":
+                //点击check box事件
+            case "700003":
+                //点击协议富文本文字事件
+            case "700004":
                 break;
             default:
                 ToastCompat.show(context, "一键登录失败,请尝试其他登录方式，错误代码：" + code);

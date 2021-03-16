@@ -1,5 +1,8 @@
 package com.yc.yfiotlock.controller.fragments.remote;
 
+import android.view.View;
+import android.widget.TextView;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -24,13 +27,14 @@ public class AlarmsFragment extends BaseFragment {
     RecyclerView recyclerView;
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
+    @BindView(R.id.tv_lock_log_loading)
+    TextView tvLoading;
 
     private int page = 1;
     private int pageSize = 10;
     private int lockerId = 3;
 
     private WarnAdapter warnAdapter;
-
     private LogEngine logEngine;
 
     @Override
@@ -46,6 +50,7 @@ public class AlarmsFragment extends BaseFragment {
 
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setOnRefreshListener(() -> {
+            page = 1;
             loadData();
         });
         mSrlRefresh.setRefreshing(true);
@@ -58,6 +63,11 @@ public class AlarmsFragment extends BaseFragment {
         warnAdapter = new WarnAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(warnAdapter);
+
+        warnAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
+            page++;
+            loadData();
+        });
     }
 
 
@@ -66,6 +76,8 @@ public class AlarmsFragment extends BaseFragment {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);
+
+                tvLoading.setVisibility(View.GONE);
             }
 
             @Override
@@ -77,7 +89,17 @@ public class AlarmsFragment extends BaseFragment {
             public void onNext(ResultInfo<WarnListInfo> logListInfoResultInfo) {
                 if (logListInfoResultInfo.getData() != null && logListInfoResultInfo.getData().getItems() != null) {
                     List<WarnInfo> items = logListInfoResultInfo.getData().getItems();
-                    warnAdapter.setNewInstance(items);
+                    if (page == 1) {
+                        warnAdapter.setNewInstance(items);
+                    } else {
+                        warnAdapter.addData(items);
+                    }
+
+                    if (items.size() < pageSize) {
+                        warnAdapter.getLoadMoreModule().loadMoreEnd();
+                    } else {
+                        warnAdapter.getLoadMoreModule().loadMoreComplete();
+                    }
                 }
             }
         });

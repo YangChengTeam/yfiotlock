@@ -3,6 +3,7 @@ package com.yc.yfiotlock.controller.activitys.user;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.user.LoginDialog;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.LoginEngin;
+import com.yc.yfiotlock.model.engin.LoginEvent;
 import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.UserInfoCache;
@@ -71,6 +73,7 @@ public class LoginActivity extends BaseActivity {
             }
         });
         mTvGetCode.setClickable(false);
+        CommonUtils.startFastLogin(this);
     }
 
 
@@ -92,7 +95,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void bindClick() {
         setClick(R.id.tv_get_code, this::sendSmsCode);
-        setClick(R.id.tv_fast_login, () -> CommonUtils.isVerifyEnable(this));
+        setClick(R.id.tv_fast_login, () -> CommonUtils.startFastLogin(this));
         setClick(R.id.tv_user_agreement, () -> WebActivity.start(getContext(), Config.USER_AGREEMENT, getString(R.string.user_agreement)));
         setClick(R.id.tv_privacy_policy, () -> WebActivity.start(getContext(), Config.PRIVACY_POLICY, getString(R.string.privacy_policy)));
     }
@@ -108,6 +111,9 @@ public class LoginActivity extends BaseActivity {
 
 
     public void sendSmsCode() {
+        if (mEtPhone.getText().length() != 11) {
+            return;
+        }
         if (mLoginDialog == null) {
             mLoginDialog = new LoginDialog(this);
             mLoginDialog.setLoginResult(new LoginDialog.LoginResult() {
@@ -184,6 +190,25 @@ public class LoginActivity extends BaseActivity {
         if (App.isLogin()) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onOneKeyLogin(LoginEvent event) {
+        Log.i("aaaa", "onOneKeyLogin: "+event);
+        switch (event.getStateString()) {
+            case FAILED:
+            case EVOKE_SUCCESS:
+                mLoadingDialog.dismiss();
+                break;
+            case WAITING:
+                mLoadingDialog.show("正在开启一键登录...");
+                break;
+            case CHECKING:
+                mLoadingDialog.show("检查环境中...");
+                break;
+            default:
+                break;
         }
     }
 

@@ -32,7 +32,7 @@ public class FAQEngine extends BaseEngin {
     public Observable<ResultInfo<List<FAQInfo>>> getList(int p) {
         Map<String, String> map = new HashMap<>();
         map.put("page", p + "");
-        map.put("page_size", "20");
+        map.put("page_size", "10");
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }

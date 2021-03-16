@@ -9,7 +9,7 @@ public class FamilyInfo implements Serializable {
     private double latitude;
     private String address;
     private String detail_address;
-    private int is_def;
+    private int is_def = 1;
     private int num;
 
     private boolean isUpdateList;

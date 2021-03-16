@@ -26,6 +26,7 @@ import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
+import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
@@ -404,9 +405,13 @@ public class PersonalInfoActivity extends BaseActivity {
                     dialog.dismiss();
                 })
                 .setPositiveButton("确定", (dialog, which) -> {
-                    UserInfoCache.setUserInfo(null);
-                    EventBus.getDefault().post(new UserInfo());
-                    finish();
+                    mLoadingDialog.show("退出登录中...");
+                    VUiKit.postDelayed(1000,() -> {
+                        mLoadingDialog.dismiss();
+                        UserInfoCache.setUserInfo(null);
+                        EventBus.getDefault().post(new UserInfo());
+                        finish();
+                    });
                 })
                 .create();
         alertDialog.show();

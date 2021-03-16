@@ -1,8 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
 
-import android.widget.TextView;
-
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
@@ -21,8 +19,6 @@ import butterknife.BindView;
 public class LockLogActivity extends BaseActivity {
     @BindView(R.id.tab_lock_log)
     TabLayout tabLayout;
-    @BindView(R.id.tv_lock_log_loading)
-    TextView tvLoading;
     @BindView(R.id.vp_lock_log)
     ViewPager viewPager;
 
