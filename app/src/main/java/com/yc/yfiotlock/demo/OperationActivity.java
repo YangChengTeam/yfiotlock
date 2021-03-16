@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -125,6 +126,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.btn_cancel_ble).setOnClickListener(this);
         findViewById(R.id.btn_cancel_wifi).setOnClickListener(this);
         findViewById(R.id.btn_change_volume).setOnClickListener(this);
+        findViewById(R.id.btn_get_al_device).setOnClickListener(this);
 
 
         findViewById(R.id.btn_open).setOnClickListener(this);
@@ -138,6 +140,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.btn_mod_fp).setOnClickListener(this);
         findViewById(R.id.btn_del_fp).setOnClickListener(this);
         findViewById(R.id.btn_wake_up).setOnClickListener(this);
+
     }
 
     private void op(byte[] bytes) {
@@ -356,6 +359,12 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 break;
             }
 
+            case R.id.btn_get_al_device: {
+                byte[] bytes = LockBLESettingCmd.getAlDeviceName(OperationActivity.this);
+                op(bytes);
+                break;
+            }
+
             case R.id.btn_open: {
                 byte[] bytes = LockBLEOpCmd.open(OperationActivity.this);
                 op(bytes);
@@ -502,13 +511,13 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         byte[] stbs = new byte[st.length];
 
                         for(int i=0;i<st.length;i++){
-                            stbs[i] =  Byte.valueOf(st[i]);
+                            stbs[i] =  (byte)Integer.parseInt(st[i], 16);
                         }
 
                         String[] et = etEt.getText().toString().split(" ");
-                        byte[] etbs = new byte[st.length];
+                        byte[] etbs = new byte[et.length];
                         for(int i=0;i<et.length;i++){
-                            etbs[i] =  Byte.valueOf(et[i]);
+                            etbs[i] =  (byte)Integer.parseInt(et[i], 16);
                         }
                         byte[] bytes = LockBLEOpCmd.addPwd(OperationActivity.this, Byte.valueOf(type), numberET.getText()+"", pwd, stbs, etbs);
                         op(bytes);
@@ -624,15 +633,14 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         String type = typeET.getText().toString();
                         String[] st = stEt.getText().toString().split(" ");
                         byte[] stbs = new byte[st.length];
-
                         for(int i=0;i<st.length;i++){
-                            stbs[i] =  Byte.valueOf(st[i]);
+                            stbs[i] =  (byte)Integer.parseInt(st[i], 16);
                         }
 
                         String[] et = etEt.getText().toString().split(" ");
-                        byte[] etbs = new byte[st.length];
+                        byte[] etbs = new byte[et.length];
                         for(int i=0;i<et.length;i++){
-                            etbs[i] =  Byte.valueOf(et[i]);
+                            etbs[i] =  (byte)Integer.parseInt(et[i], 16);
                         }
                         byte[] bytes = LockBLEOpCmd.modPwd(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id), pwd, stbs, etbs);
                         op(bytes);

@@ -12,8 +12,8 @@ import com.clj.fastble.exception.BleException;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
-import com.yc.yfiotlock.model.bean.OpenLockReConnectEvent;
-import com.yc.yfiotlock.model.bean.OpenLockReSendEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockReSendEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -44,13 +44,6 @@ public class LockBLESend {
         // 开始监听
         bleNotify();
         EventBus.getDefault().register(this);
-    }
-
-    private void send() {
-        if (mcmd == 0x00 || scmd == 0x00 || cmdBytes == null) {
-            return;
-        }
-        send(mcmd, scmd, cmdBytes);
     }
 
     // 伪发送数据
@@ -86,6 +79,15 @@ public class LockBLESend {
         }
     }
 
+    private void send() {
+        if (mcmd == 0x00 || scmd == 0x00 || cmdBytes == null) {
+            return;
+        }
+        send(mcmd, scmd, cmdBytes);
+    }
+
+
+    // 重新发送
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReSend(OpenLockReSendEvent object) {
         loadingDialog.dismiss();

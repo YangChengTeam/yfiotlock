@@ -12,14 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.alibaba.fastjson.JSONObject;
-
 import com.jakewharton.rxbinding4.view.RxView;
-import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.ILoadData;
-import com.yc.yfiotlock.model.bean.EventStub;
+import com.yc.yfiotlock.model.bean.eventbus.EventStub;
 import com.yc.yfiotlock.utils.CommonUtils;
 
 
@@ -27,9 +24,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;

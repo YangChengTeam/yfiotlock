@@ -13,7 +13,7 @@ import android.view.WindowManager;
 
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.model.bean.EventStub;
+import com.yc.yfiotlock.model.bean.eventbus.EventStub;
 import com.yc.yfiotlock.utils.CommonUtils;
 
 
