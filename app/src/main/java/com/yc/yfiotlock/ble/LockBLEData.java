@@ -88,7 +88,7 @@ public class LockBLEData {
                     .array();
         }
 
-        short crc16 = (short) LockBLEUtil.crc16(bytes);
+        short crc16 = (short) LockBLEUtils.crc16(bytes);
 
         // CRC16 = 2
         ByteBuffer packageBuffer = ByteBuffer.allocate(len + 2).order(ByteOrder.BIG_ENDIAN);
@@ -98,7 +98,7 @@ public class LockBLEData {
                 .array();
 
         if (isAesData) {
-            return LockBLEUtil.encode(context, dataBytes).getBytes();
+            return LockBLEUtils.encode(context, dataBytes).getBytes();
         }
 
         return dataBytes;

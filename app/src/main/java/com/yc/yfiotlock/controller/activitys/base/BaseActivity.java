@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.base;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -19,21 +18,16 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
-import com.yc.yfiotlock.controller.activitys.user.MainActivity;
-import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.controller.activitys.user.WebActivity;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
-import com.yc.yfiotlock.model.bean.EventStub;
+import com.yc.yfiotlock.model.bean.eventbus.EventStub;
 import com.yc.yfiotlock.utils.CommonUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.intellij.lang.annotations.Identifier;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
@@ -109,9 +103,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
 
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void stub(EventStub stub) {
-
-    }
+    public void stub(EventStub stub) {}
 
     @Override
     protected void onDestroy() {

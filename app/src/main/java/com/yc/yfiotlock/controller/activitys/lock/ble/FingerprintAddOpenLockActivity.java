@@ -4,19 +4,10 @@ import android.content.Intent;
 
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
-import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
-import com.yc.yfiotlock.utils.CacheUtils;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.Arrays;
 
 public class FingerprintAddOpenLockActivity extends BaseBackActivity {
     @Override

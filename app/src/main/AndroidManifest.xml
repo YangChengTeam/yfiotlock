@@ -6,7 +6,6 @@
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 获取网络状态 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -53,7 +52,7 @@
         <activity android:name=".controller.activitys.user.AboutUsActivity" />
         <activity android:name=".controller.activitys.user.SuggestActivity" />
         <activity android:name=".controller.activitys.user.PersonalInfoActivity" />
-        <activity android:name=".controller.activitys.base.SplashActivity">
+        <activity android:name=".demo.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -202,6 +201,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <receiver android:name=".ble.BleConnectReceiver" >
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.PAIRING_REQUEST"/>
+                <action android:name="android.bluetooth.device.action.ACTION_DISCOVERY_STARTED" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name="com.baidu.location.f"

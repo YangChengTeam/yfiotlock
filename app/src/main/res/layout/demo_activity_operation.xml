@@ -132,6 +132,13 @@
             android:layout_marginTop="10dp"
             android:text="取消蓝牙绑定"></androidx.appcompat.widget.AppCompatButton>
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_get_al_device"
+            android:layout_width="140dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:text="获取阿里设备名称"></androidx.appcompat.widget.AppCompatButton>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"

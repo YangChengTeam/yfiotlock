@@ -2,24 +2,12 @@ package com.yc.yfiotlock.ble;
 
 import android.content.Context;
 import android.location.LocationManager;
-import android.widget.Toast;
 
-import com.clj.fastble.BleManager;
-import com.clj.fastble.callback.BleWriteCallback;
-import com.clj.fastble.data.BleDevice;
-import com.clj.fastble.exception.BleException;
-import com.clj.fastble.utils.HexUtil;
-import com.yc.yfiotlock.demo.OperationActivity;
-
-public class LockBLEUtil {
-    static {
-        System.loadLibrary("yfble");
-    }
-
+public class LockBLEUtils {
     private static String key = "12345678";
 
     public static void setKey(String key) {
-        LockBLEUtil.key = key;
+        LockBLEUtils.key = key;
     }
 
     public static native int crc16(byte[] bytes, int length);

@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,20 +29,13 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.utils.HexUtil;
-import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.ble.LockBLEUtil;
+import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import static com.yc.yfiotlock.demo.MainActivity.SERVICE_UUID;
 
 public class OperationActivity extends AppCompatActivity implements View.OnClickListener {
     BleDevice bleDevice;
@@ -86,8 +80,8 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                     @Override
                     public void onCharacteristicChanged(byte[] data) {
                         bytes = data;
-                        notifyTv.setText(LockBLEUtil.toHexString(data) + "");
-                        Toast.makeText(OperationActivity.this, "Notify响应:" + LockBLEUtil.toHexString(data), Toast.LENGTH_LONG).show();
+                        notifyTv.setText(LockBLEUtils.toHexString(data) + "");
+                        Toast.makeText(OperationActivity.this, "Notify响应:" + LockBLEUtils.toHexString(data), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -116,9 +110,9 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             public void onClick(View v) {
                 LockBLEData data = LockBLEPackage.getData(bytes);
                 if (data != null) {
-                    notifyTv.setText(LockBLEUtil.toHexString(new byte[]{data.getMcmd(), data.getScmd(), data.getStatus()})
+                    notifyTv.setText(LockBLEUtils.toHexString(new byte[]{data.getMcmd(), data.getScmd(), data.getStatus()})
                             + "");
-                    Toast.makeText(OperationActivity.this, "解析结果:" + LockBLEUtil.toHexString(new byte[]{data.getMcmd(), data.getScmd(), data.getStatus()}), Toast.LENGTH_LONG).show();
+                    Toast.makeText(OperationActivity.this, "解析结果:" + LockBLEUtils.toHexString(new byte[]{data.getMcmd(), data.getScmd(), data.getStatus()}), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -132,6 +126,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.btn_cancel_ble).setOnClickListener(this);
         findViewById(R.id.btn_cancel_wifi).setOnClickListener(this);
         findViewById(R.id.btn_change_volume).setOnClickListener(this);
+        findViewById(R.id.btn_get_al_device).setOnClickListener(this);
 
 
         findViewById(R.id.btn_open).setOnClickListener(this);
@@ -145,10 +140,11 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.btn_mod_fp).setOnClickListener(this);
         findViewById(R.id.btn_del_fp).setOnClickListener(this);
         findViewById(R.id.btn_wake_up).setOnClickListener(this);
+
     }
 
     private void op(byte[] bytes) {
-        String message = LockBLEUtil.toHexString(bytes);
+        String message = LockBLEUtils.toHexString(bytes);
         AlertDialog.Builder builder = new AlertDialog.Builder(OperationActivity.this);
         builder.setTitle("模拟数据如下:");
         builder.setMessage(message);
@@ -279,8 +275,33 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 break;
             }
             case R.id.btn_bind_ble: {
-                byte[] bytes = LockBLESettingCmd.bindBle(this);
-                op(bytes);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setTitle("绑定蓝牙:");
+                LinearLayout layout = new LinearLayout(this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText codeET = new EditText(this);
+                codeET.setText("123456");
+                layout.addView(codeET);
+
+                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        String code = codeET.getText().toString();
+                        byte[] bytes = LockBLESettingCmd.bindBle(OperationActivity.this, code);
+                        op(bytes);
+                    }
+                });
+
+                dialog.show();
                 break;
             }
             case R.id.btn_verid: {
@@ -334,6 +355,12 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
 
             case R.id.btn_cancel_ble: {
                 byte[] bytes = LockBLESettingCmd.cancelBle(OperationActivity.this);
+                op(bytes);
+                break;
+            }
+
+            case R.id.btn_get_al_device: {
+                byte[] bytes = LockBLESettingCmd.getAlDeviceName(OperationActivity.this);
                 op(bytes);
                 break;
             }
@@ -444,7 +471,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LayoutParams stParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
                 stParams.weight = 1;
                 stEt.setLayoutParams(stParams);
-                stEt.setText("00 00 00 00 00 00 00");
+                stEt.setText("00 00 00 00 00 00");
                 stlayout.addView(stEt);
 
                 layout.addView(stlayout);
@@ -460,7 +487,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LayoutParams etParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
                 etParams.weight = 1;
                 etEt.setLayoutParams(etParams);
-                etEt.setText("00 00 00 00 00 00 00");
+                etEt.setText("00 00 00 00 00 00");
                 etlayout.addView(etEt);
 
                 layout.addView(etlayout);
@@ -484,13 +511,13 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         byte[] stbs = new byte[st.length];
 
                         for(int i=0;i<st.length;i++){
-                            stbs[i] =  Byte.valueOf(st[i]);
+                            stbs[i] =  (byte)Integer.parseInt(st[i], 16);
                         }
 
                         String[] et = etEt.getText().toString().split(" ");
-                        byte[] etbs = new byte[st.length];
+                        byte[] etbs = new byte[et.length];
                         for(int i=0;i<et.length;i++){
-                            etbs[i] =  Byte.valueOf(et[i]);
+                            etbs[i] =  (byte)Integer.parseInt(et[i], 16);
                         }
                         byte[] bytes = LockBLEOpCmd.addPwd(OperationActivity.this, Byte.valueOf(type), numberET.getText()+"", pwd, stbs, etbs);
                         op(bytes);
@@ -569,7 +596,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LayoutParams stParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
                 stParams.weight = 1;
                 stEt.setLayoutParams(stParams);
-                stEt.setText("00 00 00 00 00 00 00");
+                stEt.setText("00 00 00 00 00 00");
                 stlayout.addView(stEt);
 
                 layout.addView(stlayout);
@@ -585,8 +612,9 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 LayoutParams etParams = new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT);
                 etParams.weight = 1;
                 etEt.setLayoutParams(etParams);
-                etEt.setText("00 00 00 00 00 00 00");
+                etEt.setText("00 00 00 00 00 00");
                 etlayout.addView(etEt);
+                layout.addView(etlayout);
 
                 dialog.setView(layout);
                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -605,15 +633,14 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                         String type = typeET.getText().toString();
                         String[] st = stEt.getText().toString().split(" ");
                         byte[] stbs = new byte[st.length];
-
                         for(int i=0;i<st.length;i++){
-                            stbs[i] =  Byte.valueOf(st[i]);
+                            stbs[i] =  (byte)Integer.parseInt(st[i], 16);
                         }
 
                         String[] et = etEt.getText().toString().split(" ");
-                        byte[] etbs = new byte[st.length];
+                        byte[] etbs = new byte[et.length];
                         for(int i=0;i<et.length;i++){
-                            etbs[i] =  Byte.valueOf(et[i]);
+                            etbs[i] =  (byte)Integer.parseInt(et[i], 16);
                         }
                         byte[] bytes = LockBLEOpCmd.modPwd(OperationActivity.this, Byte.valueOf(type), Byte.valueOf(id), pwd, stbs, etbs);
                         op(bytes);
@@ -1100,7 +1127,6 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 // API 5+ solution
                 onBackPressed();
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }

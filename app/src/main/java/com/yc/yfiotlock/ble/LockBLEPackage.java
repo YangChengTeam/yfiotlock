@@ -73,7 +73,7 @@ public class LockBLEPackage {
                     .putShort(length)
                     .put(Arrays.copyOfRange(data, i * maxdataLen, i * maxdataLen + len)).array();
 
-            crc16 = (short) LockBLEUtil.crc16(bytes);
+            crc16 = (short) LockBLEUtils.crc16(bytes);
 
             ByteBuffer packageBuffer = ByteBuffer.allocate(len + nodataLen).order(ByteOrder.BIG_ENDIAN);
             packagesBuffer.put(packageBuffer.put(start)
@@ -85,6 +85,8 @@ public class LockBLEPackage {
         return packagesBuffer.array();
     }
 
+
+    // 解析响应数据  依照协议
     public static LockBLEData getData(byte[] response) {
         if (response == null) {
             LogUtil.msg("LockBLEPackage-> response is null!");
@@ -105,7 +107,7 @@ public class LockBLEPackage {
         }
 
         // position package crc16_data = 1, response.length - 4
-        short crc16 = (short) LockBLEUtil.crc16(Arrays.copyOfRange(response, 1, response.length - 3));
+        short crc16 = (short) LockBLEUtils.crc16(Arrays.copyOfRange(response, 1, response.length - 3));
 
         // position package CRC16 = response.length - 3, response.length - 2
         if (crc16 != ByteBuffer.wrap(new byte[]{response[response.length - 3], response[response.length - 2]}).order(ByteOrder.BIG_ENDIAN).getShort()) {
@@ -121,7 +123,7 @@ public class LockBLEPackage {
         }
 
         // position data crc16_data = 4, response.length - 5
-        crc16 = (short) LockBLEUtil.crc16(Arrays.copyOfRange(response, 4, response.length - 5));
+        crc16 = (short) LockBLEUtils.crc16(Arrays.copyOfRange(response, 4, response.length - 5));
 
         // position package CRC16 = response.length - 5, response.length - 4
         if (crc16 != ByteBuffer.wrap(new byte[]{response[response.length - 5], response[response.length - 4]}).order(ByteOrder.BIG_ENDIAN).getShort()) {

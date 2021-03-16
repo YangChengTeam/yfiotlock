@@ -7,6 +7,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -27,9 +28,17 @@ public class DeviceInfoActivity extends BaseActivity {
     @BindView(R.id.rv_device_info)
     RecyclerView mRvDeviceInfo;
 
+    private DeviceInfo deviceInfo;
+
     @Override
     protected int getLayoutId() {
         return R.layout.ble_lock_activity_device_info;
+    }
+
+    @Override
+    protected void initVars() {
+        super.initVars();
+        deviceInfo = CacheUtils.getCache("deviceInfo", DeviceInfo.class);
     }
 
     @Override
@@ -59,7 +68,7 @@ public class DeviceInfoActivity extends BaseActivity {
         mAdapter.setNewInstance(itemInfos);
     }
 
-    private class ItemInfo {
+    public class ItemInfo {
         private String name;
         private String value;
 

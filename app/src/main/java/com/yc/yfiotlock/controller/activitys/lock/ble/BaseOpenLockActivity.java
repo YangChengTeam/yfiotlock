@@ -1,6 +1,5 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import android.location.LocationManager;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,7 +13,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.model.bean.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
