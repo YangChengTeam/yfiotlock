@@ -26,8 +26,6 @@ public class LogFragment extends BaseFragment {
     RecyclerView recyclerView;
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
-    @BindView(R.id.tv_lock_log_loading)
-    TextView tvLoading;
 
     private LogEngine logEngine;
     private LogAdapter logAdapter;
@@ -76,7 +74,6 @@ public class LogFragment extends BaseFragment {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);
-                tvLoading.setVisibility(View.GONE);
             }
 
             @Override

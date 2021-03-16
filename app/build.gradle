@@ -120,7 +120,7 @@ dependencies {
 
     implementation 'com.zhy:okhttputils:2.6.2'
     implementation "com.zhihu.android:matisse:0.5.3-beta3"
-
+    implementation 'com.contrarywind:Android-PickerView:4.1.9'
 
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'

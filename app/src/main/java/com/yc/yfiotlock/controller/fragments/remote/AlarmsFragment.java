@@ -27,8 +27,6 @@ public class AlarmsFragment extends BaseFragment {
     RecyclerView recyclerView;
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
-    @BindView(R.id.tv_lock_log_loading)
-    TextView tvLoading;
 
     private int page = 1;
     private int pageSize = 10;
@@ -76,8 +74,6 @@ public class AlarmsFragment extends BaseFragment {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);
-
-                tvLoading.setVisibility(View.GONE);
             }
 
             @Override
