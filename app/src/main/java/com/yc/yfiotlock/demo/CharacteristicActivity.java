@@ -17,7 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.clj.fastble.data.BleDevice;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.R;
 
 import java.util.ArrayList;

@@ -8,7 +8,7 @@ import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
-import com.yc.yfiotlock.utils.CacheUtils;
+import com.yc.yfiotlock.utils.CacheUtil;
 
 import butterknife.BindView;
 
@@ -40,17 +40,17 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     protected void cloudAddSucc() {
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setCardCount(countInfo.getCardCount() + 1);
-            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+            CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
         }
     }
 
     @Override
     protected void cloudAdd(String keyid) {
         int cardCount = 0;
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             cardCount = countInfo.getCardCount();
         }

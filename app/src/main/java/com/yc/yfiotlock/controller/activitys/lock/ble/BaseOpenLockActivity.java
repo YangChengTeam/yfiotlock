@@ -14,11 +14,11 @@ import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.utils.BleUtils;
-import com.yc.yfiotlock.utils.CacheUtils;
+import com.yc.yfiotlock.utils.BleUtil;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 
@@ -79,8 +79,8 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     }
 
     private void loadData() {
-        String way = BleUtils.getType(title) + "";
-        List<OpenLockInfo> lockInfos = CacheUtils.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, new TypeReference<List<OpenLockInfo>>() {
+        String way = BleUtil.getType(title) + "";
+        List<OpenLockInfo> lockInfos = CacheUtil.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, new TypeReference<List<OpenLockInfo>>() {
         }.getType());
         if (lockInfos != null) {
             openLockAdapter.setNewInstance(lockInfos);
@@ -103,7 +103,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                 if (listResultInfo.getCode() == 1 && listResultInfo.getData() != null) {
                     List<OpenLockInfo> lockInfos = listResultInfo.getData();
                     openLockAdapter.setNewInstance(lockInfos);
-                    CacheUtils.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, lockInfos);
+                    CacheUtil.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, lockInfos);
                     if (lockInfos.size() == 0) {
                         nodataView.setVisibility(View.VISIBLE);
                         nodataView.setMessage("暂无" + title + "数据");

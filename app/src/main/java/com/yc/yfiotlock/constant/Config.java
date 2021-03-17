@@ -30,6 +30,12 @@ public class Config {
     public final static String LOGIN_SEND_CODE_URL = getBaseUrl() + "/userapp/v1.Sms/send" + isRsa();
     public final static String SMS_CODE_LOGIN_URL = getBaseUrl() + "/userapp/v1.User/codeLogin" + isRsa();
 
+
+    //首页
+    public final static String INDEX_FAMILY_URL = getBaseUrl() + "/userapp/v1.Home/homeFamily" + isRsa();
+    public final static String INDEX_LIST_DEVICE_LIST = getBaseUrl() + "/userapp/v1.Home/homeLocker" + isRsa();
+    public final static String INDEX_DETAIL_URL = getBaseUrl() + "/userapp/v1.Home/homeDetails" + isRsa();
+
     //FAQ
 
     public static final String FQA_LIST_URL = getBaseUrl() + "/userapp/v1.faq/faqList" + isRsa();
@@ -61,6 +67,14 @@ public class Config {
     public static final String HOME_SET_DEFAULT_URL = getBaseUrl() + "/userapp/v1.family/familyDefSet" + isRsa();
     public static final String HOME_INFO_DELETE_URL = getBaseUrl() + "/userapp/v1.family/familyDel" + isRsa();
 
+    // 设备相关
+    public static final String DEVICE_ADD_URL = getBaseUrl() + "/userapp/v1.Locker/lockerAdd" + isRsa();
+    public static final String DEVICE_DETAIL_URL = getBaseUrl() + "/userapp/v1.Locker/lockerDetails" + isRsa();
+    public static final String DEVICE_MODIFY_URL = getBaseUrl() + "/userapp/v1.Locker/lockerNameUpd" + isRsa();
+
+    // 安全设备
+    public static final String DEVICE_SET_SAFE_URL = getBaseUrl() + "/userapp/v1.Locker/setOperationPwd" + isRsa();
+
     //开锁管理相关
 
     public static final String OPEN_LOCK_ADD_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdAdd" + isRsa();
@@ -69,7 +83,7 @@ public class Config {
     public static final String OPEN_LOCK_MODIFY_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpd" + isRsa();
     public static final String OPEN_LOCK_DEL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDel" + isRsa();
 
-
+    //远程
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();
     public static final String LOG_OPEN_URL = getBaseUrl() + "/userapp/v1.locker_open_log/openLogList" + isRsa();
 

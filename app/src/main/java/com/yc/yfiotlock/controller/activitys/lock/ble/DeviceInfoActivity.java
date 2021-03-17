@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
-import com.yc.yfiotlock.utils.CacheUtils;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
@@ -38,7 +38,7 @@ public class DeviceInfoActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        deviceInfo = CacheUtils.getCache("deviceInfo", DeviceInfo.class);
+        deviceInfo = CacheUtil.getCache("deviceInfo", DeviceInfo.class);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class DeviceInfoActivity extends BaseActivity {
                 return false;
             }
         });
-        CommonUtils.setItemDivider(getContext(), mRvDeviceInfo);
+        CommonUtil.setItemDivider(getContext(), mRvDeviceInfo);
         List<ItemInfo> itemInfos = new ArrayList<>();
         itemInfos.add(new ItemInfo("固件版本", "V20:R6.00.9.12"));
         itemInfos.add(new ItemInfo("协议版本", "2.7"));

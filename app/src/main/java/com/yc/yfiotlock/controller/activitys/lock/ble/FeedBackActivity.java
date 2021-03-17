@@ -25,11 +25,10 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
-import com.yc.yfiotlock.model.bean.user.PersonalInfo;
 import com.yc.yfiotlock.model.bean.user.PicInfo;
 import com.yc.yfiotlock.model.engin.FeedBackEngine;
 import com.yc.yfiotlock.model.engin.UploadFileEngine;
-import com.yc.yfiotlock.utils.PictureUtils;
+import com.yc.yfiotlock.utils.PictureUtil;
 import com.yc.yfiotlock.view.adapters.FeedBackAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.zhihu.matisse.Matisse;
@@ -171,7 +170,7 @@ public class FeedBackActivity extends BaseActivity {
         if (uris.size() == 0) {
             return;
         }
-        PictureUtils.zipPic(getContext(), uris, new Callback<List<File>>() {
+        PictureUtil.zipPic(getContext(), uris, new Callback<List<File>>() {
             @Override
             public void onSuccess(List<File> resultInfo) {
                 Log.i("aaaa", "onSuccess: " + resultInfo.size());

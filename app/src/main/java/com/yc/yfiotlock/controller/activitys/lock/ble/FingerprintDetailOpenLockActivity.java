@@ -7,13 +7,12 @@ import androidx.annotation.NonNull;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
-import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
-import com.yc.yfiotlock.utils.CacheUtils;
+import com.yc.yfiotlock.utils.CacheUtil;
 
 public class FingerprintDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     @Override
@@ -41,10 +40,10 @@ public class FingerprintDetailOpenLockActivity extends BaseDetailOpenLockActivit
 
     @Override
     protected void cloudDelSucc() {
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setFingerprintCount(countInfo.getFingerprintCount() - 1);
-            CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+            CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
         }
     }
 

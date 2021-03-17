@@ -1,22 +1,12 @@
 package com.yc.yfiotlock.ble;
 
-import android.app.Activity;
 import android.app.Application;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.clj.fastble.BleManager;
-import com.clj.fastble.callback.BleMtuChangedCallback;
-import com.clj.fastble.data.BleDevice;
-import com.clj.fastble.exception.BleException;
-import com.clj.fastble.scan.BleScanRuleConfig;
-import com.kk.securityhttp.utils.LogUtil;
+import com.yc.yfiotlock.libs.fastble.BleManager;
+import com.yc.yfiotlock.libs.fastble.callback.BleMtuChangedCallback;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.libs.fastble.exception.BleException;
+import com.yc.yfiotlock.libs.fastble.scan.BleScanRuleConfig;
 
 public class LockBLEManager {
     public static final String DEVICE_NAME = "YF-L1";

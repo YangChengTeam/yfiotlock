@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.SettingSoundView;
 
@@ -71,7 +71,7 @@ public class LockSettingActivity extends BaseBackActivity {
                     break;
             }
         });
-        CommonUtils.setItemDivider(getContext(), mRvSetting);
+        CommonUtil.setItemDivider(getContext(), mRvSetting);
         List<SettingInfo> settingInfos = new ArrayList<>();
         settingInfos.add(new SettingInfo("报警管理", ""));
         settingInfos.add(new SettingInfo("设备信息", ""));
