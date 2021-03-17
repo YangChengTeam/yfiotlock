@@ -19,6 +19,7 @@ public class DeviceInfo implements Serializable {
     private boolean isOnline;
     @JSONField(name = "mac_address")
     private String macAddress;
+    private String model = "Locker";
 
     public DeviceInfo() {
     }
@@ -77,5 +78,13 @@ public class DeviceInfo implements Serializable {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
     }
 }

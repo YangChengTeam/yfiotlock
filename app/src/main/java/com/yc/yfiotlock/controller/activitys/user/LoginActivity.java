@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -17,7 +16,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.user.LoginDialog;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.LoginEngin;
-import com.yc.yfiotlock.model.engin.LoginEvent;
+import com.yc.yfiotlock.model.bean.user.LoginEvent;
 import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.utils.UserInfoCache;
@@ -27,7 +26,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 import rx.Observer;
 
 public class LoginActivity extends BaseActivity {

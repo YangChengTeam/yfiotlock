@@ -49,22 +49,22 @@ public class LockSettingActivity extends BaseBackActivity {
         mRvSetting.setAdapter(mSettingAdapter);
         mSettingAdapter.setOnItemClickListener((adapter, view, position) -> {
             SettingInfo settingInfo = mSettingAdapter.getData().get(position);
-            switch (position) {
-                case 0:
+            switch (settingInfo.getName()) {
+                case "报警管理":
                     startActivity(new Intent(this, AlarmOpenLockManagerActivity.class));
                     break;
-                case 1:
+                case "设备信息":
                     startActivity(new Intent(this, DeviceInfoActivity.class));
                     break;
-                case 2:
+                case "设备名称":
                     Intent intent = new Intent(this, DeviceNameEditActivity.class);
                     intent.putExtra("name", settingInfo.getValue());
                     startActivity(intent);
                     break;
-                case 3:
+                case "安全设置":
                     startActivity(new Intent(this, SafePwdSettingActivity.class));
                     break;
-                case 5:
+                case "帮助与反馈":
                     startActivity(new Intent(this, FAQActivity.class));
                     break;
                 default:
@@ -77,7 +77,6 @@ public class LockSettingActivity extends BaseBackActivity {
         settingInfos.add(new SettingInfo("设备信息", ""));
         settingInfos.add(new SettingInfo("设备名称", "智能门锁09"));
         settingInfos.add(new SettingInfo("安全设置", ""));
-        settingInfos.add(new SettingInfo("固件升级", ""));
         settingInfos.add(new SettingInfo("帮助与反馈", ""));
         mSettingAdapter.setNewInstance(settingInfos);
         mSettingAdapter.setHeaderView(new SettingSoundView(this));

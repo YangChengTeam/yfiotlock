@@ -2,12 +2,9 @@ package com.yc.yfiotlock;
 
 import android.app.Application;
 import android.os.Build;
-import android.widget.ImageView;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
@@ -22,7 +19,6 @@ import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 
 public class App extends Application {
@@ -46,8 +42,6 @@ public class App extends Application {
         initHttp();
         initCommonConfig();
         initBauduMap();
-
-
     }
 
     private void initBauduMap() {
@@ -61,8 +55,6 @@ public class App extends Application {
     private void initCommonConfig() {
         LoadMoreModuleConfig.setDefLoadMoreView(new CustomLoadMoreView());
     }
-
-
 
     private void initHttp() {
         GoagalInfo.get().init(getApplicationContext());

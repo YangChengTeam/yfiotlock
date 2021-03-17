@@ -49,11 +49,11 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/et_no_underline"
                 android:gravity="start|top"
-                android:textColor="#222222"
-                android:textSize="14dp"
-                android:textColorHint="#B6B4B4"
                 android:hint="@string/et_question_hint"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textColor="#222222"
+                android:textColorHint="#B6B4B4"
+                android:textSize="14dp" />
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>
@@ -156,12 +156,15 @@
 
     <com.coorchice.library.SuperTextView
         android:id="@+id/stv_send_with_log"
-        android:layout_width="330dp"
+        android:layout_width="match_parent"
         android:layout_height="36dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginBottom="17dp"
         android:gravity="center"
         android:text="@string/commit_with_log"
         android:textColor="@color/white"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/stv_send"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -174,8 +177,10 @@
 
     <com.coorchice.library.SuperTextView
         android:id="@+id/stv_send"
-        android:layout_width="330dp"
+        android:layout_width="match_parent"
         android:layout_height="36dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="@string/commit"
