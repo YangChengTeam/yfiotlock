@@ -37,6 +37,7 @@ import com.yc.yfiotlock.helper.ShakeSensor;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
@@ -81,33 +82,21 @@ public class LockIndexActivity extends BaseActivity {
     TextView openCountTv;
 
     private ShakeSensor shakeSensor;
-
+    private BleDevice bleDevice;
     private LockEngine lockEngine;
+    private FamilyInfo familyInfo;
     private DeviceInfo lockInfo;
+    private LockBLESend lockBleSend;
 
     public DeviceInfo getLockInfo() {
         return lockInfo;
     }
-
-    private BleDevice bleDevice;
-
     public BleDevice getBleDevice() {
         return bleDevice;
     }
-
-    private LockBLESend lockBleSend;
-
-    private CONNECT_STATUS connectStatus;
-
-    enum CONNECT_STATUS {
-        CONNECTING,
-        CONNECT_FAILED,
-        CONNECT_SUCC,
-        CONNECT_OPING
-    }
+    public FamilyInfo getFamilyInfo() { return familyInfo; }
 
     private static LockIndexActivity mInstance;
-
     public static LockIndexActivity getInstance() {
         return mInstance;
     }
@@ -120,10 +109,9 @@ public class LockIndexActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
+        familyInfo = (FamilyInfo) getIntent().getSerializableExtra("device");
         lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
         lockEngine = new LockEngine(this);
-
-
     }
 
     @Override
@@ -459,5 +447,14 @@ public class LockIndexActivity extends BaseActivity {
         }
         // 处理授权回调
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
+    }
+
+    private CONNECT_STATUS connectStatus;
+
+    enum CONNECT_STATUS {
+        CONNECTING,
+        CONNECT_FAILED,
+        CONNECT_SUCC,
+        CONNECT_OPING
     }
 }

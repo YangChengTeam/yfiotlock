@@ -13,6 +13,7 @@ import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
@@ -37,13 +38,13 @@ public class IndexEngin extends BaseEngin {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    public Observable<ResultInfo<DeviceInfo>> getDeviceList() {
+    public Observable<ResultInfo<List<DeviceInfo>>> getDeviceList() {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        return new HttpCoreEngin<ResultInfo<DeviceInfo>>(getContext()).rxpost(Config.INDEX_LIST_DEVICE_LIST,
-                new TypeReference<ResultInfo<DeviceInfo>>() {
+        return new HttpCoreEngin<ResultInfo<List<DeviceInfo>>>(getContext()).rxpost(Config.INDEX_LIST_DEVICE_LIST,
+                new TypeReference<ResultInfo<List<DeviceInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }
