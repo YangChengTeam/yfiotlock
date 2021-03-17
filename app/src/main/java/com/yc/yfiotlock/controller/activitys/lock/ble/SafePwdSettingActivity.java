@@ -38,6 +38,7 @@ public class SafePwdSettingActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
+
         mBnbTitle.setBackListener(view -> finish());
         setClick(R.id.tv_change_pwd, () -> startActivityForResult(new Intent(this, SafePwdCreateActivity.class), REQUEST_PWD_CODE));
     }
