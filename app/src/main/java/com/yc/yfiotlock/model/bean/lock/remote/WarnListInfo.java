@@ -1,10 +1,10 @@
-package com.yc.yfiotlock.model.bean;
+package com.yc.yfiotlock.model.bean.lock.remote;
 
 import java.util.List;
 
-public class LogListInfo {
+public class WarnListInfo {
     private int total;
-    private List<LogInfo> items;
+    private List<WarnInfo> items;
 
     public int getTotal() {
         return total;
@@ -14,11 +14,11 @@ public class LogListInfo {
         this.total = total;
     }
 
-    public List<LogInfo> getItems() {
+    public List<WarnInfo> getItems() {
         return items;
     }
 
-    public void setItems(List<LogInfo> items) {
+    public void setItems(List<WarnInfo> items) {
         this.items = items;
     }
 }

@@ -1,8 +1,5 @@
 package com.yc.yfiotlock.controller.fragments.remote;
 
-import android.view.View;
-import android.widget.TextView;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -10,8 +7,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
-import com.yc.yfiotlock.model.bean.WarnInfo;
-import com.yc.yfiotlock.model.bean.WarnListInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.WarnInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.WarnListInfo;
 import com.yc.yfiotlock.model.engin.LogEngine;
 import com.yc.yfiotlock.view.adapters.WarnAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;

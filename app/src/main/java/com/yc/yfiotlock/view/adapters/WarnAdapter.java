@@ -4,7 +4,7 @@ import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.kk.securityhttp.utils.DateUtils;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.model.bean.WarnInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.WarnInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.jetbrains.annotations.NotNull;
