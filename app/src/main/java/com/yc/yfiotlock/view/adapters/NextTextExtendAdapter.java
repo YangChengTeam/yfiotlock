@@ -20,7 +20,7 @@ public class NextTextExtendAdapter extends BaseExtendAdapter<NextTextInfo> {
     protected void convert(@NotNull BaseViewHolder baseViewHolder, NextTextInfo nextTextInfo) {
         baseViewHolder.setText(R.id.tv_next_name, nextTextInfo.getName())
                 .setText(R.id.tv_next_des, nextTextInfo.getDes());
+
+        baseViewHolder.setGone(R.id.view_line_next, baseViewHolder.getAdapterPosition() == 0);
     }
-
-
 }

@@ -11,7 +11,7 @@
         android:id="@+id/tv_temp_pwd_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="6dp"
+        android:layout_marginTop="8dp"
         android:text="@string/app_name"
         android:textColor="#222222"
         android:textSize="15dp"
@@ -34,8 +34,8 @@
         android:id="@+id/tv_temp_pwd_validity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:paddingBottom="6dp"
+        android:layout_marginTop="2dp"
+        android:paddingBottom="8dp"
         android:text="@string/app_name"
         android:textColor="#999999"
         android:textSize="13dp"
@@ -44,10 +44,10 @@
         app:layout_constraintTop_toBottomOf="@id/tv_temp_pwd_name" />
 
     <View
+        android:id="@+id/view_line"
         android:layout_width="match_parent"
         android:layout_height="1sp"
-        android:background="#EDEDED"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_temp_pwd_validity" />
+        android:background="@color/grayBg"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

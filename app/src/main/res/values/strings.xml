@@ -61,6 +61,7 @@
     <string name="add_open_type">添加</string>
     <string name="pwd_name">密码名称</string>
     <string name="pwd_name_hint">请输入密码名称</string>
+    <string name="pwd_number_hint">请输入6位数密码</string>
     <string name="pwd_type">密码时效</string>
     <string name="valid_date">有效日期</string>
     <string name="valid_time">有效时段</string>

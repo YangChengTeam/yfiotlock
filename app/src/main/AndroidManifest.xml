@@ -53,6 +53,7 @@
         <activity android:name=".controller.activitys.user.SuggestActivity" />
         <activity android:name=".controller.activitys.user.PersonalInfoActivity" />
         <activity android:name=".controller.activitys.base.SplashActivity">
+        <activity android:name=".controller.activitys.base.SplashActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -20,7 +20,7 @@ public class TempPwdAdapter extends BaseExtendAdapter<PassWordInfo> {
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, PassWordInfo passWordInfo) {
         baseViewHolder.setText(R.id.tv_temp_pwd_name, passWordInfo.getName())
-                .setText(R.id.tv_temp_pwd_validity, passWordInfo.getValidity());
+                .setText(R.id.tv_temp_pwd_validity, "有效期：" + passWordInfo.getValidity());
 
 
         int state = passWordInfo.getState();
@@ -32,14 +32,17 @@ public class TempPwdAdapter extends BaseExtendAdapter<PassWordInfo> {
                 break;
             case 1:
                 passWordInfo.setStateDes("已生效");
+                textColor = getContext().getResources().getColor(R.color.blue_2F90F7);
                 break;
             case 2:
                 passWordInfo.setStateDes("已失效");
-                textColor = getContext().getResources().getColor(R.color.blue_2F90F7);
+                textColor = getContext().getResources().getColor(R.color.gray_999);
                 break;
         }
         baseViewHolder.setText(R.id.tv_temp_pwd_state, passWordInfo.getStateDes())
                 .setTextColor(R.id.tv_temp_pwd_state, textColor);
+
+        baseViewHolder.setGone(R.id.view_line, baseViewHolder.getAdapterPosition() == 0);
     }
 
 

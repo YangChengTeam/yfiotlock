@@ -22,10 +22,10 @@
         android:id="@+id/tv_my_family_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="3dp"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
-        android:paddingBottom="6dp"
+        android:paddingBottom="7dp"
         android:text="@string/app_name"
         android:textColor="#999999"
         android:textSize="13dp"
@@ -49,7 +49,7 @@
         android:layout_height="1sp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:background="#EDEDED"
+        android:background="@color/grayBg"
         app:layout_constraintTop_toBottomOf="@id/tv_my_family_number" />
 
     <ImageView
