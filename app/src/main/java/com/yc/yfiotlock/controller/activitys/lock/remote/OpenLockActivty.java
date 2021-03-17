@@ -26,7 +26,6 @@ public class OpenLockActivty extends BaseActivity {
     ConstraintLayout clOpenFail;
 
 
-
     @Override
     protected int getLayoutId() {
         return R.layout.activity_open_lock;
@@ -36,12 +35,12 @@ public class OpenLockActivty extends BaseActivity {
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
 
-        String text = "开锁指令已下发 /n在门锁上输入" +
+        String text = "开锁指令已下发<br>在门锁上输入" +
                 "<font color='#3395FD'>4#</font>" +
                 "后开启门锁";
         tvHint.setText(Html.fromHtml(text));
 
-        VUiKit.postDelayed(3 * 1000, () -> {
+        VUiKit.postDelayed(9 * 1000, () -> {
             clOpenLock.setVisibility(View.GONE);
             clOpenFail.setVisibility(View.VISIBLE);
         });

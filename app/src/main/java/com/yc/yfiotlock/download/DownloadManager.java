@@ -59,7 +59,7 @@ public class DownloadManager {
         if (mContext != null && mContext.get() != null) {
             return mContext.get();
         } else {
-            return App.getApp().getBaseContext();
+            return App.getApp().getApplicationContext();
         }
     }
 
