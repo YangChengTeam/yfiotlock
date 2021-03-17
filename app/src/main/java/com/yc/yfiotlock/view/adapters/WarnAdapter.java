@@ -2,7 +2,7 @@ package com.yc.yfiotlock.view.adapters;
 
 import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
-import com.kk.securityhttp.utils.DateUtils;
+import com.kk.securityhttp.utils.DateUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.model.bean.lock.remote.WarnInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
@@ -22,6 +22,7 @@ public class WarnAdapter extends BaseExtendAdapter<WarnInfo> implements LoadMore
         baseViewHolder.setText(R.id.tv_log_name, warnInfo.getActionName())
                 .setText(R.id.tv_log_des, warnInfo.getDesp())
                 .setText(R.id.tv_log_date, DateUtils.timestamp2Date(warnInfo.getAddTime()))
+                .setText(R.id.tv_log_date, DateUtil.timestamp2Date(warnInfo.getAdd_time()))
                 .setImageResource(R.id.iv_log_icon, warnInfo.getIcon());
 
         baseViewHolder.setGone(R.id.view_item_log_line, baseViewHolder.getLayoutPosition() == 0);

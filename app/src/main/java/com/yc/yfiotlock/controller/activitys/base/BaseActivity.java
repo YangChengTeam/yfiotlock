@@ -22,7 +22,7 @@ import com.yc.yfiotlock.controller.activitys.user.WebActivity;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.eventbus.EventStub;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -97,7 +97,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
                 && this.getClass() != LoginActivity.class
                 && this.getClass() != SplashActivity.class
                 && this.getClass() != WebActivity.class) {
-            CommonUtils.startLogin(this);
+            CommonUtil.startLogin(this);
         }
     }
 

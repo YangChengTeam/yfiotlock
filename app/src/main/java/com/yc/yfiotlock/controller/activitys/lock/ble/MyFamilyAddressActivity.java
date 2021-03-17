@@ -9,7 +9,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.FamilyInfo;
+import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.greenrobot.eventbus.EventBus;

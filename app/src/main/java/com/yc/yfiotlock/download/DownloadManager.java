@@ -34,7 +34,7 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -112,7 +112,7 @@ public class DownloadManager {
 
     public static void updateApp(UpdateInfo upgradeInfo) {
         requestPermissionCount++;
-        BaseActivity baseActivity = (BaseActivity) CommonUtils.findActivity(getContext());
+        BaseActivity baseActivity = (BaseActivity) CommonUtil.findActivity(getContext());
         if (baseActivity != null && baseActivity instanceof BaseActivity) {
             baseActivity.getPermissionHelper().setMustPermissions(new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE,

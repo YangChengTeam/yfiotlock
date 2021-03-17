@@ -18,7 +18,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
-import com.yc.yfiotlock.model.bean.FamilyInfo;
+import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.engin.HomeEngine;
 import com.yc.yfiotlock.view.adapters.MyFamilyAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;

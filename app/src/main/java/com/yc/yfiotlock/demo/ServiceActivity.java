@@ -17,10 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.clj.fastble.BleManager;
-import com.clj.fastble.callback.BleMtuChangedCallback;
-import com.clj.fastble.data.BleDevice;
-import com.clj.fastble.exception.BleException;
+import com.yc.yfiotlock.libs.fastble.BleManager;
+import com.yc.yfiotlock.libs.fastble.callback.BleMtuChangedCallback;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEPackage;
 

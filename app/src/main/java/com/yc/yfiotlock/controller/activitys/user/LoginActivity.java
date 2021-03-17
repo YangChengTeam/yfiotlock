@@ -17,8 +17,8 @@ import com.yc.yfiotlock.controller.dialogs.user.LoginDialog;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.model.bean.user.LoginEvent;
-import com.yc.yfiotlock.utils.CacheUtils;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import org.greenrobot.eventbus.EventBus;
@@ -71,7 +71,7 @@ public class LoginActivity extends BaseActivity {
             }
         });
         mTvGetCode.setClickable(false);
-        CommonUtils.startFastLogin(this);
+        CommonUtil.startFastLogin(this);
     }
 
 
@@ -93,7 +93,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void bindClick() {
         setClick(R.id.tv_get_code, this::sendSmsCode);
-        setClick(R.id.tv_fast_login, () -> CommonUtils.startFastLogin(this));
+        setClick(R.id.tv_fast_login, () -> CommonUtil.startFastLogin(this));
         setClick(R.id.tv_user_agreement, () -> WebActivity.start(getContext(), Config.USER_AGREEMENT, getString(R.string.user_agreement)));
         setClick(R.id.tv_privacy_policy, () -> WebActivity.start(getContext(), Config.PRIVACY_POLICY, getString(R.string.privacy_policy)));
     }
@@ -127,7 +127,7 @@ public class LoginActivity extends BaseActivity {
             });
         }
 
-        long lastTime = CacheUtils.getSendCodeTime(Config.LOGIN_SEND_CODE_URL + mEtPhone.getText().toString());
+        long lastTime = CacheUtil.getSendCodeTime(Config.LOGIN_SEND_CODE_URL + mEtPhone.getText().toString());
         if (System.currentTimeMillis() - lastTime < 60000) {
             mLoginDialog.show(mEtPhone.getText().toString());
             return;

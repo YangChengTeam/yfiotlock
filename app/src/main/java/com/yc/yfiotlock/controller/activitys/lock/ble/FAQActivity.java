@@ -12,9 +12,9 @@ import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.lock.ble.FAQInfo;
+import com.yc.yfiotlock.model.bean.lock.FAQInfo;
 import com.yc.yfiotlock.model.engin.FAQEngine;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.FAQAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.NoDataView;
@@ -103,7 +103,7 @@ public class FAQActivity extends BaseActivity {
         mFAQAdapter = new FAQAdapter(null);
         mRvQuestion.setAdapter(mFAQAdapter);
         mRvQuestion.setLayoutManager(new LinearLayoutManager(getContext()));
-        CommonUtils.setItemDivider(getContext(), mRvQuestion);
+        CommonUtil.setItemDivider(getContext(), mRvQuestion);
         mFAQAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
             p++;
             loadData();

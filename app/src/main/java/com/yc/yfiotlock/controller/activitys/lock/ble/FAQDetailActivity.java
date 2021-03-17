@@ -9,7 +9,7 @@ import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.lock.ble.FAQInfo;
+import com.yc.yfiotlock.model.bean.lock.FAQInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import butterknife.BindView;

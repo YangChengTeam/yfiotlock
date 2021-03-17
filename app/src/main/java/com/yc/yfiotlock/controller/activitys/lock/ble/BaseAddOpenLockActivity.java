@@ -1,12 +1,12 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import com.clj.fastble.data.BleDevice;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.engin.LockEngine;
 

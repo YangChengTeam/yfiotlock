@@ -17,7 +17,7 @@ import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.ILoadData;
 import com.yc.yfiotlock.model.bean.eventbus.EventStub;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 
 import org.greenrobot.eventbus.EventBus;
@@ -132,7 +132,7 @@ public abstract class BaseFragment extends Fragment implements ILoadData {
     @Override
     public void startActivity(Intent intent) {
         Activity activity = getActivity();
-        if (CommonUtils.isActivityDestory(activity)) {
+        if (CommonUtil.isActivityDestory(activity)) {
             super.startActivity(intent);
         } else {
             activity.startActivity(intent);

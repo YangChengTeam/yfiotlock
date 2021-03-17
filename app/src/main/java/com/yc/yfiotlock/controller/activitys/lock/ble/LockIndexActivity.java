@@ -14,12 +14,11 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.bumptech.glide.Glide;
-import com.clj.fastble.BleManager;
-import com.clj.fastble.callback.BleGattCallback;
-import com.clj.fastble.callback.BleScanCallback;
-import com.clj.fastble.data.BleDevice;
-import com.clj.fastble.exception.BleException;
+import com.yc.yfiotlock.libs.fastble.BleManager;
+import com.yc.yfiotlock.libs.fastble.callback.BleGattCallback;
+import com.yc.yfiotlock.libs.fastble.callback.BleScanCallback;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
@@ -34,20 +33,20 @@ import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
-import com.yc.yfiotlock.helper.ShakeSensor;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.libs.sensor.ShakeSensor;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.utils.AnimatinUtils;
-import com.yc.yfiotlock.utils.CacheUtils;
+import com.yc.yfiotlock.utils.AnimatinUtil;
+import com.yc.yfiotlock.utils.CacheUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -83,33 +82,21 @@ public class LockIndexActivity extends BaseActivity {
     TextView openCountTv;
 
     private ShakeSensor shakeSensor;
-
+    private BleDevice bleDevice;
     private LockEngine lockEngine;
+    private FamilyInfo familyInfo;
     private DeviceInfo lockInfo;
+    private LockBLESend lockBleSend;
 
     public DeviceInfo getLockInfo() {
         return lockInfo;
     }
-
-    private BleDevice bleDevice;
-
     public BleDevice getBleDevice() {
         return bleDevice;
     }
-
-    private LockBLESend lockBleSend;
-
-    private CONNECT_STATUS connectStatus;
-
-    enum CONNECT_STATUS {
-        CONNECTING,
-        CONNECT_FAILED,
-        CONNECT_SUCC,
-        CONNECT_OPING
-    }
+    public FamilyInfo getFamilyInfo() { return familyInfo; }
 
     private static LockIndexActivity mInstance;
-
     public static LockIndexActivity getInstance() {
         return mInstance;
     }
@@ -122,10 +109,9 @@ public class LockIndexActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
+        familyInfo = (FamilyInfo) getIntent().getSerializableExtra("device");
         lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
         lockEngine = new LockEngine(this);
-
-
     }
 
     @Override
@@ -137,7 +123,7 @@ public class LockIndexActivity extends BaseActivity {
         RxView.clicks(backBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             finish();
         });
-        
+
         RxView.clicks(settingBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             nav2setting();
         });
@@ -203,9 +189,9 @@ public class LockIndexActivity extends BaseActivity {
     }
 
     private void startAnimations() {
-        AnimatinUtils.rotate(loadingIv);
-        AnimatinUtils.scale(tabView, 0.05f);
-        AnimatinUtils.scale(tabView2, 0.05f);
+        AnimatinUtil.rotate(loadingIv);
+        AnimatinUtil.scale(tabView, 0.05f);
+        AnimatinUtil.scale(tabView2, 0.05f);
     }
 
     private void open() {
@@ -408,7 +394,7 @@ public class LockIndexActivity extends BaseActivity {
 
     private int setCountInfo(){
         int type = 1;
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL+ type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL+ type, OpenLockCountInfo.class);
         if (countInfo != null) {
             openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
         }
@@ -444,7 +430,7 @@ public class LockIndexActivity extends BaseActivity {
                 if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
                     OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
                     openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
-                    CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+                    CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
                 }
             }
         });
@@ -461,5 +447,14 @@ public class LockIndexActivity extends BaseActivity {
         }
         // 处理授权回调
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
+    }
+
+    private CONNECT_STATUS connectStatus;
+
+    enum CONNECT_STATUS {
+        CONNECTING,
+        CONNECT_FAILED,
+        CONNECT_SUCC,
+        CONNECT_OPING
     }
 }
