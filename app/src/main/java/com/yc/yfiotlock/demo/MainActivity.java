@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
 
         permissionHelper = new PermissionHelper();
-        //initFingerprint();
+        initFingerprint();
 
         initBle();
 

@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.coorchice.library.SuperTextView;
@@ -43,6 +44,8 @@ public class EditNameActivity extends BaseActivity {
         }
         mEtName.setText(name);
         mEtName.setSelection(name.length());
+        mEtName.requestFocus();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
     @Override
