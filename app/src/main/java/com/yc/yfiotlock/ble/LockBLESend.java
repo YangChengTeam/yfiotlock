@@ -4,11 +4,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
 
-import com.clj.fastble.BleManager;
-import com.clj.fastble.callback.BleNotifyCallback;
-import com.clj.fastble.callback.BleWriteCallback;
-import com.clj.fastble.data.BleDevice;
-import com.clj.fastble.exception.BleException;
+import com.yc.yfiotlock.libs.fastble.BleManager;
+import com.yc.yfiotlock.libs.fastble.callback.BleNotifyCallback;
+import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;

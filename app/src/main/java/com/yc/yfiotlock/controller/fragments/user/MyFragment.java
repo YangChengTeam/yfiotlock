@@ -17,7 +17,7 @@ import com.yc.yfiotlock.controller.activitys.user.SuggestActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.model.bean.user.PersonalInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
@@ -93,7 +93,7 @@ public class MyFragment extends BaseFragment {
         mItemAdapter = new ItemAdapter(null);
         mRvMy.setAdapter(mItemAdapter);
         mRvMy.setLayoutManager(new LinearLayoutManager(getContext()));
-        CommonUtils.setItemDivider(getContext(), mRvMy);
+        CommonUtil.setItemDivider(getContext(), mRvMy);
         mItemAdapter.setOnItemClickListener((adapter, view, position) -> {
             switch (position) {
                 case 0:

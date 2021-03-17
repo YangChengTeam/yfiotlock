@@ -14,7 +14,7 @@ import android.view.WindowManager;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.model.bean.eventbus.EventStub;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 
 import org.greenrobot.eventbus.EventBus;
@@ -102,7 +102,7 @@ public abstract class BaseDialog extends Dialog {
 
     @Override
     public void show() {
-        if (!this.isShowing() && !CommonUtils.isActivityDestory(getContext())) {
+        if (!this.isShowing() && !CommonUtil.isActivityDestory(getContext())) {
             super.show();
         }
     }
@@ -112,7 +112,7 @@ public abstract class BaseDialog extends Dialog {
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
-        if (this.isShowing() && !CommonUtils.isActivityDestory(getContext())) {
+        if (this.isShowing() && !CommonUtil.isActivityDestory(getContext())) {
             super.dismiss();
         }
     }

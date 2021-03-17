@@ -1,6 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import com.clj.fastble.data.BleDevice;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;

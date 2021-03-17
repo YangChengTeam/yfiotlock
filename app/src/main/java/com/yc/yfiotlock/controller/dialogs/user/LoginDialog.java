@@ -1,16 +1,13 @@
 package com.yc.yfiotlock.controller.dialogs.user;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -20,18 +17,14 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
-import com.yc.yfiotlock.controller.dialogs.BaseDialog;
-import com.yc.yfiotlock.utils.CacheUtils;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.SignCodeAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -80,7 +73,7 @@ public class LoginDialog extends Dialog {
 
     protected void initViews() {
         setCanceledOnTouchOutside(false);
-        if (CacheUtils.getCache(Config.LOGIN_SEND_CODE_URL + phone, long.class) != null) {
+        if (CacheUtil.getCache(Config.LOGIN_SEND_CODE_URL + phone, long.class) != null) {
             setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTvTimer);
         }
         mEtSmsCode.setOnLongClickListener(v -> true);
@@ -153,7 +146,7 @@ public class LoginDialog extends Dialog {
 
 
     public void setSendSmsCodeCache() {
-        CacheUtils.setSendCodeTime(Config.LOGIN_SEND_CODE_URL + phone, System.currentTimeMillis());
+        CacheUtil.setSendCodeTime(Config.LOGIN_SEND_CODE_URL + phone, System.currentTimeMillis());
         setSendSmsTvText(Config.LOGIN_SEND_CODE_URL + phone, mTvTimer);
     }
 
@@ -173,15 +166,15 @@ public class LoginDialog extends Dialog {
      * @param textView 发送验证码的textview
      */
     public void setSendSmsTvText(String url, TextView textView) {
-        if (CommonUtils.findActivity(getContext()).isDestroyed()) {  //如果结束了 就停止递归 避免内存泄漏
+        if (CommonUtil.findActivity(getContext()).isDestroyed()) {  //如果结束了 就停止递归 避免内存泄漏
             return;
         }
         //设置不可点击 就不能请求发送验证码
         textView.setClickable(false);
         //获取上一次的发送时间
-        long sendTime = CacheUtils.getSendCodeTime(url);
+        long sendTime = CacheUtil.getSendCodeTime(url);
         if (sendTime == 0) { //如果发送时间为0 说明从未发送过验证码
-            CacheUtils.setSendCodeTime(url, System.currentTimeMillis()); // 保存一下当前时间作为上一次发送验证码的时间
+            CacheUtil.setSendCodeTime(url, System.currentTimeMillis()); // 保存一下当前时间作为上一次发送验证码的时间
             textView.postDelayed(() -> setSendSmsTvText(url, textView), 1000);//递归设置UI显示
             return;
         }

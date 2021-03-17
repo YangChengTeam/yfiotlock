@@ -7,7 +7,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.download.DownloadManager;
 import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -29,7 +29,7 @@ public class SplashActivity extends BaseActivity {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         } else {
-            CommonUtils.startLogin(this);
+            CommonUtil.startLogin(this);
         }
     }
 

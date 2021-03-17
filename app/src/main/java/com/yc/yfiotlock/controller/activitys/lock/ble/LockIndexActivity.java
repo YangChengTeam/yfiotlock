@@ -14,11 +14,11 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.clj.fastble.BleManager;
-import com.clj.fastble.callback.BleGattCallback;
-import com.clj.fastble.callback.BleScanCallback;
-import com.clj.fastble.data.BleDevice;
-import com.clj.fastble.exception.BleException;
+import com.yc.yfiotlock.libs.fastble.BleManager;
+import com.yc.yfiotlock.libs.fastble.callback.BleGattCallback;
+import com.yc.yfiotlock.libs.fastble.callback.BleScanCallback;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
@@ -33,7 +33,7 @@ import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
-import com.yc.yfiotlock.helper.ShakeSensor;
+import com.yc.yfiotlock.libs.sensor.ShakeSensor;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
@@ -41,7 +41,7 @@ import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
-import com.yc.yfiotlock.utils.CacheUtils;
+import com.yc.yfiotlock.utils.CacheUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -394,7 +394,7 @@ public class LockIndexActivity extends BaseActivity {
 
     private int setCountInfo(){
         int type = 1;
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL+ type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL+ type, OpenLockCountInfo.class);
         if (countInfo != null) {
             openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
         }
@@ -430,7 +430,7 @@ public class LockIndexActivity extends BaseActivity {
                 if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
                     OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
                     openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
-                    CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+                    CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
                 }
             }
         });

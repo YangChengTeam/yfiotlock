@@ -9,7 +9,7 @@ import com.yc.yfiotlock.controller.dialogs.lock.ble.AlarmOpenLockManagerDialog;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.utils.CacheUtils;
+import com.yc.yfiotlock.utils.CacheUtil;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -54,7 +54,7 @@ public class AlarmOpenLockManagerActivity extends BaseOpenLockManagerActivity {
     @Override
     protected void loadData() {
         int type = 2;
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             notifyAdapter(countInfo);
         }
@@ -74,7 +74,7 @@ public class AlarmOpenLockManagerActivity extends BaseOpenLockManagerActivity {
                 if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
                     OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
                     notifyAdapter(countInfo);
-                    CacheUtils.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+                    CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
                 }
             }
         });

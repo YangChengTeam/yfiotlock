@@ -38,9 +38,9 @@ import com.yc.yfiotlock.model.bean.user.PicInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.UploadFileEngine;
 import com.yc.yfiotlock.model.engin.UserEngine;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.PathUtil;
-import com.yc.yfiotlock.utils.PictureUtils;
+import com.yc.yfiotlock.utils.PictureUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.adapters.PersonalEditAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -57,7 +57,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -133,7 +132,7 @@ public class PersonalInfoActivity extends BaseActivity {
         });
         mRvInfo.setAdapter(mAdapter);
         mRvInfo.setLayoutManager(new LinearLayoutManager(getContext()));
-        CommonUtils.setItemDivider(getContext(), mRvInfo);
+        CommonUtil.setItemDivider(getContext(), mRvInfo);
     }
 
     private void onUseCamera() {
@@ -359,7 +358,7 @@ public class PersonalInfoActivity extends BaseActivity {
 
     private void zipPic(File file) {
         mLoadingDialog.show("压缩中...");
-        PictureUtils.zipPic(getContext(), file, new Callback<File>() {
+        PictureUtil.zipPic(getContext(), file, new Callback<File>() {
             @Override
             public void onSuccess(File resultInfo) {
                 mLoadingDialog.dismiss();

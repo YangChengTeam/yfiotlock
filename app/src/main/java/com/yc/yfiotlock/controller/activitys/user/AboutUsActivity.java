@@ -19,7 +19,7 @@ import com.yc.yfiotlock.model.bean.user.AboutInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
@@ -64,13 +64,13 @@ public class AboutUsActivity extends BaseActivity {
             AboutInfo aboutInfo = mAboutAdapter.getData().get(position);
             switch (position) {
                 case 0:
-                    CommonUtils.startBrowser(getContext(), aboutInfo.getValue());
+                    CommonUtil.startBrowser(getContext(), aboutInfo.getValue());
                     break;
                 case 1:
-                    CommonUtils.joinQQGroup(getContext(), aboutInfo.getValue());
+                    CommonUtil.joinQQGroup(getContext(), aboutInfo.getValue());
                     break;
                 case 2:
-                    CommonUtils.copyWithToast(getContext(), aboutInfo.getValue(), "邮箱已复制");
+                    CommonUtil.copyWithToast(getContext(), aboutInfo.getValue(), "邮箱已复制");
                     break;
                 case 3:
                     break;
@@ -80,7 +80,7 @@ public class AboutUsActivity extends BaseActivity {
         });
         mRvAbout.setAdapter(mAboutAdapter);
         mRvAbout.setLayoutManager(new LinearLayoutManager(getContext()));
-        CommonUtils.setItemDivider(getContext(), mRvAbout);
+        CommonUtil.setItemDivider(getContext(), mRvAbout);
         List<AboutInfo> aboutInfos = new ArrayList<>();
         aboutInfos.add(new AboutInfo("官方网站", ""));
         aboutInfos.add(new AboutInfo("官方QQ群", ""));
@@ -125,7 +125,7 @@ public class AboutUsActivity extends BaseActivity {
                     mAboutAdapter.getData().get(2).setValue(upgradeInfo.getKfEmail());
                     mAboutAdapter.notifyDataSetChanged();
 
-                    UpdateInfo updateInfo = CommonUtils.getNeedUpgradeInfo(info.getData().getUpgrade());
+                    UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(info.getData().getUpgrade());
                     if (updateInfo != null) {
                         if (showDialog) {
                             UpdateDialog updateDialog = new UpdateDialog(getContext());

@@ -19,7 +19,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
-import com.yc.yfiotlock.utils.CacheUtils;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -87,7 +87,7 @@ public class BaseOpenLockManagerActivity extends BaseBackActivity {
         int passwordCount = 0;
         int cardCount = 0;
         int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
-        OpenLockCountInfo countInfo = CacheUtils.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             fingerprintCount = countInfo.getFingerprintCount();
             passwordCount = countInfo.getPasswordCount();

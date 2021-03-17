@@ -17,7 +17,7 @@ import android.text.TextUtils;
 import androidx.core.content.FileProvider;
 
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -28,7 +28,7 @@ public class DownloadUtils {
     }
 
     public static PackageInfo getPackageInfo(Context context, String packageName) {
-        if (CommonUtils.isActivityDestory(context) || TextUtils.isEmpty(packageName))
+        if (CommonUtil.isActivityDestory(context) || TextUtils.isEmpty(packageName))
             return null;
 
         synchronized (DownloadUtils.class) {
@@ -65,7 +65,7 @@ public class DownloadUtils {
     }
 
     public static void installApp(Context context, File file) {
-        if (CommonUtils.isActivityDestory(context)) return;
+        if (CommonUtil.isActivityDestory(context)) return;
 
         Uri apkUri = getUriFromFile(context, file);
         Intent installIntent = new Intent(Intent.ACTION_VIEW);
@@ -93,7 +93,7 @@ public class DownloadUtils {
 
 
     public static PackageInfo getPackageInfoByFile(Context context, File file) {
-        if (CommonUtils.isActivityDestory(context)) return null;
+        if (CommonUtil.isActivityDestory(context)) return null;
 
         PackageInfo packageInfo = null;
         try {
@@ -137,7 +137,7 @@ public class DownloadUtils {
 
 
     public static boolean isWifi(Context context) {
-        if (context == null || CommonUtils.isActivityDestory(context))
+        if (context == null || CommonUtil.isActivityDestory(context))
             return true;
 
         boolean flag = true;

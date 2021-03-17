@@ -10,10 +10,9 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 
-import com.yc.yfiotlock.utils.CommonUtils;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 public class ToastCompat {
     private static Field sField_TN;
@@ -45,7 +44,7 @@ public class ToastCompat {
     }
 
     public static void show(Context context, CharSequence cs, int length) {
-        if (CommonUtils.isActivityDestory(context)) return;
+        if (CommonUtil.isActivityDestory(context)) return;
 
         CharSequence text = cs + "";
         Toast toast = Toast.makeText(context, text, length);
@@ -73,7 +72,7 @@ public class ToastCompat {
     }
 
     public static void showCenter(Context context, CharSequence cs) {
-        if (CommonUtils.isActivityDestory(context)) return;
+        if (CommonUtil.isActivityDestory(context)) return;
         Toast toast = Toast.makeText(context, cs, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         hook(toast);
