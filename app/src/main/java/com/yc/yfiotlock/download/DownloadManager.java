@@ -70,7 +70,9 @@ public class DownloadManager {
 
 
     public static void init(WeakReference<Context> context) {
-        if (!TextUtils.isEmpty(parentDir) || context == null) return;
+        if (!TextUtils.isEmpty(parentDir) || context == null) {
+            return;
+        }
         OkDownload.with();
         DownloadDispatcher.setMaxParallelRunningCount(3);
         parentDir = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
@@ -104,6 +106,10 @@ public class DownloadManager {
 
     public static final String TAG = "DownloadManager";
 
+    private static boolean checkDownLoadUrlCorrect(String url) {
+        return !TextUtils.isEmpty(url) && (url.startsWith("http://") || url.startsWith("https://")) && url.endsWith(".apk");
+    }
+
     public static void updateApp(UpdateInfo upgradeInfo) {
         requestPermissionCount++;
         BaseActivity baseActivity = (BaseActivity) CommonUtils.findActivity(getContext());
@@ -115,6 +121,10 @@ public class DownloadManager {
             baseActivity.getPermissionHelper().checkAndRequestPermission(baseActivity, new PermissionHelper.OnRequestPermissionsCallback() {
                 @Override
                 public void onRequestPermissionSuccess() {
+                    if (!checkDownLoadUrlCorrect(upgradeInfo.getDownUrl())) {
+                        ToastCompat.showCenter(getContext(), upgradeInfo.getDownUrl() + "下载地址有误，请联系客服");
+                        return;
+                    }
                     DownloadManager.init(new WeakReference<>(baseActivity));
 
                     DownloadTask task = new DownloadTask.Builder(upgradeInfo.getDownUrl(), new File(parentDir))
