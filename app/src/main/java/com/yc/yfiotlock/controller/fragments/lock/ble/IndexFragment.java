@@ -21,6 +21,7 @@ import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
+import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
 
@@ -91,14 +92,10 @@ public class IndexFragment extends BaseFragment {
         });
     }
 
-    private void loadData(){
-
-    }
-
-    private void loadDevices() {
+    private void loadData() {
         BaseActivity baseActivity = (BaseActivity) getActivity();
         baseActivity.mLoadingDialog.show("加载中...");
-        indexEngin.getDeviceList().subscribe(new Subscriber<ResultInfo<List<DeviceInfo>>>() {
+        indexEngin.getIndexInfo().subscribe(new Subscriber<ResultInfo<IndexInfo>>() {
             @Override
             public void onCompleted() {
                 baseActivity.mLoadingDialog.dismiss();
@@ -110,20 +107,15 @@ public class IndexFragment extends BaseFragment {
             }
 
             @Override
-            public void onNext(ResultInfo<List<DeviceInfo>> resultInfo) {
-                if (resultInfo != null && resultInfo.getCode() == 1) {
-                    indexDeviceAdapter.setNewInstance(resultInfo.getData());
-                }
-            }
-        });
-    }
-
-    private void loadDefaultFamily() {
-        indexEngin.getDefaultFamily().subscribe(new Action1<ResultInfo<FamilyInfo>>() {
-            @Override
-            public void call(ResultInfo<FamilyInfo> resultInfo) {
-                if (resultInfo != null && resultInfo.getCode() == 1) {
-                    familyInfo = resultInfo.getData();
+            public void onNext(ResultInfo<IndexInfo> resultInfo) {
+                if (resultInfo != null && resultInfo.getCode() == 1 && resultInfo.getData() != null) {
+                    familyInfo = resultInfo.getData().getFamilyInfo();
+                    List<DeviceInfo> deviceInfoList = resultInfo.getData().getDeviceInfos();
+                    if (deviceInfoList == null) {
+                        deviceInfoList = new ArrayList<>();
+                    }
+                    deviceInfoList.add(new DeviceInfo());
+                    indexDeviceAdapter.setNewInstance(deviceInfoList);
                 }
             }
         });
