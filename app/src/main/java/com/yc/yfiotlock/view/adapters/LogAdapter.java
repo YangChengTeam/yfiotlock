@@ -21,8 +21,7 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
     protected void convert(@NotNull BaseViewHolder baseViewHolder, LogInfo logInfo) {
         baseViewHolder
                 .setText(R.id.tv_log_des, logInfo.getName())
-                .setText(R.id.tv_log_date, DateUtils.timestamp2Date(logInfo.getAddTime()))
-                .setText(R.id.tv_log_date, DateUtil.timestamp2Date(logInfo.getAdd_time()))
+                .setText(R.id.tv_log_date, DateUtil.timestamp2Date(logInfo.getAddTime()))
                 .setImageResource(R.id.iv_log_icon, logInfo.getIcon());
 
         String name = "";

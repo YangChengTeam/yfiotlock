@@ -21,8 +21,7 @@ public class WarnAdapter extends BaseExtendAdapter<WarnInfo> implements LoadMore
     protected void convert(@NotNull BaseViewHolder baseViewHolder, WarnInfo warnInfo) {
         baseViewHolder.setText(R.id.tv_log_name, warnInfo.getActionName())
                 .setText(R.id.tv_log_des, warnInfo.getDesp())
-                .setText(R.id.tv_log_date, DateUtils.timestamp2Date(warnInfo.getAddTime()))
-                .setText(R.id.tv_log_date, DateUtil.timestamp2Date(warnInfo.getAdd_time()))
+                .setText(R.id.tv_log_date, DateUtil.timestamp2Date(warnInfo.getAddTime()))
                 .setImageResource(R.id.iv_log_icon, warnInfo.getIcon());
 
         baseViewHolder.setGone(R.id.view_item_log_line, baseViewHolder.getLayoutPosition() == 0);
