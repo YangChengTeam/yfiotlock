@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.model.bean.SettingInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.SettingSoundView;
@@ -93,6 +92,32 @@ public class LockSettingActivity extends BaseBackActivity {
         protected void convert(@NotNull BaseViewHolder holder, SettingInfo settingInfo) {
             holder.setText(R.id.tv_name, settingInfo.getName());
             holder.setText(R.id.tv_value, settingInfo.getValue());
+        }
+    }
+
+    private class SettingInfo {
+        private String name;
+        private String value;
+
+        public SettingInfo(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
         }
     }
 

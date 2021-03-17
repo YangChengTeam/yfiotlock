@@ -16,7 +16,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.CacheUtils;

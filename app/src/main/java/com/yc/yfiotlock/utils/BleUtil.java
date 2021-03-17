@@ -2,7 +2,7 @@ package com.yc.yfiotlock.utils;
 
 import com.yc.yfiotlock.ble.LockBLEManager;
 
-public class BleUtils {
+public class BleUtil {
     public static int getType(String title) {
         if (title.equals("指纹")) {
             return LockBLEManager.OPEN_LOCK_FINGERPRINT;

@@ -2,7 +2,6 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -10,11 +9,10 @@ import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.FAQInfo;
+import com.yc.yfiotlock.model.bean.lock.FAQInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class FAQDetailActivity extends BaseActivity {

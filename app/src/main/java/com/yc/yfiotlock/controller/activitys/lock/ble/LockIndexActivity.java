@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.bumptech.glide.Glide;
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleGattCallback;
 import com.clj.fastble.callback.BleScanCallback;
@@ -35,19 +34,18 @@ import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.helper.ShakeSensor;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.utils.AnimatinUtils;
+import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CacheUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -137,7 +135,7 @@ public class LockIndexActivity extends BaseActivity {
         RxView.clicks(backBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             finish();
         });
-        
+
         RxView.clicks(settingBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             nav2setting();
         });
@@ -203,9 +201,9 @@ public class LockIndexActivity extends BaseActivity {
     }
 
     private void startAnimations() {
-        AnimatinUtils.rotate(loadingIv);
-        AnimatinUtils.scale(tabView, 0.05f);
-        AnimatinUtils.scale(tabView2, 0.05f);
+        AnimatinUtil.rotate(loadingIv);
+        AnimatinUtil.scale(tabView, 0.05f);
+        AnimatinUtil.scale(tabView2, 0.05f);
     }
 
     private void open() {

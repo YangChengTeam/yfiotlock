@@ -6,7 +6,7 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.view.animation.ScaleAnimation;
 
-public class AnimatinUtils {
+public class AnimatinUtil {
     public static void rotate(View view) {
         RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         rotate.setDuration(5000);

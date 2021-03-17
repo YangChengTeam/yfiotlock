@@ -1,15 +1,24 @@
-package com.yc.yfiotlock.model.bean;
+package com.yc.yfiotlock.model.bean.lock;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
 
 public class DeviceInfo implements Serializable {
     private String id;
     private String name;
+    @JSONField(name = "firmware_version")
     private String firmwareVersion;
+    @JSONField(name = "protocol_version")
     private String protocolVersion;
     private String regtime;
-    private int electricity;
+    private int battery;
+    @JSONField(name = "device_id")
     private String deviceId;
+    @JSONField(name = "is_online")
+    private boolean isOnline;
+    @JSONField(name = "mac_address")
+    private String macAddress;
 
     public DeviceInfo() {
     }
@@ -54,12 +63,12 @@ public class DeviceInfo implements Serializable {
         this.regtime = regtime;
     }
 
-    public int getElectricity() {
-        return electricity;
+    public int getBattery() {
+        return battery;
     }
 
-    public void setElectricity(int electricity) {
-        this.electricity = electricity;
+    public void setBattery(int battery) {
+        this.battery = battery;
     }
 
     public String getDeviceId() {

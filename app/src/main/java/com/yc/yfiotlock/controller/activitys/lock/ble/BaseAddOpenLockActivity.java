@@ -6,7 +6,7 @@ import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.engin.LockEngine;
 

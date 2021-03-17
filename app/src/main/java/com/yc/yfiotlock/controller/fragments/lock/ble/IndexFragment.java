@@ -7,14 +7,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.rxbinding4.view.RxView;
-import com.yc.yfiotlock.IMyAidlInterface;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.lock.ble.AddDeviceActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
 
 import java.util.ArrayList;

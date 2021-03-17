@@ -14,10 +14,10 @@ import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.utils.BleUtils;
+import com.yc.yfiotlock.utils.BleUtil;
 import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;
@@ -79,7 +79,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     }
 
     private void loadData() {
-        String way = BleUtils.getType(title) + "";
+        String way = BleUtil.getType(title) + "";
         List<OpenLockInfo> lockInfos = CacheUtils.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, new TypeReference<List<OpenLockInfo>>() {
         }.getType());
         if (lockInfos != null) {

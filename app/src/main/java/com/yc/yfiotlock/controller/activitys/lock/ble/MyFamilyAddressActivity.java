@@ -2,16 +2,14 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding4.view.RxView;
-import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.FamilyInfo;
+import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.greenrobot.eventbus.EventBus;

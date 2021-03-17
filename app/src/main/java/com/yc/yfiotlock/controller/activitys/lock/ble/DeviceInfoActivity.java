@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.utils.CacheUtils;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;

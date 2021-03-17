@@ -5,7 +5,7 @@ import android.widget.ImageView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.model.bean.FamilyInfo;
+import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.jetbrains.annotations.NotNull;

@@ -61,6 +61,14 @@ public class Config {
     public static final String HOME_SET_DEFAULT_URL = getBaseUrl() + "/userapp/v1.family/familyDefSet" + isRsa();
     public static final String HOME_INFO_DELETE_URL = getBaseUrl() + "/userapp/v1.family/familyDel" + isRsa();
 
+    // 设备相关
+    public static final String DEVICE_ADD_URL = getBaseUrl() + "/userapp/v1.Locker/lockerAdd" + isRsa();
+    public static final String DEVICE_DETAIL_URL = getBaseUrl() + "/userapp/v1.Locker/lockerDetails" + isRsa();
+    public static final String DEVICE_MODIFY_URL = getBaseUrl() + "/userapp/v1.Locker/lockerNameUpd" + isRsa();
+
+    // 安全设备
+    public static final String DEVICE_SET_SAFE_URL = getBaseUrl() + "/userapp/v1.Locker/setOperationPwd" + isRsa();
+
     //开锁管理相关
 
     public static final String OPEN_LOCK_ADD_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdAdd" + isRsa();
@@ -69,7 +77,7 @@ public class Config {
     public static final String OPEN_LOCK_MODIFY_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpd" + isRsa();
     public static final String OPEN_LOCK_DEL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDel" + isRsa();
 
-
+    //远程
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();
     public static final String LOG_OPEN_URL = getBaseUrl() + "/userapp/v1.locker_open_log/openLogList" + isRsa();
 
