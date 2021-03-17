@@ -1,4 +1,4 @@
-package com.yc.yfiotlock.model.engin;
+package com.yc.yfiotlock.model.bean.user;
 
 /**
  * @author Dullyoung

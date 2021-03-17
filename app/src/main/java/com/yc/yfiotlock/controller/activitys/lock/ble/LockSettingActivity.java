@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.model.bean.SettingInfo;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.SettingSoundView;
@@ -50,22 +49,22 @@ public class LockSettingActivity extends BaseBackActivity {
         mRvSetting.setAdapter(mSettingAdapter);
         mSettingAdapter.setOnItemClickListener((adapter, view, position) -> {
             SettingInfo settingInfo = mSettingAdapter.getData().get(position);
-            switch (position) {
-                case 0:
+            switch (settingInfo.getName()) {
+                case "报警管理":
                     startActivity(new Intent(this, AlarmOpenLockManagerActivity.class));
                     break;
-                case 1:
+                case "设备信息":
                     startActivity(new Intent(this, DeviceInfoActivity.class));
                     break;
-                case 2:
+                case "设备名称":
                     Intent intent = new Intent(this, DeviceNameEditActivity.class);
                     intent.putExtra("name", settingInfo.getValue());
                     startActivity(intent);
                     break;
-                case 3:
+                case "安全设置":
                     startActivity(new Intent(this, SafePwdSettingActivity.class));
                     break;
-                case 5:
+                case "帮助与反馈":
                     startActivity(new Intent(this, FAQActivity.class));
                     break;
                 default:
@@ -78,7 +77,6 @@ public class LockSettingActivity extends BaseBackActivity {
         settingInfos.add(new SettingInfo("设备信息", ""));
         settingInfos.add(new SettingInfo("设备名称", "智能门锁09"));
         settingInfos.add(new SettingInfo("安全设置", ""));
-        settingInfos.add(new SettingInfo("固件升级", ""));
         settingInfos.add(new SettingInfo("帮助与反馈", ""));
         mSettingAdapter.setNewInstance(settingInfos);
         mSettingAdapter.setHeaderView(new SettingSoundView(this));
@@ -93,6 +91,32 @@ public class LockSettingActivity extends BaseBackActivity {
         protected void convert(@NotNull BaseViewHolder holder, SettingInfo settingInfo) {
             holder.setText(R.id.tv_name, settingInfo.getName());
             holder.setText(R.id.tv_value, settingInfo.getValue());
+        }
+    }
+
+    private class SettingInfo {
+        private String name;
+        private String value;
+
+        public SettingInfo(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
         }
     }
 

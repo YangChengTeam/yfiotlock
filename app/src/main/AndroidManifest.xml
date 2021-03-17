@@ -59,6 +59,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".demo.MainActivity" android:exported="true">
+
+        </activity>
         <activity
             android:name=".controller.activitys.user.LoginActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
