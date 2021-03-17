@@ -30,9 +30,11 @@ public class Config {
     public final static String LOGIN_SEND_CODE_URL = getBaseUrl() + "/userapp/v1.Sms/send" + isRsa();
     public final static String SMS_CODE_LOGIN_URL = getBaseUrl() + "/userapp/v1.User/codeLogin" + isRsa();
 
+
     //首页
     public final static String INDEX_FAMILY_URL = getBaseUrl() + "/userapp/v1.Home/homeFamily" + isRsa();
     public final static String INDEX_LIST_DEVICE_LIST = getBaseUrl() + "/userapp/v1.Home/homeLocker" + isRsa();
+    public final static String INDEX_DETAIL_URL = getBaseUrl() + "/userapp/v1.Home/homeDetails" + isRsa();
 
     //FAQ
 
