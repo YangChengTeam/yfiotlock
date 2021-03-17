@@ -27,7 +27,7 @@ public class MyFamilyAdapter extends BaseExtendAdapter<FamilyInfo> {
                 .setText(R.id.tv_my_family_name, familyInfo.getName())
                 .setText(R.id.tv_my_family_number, familyInfo.getNum() + "个设备");
 
-        int aDefault = familyInfo.isIs_def();
+        int aDefault = familyInfo.isDef();
         if (aDefault == 0) {
             baseViewHolder.setImageResource(R.id.iv_family_number_default, R.mipmap.sel);
         } else {

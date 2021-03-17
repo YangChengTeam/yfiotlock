@@ -78,7 +78,7 @@ public class FamilyInfo implements Serializable {
         this.detailAddress = detailAddress;
     }
 
-    public int isIs_def() {
+    public int isDef() {
         return isDef;
     }
 
