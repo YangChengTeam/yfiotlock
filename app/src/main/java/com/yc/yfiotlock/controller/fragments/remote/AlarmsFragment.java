@@ -14,6 +14,8 @@ import com.yc.yfiotlock.model.bean.WarnInfo;
 import com.yc.yfiotlock.model.bean.WarnListInfo;
 import com.yc.yfiotlock.model.engin.LogEngine;
 import com.yc.yfiotlock.view.adapters.WarnAdapter;
+import com.yc.yfiotlock.view.widgets.NoDataView;
+import com.yc.yfiotlock.view.widgets.NoWifiView;
 
 import java.util.List;
 
@@ -79,25 +81,49 @@ public class AlarmsFragment extends BaseFragment {
             @Override
             public void onError(Throwable e) {
                 mSrlRefresh.setRefreshing(false);
+                loadDateFail();
             }
 
             @Override
             public void onNext(ResultInfo<WarnListInfo> logListInfoResultInfo) {
-                if (logListInfoResultInfo.getData() != null && logListInfoResultInfo.getData().getItems() != null) {
-                    List<WarnInfo> items = logListInfoResultInfo.getData().getItems();
-                    if (page == 1) {
-                        warnAdapter.setNewInstance(items);
-                    } else {
-                        warnAdapter.addData(items);
-                    }
+                if (logListInfoResultInfo.getData() == null||logListInfoResultInfo.getData().getItems() == null || logListInfoResultInfo.getData().getItems().size() == 0) {
+                    loadDateEmpty();
+                    return;
+                }
 
-                    if (items.size() < pageSize) {
-                        warnAdapter.getLoadMoreModule().loadMoreEnd();
-                    } else {
-                        warnAdapter.getLoadMoreModule().loadMoreComplete();
-                    }
+                List<WarnInfo> items = logListInfoResultInfo.getData().getItems();
+                if (page == 1) {
+                    warnAdapter.setNewInstance(items);
+                } else {
+                    warnAdapter.addData(items);
+                }
+
+                if (items.size() < pageSize) {
+                    warnAdapter.getLoadMoreModule().loadMoreEnd();
+                } else {
+                    warnAdapter.getLoadMoreModule().loadMoreComplete();
                 }
             }
         });
+    }
+
+    private void loadDateFail() {
+        if (page == 1) {
+            warnAdapter.setNewInstance(null);
+            warnAdapter.setEmptyView(new NoWifiView(getContext()));
+        } else {
+            page--;
+            warnAdapter.getLoadMoreModule().loadMoreComplete();
+        }
+    }
+
+    private void loadDateEmpty() {
+        if (page == 1) {
+            warnAdapter.setNewInstance(null);
+            warnAdapter.setEmptyView(new NoDataView(getContext()));
+        } else {
+            page--;
+            warnAdapter.getLoadMoreModule().loadMoreComplete();
+        }
     }
 }

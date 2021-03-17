@@ -1,8 +1,5 @@
 package com.yc.yfiotlock.controller.fragments.remote;
 
-import android.view.View;
-import android.widget.TextView;
-
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -14,6 +11,8 @@ import com.yc.yfiotlock.model.bean.LogInfo;
 import com.yc.yfiotlock.model.bean.LogListInfo;
 import com.yc.yfiotlock.model.engin.LogEngine;
 import com.yc.yfiotlock.view.adapters.LogAdapter;
+import com.yc.yfiotlock.view.widgets.NoDataView;
+import com.yc.yfiotlock.view.widgets.NoWifiView;
 
 import java.util.List;
 
@@ -79,26 +78,49 @@ public class LogFragment extends BaseFragment {
             @Override
             public void onError(Throwable e) {
                 mSrlRefresh.setRefreshing(false);
+                loadDateFail();
             }
 
             @Override
             public void onNext(ResultInfo<LogListInfo> logListInfoResultInfo) {
-                if (logListInfoResultInfo.getData() != null && logListInfoResultInfo.getData().getItems() != null) {
-                    List<LogInfo> items = logListInfoResultInfo.getData().getItems();
-                    if (page == 1) {
-                        logAdapter.setNewInstance(items);
-                    } else {
-                        logAdapter.addData(items);
-                    }
+                if (logListInfoResultInfo.getData() == null || logListInfoResultInfo.getData().getItems() == null || logListInfoResultInfo.getData().getItems().size() == 0) {
+                    loadDateEmpty();
+                    return;
+                }
 
-                    if (items.size() < pageSize) {
-                        logAdapter.getLoadMoreModule().loadMoreEnd();
-                    } else {
-                        logAdapter.getLoadMoreModule().loadMoreComplete();
-                    }
+                List<LogInfo> items = logListInfoResultInfo.getData().getItems();
+                if (page == 1) {
+                    logAdapter.setNewInstance(items);
+                } else {
+                    logAdapter.addData(items);
+                }
 
+                if (items.size() < pageSize) {
+                    logAdapter.getLoadMoreModule().loadMoreEnd();
+                } else {
+                    logAdapter.getLoadMoreModule().loadMoreComplete();
                 }
             }
         });
+    }
+
+    private void loadDateFail() {
+        if (page == 1) {
+            logAdapter.setNewInstance(null);
+            logAdapter.setEmptyView(new NoWifiView(getContext()));
+        } else {
+            page--;
+            logAdapter.getLoadMoreModule().loadMoreComplete();
+        }
+    }
+
+    private void loadDateEmpty() {
+        if (page == 1) {
+            logAdapter.setNewInstance(null);
+            logAdapter.setEmptyView(new NoDataView(getContext()));
+        } else {
+            page--;
+            logAdapter.getLoadMoreModule().loadMoreComplete();
+        }
     }
 }
