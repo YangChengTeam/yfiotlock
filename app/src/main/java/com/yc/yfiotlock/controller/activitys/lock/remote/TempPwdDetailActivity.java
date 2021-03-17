@@ -13,8 +13,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.NextTextInfo;
-import com.yc.yfiotlock.model.bean.PassWordInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.NextTextInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
 import com.yc.yfiotlock.view.adapters.NextTextExtendAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 

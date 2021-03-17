@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.PassWordInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import butterknife.BindView;
