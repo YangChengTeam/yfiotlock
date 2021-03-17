@@ -1,4 +1,4 @@
-package com.yc.yfiotlock.controller.fragments.remote;
+package com.yc.yfiotlock.controller.fragments.lock.remote;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;

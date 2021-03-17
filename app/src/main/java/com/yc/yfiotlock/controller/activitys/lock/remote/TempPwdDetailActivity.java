@@ -13,9 +13,9 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.lock.remote.NextTextInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
-import com.yc.yfiotlock.view.adapters.NextTextExtendAdapter;
+import com.yc.yfiotlock.view.adapters.ItemAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,7 @@ public class TempPwdDetailActivity extends BaseActivity {
     @BindView(R.id.rv_temp_pwd_detail)
     RecyclerView recyclerView;
 
-    private NextTextExtendAdapter nextTextExtendAdapter;
+    private ItemAdapter itemAdapter;
 
     @Override
     protected int getLayoutId() {
@@ -56,11 +56,11 @@ public class TempPwdDetailActivity extends BaseActivity {
 
 
     private void initRv() {
-        nextTextExtendAdapter = new NextTextExtendAdapter(null);
+        itemAdapter = new ItemAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.setAdapter(nextTextExtendAdapter);
+        recyclerView.setAdapter(itemAdapter);
 
-        nextTextExtendAdapter.setOnItemClickListener(new OnItemClickListener() {
+        itemAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
                 Serializable serializable = getIntent().getSerializableExtra("password_info");
@@ -72,15 +72,15 @@ public class TempPwdDetailActivity extends BaseActivity {
     }
 
     private void loadData() {
-        List<NextTextInfo> list = new ArrayList<>();
+        List<ItemInfo> list = new ArrayList<>();
         Serializable serializable = getIntent().getSerializableExtra("password_info");
         if (serializable instanceof PassWordInfo) {
             PassWordInfo passWordInfo = (PassWordInfo) serializable;
 
             mBnbTitle.setTitle(passWordInfo.getName());
 
-            list.add(new NextTextInfo("修改密码", "", passWordInfo.getId()));
-            nextTextExtendAdapter.setNewInstance(list);
+            list.add(new ItemInfo("修改密码", "", passWordInfo.getId()));
+            itemAdapter.setNewInstance(list);
         }
 
     }

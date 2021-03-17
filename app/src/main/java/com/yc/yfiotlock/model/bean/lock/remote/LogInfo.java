@@ -1,17 +1,25 @@
 package com.yc.yfiotlock.model.bean.lock.remote;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.yc.yfiotlock.R;
 
 public class LogInfo {
     private int id;
-    private int pwd_type;
-    private int group_type;
-    private int is_local;
-    private int is_succ;
-    private long action_time;
+    @JSONField(name = "pwd_type")
+    private int pwdType;
+    @JSONField(name = "group_type")
+    private int groupType;
+    @JSONField(name = "is_local")
+    private int isLocal;
+    @JSONField(name = "is_succ")
+    private int isSucc;
+    @JSONField(name = "action_time")
+    private long actionTime;
     private int icon;
-    private String action_name;
-    private long add_time;
+    @JSONField(name = "action_name")
+    private String actionName;
+    @JSONField(name = "add_time")
+    private long addTime;
     private String desp;
     private String name;
 
@@ -23,20 +31,20 @@ public class LogInfo {
         this.name = name;
     }
 
-    public long getAdd_time() {
-        return add_time;
+    public long getAddTime() {
+        return addTime;
     }
 
-    public void setAdd_time(long add_time) {
-        this.add_time = add_time;
+    public void setAddTime(long addTime) {
+        this.addTime = addTime;
     }
 
-    public String getAction_name() {
-        return action_name;
+    public String getActionName() {
+        return actionName;
     }
 
-    public void setAction_name(String action_name) {
-        this.action_name = action_name;
+    public void setActionName(String actionName) {
+        this.actionName = actionName;
     }
 
     public String getDesp() {
@@ -55,44 +63,44 @@ public class LogInfo {
         this.id = id;
     }
 
-    public int getPwd_type() {
-        return pwd_type;
+    public int getPwdType() {
+        return pwdType;
     }
 
-    public void setPwd_type(int pwd_type) {
-        this.pwd_type = pwd_type;
+    public void setPwdType(int pwdType) {
+        this.pwdType = pwdType;
     }
 
-    public int getGroup_type() {
-        return group_type;
+    public int getGroupType() {
+        return groupType;
     }
 
-    public void setGroup_type(int group_type) {
-        this.group_type = group_type;
+    public void setGroupType(int groupType) {
+        this.groupType = groupType;
     }
 
-    public int getIs_local() {
-        return is_local;
+    public int getIsLocal() {
+        return isLocal;
     }
 
-    public void setIs_local(int is_local) {
-        this.is_local = is_local;
+    public void setIsLocal(int isLocal) {
+        this.isLocal = isLocal;
     }
 
-    public int getIs_succ() {
-        return is_succ;
+    public int getIsSucc() {
+        return isSucc;
     }
 
-    public void setIs_succ(int is_succ) {
-        this.is_succ = is_succ;
+    public void setIsSucc(int isSucc) {
+        this.isSucc = isSucc;
     }
 
-    public long getAction_time() {
-        return action_time;
+    public long getActionTime() {
+        return actionTime;
     }
 
-    public void setAction_time(long action_time) {
-        this.action_time = action_time;
+    public void setActionTime(long actionTime) {
+        this.actionTime = actionTime;
     }
 
     public int getIcon() {

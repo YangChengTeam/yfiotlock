@@ -2,12 +2,10 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding4.view.RxView;
-import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -51,12 +49,12 @@ public class MyFamilyAddressActivity extends BaseActivity {
         Serializable serializable = getIntent().getSerializableExtra("family_info");
         if (serializable instanceof FamilyInfo) {
             this.familyInfo = (FamilyInfo) serializable;
-            editText.setText(familyInfo.getDetail_address());
+            editText.setText(familyInfo.getDetailAddress());
         }
 
         RxView.clicks(tvSure).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             String trim = editText.getText().toString().trim();
-            familyInfo.setDetail_address(trim);
+            familyInfo.setDetailAddress(trim);
             EventBus.getDefault().post(familyInfo);
             finish();
         });

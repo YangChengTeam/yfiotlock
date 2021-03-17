@@ -94,7 +94,7 @@ public class MyFamilyAddActivity extends BaseActivity {
         mLoadingDialog.show("提交中");
         if (id <= 0) {
             homeEngine.addFamily(familyInfo.getName(), familyInfo.getLongitude(),
-                    familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetail_address()).subscribe(new Observer<ResultInfo<String>>() {
+                    familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetailAddress()).subscribe(new Observer<ResultInfo<String>>() {
                 @Override
                 public void onCompleted() {
                     mLoadingDialog.dismiss();
@@ -122,7 +122,7 @@ public class MyFamilyAddActivity extends BaseActivity {
             });
         } else {
             homeEngine.modifyFamily(id, familyInfo.getName(), familyInfo.getLongitude(),
-                    familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetail_address()).subscribe(new Observer<ResultInfo<String>>() {
+                    familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetailAddress()).subscribe(new Observer<ResultInfo<String>>() {
                 @Override
                 public void onCompleted() {
                     mLoadingDialog.dismiss();
@@ -169,7 +169,7 @@ public class MyFamilyAddActivity extends BaseActivity {
             this.familyInfo = familyInfo;
             tvName.setTvDes(familyInfo.getName(), Color.parseColor("#000000"));
             tvLocation.setTvDes(familyInfo.getAddress(), Color.parseColor("#000000"));
-            tvAddress.setTvDes(familyInfo.getDetail_address(), Color.parseColor("#000000"));
+            tvAddress.setTvDes(familyInfo.getDetailAddress(), Color.parseColor("#000000"));
 
             mBnbTitle.setTitle(familyInfo.getName());
         }
@@ -181,10 +181,10 @@ public class MyFamilyAddActivity extends BaseActivity {
         this.familyInfo = familyInfo;
         tvName.setTvDes(familyInfo.getName(), Color.parseColor("#000000"));
         tvLocation.setTvDes(familyInfo.getAddress(), Color.parseColor("#000000"));
-        if (TextUtils.isEmpty(familyInfo.getDetail_address())) {
+        if (TextUtils.isEmpty(familyInfo.getDetailAddress())) {
             tvAddress.setTvDes("请输入详细地址（非必填）", Color.parseColor("#ff999999"));
         } else {
-            tvAddress.setTvDes(familyInfo.getDetail_address(), Color.parseColor("#000000"));
+            tvAddress.setTvDes(familyInfo.getDetailAddress(), Color.parseColor("#000000"));
         }
     }
 }

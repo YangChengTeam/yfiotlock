@@ -21,11 +21,11 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
     protected void convert(@NotNull BaseViewHolder baseViewHolder, LogInfo logInfo) {
         baseViewHolder
                 .setText(R.id.tv_log_des, logInfo.getName())
-                .setText(R.id.tv_log_date, DateUtils.timestamp2Date(logInfo.getAdd_time()))
+                .setText(R.id.tv_log_date, DateUtils.timestamp2Date(logInfo.getAddTime()))
                 .setImageResource(R.id.iv_log_icon, logInfo.getIcon());
 
         String name = "";
-        int pwdType = logInfo.getPwd_type();
+        int pwdType = logInfo.getPwdType();
         switch (pwdType) {
             case 1:
                 name += "指纹";
@@ -38,7 +38,7 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
                 break;
         }
         name += "开锁";
-        int isSucc = logInfo.getIs_succ();
+        int isSucc = logInfo.getIsSucc();
         switch (isSucc) {
             case 0:
                 name += "失败";

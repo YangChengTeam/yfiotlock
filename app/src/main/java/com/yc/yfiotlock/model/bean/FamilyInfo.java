@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.model.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.io.Serializable;
 
 public class FamilyInfo implements Serializable {
@@ -8,8 +10,10 @@ public class FamilyInfo implements Serializable {
     private double longitude;
     private double latitude;
     private String address;
-    private String detail_address;
-    private int is_def = 1;
+    @JSONField(name = "detail_address")
+    private String detailAddress;
+    @JSONField(name = "is_def")
+    private int isDef = 1;
     private int num;
 
     private boolean isUpdateList;
@@ -66,20 +70,20 @@ public class FamilyInfo implements Serializable {
         this.address = address;
     }
 
-    public String getDetail_address() {
-        return detail_address;
+    public String getDetailAddress() {
+        return detailAddress;
     }
 
-    public void setDetail_address(String detail_address) {
-        this.detail_address = detail_address;
+    public void setDetailAddress(String detailAddress) {
+        this.detailAddress = detailAddress;
     }
 
     public int isIs_def() {
-        return is_def;
+        return isDef;
     }
 
-    public void setIs_def(int is_def) {
-        this.is_def = is_def;
+    public void setIsDef(int isDef) {
+        this.isDef = isDef;
     }
 
     public int getNum() {

@@ -1,6 +1,6 @@
 package com.yc.yfiotlock.model.bean.lock.remote;
 
-public class NextTextInfo {
+public class ItemInfo {
     private String name;
     private String des;
     private int id;
@@ -29,7 +29,7 @@ public class NextTextInfo {
         this.id = id;
     }
 
-    public NextTextInfo(String name, String des, int id) {
+    public ItemInfo(String name, String des, int id) {
         this.name = name;
         this.des = des;
         this.id = id;

@@ -1,22 +1,27 @@
 package com.yc.yfiotlock.model.bean.lock.remote;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.yc.yfiotlock.R;
 
 public class WarnInfo {
     private int id;
-    private String action_name;
-    private long action_time;
-    private long add_time;
+    @JSONField(name = "action_name")
+    private String actionName;
+    @JSONField(name = "action_time")
+    private long actionTime;
+    @JSONField(name = "add_time")
+    private long addTime;
     private String desp;
-    private String msg_conent;
+    @JSONField(name = "msg_conent")
+    private String msgConent;
     private int icon;
 
-    public long getAdd_time() {
-        return add_time;
+    public long getAddTime() {
+        return addTime;
     }
 
-    public void setAdd_time(long add_time) {
-        this.add_time = add_time;
+    public void setAddTime(long addTime) {
+        this.addTime = addTime;
     }
 
     public int getId() {
@@ -27,20 +32,20 @@ public class WarnInfo {
         this.id = id;
     }
 
-    public String getAction_name() {
-        return action_name;
+    public String getActionName() {
+        return actionName;
     }
 
-    public void setAction_name(String action_name) {
-        this.action_name = action_name;
+    public void setActionName(String actionName) {
+        this.actionName = actionName;
     }
 
-    public long getAction_time() {
-        return action_time;
+    public long getActionTime() {
+        return actionTime;
     }
 
-    public void setAction_time(long action_time) {
-        this.action_time = action_time;
+    public void setActionTime(long actionTime) {
+        this.actionTime = actionTime;
     }
 
     public String getDesp() {
@@ -51,12 +56,12 @@ public class WarnInfo {
         this.desp = desp;
     }
 
-    public String getMsg_conent() {
-        return msg_conent;
+    public String getMsgConent() {
+        return msgConent;
     }
 
-    public void setMsg_conent(String msg_conent) {
-        this.msg_conent = msg_conent;
+    public void setMsgConent(String msgConent) {
+        this.msgConent = msgConent;
     }
 
     public int getIcon() {

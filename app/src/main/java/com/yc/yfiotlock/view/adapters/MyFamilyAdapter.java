@@ -47,12 +47,12 @@ public class MyFamilyAdapter extends BaseExtendAdapter<FamilyInfo> {
             for (int i = 0; i < data.size(); i++) {
                 View viewByPosition = getViewByPosition(i, R.id.iv_family_number_default);
                 if (index == i) {
-                    data.get(i).setIs_def(0);
+                    data.get(i).setIsDef(0);
                     if (viewByPosition instanceof ImageView) {
                         ((ImageView) viewByPosition).setImageResource(R.mipmap.sel);
                     }
                 } else {
-                    data.get(i).setIs_def(1);
+                    data.get(i).setIsDef(1);
                     if (viewByPosition instanceof ImageView) {
                         ((ImageView) viewByPosition).setImageResource(R.mipmap.sel_no);
                     }

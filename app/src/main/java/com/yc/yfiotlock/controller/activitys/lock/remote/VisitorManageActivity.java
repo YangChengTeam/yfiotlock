@@ -11,8 +11,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.lock.remote.NextTextInfo;
-import com.yc.yfiotlock.view.adapters.NextTextExtendAdapter;
+import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
+import com.yc.yfiotlock.view.adapters.ItemAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ public class VisitorManageActivity extends BaseActivity {
     @BindView(R.id.visitor_manage_recycler_view)
     RecyclerView recyclerView;
 
-    private NextTextExtendAdapter nextTextExtendAdapter;
+    private ItemAdapter itemAdapter;
 
     @Override
     protected int getLayoutId() {
@@ -46,15 +46,15 @@ public class VisitorManageActivity extends BaseActivity {
 
 
     private void initRv() {
-        nextTextExtendAdapter = new NextTextExtendAdapter(null);
+        itemAdapter = new ItemAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.setAdapter(nextTextExtendAdapter);
+        recyclerView.setAdapter(itemAdapter);
 
-        nextTextExtendAdapter.setOnItemClickListener(new OnItemClickListener() {
+        itemAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-                NextTextInfo nextTextInfo = nextTextExtendAdapter.getData().get(position);
-                switch (nextTextInfo.getId()) {
+                ItemInfo itemInfo = itemAdapter.getData().get(position);
+                switch (itemInfo.getId()) {
                     case 1:
                         startActivity(new Intent(VisitorManageActivity.this, OpenLockActivty.class));
                         break;
@@ -67,9 +67,9 @@ public class VisitorManageActivity extends BaseActivity {
     }
 
     private void loadData() {
-        List<NextTextInfo> list = new ArrayList<>();
-        list.add(new NextTextInfo("远程开锁", "", 1));
-        list.add(new NextTextInfo("临时密码", "", 2));
-        nextTextExtendAdapter.setNewInstance(list);
+        List<ItemInfo> list = new ArrayList<>();
+        list.add(new ItemInfo("远程开锁", "", 1));
+        list.add(new ItemInfo("临时密码", "", 2));
+        itemAdapter.setNewInstance(list);
     }
 }
