@@ -1,4 +1,4 @@
-package com.yc.yfiotlock.model.bean;
+package com.yc.yfiotlock.model.bean.lock.ble;
 
 import java.io.Serializable;
 

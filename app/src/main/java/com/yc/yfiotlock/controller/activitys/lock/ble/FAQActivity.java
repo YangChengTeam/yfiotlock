@@ -1,9 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Intent;
-import android.graphics.ImageFormat;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,7 +12,7 @@ import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.FAQInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.FAQInfo;
 import com.yc.yfiotlock.model.engin.FAQEngine;
 import com.yc.yfiotlock.utils.CommonUtils;
 import com.yc.yfiotlock.view.adapters.FAQAdapter;
@@ -26,7 +23,6 @@ import com.yc.yfiotlock.view.widgets.NoWifiView;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observer;
 
