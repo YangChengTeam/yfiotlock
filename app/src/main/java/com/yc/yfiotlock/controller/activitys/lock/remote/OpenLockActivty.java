@@ -11,19 +11,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.FAQDetailActivity;
-import com.yc.yfiotlock.controller.dialogs.SuccessDialog;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import rx.Subscriber;
