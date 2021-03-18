@@ -100,7 +100,7 @@ public class AboutUsActivity extends BaseActivity {
         setClick(R.id.stv_check, () -> checkVersion(true));
     }
 
-    UpdateEngine mUpdateEngine;
+    private UpdateEngine mUpdateEngine;
 
     private void checkVersion(boolean showDialog) {
         mLoadingDialog.show("获取更新中...");
@@ -118,8 +118,8 @@ public class AboutUsActivity extends BaseActivity {
             @Override
             public void onNext(ResultInfo<UpgradeInfo> info) {
                 if (info != null && info.getCode() == 1) {
-
                     UpgradeInfo upgradeInfo = info.getData();
+
                     mAboutAdapter.getData().get(0).setValue(upgradeInfo.getOfficialWeb());
                     mAboutAdapter.getData().get(1).setValue(upgradeInfo.getKfQqQun());
                     mAboutAdapter.getData().get(2).setValue(upgradeInfo.getKfEmail());
@@ -131,6 +131,13 @@ public class AboutUsActivity extends BaseActivity {
                             UpdateDialog updateDialog = new UpdateDialog(getContext());
                             updateDialog.show(updateInfo);
                         }
+                        mStvCheck.setShaderEnable(true);
+                        mStvCheck.setShaderStartColor(0xff34A2FF);
+                        mStvCheck.setShaderEndColor(0xff338DFC);
+                        mStvCheck.setShaderMode(SuperTextView.ShaderMode.TOP_TO_BOTTOM);
+                        mStvCheck.setClickable(true);
+                        mStvCheck.setSolid(Color.TRANSPARENT);
+                        mStvCheck.setText("有新版本可以更新");
                     } else {
                         ToastCompat.showCenter(getContext(), "已是最新版本");
                         mStvCheck.setSolid(getResources().getColor(R.color.blue_no_input));
@@ -156,7 +163,7 @@ public class AboutUsActivity extends BaseActivity {
         }
     }
 
-    private  class AboutAdapter extends BaseExtendAdapter<AboutInfo> {
+    private class AboutAdapter extends BaseExtendAdapter<AboutInfo> {
         public AboutAdapter(@Nullable List<AboutInfo> data) {
             super(R.layout.item_about_us, data);
         }

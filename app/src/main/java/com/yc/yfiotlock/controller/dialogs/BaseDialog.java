@@ -11,8 +11,13 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+
+import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.eventbus.EventStub;
 import com.yc.yfiotlock.utils.CommonUtil;
 
@@ -20,6 +25,8 @@ import com.yc.yfiotlock.utils.CommonUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
@@ -51,7 +58,7 @@ public abstract class BaseDialog extends Dialog {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void stub(EventStub stub){
+    public void stub(EventStub stub) {
 
     }
 
@@ -94,6 +101,17 @@ public abstract class BaseDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViews();
+        bindClick();
+    }
+
+    public void bindClick() {
+
+    }
+
+    public void setClick(@IdRes int id, @NonNull Runnable runnable) {
+        RxView.clicks(findViewById(id)).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view1 -> {
+            runnable.run();
+        });
     }
 
     protected abstract int getLayoutId();

@@ -12,13 +12,14 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 import butterknife.BindView;
 import butterknife.OnClick;
 
+/**
+ * @author Dullyoung
+ */
 public class DeviceNameEditActivity extends BaseActivity {
 
 
     @BindView(R.id.bnb_title)
     BackNavBar mBnbTitle;
-    @BindView(R.id.stv_sure)
-    SuperTextView mSTvSure;
     @BindView(R.id.et_name)
     EditText mEtName;
 
