@@ -89,6 +89,13 @@ public class CommonUtil {
                 .setCountNotDraw(1);
         recyclerView.addItemDecoration(myItemDivider);
     }
+    public static void setItemDivider3(Context context, RecyclerView recyclerView) {
+        MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
+                .setPadding(ScreenUtil.dip2px(context, 15))
+                .setDrawable(ContextCompat.getDrawable(context, R.drawable.shape_line_divide))
+                .setCountNotDraw(0);
+        recyclerView.addItemDecoration(myItemDivider);
+    }
 
     public static void setItemDividerWithNoPadding(Context context, RecyclerView recyclerView) {
         MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
