@@ -71,6 +71,7 @@ public class Config {
     public static final String DEVICE_ADD_URL = getBaseUrl() + "/userapp/v1.Locker/lockerAdd" + isRsa();
     public static final String DEVICE_DETAIL_URL = getBaseUrl() + "/userapp/v1.Locker/lockerDetails" + isRsa();
     public static final String DEVICE_MODIFY_URL = getBaseUrl() + "/userapp/v1.Locker/lockerNameUpd" + isRsa();
+    public static final String DEVICE_SET_VOLUME_URL = getBaseUrl() + "/userapp/v1.Locker/setVolume" + isRsa();
 
     // 安全设备
     public static final String DEVICE_SET_SAFE_URL = getBaseUrl() + "/userapp/v1.Locker/setOperationPwd" + isRsa();
