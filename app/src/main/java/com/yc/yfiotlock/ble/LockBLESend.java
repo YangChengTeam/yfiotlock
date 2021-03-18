@@ -89,7 +89,7 @@ public class LockBLESend {
 
     // 重新发送
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onReSend(OpenLockReSendEvent object) {
+    public void onResend(OpenLockReSendEvent object) {
         loadingDialog.dismiss();
         send();
     }
@@ -159,6 +159,7 @@ public class LockBLESend {
             } else if (lockBLEData.getStatus() == (byte) 0x11) {
 
             }
+
             sendingStatus = false;
             mcmd = 0x00;
             scmd = 0x00;
