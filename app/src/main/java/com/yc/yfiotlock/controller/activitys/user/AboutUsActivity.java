@@ -6,6 +6,7 @@ import android.widget.LinearLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.TypeReference;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.GoagalInfo;
@@ -19,6 +20,7 @@ import com.yc.yfiotlock.model.bean.user.AboutInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -100,10 +102,22 @@ public class AboutUsActivity extends BaseActivity {
         setClick(R.id.stv_check, () -> checkVersion(true));
     }
 
+    private boolean loadCache(boolean showDialog) {
+        ResultInfo<UpgradeInfo> info = CacheUtil.getCache(mUpdateEngine.getUrl(), new TypeReference<ResultInfo<UpgradeInfo>>() {
+        }.getType());
+        if (info != null) {
+            onSuccess(info, showDialog);
+            return true;
+        }
+        return false;
+    }
+
     private UpdateEngine mUpdateEngine;
 
     private void checkVersion(boolean showDialog) {
-        mLoadingDialog.show("获取更新中...");
+        if (!loadCache(showDialog)) {
+            mLoadingDialog.show("获取更新中...");
+        }
         mUpdateEngine.getUpdateInfo().subscribe(new Observer<ResultInfo<UpgradeInfo>>() {
             @Override
             public void onCompleted() {
@@ -118,40 +132,46 @@ public class AboutUsActivity extends BaseActivity {
             @Override
             public void onNext(ResultInfo<UpgradeInfo> info) {
                 if (info != null && info.getCode() == 1) {
-                    UpgradeInfo upgradeInfo = info.getData();
-
-                    mAboutAdapter.getData().get(0).setValue(upgradeInfo.getOfficialWeb());
-                    mAboutAdapter.getData().get(1).setValue(upgradeInfo.getKfQqQun());
-                    mAboutAdapter.getData().get(2).setValue(upgradeInfo.getKfEmail());
-                    mAboutAdapter.notifyDataSetChanged();
-
-                    UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(info.getData().getUpgrade());
-                    if (updateInfo != null) {
-                        if (showDialog) {
-                            UpdateDialog updateDialog = new UpdateDialog(getContext());
-                            updateDialog.show(updateInfo);
-                        }
-                        mStvCheck.setShaderEnable(true);
-                        mStvCheck.setShaderStartColor(0xff34A2FF);
-                        mStvCheck.setShaderEndColor(0xff338DFC);
-                        mStvCheck.setShaderMode(SuperTextView.ShaderMode.TOP_TO_BOTTOM);
-                        mStvCheck.setClickable(true);
-                        mStvCheck.setSolid(Color.TRANSPARENT);
-                        mStvCheck.setText("有新版本可以更新");
-                    } else {
-                        ToastCompat.showCenter(getContext(), "已是最新版本");
-                        mStvCheck.setSolid(getResources().getColor(R.color.blue_no_input));
-                        mStvCheck.setClickable(false);
-                        mStvCheck.setPressBgColor(Color.TRANSPARENT);
-                        mStvCheck.setShaderEnable(false);
-                        mStvCheck.setText("已是最新版本");
-                    }
-
+                    onSuccess(info, showDialog);
+                    CacheUtil.setCache(mUpdateEngine.getUrl(), info);
                 } else {
-                    ToastCompat.show(getContext(), info == null ? "数据获取失败" : info.getMsg());
+                    if (info != null && info.getMsg() != null) {
+                        ToastCompat.show(getContext(), info.getMsg());
+                    }
                 }
             }
         });
+    }
+
+    private void onSuccess(ResultInfo<UpgradeInfo> info, boolean showDialog) {
+        UpgradeInfo upgradeInfo = info.getData();
+
+        mAboutAdapter.getData().get(0).setValue(upgradeInfo.getOfficialWeb());
+        mAboutAdapter.getData().get(1).setValue(upgradeInfo.getKfQqQun());
+        mAboutAdapter.getData().get(2).setValue(upgradeInfo.getKfEmail());
+        mAboutAdapter.notifyDataSetChanged();
+
+        UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(info.getData().getUpgrade());
+        if (updateInfo != null) {
+            if (showDialog) {
+                UpdateDialog updateDialog = new UpdateDialog(getContext());
+                updateDialog.show(updateInfo);
+            }
+            mStvCheck.setShaderEnable(true);
+            mStvCheck.setShaderStartColor(0xff34A2FF);
+            mStvCheck.setShaderEndColor(0xff338DFC);
+            mStvCheck.setShaderMode(SuperTextView.ShaderMode.TOP_TO_BOTTOM);
+            mStvCheck.setClickable(true);
+            mStvCheck.setSolid(Color.TRANSPARENT);
+            mStvCheck.setText("有新版本可以更新");
+        } else {
+            ToastCompat.showCenter(getContext(), "已是最新版本");
+            mStvCheck.setSolid(getResources().getColor(R.color.blue_no_input));
+            mStvCheck.setClickable(false);
+            mStvCheck.setPressBgColor(Color.TRANSPARENT);
+            mStvCheck.setShaderEnable(false);
+            mStvCheck.setText("已是最新版本");
+        }
     }
 
 
