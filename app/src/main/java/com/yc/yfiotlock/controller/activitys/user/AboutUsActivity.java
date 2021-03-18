@@ -143,6 +143,8 @@ public class AboutUsActivity extends BaseActivity {
         });
     }
 
+    UpdateDialog updateDialog;
+
     private void onSuccess(ResultInfo<UpgradeInfo> info, boolean showDialog) {
         UpgradeInfo upgradeInfo = info.getData();
 
@@ -154,7 +156,9 @@ public class AboutUsActivity extends BaseActivity {
         UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(info.getData().getUpgrade());
         if (updateInfo != null) {
             if (showDialog) {
-                UpdateDialog updateDialog = new UpdateDialog(getContext());
+                if (updateDialog == null) {
+                    updateDialog = new UpdateDialog(getContext());
+                }
                 updateDialog.show(updateInfo);
             }
             mStvCheck.setShaderEnable(true);
