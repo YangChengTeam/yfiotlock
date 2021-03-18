@@ -64,4 +64,16 @@ public class DeviceEngin extends BaseEngin {
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
+
+    public Observable<ResultInfo<String>> setDeviceVolume(String id, int volume) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("locker_id", id);
+        map.put("volume", volume + "");
+        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_SET_VOLUME_URL,
+                new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
 }
