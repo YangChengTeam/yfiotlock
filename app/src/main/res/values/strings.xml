@@ -106,6 +106,10 @@
     <string name="pwd_tip">请牢记密码，忘记后将无法找回，仅能通过重新添加设备到扬飞智能APP中后清除密码</string>
     <string name="input_new_pwd">输入新密码</string>
     <string name="_6_number_safe_pwd">6位数字安全密码</string>
+    <string name="scan_qa_title">扫描不到要添加的设备怎么办？</string>
+    <string name="scan_qa_answer">可能由于当前网络环境较差或设备已被他人绑定。\n\n1、请确保手机与设备之间的距离足够近，并且周围网络环境没有强干扰。\n\n2、同时需确认扬飞智能应用的定位权限未被关闭。若手动关闭了应用定位权限可能会导致无法自动发现设备。\n\n3、如果仍始终无法发现设备，可能因为设备已经被他人绑定了。如果你并不清楚是谁连接了设备，可以进行重置，重置方式请查阅说明书。\n\n4、蓝牙设备请检查设备是否正常通电，手机蓝牙是否已经打开。</string>
+    <string name="find_nearby_can_connect_devices">发现附近可以连接的设备</string>
+    <string name="rescan">再次扫描</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>
