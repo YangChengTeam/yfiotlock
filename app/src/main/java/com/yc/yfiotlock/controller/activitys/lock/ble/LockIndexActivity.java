@@ -377,7 +377,6 @@ public class LockIndexActivity extends BaseActivity {
     // 进入开门方式管理
     private void nav2OpenLock() {
         Intent intent = new Intent(this, BaseOpenLockManagerActivity.class);
-        intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
 
@@ -391,6 +390,7 @@ public class LockIndexActivity extends BaseActivity {
     // 进入日志管理
     private void nav2Log() {
         Intent intent = new Intent(this, LockLogActivity.class);
+        intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
 
