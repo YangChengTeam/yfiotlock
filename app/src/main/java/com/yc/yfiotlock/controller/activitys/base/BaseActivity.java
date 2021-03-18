@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.base;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -91,6 +92,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPermissionHelper.onRequestPermissionsResult(this, requestCode);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (!App.isLogin()
@@ -103,7 +110,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
 
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void stub(EventStub stub) {}
+    public void stub(EventStub stub) {
+    }
 
     @Override
     protected void onDestroy() {
