@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.coorchice.library.SuperTextView;
@@ -10,13 +12,14 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 import butterknife.BindView;
 import butterknife.OnClick;
 
+/**
+ * @author Dullyoung
+ */
 public class DeviceNameEditActivity extends BaseActivity {
 
 
     @BindView(R.id.bnb_title)
     BackNavBar mBnbTitle;
-    @BindView(R.id.stv_sure)
-    SuperTextView mSTvSure;
     @BindView(R.id.et_name)
     EditText mEtName;
 
@@ -33,6 +36,8 @@ public class DeviceNameEditActivity extends BaseActivity {
             mEtName.setText(name);
             mEtName.setSelection(name.length());
         }
+        mEtName.requestFocus();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
 

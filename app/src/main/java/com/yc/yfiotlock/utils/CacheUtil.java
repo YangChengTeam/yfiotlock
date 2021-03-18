@@ -49,7 +49,7 @@ public class CacheUtil {
                 }); //范型已被擦除 --！
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return resultInfo;
     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -78,6 +79,7 @@ public class FeedBackActivity extends BaseActivity {
     @Override
     protected void initViews() {
         setRvPic();
+        mEtQuestion.requestFocus();
     }
 
     FeedBackAdapter mFeedBackAdapter;

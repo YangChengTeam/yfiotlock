@@ -3,16 +3,24 @@ package com.yc.yfiotlock.helper;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PermissionHelper {
+    public static final int REQUEST_MANAGE_ALL_FILE_CODE = 1025;
+    public static final int REQUEST_NORMAL_PERMISSION_CODE = 1024;
+
     private String[] mustPermissions = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
 
@@ -26,8 +34,27 @@ public class PermissionHelper {
 
     public PermissionHelper justStoragePermission() {
         this.mustPermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.ACCESS_COARSE_LOCATION};
+                Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_COARSE_LOCATION};
         return this;
+    }
+
+    private boolean checkManagerExternalStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        } else {
+            return true;
+        }
+    }
+
+
+    public void checkAndRequestManagerExternalStoragePermission(Activity activity, OnRequestPermissionsCallback callback) {
+        this.onRequestPermissionsCallback = callback;
+        if (checkManagerExternalStoragePermission()) {
+            this.onRequestPermissionsCallback.onRequestPermissionSuccess();
+        } else {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            activity.startActivityForResult(intent, REQUEST_MANAGE_ALL_FILE_CODE);
+        }
     }
 
     public void checkAndRequestPermission(Activity activity, OnRequestPermissionsCallback onRequestPermissionsCallback) {
@@ -46,7 +73,7 @@ public class PermissionHelper {
             }
             return;
         }
-        ActivityCompat.requestPermissions(activity, mustPermissions, 1024);
+        ActivityCompat.requestPermissions(activity, mustPermissions, REQUEST_NORMAL_PERMISSION_CODE);
     }
 
     @TargetApi(23)
@@ -56,31 +83,57 @@ public class PermissionHelper {
         }
         List<String> lackedPermission = new ArrayList<>();
         for (String permissions : mustPermissions) {
-            if (!(ContextCompat.checkSelfPermission(activity, permissions) == PackageManager.PERMISSION_GRANTED)) {
+            if (ContextCompat.checkSelfPermission(activity, permissions) != PackageManager.PERMISSION_GRANTED) {
                 lackedPermission.add(permissions);
             }
         }
 
-        if (0 == lackedPermission.size()) {
-            return true;
-        }
-
-        return false;
+        return 0 == lackedPermission.size();
     }
 
+    /**
+     * {@link androidx.appcompat.app.AppCompatActivity#startActivityForResult(Intent, int)}这个方法会回调两次
+     * 用 callBackTime 来做限制
+     */
+    private long callBackTime = 0;
+
     public void onRequestPermissionsResult(Activity activity, int requestCode) {
-        if (!(activity instanceof Activity)) {
+        if (!(activity instanceof BaseActivity)) {
             return;
         }
-        if (requestCode == 1024 && checkMustPermissions(activity)) {
-            if (onRequestPermissionsCallback != null) {
-                onRequestPermissionsCallback.onRequestPermissionSuccess();
-            }
-        } else {
-            if (onRequestPermissionsCallback != null) {
-                onRequestPermissionsCallback.onRequestPermissionError();
-            }
+
+        switch (requestCode) {
+            case REQUEST_NORMAL_PERMISSION_CODE:
+                if (checkMustPermissions(activity)) {
+                    if (onRequestPermissionsCallback != null) {
+                        onRequestPermissionsCallback.onRequestPermissionSuccess();
+                    }
+                } else {
+                    if (onRequestPermissionsCallback != null) {
+                        onRequestPermissionsCallback.onRequestPermissionError();
+                    }
+                }
+                break;
+            case REQUEST_MANAGE_ALL_FILE_CODE:
+                if (System.currentTimeMillis() - callBackTime < 1000) {
+                    return;
+                }
+                callBackTime = System.currentTimeMillis();
+                if (checkManagerExternalStoragePermission()) {
+                    if (onRequestPermissionsCallback != null) {
+                        onRequestPermissionsCallback.onRequestPermissionSuccess();
+                    }
+                } else {
+                    if (onRequestPermissionsCallback != null) {
+                        onRequestPermissionsCallback.onRequestPermissionError();
+                    }
+                }
+                break;
+            default:
+                break;
         }
+
+
     }
 
     private OnRequestPermissionsCallback onRequestPermissionsCallback;

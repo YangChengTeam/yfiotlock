@@ -16,6 +16,10 @@ public class UserInfo {
     private String model;
 
     private String mobile;
+    /**
+     * 智能设备的数量
+     */
+    @JSONField(name = "locker_number")
     private String deviceNumber;
 
     public String getSign() {
@@ -78,9 +82,8 @@ public class UserInfo {
     }
 
 
-
     public String getDeviceNumber() {
-        return deviceNumber == null ? "1" : deviceNumber;
+        return deviceNumber == null ? "0" : deviceNumber;
     }
 
     public void setDeviceNumber(String deviceNumber) {

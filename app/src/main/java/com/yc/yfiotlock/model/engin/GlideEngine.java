@@ -13,6 +13,8 @@ import com.bumptech.glide.request.transition.Transition;
 import com.coorchice.library.ImageEngine;
 import com.coorchice.library.image_engine.Engine;
 
+import java.util.HashMap;
+
 /*
  * Created by　Dullyoung on 2021/3/4
  */

@@ -2,7 +2,6 @@ package com.yc.yfiotlock.controller.fragments.lock.ble;
 
 import android.content.Intent;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,16 +12,16 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.AddDeviceActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.add.ScanDeviceActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
-import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -34,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import rx.Subscriber;
-import rx.functions.Action1;
 
 public class IndexFragment extends BaseFragment {
 
@@ -94,7 +92,13 @@ public class IndexFragment extends BaseFragment {
 
     private void loadData() {
         BaseActivity baseActivity = (BaseActivity) getActivity();
-        baseActivity.mLoadingDialog.show("加载中...");
+        IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
+        if (indexInfo != null) {
+            familyInfo = indexInfo.getFamilyInfo();
+            indexDeviceAdapter.setNewInstance(indexInfo.getDeviceInfos());
+        } else {
+            baseActivity.mLoadingDialog.show("加载中...");
+        }
         indexEngin.getIndexInfo().subscribe(new Subscriber<ResultInfo<IndexInfo>>() {
             @Override
             public void onCompleted() {
@@ -116,6 +120,7 @@ public class IndexFragment extends BaseFragment {
                     }
                     deviceInfoList.add(new DeviceInfo());
                     indexDeviceAdapter.setNewInstance(deviceInfoList);
+                    CacheUtil.setCache(Config.INDEX_DETAIL_URL, resultInfo.getData());
                 }
             }
         });
@@ -143,7 +148,8 @@ public class IndexFragment extends BaseFragment {
             ToastCompat.show(getActivity(), "家庭信息未加载");
             return;
         }
-        Intent intent = new Intent(getActivity(), AddDeviceActivity.class);
+        Intent intent = new Intent(getActivity(), ScanDeviceActivity.class);
+        intent.putExtra("family", familyInfo);
         startActivity(intent);
     }
 

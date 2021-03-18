@@ -43,8 +43,8 @@
         <activity android:name=".controller.activitys.lock.ble.FAQDetailActivity" />
         <activity
             android:name=".controller.activitys.lock.ble.FeedBackActivity"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize|keyboard"
-            android:windowSoftInputMode="adjustNothing" />
+            android:configChanges="orientation|navigation|screenSize"
+            android:windowSoftInputMode="adjustNothing|stateAlwaysVisible" />
         <activity android:name=".controller.activitys.lock.ble.FAQActivity" />
         <activity android:name=".controller.activitys.lock.ble.DeviceInfoActivity" />
         <activity android:name=".controller.activitys.lock.ble.DeviceNameEditActivity" />
@@ -78,7 +78,7 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
             android:launchMode="singleTask" />
         <activity
-            android:name=".controller.activitys.lock.ble.AddDeviceActivity"
+            android:name=".controller.activitys.lock.ble.add.ScanDeviceActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.ble.PasswordAddOpenLockActivity"
