@@ -95,6 +95,7 @@ public class OpenLockActivty extends BaseActivity {
                             "后开启门锁";
                     tvHint.setText(Html.fromHtml(text));
                 } else {
+                    mLoadingDialog.dismiss();
                     clOpenLock.setVisibility(View.GONE);
                     clOpenFail.setVisibility(View.VISIBLE);
                 }
