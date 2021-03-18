@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
+import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
@@ -33,6 +34,12 @@ public class VisitorManageActivity extends BaseActivity {
 
     private ItemAdapter itemAdapter;
     private DeviceInfo deviceInfo;
+
+    public static void start(Context context, DeviceInfo deviceInfo) {
+        Intent intent = new Intent(context, VisitorManageActivity.class);
+        intent.putExtra("device", deviceInfo);
+        context.startActivity(intent);
+    }
 
     @Override
     protected int getLayoutId() {

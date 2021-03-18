@@ -27,7 +27,7 @@ public class LogEngine extends BaseEngin {
         return null;
     }
 
-    public Observable<ResultInfo<LogListInfo>> getOpenLog(int lockerId, int page, int pageSize) {
+    public Observable<ResultInfo<LogListInfo>> getOpenLog(String lockerId, int page, int pageSize) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("user_id", UserInfoCache.getUserInfo().getId());
@@ -41,7 +41,7 @@ public class LogEngine extends BaseEngin {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    public Observable<ResultInfo<WarnListInfo>> getWarnLog(int lockerId, int page, int pageSize) {
+    public Observable<ResultInfo<WarnListInfo>> getWarnLog(String lockerId, int page, int pageSize) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("user_id", UserInfoCache.getUserInfo().getId());

@@ -7,6 +7,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.WarnInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.WarnListInfo;
 import com.yc.yfiotlock.model.engin.LogEngine;
@@ -29,10 +30,15 @@ public class AlarmsFragment extends BaseFragment {
 
     private int page = 1;
     private int pageSize = 10;
-    private int lockerId = 3;
+    private final DeviceInfo deviceInfo;
+
 
     private WarnAdapter warnAdapter;
     private LogEngine logEngine;
+
+    public AlarmsFragment(DeviceInfo deviceInfo) {
+        this.deviceInfo = deviceInfo;
+    }
 
     @Override
     protected int getLayoutId() {
@@ -69,7 +75,10 @@ public class AlarmsFragment extends BaseFragment {
 
 
     private void loadData() {
-        logEngine.getWarnLog(lockerId, page, pageSize).subscribe(new Observer<ResultInfo<WarnListInfo>>() {
+        if (deviceInfo == null) {
+            return;
+        }
+        logEngine.getWarnLog(deviceInfo.getId(), page, pageSize).subscribe(new Observer<ResultInfo<WarnListInfo>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);
@@ -83,7 +92,7 @@ public class AlarmsFragment extends BaseFragment {
 
             @Override
             public void onNext(ResultInfo<WarnListInfo> logListInfoResultInfo) {
-                if (logListInfoResultInfo.getData() == null||logListInfoResultInfo.getData().getItems() == null || logListInfoResultInfo.getData().getItems().size() == 0) {
+                if (logListInfoResultInfo.getData() == null || logListInfoResultInfo.getData().getItems() == null || logListInfoResultInfo.getData().getItems().size() == 0) {
                     loadDateEmpty();
                     return;
                 }

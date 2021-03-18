@@ -389,16 +389,12 @@ public class LockIndexActivity extends BaseActivity {
 
     // 进入访客管理
     private void nav2Vm() {
-        Intent intent = new Intent(this, VisitorManageActivity.class);
-        intent.putExtra("device", lockInfo);
-        startActivity(intent);
+        VisitorManageActivity.start(this, lockInfo);
     }
 
     // 进入日志管理
     private void nav2Log() {
-        Intent intent = new Intent(this, LockLogActivity.class);
-        intent.putExtra("device", lockInfo);
-        startActivity(intent);
+        LockLogActivity.start(this, lockInfo);
     }
 
     // 进入设置
