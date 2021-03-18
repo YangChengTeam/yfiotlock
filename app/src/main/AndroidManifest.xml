@@ -32,7 +32,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".controller.activitys.lock.ble.SafePwdCreateActivity"></activity>
+        <activity android:name=".controller.activitys.lock.ble.add.DeviceListActivity" />
+        <activity android:name=".controller.activitys.lock.ble.SafePwdCreateActivity" />
         <activity android:name=".controller.activitys.lock.ble.SafePwdSettingActivity" />
         <activity android:name=".controller.activitys.user.WebActivity" />
 
@@ -194,6 +195,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:launchMode="singleTop" />
+        <activity android:name=".controller.activitys.lock.ble.add.QaActivity" />
 
         <provider
             android:name=".download.DownloadProvider"

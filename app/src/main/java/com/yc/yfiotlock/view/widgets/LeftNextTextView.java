@@ -34,8 +34,8 @@ public class LeftNextTextView extends BaseView {
         if (des != null && tvDes != null) {
             tvDes.setText(des);
         }
-        boolean hindLine = a.getBoolean(R.styleable.tab_item_hindLine, false);
-        if (viewLine != null && hindLine) {
+        boolean hideLine = a.getBoolean(R.styleable.tab_item_hideLine, false);
+        if (viewLine != null && hideLine) {
             viewLine.setVisibility(GONE);
         }
     }

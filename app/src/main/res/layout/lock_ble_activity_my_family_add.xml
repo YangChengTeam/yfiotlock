@@ -43,7 +43,7 @@
         android:textColor="#ff999999"
         android:textSize="13sp"
         app:des="请输入详细地址（非必填）"
-        app:hindLine="true"
+        app:hideLine="true"
         app:layout_constraintTop_toBottomOf="@id/tv_family_add_location"
         app:text="详细地址" />
 

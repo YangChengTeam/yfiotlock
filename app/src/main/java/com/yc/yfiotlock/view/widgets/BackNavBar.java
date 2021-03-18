@@ -39,8 +39,8 @@ public class BackNavBar extends BaseView {
         if (title != null && mTitleTV != null) {
             mTitleTV.setText(title);
         }
-        boolean hindLine = a.getBoolean(R.styleable.tab_item_hindLine, false);
-        if (viewLine != null && hindLine) {
+        boolean hideLine = a.getBoolean(R.styleable.tab_item_hideLine, false);
+        if (viewLine != null && hideLine) {
             viewLine.setVisibility(GONE);
         }
         boolean showNext = a.getBoolean(R.styleable.tab_item_showNext, false);
