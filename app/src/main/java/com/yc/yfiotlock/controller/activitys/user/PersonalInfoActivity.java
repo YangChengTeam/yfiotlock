@@ -84,7 +84,7 @@ public class PersonalInfoActivity extends BaseActivity {
     private Uri mImageUri;
     private String mFilePath;
     private String mFileName = "userIcon.png";
-    public static final String mCropIcon = "cropIcon.png";
+    public static final String CROP_ICON_NAME = "cropIcon.png";
 
     @Override
     protected void initViews() {
@@ -210,7 +210,7 @@ public class PersonalInfoActivity extends BaseActivity {
         cut.putExtra("outputY", 480);
         // in Android 11  cropApp cannot use app's private dir ,so we need use public dir
         String publicPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
-        File file = new File(publicPath, mCropIcon);
+        File file = new File(publicPath, CROP_ICON_NAME);
         if (file.exists() && file.delete()) {
             Log.i("aaaa", "onCrop: file.delete" + file.getAbsolutePath());
         }
@@ -339,7 +339,7 @@ public class PersonalInfoActivity extends BaseActivity {
             onCrop(mImageUri);
         }
         if (requestCode == USE_PIC && resultCode == RESULT_OK) {
-            File file = PathUtil.copyFileToPath(getContext(), data.getData(), mFilePath + mCropIcon);
+            File file = PathUtil.copyFileToPath(getContext(), data.getData(), mFilePath + CROP_ICON_NAME);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 //如果是7.0及以上的系统使用FileProvider的方式创建一个Uri
                 mImageUri = FileProvider.getUriForFile(getContext(),
@@ -351,7 +351,7 @@ public class PersonalInfoActivity extends BaseActivity {
             onCrop(mImageUri);
         }
         if (requestCode == USE_CROP && resultCode == RESULT_OK) {
-            zipPic(new File(mFilePath, mCropIcon));
+            zipPic(new File(mFilePath, CROP_ICON_NAME));
         }
 
     }
