@@ -26,6 +26,9 @@ public class UpdateInfo {
     private int isMust;
 
     public int getProgress() {
+        if (totalSize == 0) {
+            return 0;
+        }
         return (int) (offsetSize * 100 / totalSize);
     }
 
@@ -118,8 +121,8 @@ public class UpdateInfo {
         this.downloadStatus = downloadStatus;
     }
 
-    public boolean isMust() {
-        return isMust == 1;
+    public int getIsMust() {
+        return isMust;
     }
 
     public void setMust(int must) {

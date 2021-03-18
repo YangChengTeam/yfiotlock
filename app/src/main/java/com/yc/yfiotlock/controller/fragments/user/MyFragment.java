@@ -87,14 +87,12 @@ public class MyFragment extends BaseFragment {
         mTvDeviceNumber.setText(userInfo.getDeviceNumber().concat("个智能设备"));
     }
 
-    private ItemAdapter mItemAdapter;
-
     private void setRvMy() {
-        mItemAdapter = new ItemAdapter(null);
-        mRvMy.setAdapter(mItemAdapter);
+        ItemAdapter itemAdapter = new ItemAdapter(null);
+        mRvMy.setAdapter(itemAdapter);
         mRvMy.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvMy);
-        mItemAdapter.setOnItemClickListener((adapter, view, position) -> {
+        itemAdapter.setOnItemClickListener((adapter, view, position) -> {
             switch (position) {
                 case 0:
                     startActivity(new Intent(getContext(), SuggestActivity.class));
@@ -109,7 +107,7 @@ public class MyFragment extends BaseFragment {
         List<PersonalInfo> personalInfos = new ArrayList<>();
         personalInfos.add(new PersonalInfo("投诉及建议", R.mipmap.icon_suggest));
         personalInfos.add(new PersonalInfo("关于我们", R.mipmap.icon_us));
-        mItemAdapter.setNewInstance(personalInfos);
+        itemAdapter.setNewInstance(personalInfos);
     }
 
 

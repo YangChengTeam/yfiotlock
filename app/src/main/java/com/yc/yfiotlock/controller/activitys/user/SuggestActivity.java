@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
 import android.os.Bundle;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -54,6 +55,9 @@ public class SuggestActivity extends BaseActivity {
             }
             commit();
         });
+
+        mEtSuggest.requestFocus();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
 

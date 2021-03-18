@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -15,6 +16,7 @@ import android.view.KeyEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
 import com.liulishuo.okdownload.DownloadTask;
@@ -31,9 +33,11 @@ import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -110,7 +114,15 @@ public class DownloadManager {
         return !TextUtils.isEmpty(url) && (url.startsWith("http://") || url.startsWith("https://")) && url.endsWith(".apk");
     }
 
-    public static void updateApp(UpdateInfo upgradeInfo) {
+    private static void saveDownloadCache(UpdateInfo updateInfo) {
+        CacheUtil.setCache(Config.UPDATE_URL + Build.VERSION.SDK_INT, updateInfo);
+    }
+
+    public static UpdateInfo getUpdateInfo() {
+        return CacheUtil.getCache(Config.UPDATE_URL + Build.VERSION.SDK_INT, UpdateInfo.class);
+    }
+
+    public static void updateApp(UpdateInfo updateInfo) {
         requestPermissionCount++;
         BaseActivity baseActivity = (BaseActivity) CommonUtil.findActivity(getContext());
         if (baseActivity != null && baseActivity instanceof BaseActivity) {
@@ -121,20 +133,20 @@ public class DownloadManager {
             baseActivity.getPermissionHelper().checkAndRequestPermission(baseActivity, new PermissionHelper.OnRequestPermissionsCallback() {
                 @Override
                 public void onRequestPermissionSuccess() {
-                    if (!checkDownLoadUrlCorrect(upgradeInfo.getDownUrl())) {
-                        ToastCompat.showCenter(getContext(), upgradeInfo.getDownUrl() + "下载地址有误，请联系客服");
+                    if (!checkDownLoadUrlCorrect(updateInfo.getDownUrl())) {
+                        ToastCompat.showCenter(getContext(), updateInfo.getDownUrl() + "下载地址有误，请联系客服");
                         return;
                     }
                     DownloadManager.init(new WeakReference<>(baseActivity));
 
-                    DownloadTask task = new DownloadTask.Builder(upgradeInfo.getDownUrl(), new File(parentDir))
+                    DownloadTask task = new DownloadTask.Builder(updateInfo.getDownUrl(), new File(parentDir))
                             .setConnectionCount(1)
-                            .setFilename(getUpdateFileName(upgradeInfo))
+                            .setFilename(getUpdateFileName(updateInfo))
                             .setMinIntervalMillisCallbackProcess(500)
                             .setPassIfAlreadyCompleted(true)
                             .setPreAllocateLength(false)
                             .build();
-                    task.setTag(upgradeInfo);
+                    task.setTag(updateInfo);
 
                     mDownloadListener = new DownloadListener4WithSpeed() {
                         @Override
@@ -156,12 +168,12 @@ public class DownloadManager {
                         public void infoReady(@NonNull DownloadTask task, @NonNull BreakpointInfo info, boolean fromBreakpoint, @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
 
                             if (task.getTag() instanceof UpdateInfo) {
-                                UpdateInfo upgradeInfo = (UpdateInfo) task.getTag();
-                                upgradeInfo.setTotalSize(info.getTotalLength());
-                                upgradeInfo.setOffsetSize(info.getTotalOffset());
-                                upgradeInfo.setDownloading(true);
-                                Log.i(TAG, "infoReady: " + upgradeInfo.getProgress());
-                                EventBus.getDefault().post(upgradeInfo);
+                                UpdateInfo updateInfo = (UpdateInfo) task.getTag();
+                                updateInfo.setTotalSize(info.getTotalLength());
+                                updateInfo.setOffsetSize(info.getTotalOffset());
+                                updateInfo.setDownloading(true);
+                                Log.i(TAG, "infoReady: " + updateInfo.getProgress());
+                                EventBus.getDefault().post(updateInfo);
                             }
                         }
 
@@ -174,11 +186,12 @@ public class DownloadManager {
                         public void progress(@NonNull DownloadTask task, long currentOffset, @NonNull SpeedCalculator taskSpeed) {
                             Log.i(TAG, "progress: " + currentOffset);
                             if (task.getTag() instanceof UpdateInfo) {
-                                UpdateInfo upgradeInfo = (UpdateInfo) task.getTag();
-                                upgradeInfo.setSpeed(taskSpeed.speed());
-                                upgradeInfo.setOffsetSize(currentOffset);
-                                upgradeInfo.setDownloading(true);
-                                EventBus.getDefault().post(upgradeInfo);
+                                UpdateInfo updateInfo = (UpdateInfo) task.getTag();
+                                updateInfo.setSpeed(taskSpeed.speed());
+                                updateInfo.setOffsetSize(currentOffset);
+                                updateInfo.setDownloading(true);
+                                EventBus.getDefault().post(updateInfo);
+                                saveDownloadCache(updateInfo);
                             }
                         }
 
@@ -192,6 +205,7 @@ public class DownloadManager {
                             Log.i(TAG, "taskEnd: " + cause);
                             UpdateInfo updateInfo = (UpdateInfo) task.getTag();
                             if (cause == EndCause.COMPLETED) {
+                                saveDownloadCache(updateInfo);
                                 File file = new File(parentDir, getUpdateFileName(updateInfo));
                                 long offsetSize = getFileSize(file);
                                 if (offsetSize != 0) {
@@ -203,13 +217,15 @@ public class DownloadManager {
                                         redownload(task, updateInfo);
                                         return;
                                     }
+                                    updateInfo.setTotalSize(offsetSize);
+                                    updateInfo.setOffsetSize(offsetSize);
                                     installSelf(updateInfo);
-                                    if (task.getTag() instanceof UpdateInfo) {
-                                        UpdateInfo upgradeInfo = (UpdateInfo) task.getTag();
-                                        upgradeInfo.setDownloading(false);
-                                        EventBus.getDefault().post(upgradeInfo);
-                                    }
+                                    updateInfo.setDownloading(false);
+                                    EventBus.getDefault().post(updateInfo);
+                                    saveDownloadCache(updateInfo);
                                 }
+                            } else {
+                                ToastCompat.show(getContext(), "更新失败" + realCause);
                             }
                         }
                     };
@@ -243,7 +259,7 @@ public class DownloadManager {
                         return;
                     }
                     ToastCompat.show(getContext(), "请授予存储权限");
-                    updateApp(upgradeInfo);
+                    updateApp(updateInfo);
 
                 }
 
@@ -251,15 +267,15 @@ public class DownloadManager {
         }
     }
 
-    public static void installSelf(UpdateInfo upgradeInfo) {
-        File file = new File(parentDir, getUpdateFileName(upgradeInfo));
+    public static void installSelf(UpdateInfo updateInfo) {
+        File file = new File(parentDir, getUpdateFileName(updateInfo));
         String packageName = DownloadUtils.getPackageNameByFile(getContext(), file);
         if (TextUtils.isEmpty(packageName)) {
             if (file.delete()) {
-                upgradeInfo.setDownloading(true);
+                updateInfo.setDownloading(true);
                 ToastCompat.show(getContext(), getContext().getResources().getString(R.string.download_again_tip));
             }
-            updateApp(upgradeInfo);
+            updateApp(updateInfo);
         } else {
             DownloadUtils.installApp(getContext(), file);
         }

@@ -175,6 +175,7 @@
         app:stv_shaderMode="topToBottom"
         app:stv_shaderStartColor="#34A2FF" />
 
+
     <com.coorchice.library.SuperTextView
         android:id="@+id/stv_send"
         android:layout_width="match_parent"
@@ -184,14 +185,16 @@
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="@string/commit"
-        android:textColor="#3395FD"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:stv_corner="18dp"
         app:stv_pressBgColor="@color/pressedColor"
-        app:stv_pressTextColor="#553395FD"
-        app:stv_stroke_color="#3395FD"
-        app:stv_stroke_width="0.67dp" />
+        app:stv_shaderEnable="true"
+        app:stv_shaderEndColor="@color/color_end"
+        app:stv_shaderMode="topToBottom"
+        app:stv_shaderStartColor="#34A2FF" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
