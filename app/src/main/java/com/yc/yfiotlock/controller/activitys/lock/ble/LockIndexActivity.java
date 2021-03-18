@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import rx.Subscriber;
+import rx.functions.Action1;
 
 public class LockIndexActivity extends BaseActivity {
     @BindView(R.id.iv_back)
@@ -91,12 +92,17 @@ public class LockIndexActivity extends BaseActivity {
     public DeviceInfo getLockInfo() {
         return lockInfo;
     }
+
     public BleDevice getBleDevice() {
         return bleDevice;
     }
-    public FamilyInfo getFamilyInfo() { return familyInfo; }
+
+    public FamilyInfo getFamilyInfo() {
+        return familyInfo;
+    }
 
     private static LockIndexActivity mInstance;
+
     public static LockIndexActivity getInstance() {
         return mInstance;
     }
@@ -377,12 +383,14 @@ public class LockIndexActivity extends BaseActivity {
     // 进入访客管理
     private void nav2Vm() {
         Intent intent = new Intent(this, VisitorManageActivity.class);
+        intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
 
     // 进入日志管理
     private void nav2Log() {
         Intent intent = new Intent(this, LockLogActivity.class);
+        intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
 
@@ -392,9 +400,9 @@ public class LockIndexActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    private int setCountInfo(){
+    private int setCountInfo() {
         int type = 1;
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL+ type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
         }
@@ -414,19 +422,9 @@ public class LockIndexActivity extends BaseActivity {
     // 开门方式数量
     private void loadLockOpenCountInfo() {
         int type = setCountInfo();
-        lockEngine.getOpenLockInfoCount(lockInfo.getId(), type + "").subscribe(new Subscriber<ResultInfo<OpenLockCountInfo>>() {
+        lockEngine.getOpenLockInfoCount(lockInfo.getId(), type + "").subscribe(new Action1<ResultInfo<OpenLockCountInfo>>() {
             @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(ResultInfo<OpenLockCountInfo> openLockCountInfoResultInfo) {
+            public void call(ResultInfo<OpenLockCountInfo> openLockCountInfoResultInfo) {
                 if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
                     OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
                     openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
