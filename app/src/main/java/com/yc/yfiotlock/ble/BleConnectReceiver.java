@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
+
 public class BleConnectReceiver extends BroadcastReceiver {
-    public BleConnectReceiver(){}
+    public BleConnectReceiver() {
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {

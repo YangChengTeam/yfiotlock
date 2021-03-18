@@ -80,7 +80,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
     private void loadData() {
         String way = BleUtil.getType(title) + "";
-        List<OpenLockInfo> lockInfos = CacheUtil.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, new TypeReference<List<OpenLockInfo>>() {
+        List<OpenLockInfo> lockInfos = CacheUtil.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + way + type, new TypeReference<List<OpenLockInfo>>() {
         }.getType());
         if (lockInfos != null) {
             openLockAdapter.setNewInstance(lockInfos);
@@ -103,7 +103,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                 if (listResultInfo.getCode() == 1 && listResultInfo.getData() != null) {
                     List<OpenLockInfo> lockInfos = listResultInfo.getData();
                     openLockAdapter.setNewInstance(lockInfos);
-                    CacheUtil.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + type, lockInfos);
+                    CacheUtil.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + way + type, lockInfos);
                     if (lockInfos.size() == 0) {
                         nodataView.setVisibility(View.VISIBLE);
                         nodataView.setMessage("暂无" + title + "数据");

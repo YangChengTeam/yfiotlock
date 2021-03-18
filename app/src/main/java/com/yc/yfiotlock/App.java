@@ -42,6 +42,7 @@ public class App extends Application {
         initHttp();
         initCommonConfig();
         initBauduMap();
+
     }
 
     private void initBauduMap() {

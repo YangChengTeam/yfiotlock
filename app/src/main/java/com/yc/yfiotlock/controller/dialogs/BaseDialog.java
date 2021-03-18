@@ -44,6 +44,7 @@ public abstract class BaseDialog extends Dialog {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         view.setLayoutParams(layoutParams);
 
         setCancelable(true);

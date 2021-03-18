@@ -78,7 +78,7 @@
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"
             android:launchMode="singleTask" />
         <activity
-            android:name=".controller.activitys.lock.ble.AddDeviceActivity"
+            android:name=".controller.activitys.lock.ble.add.ScanDeviceActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
             android:name=".controller.activitys.lock.ble.PasswordAddOpenLockActivity"
