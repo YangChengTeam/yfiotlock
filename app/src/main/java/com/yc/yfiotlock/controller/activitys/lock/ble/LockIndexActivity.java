@@ -46,6 +46,7 @@ import com.yc.yfiotlock.utils.CacheUtil;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -91,12 +92,17 @@ public class LockIndexActivity extends BaseActivity {
     public DeviceInfo getLockInfo() {
         return lockInfo;
     }
+
     public BleDevice getBleDevice() {
         return bleDevice;
     }
-    public FamilyInfo getFamilyInfo() { return familyInfo; }
+
+    public FamilyInfo getFamilyInfo() {
+        return familyInfo;
+    }
 
     private static LockIndexActivity mInstance;
+
     public static LockIndexActivity getInstance() {
         return mInstance;
     }
@@ -109,8 +115,14 @@ public class LockIndexActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        familyInfo = (FamilyInfo) getIntent().getSerializableExtra("device");
-        lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
+        Serializable device = getIntent().getSerializableExtra("device");
+        if (device instanceof DeviceInfo) {
+            lockInfo = (DeviceInfo) device;
+        }
+        Serializable family = getIntent().getSerializableExtra("family");
+        if (device instanceof FamilyInfo) {
+            familyInfo = (FamilyInfo) family;
+        }
         lockEngine = new LockEngine(this);
     }
 
@@ -392,9 +404,9 @@ public class LockIndexActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    private int setCountInfo(){
+    private int setCountInfo() {
         int type = 1;
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL+ type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
         }
