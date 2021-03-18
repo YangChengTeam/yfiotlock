@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
@@ -153,4 +155,20 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+
+    /**
+     * 按下返回键时 通过ACTION 和 CATEGORY 加Flag {@link Intent#CATEGORY_HOME}返回桌面而不关闭当前activity
+     */
+    @Override
+    public void onBackPressed() {
+        Intent home = new Intent(Intent.ACTION_MAIN);
+        home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        home.addCategory(Intent.CATEGORY_HOME);
+        startActivity(home);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
