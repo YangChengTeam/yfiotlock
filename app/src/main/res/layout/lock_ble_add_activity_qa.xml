@@ -5,9 +5,10 @@
     android:layout_height="match_parent">
 
     <com.yc.yfiotlock.view.widgets.BackNavBar
-        android:id="@+id/bnb_title"
+        android:id="@+id/view_nav_bar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        app:hideLine="true"
         app:layout_constraintTop_toTopOf="parent"
         app:text="扫描不到怎么办？" />
 
@@ -21,7 +22,7 @@
         android:textColor="#222222"
         android:textSize="15dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bnb_title" />
+        app:layout_constraintTop_toBottomOf="@id/view_nav_bar" />
 
     <View
         android:id="@+id/view_line"
@@ -39,6 +40,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="15dp"
+        android:lineSpacingExtra="4dp"
         android:text="@string/scan_qa_answer"
         android:textColor="#999999"
         android:textSize="14dp"

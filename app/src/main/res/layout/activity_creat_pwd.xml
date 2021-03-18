@@ -163,7 +163,7 @@
                     android:layout_height="55dp"
                     android:background="@color/white"
                     app:des="请选择"
-                    app:hindLine="true"
+                    app:hideLine="true"
                     app:layout_constraintTop_toBottomOf="@id/lnt_start_time"
                     app:text="@string/end_time" />
 
@@ -195,7 +195,7 @@
                     android:layout_height="55dp"
                     android:background="@color/white"
                     app:des="请选择"
-                    app:hindLine="true"
+                    app:hideLine="true"
                     app:layout_constraintTop_toBottomOf="@id/lnt_start_date"
                     app:text="@string/end_date" />
             </androidx.constraintlayout.widget.ConstraintLayout>

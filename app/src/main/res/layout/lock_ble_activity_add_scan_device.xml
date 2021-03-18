@@ -2,18 +2,79 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/grayBg">
+    android:layout_height="match_parent">
 
     <com.yc.yfiotlock.view.widgets.BackNavBar
         android:id="@+id/view_nav_bar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        app:hideLine="true"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:text="添加智能设备" />
 
+    <ImageView
+        android:id="@+id/iv_scan_bg"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_marginTop="60dp"
+        android:src="@mipmap/icon_scan_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view_nav_bar" />
 
+    <ImageView
+        android:id="@+id/iv_scan_flag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/icon_scan_flag"
+        app:layout_constraintBottom_toBottomOf="@id/iv_scan_bg"
+        app:layout_constraintEnd_toEndOf="@id/iv_scan_bg"
+        app:layout_constraintStart_toStartOf="@id/iv_scan_bg"
+        app:layout_constraintTop_toTopOf="@id/iv_scan_bg" />
+
+    <TextView
+        android:id="@+id/tv_scan_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+
+        android:textColor="#222222"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_scan_bg" />
+
+    <TextView
+        android:id="@+id/tv_scan_qa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="#3395FD"
+        android:textSize="13dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_scan_state" />
+
+
+    <com.coorchice.library.SuperTextView
+        android:id="@+id/stv_rescan"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        app:stv_corner="20dp"
+        android:layout_marginBottom="18dp"
+        android:gravity="center"
+        android:text="@string/rescan"
+        android:textColor="@color/white"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:stv_pressBgColor="@color/pressedColor"
+        app:stv_shaderEnable="true"
+        app:stv_shaderEndColor="@color/color_end"
+        app:stv_shaderMode="topToBottom"
+        app:stv_shaderStartColor="@color/color_start" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
