@@ -85,6 +85,16 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
         });
     }
 
+    /**
+     * @param view     view
+     * @param runnable when click to do sth.
+     */
+    protected void setClick(@NonNull View view, @NonNull Runnable runnable) {
+        RxView.clicks(view).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view1 -> {
+            runnable.run();
+        });
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
