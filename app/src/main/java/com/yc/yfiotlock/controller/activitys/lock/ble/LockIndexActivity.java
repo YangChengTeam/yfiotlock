@@ -81,6 +81,8 @@ public class LockIndexActivity extends BaseActivity {
     private DeviceInfo lockInfo;
     private LockBLESend lockBleSend;
 
+    private boolean isOpening;
+
     public DeviceInfo getLockInfo() {
         return lockInfo;
     }
@@ -116,6 +118,7 @@ public class LockIndexActivity extends BaseActivity {
             familyInfo = (FamilyInfo) family;
         }
         lockEngine = new LockEngine(this);
+        bleDevice = getIntent().getParcelableExtra("bleDevice");
     }
 
     @Override
@@ -145,23 +148,26 @@ public class LockIndexActivity extends BaseActivity {
         });
 
         RxView.clicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (connectStatus == CONNECT_STATUS.CONNECT_FAILED) {
+            if (!LockBLEManager.isConnected(bleDevice)) {
                 scan();
             }
         });
 
         RxView.longClicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (connectStatus == CONNECT_STATUS.CONNECT_SUCC) {
+            if (LockBLEManager.isConnected(bleDevice)) {
                 open();
             }
         });
-        scan();
+
+        if (bleDevice == null) {
+            scan();
+        }
 
         shakeSensor = new ShakeSensor(this);
         shakeSensor.setShakeListener(new ShakeSensor.OnShakeListener() {
             @Override
             public void onShakeComplete(SensorEvent event) {
-                if (connectStatus == CONNECT_STATUS.CONNECT_SUCC) {
+                if (LockBLEManager.isConnected(bleDevice)) {
                     // 开门
                     open();
                 }
@@ -175,7 +181,7 @@ public class LockIndexActivity extends BaseActivity {
         shakeSensor.register();
 
         // 重新连接
-        if (bleDevice != null && connectStatus == CONNECT_STATUS.CONNECT_FAILED) {
+        if (LockBLEManager.isConnected(bleDevice)) {
             reconnect();
         }
     }
@@ -199,7 +205,8 @@ public class LockIndexActivity extends BaseActivity {
     }
 
     private void open() {
-        connectStatus = CONNECT_STATUS.CONNECT_OPING;
+        if(isOpening) return;
+        isOpening = true;
 
         loadingIv.setImageResource(R.mipmap.three);
         statusTitleTv.setText("正在开锁...");
@@ -216,11 +223,11 @@ public class LockIndexActivity extends BaseActivity {
             BleManager.getInstance().enableBluetooth();
             return;
         }
+        LockBLEManager.initConfig2(lockInfo.getMacAddress());
         LockBLEManager.scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override
             public void onScanStarted() {
                 // 设置搜索状态
-                connectStatus = CONNECT_STATUS.CONNECTING;
                 loadingIv.setImageResource(R.mipmap.two);
                 statusIv.setImageResource(R.mipmap.icon_bluetooth);
                 statusTitleTv.setText("搜索门锁中...");
@@ -242,7 +249,6 @@ public class LockIndexActivity extends BaseActivity {
             @Override
             public void onScanFailed() {
                 // 搜索完成未发现设备
-                connectStatus = CONNECT_STATUS.CONNECT_FAILED;
                 stopAnimations();
                 statusTitleTv.setText("未搜索到门锁");
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
@@ -264,7 +270,6 @@ public class LockIndexActivity extends BaseActivity {
             @Override
             public void onDisconnect(BleDevice bleDevice) {
                 // 设置连接失败状态
-                connectStatus = CONNECT_STATUS.CONNECT_FAILED;
                 stopAnimations();
                 statusTitleTv.setText("门锁未连接");
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
@@ -278,7 +283,6 @@ public class LockIndexActivity extends BaseActivity {
                 lockBleSend = new LockBLESend(LockIndexActivity.this, bleDevice);
 
                 // 设置连接成功状态
-                connectStatus = CONNECT_STATUS.CONNECT_SUCC;
                 stopAnimations();
                 statusTitleTv.setText("已连接门锁");
                 opDespTv.setText("长按按钮或者摇一摇开锁");
@@ -290,7 +294,6 @@ public class LockIndexActivity extends BaseActivity {
 
             @Override
             public void onConnectFailed() {
-                connectStatus = CONNECT_STATUS.CONNECT_FAILED;
                 stopAnimations();
                 statusTitleTv.setText("门锁连接失败");
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
@@ -318,7 +321,7 @@ public class LockIndexActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onProcess(LockBLEData bleData) {
         if (bleData != null && bleData.getMcmd() == (byte) 0x02 && bleData.getScmd() == (byte) 0x01) {
-            connectStatus = CONNECT_STATUS.CONNECT_SUCC;
+            isOpening = false;
             stopAnimations();
             if (bleData.getStatus() == (byte) 0x00) {
                 statusTitleTv.setText("门锁已打开");
@@ -396,14 +399,5 @@ public class LockIndexActivity extends BaseActivity {
         }
         // 处理授权回调
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
-    }
-
-    private CONNECT_STATUS connectStatus;
-
-    private enum CONNECT_STATUS {
-        CONNECTING,
-        CONNECT_FAILED,
-        CONNECT_SUCC,
-        CONNECT_OPING
     }
 }

@@ -82,7 +82,7 @@ public class ScanDeviceActivity extends BaseBackActivity {
     private void setStartInfo() {
         AnimatinUtil.rotate(mIvScanFlag);
         mStvRescan.setVisibility(View.GONE);
-        mTvScanState.setText("正在扫描");
+        mTvScanState.setText("正在扫描...");
         mTvScanQa.setText("扫描不到怎么办？");
     }
 

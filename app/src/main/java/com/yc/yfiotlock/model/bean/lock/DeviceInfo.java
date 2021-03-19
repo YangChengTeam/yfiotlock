@@ -80,6 +80,22 @@ public class DeviceInfo implements Serializable {
         this.deviceId = deviceId;
     }
 
+    public String getMacAddress() {
+        return macAddress;
+    }
+
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     public boolean isOnline() {
         return isOnline;
     }
