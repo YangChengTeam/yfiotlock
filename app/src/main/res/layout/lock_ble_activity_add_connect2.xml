@@ -9,21 +9,90 @@
         android:id="@+id/view_nav_bar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        app:text=""
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="" />
 
-    <ProgressBar
-        style="?android:progressBarStyleHorizontal"
+    <com.yc.yfiotlock.view.widgets.CircularProgressBar
+        android:id="@+id/cpb_progress"
         android:layout_width="149dp"
         android:layout_height="149dp"
         android:layout_marginTop="67dp"
-        android:max="100"
-        android:progress="80"
-        android:indeterminate="false"
-        android:progressDrawable="@drawable/circular_progress_bar"
-        android:background="@drawable/circle_shape"
+        app:cpb_background_progressbar_color="#e4e4e4"
+        app:cpb_background_progressbar_width="9dp"
+        app:cpb_progress_direction="to_right"
+        app:cpb_progress_max="100"
+        app:cpb_progressbar_color="#3395fd"
+        app:cpb_progressbar_width="9dp"
+        app:cpb_round_border="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view_nav_bar" />
+
+    <TextView
+        android:id="@+id/tv_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#222222"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toBottomOf="@id/cpb_progress"
+        app:layout_constraintEnd_toEndOf="@id/cpb_progress"
+        app:layout_constraintStart_toStartOf="@id/cpb_progress"
+        app:layout_constraintTop_toTopOf="@id/cpb_progress" />
+
+    <LinearLayout
+        android:id="@+id/ll_connecting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/cpb_progress">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/connecting_tip"
+            android:textColor="#222222"
+            android:textSize="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/connecting_tip_detail"
+            android:textColor="#999999"
+            android:textSize="13dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_connected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/cpb_progress">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/device_add_success"
+            android:textColor="#222222"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/tv_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawablePadding="8dp"
+            android:text="扬飞智能门锁"
+            android:textColor="#999999"
+            android:textSize="13dp"
+            app:drawableEndCompat="@mipmap/editor" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

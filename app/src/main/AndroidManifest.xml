@@ -6,6 +6,7 @@
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 获取网络状态 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -32,8 +33,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".controller.activitys.lock.ble.add.ConnectFailActivity" />
         <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" />
-        <activity android:name=".controller.activitys.lock.ble.add.Connect2Activity" />
+        <activity android:name=".controller.activitys.lock.ble.add.Connect2Activity">
+
+        </activity>
         <activity android:name=".controller.activitys.lock.ble.add.DeviceListActivity" />
         <activity android:name=".controller.activitys.lock.ble.SafePwdCreateActivity" />
         <activity android:name=".controller.activitys.lock.ble.SafePwdSettingActivity" />
@@ -55,7 +59,9 @@
         <activity android:name=".controller.activitys.user.AboutUsActivity" />
         <activity android:name=".controller.activitys.user.SuggestActivity" />
         <activity android:name=".controller.activitys.user.PersonalInfoActivity" />
-        <activity android:name=".controller.activitys.base.SplashActivity" android:exported="true">
+        <activity
+            android:name=".controller.activitys.base.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
