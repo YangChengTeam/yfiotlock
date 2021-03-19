@@ -62,6 +62,7 @@ public class DeviceListActivity extends BaseBackActivity {
         for (BleDevice bleDevice : bleDevices) {
             LockInfo lockInfo = new LockInfo(bleDevice.getName());
             lockInfo.setBleDevice(bleDevice);
+            lockInfo.setMacAddress(bleDevice.getMac());
             lockInfos.add(lockInfo);
         }
         mDeviceAdapter = new DeviceAdapter(lockInfos);
