@@ -30,24 +30,28 @@ public class ConnectActivity extends BaseBackActivity {
     @BindView(R.id.ll_bottom)
     LinearLayout mLlBottom;
 
+    private BleDevice bleDevice;
+
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_add_connect;
     }
 
-    public static void start(Context context, LockInfo lockInfo) {
-        Intent intent = new Intent(context, ConnectActivity.class);
-        intent.putExtra("info", lockInfo);
-        context.startActivity(intent);
+    @Override
+    protected void initVars() {
+        super.initVars();
+        bleDevice = getIntent().getParcelableExtra("bleDevice");
     }
-
 
     @Override
     protected void initViews() {
         super.initViews();
-        BleDevice bleDevice = getIntent().getParcelableExtra("bleDevice");
         setClick(mStvNext, () -> Connect2Activity.start(getContext(), bleDevice));
         backNavBar.setTitle(bleDevice.getName());
+    }
+
+    private void setInfo(){
+        
     }
 
     @Override

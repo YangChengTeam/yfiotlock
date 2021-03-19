@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
-import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 
 public class Connect2Activity extends BaseBackActivity {
     @Override
