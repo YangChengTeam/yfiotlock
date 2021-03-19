@@ -15,6 +15,7 @@ import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;

@@ -2,7 +2,6 @@ package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -11,11 +10,11 @@ import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ConnectActivity extends BaseBackActivity {
     @BindView(R.id.ll_title)
@@ -46,14 +45,9 @@ public class ConnectActivity extends BaseBackActivity {
     @Override
     protected void initViews() {
         super.initViews();
-        LockInfo lockInfo = (LockInfo) getIntent().getSerializableExtra("info");
-        if (lockInfo == null) {
-            ToastCompat.show(getContext(), "设备信息缺失，请重新选择");
-            finish();
-            return;
-        }
-        setClick(mStvNext, () -> Connect2Activity.start(getContext(), lockInfo));
-        backNavBar.setTitle(lockInfo.getName());
+        BleDevice bleDevice = getIntent().getParcelableExtra("bleDevice");
+        setClick(mStvNext, () -> Connect2Activity.start(getContext(), bleDevice));
+        backNavBar.setTitle(bleDevice.getName());
     }
 
     @Override
