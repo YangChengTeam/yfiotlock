@@ -366,7 +366,11 @@ public class CommonUtil {
     public static String getSsid(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();
-        return info.getSSID();
+        String ssid = info.getSSID();
+        if(!TextUtils.isEmpty(ssid)){
+            ssid =ssid.replace("\"", "");
+        }
+        return ssid;
     }
 
 }

@@ -13,6 +13,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
+import com.yc.yfiotlock.demo.comm.ObserverManager;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleGattCallback;
@@ -26,11 +27,12 @@ import java.util.List;
 
 public class LockBLEManager {
     public static final String DEVICE_NAME = "YF-L1";
+    public static final int OP_INTERVAL_TIME = 200;
     public static final String PIN_CODE = "123456";
     public static byte GROUP_TYPE = 0;
     public static final byte GROUP_ADMIN = 0;
     public static final byte GROUP_HIJACK = 3;
-    public static int OP_TIMEOUT = 1000;
+    public static int OP_TIMEOUT = 20000;
     public static int OPEN_LOCK_FINGERPRINT = 1;
     public static int OPEN_LOCK_PASSWORD = 2;
     public static int OPEN_LOCK_CARD = 3;
@@ -190,6 +192,9 @@ public class LockBLEManager {
             public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
                 // 设置连接失败状态
                 callbck.onDisconnect(bleDevice);
+                if (!isActiveDisConnected) {
+                    ObserverManager.getInstance().notifyObserver(bleDevice);
+                }
             }
         });
     }

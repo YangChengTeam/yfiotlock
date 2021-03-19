@@ -368,11 +368,6 @@ public class LockIndexActivity extends BaseActivity {
         setCountInfo();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onReConnect(OpenLockReConnectEvent object) {
-        connect(bleDevice);
-    }
-
     // 开门方式数量
     private void loadLockOpenCountInfo() {
         int type = setCountInfo();
