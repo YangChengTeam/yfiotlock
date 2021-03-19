@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
+import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
@@ -11,12 +12,14 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
 import com.yc.yfiotlock.view.adapters.ItemAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +33,26 @@ public class VisitorManageActivity extends BaseActivity {
     RecyclerView recyclerView;
 
     private ItemAdapter itemAdapter;
+    private DeviceInfo deviceInfo;
+
+    public static void start(Context context, DeviceInfo deviceInfo) {
+        Intent intent = new Intent(context, VisitorManageActivity.class);
+        intent.putExtra("device", deviceInfo);
+        context.startActivity(intent);
+    }
 
     @Override
     protected int getLayoutId() {
         return R.layout.activity_visitor_manage;
+    }
+
+    @Override
+    protected void initVars() {
+        super.initVars();
+        Serializable device = getIntent().getSerializableExtra("device");
+        if (device instanceof DeviceInfo) {
+            this.deviceInfo = (DeviceInfo) device;
+        }
     }
 
     @Override
@@ -56,7 +75,7 @@ public class VisitorManageActivity extends BaseActivity {
                 ItemInfo itemInfo = itemAdapter.getData().get(position);
                 switch (itemInfo.getId()) {
                     case 1:
-                        startActivity(new Intent(VisitorManageActivity.this, OpenLockActivty.class));
+                        OpenLockActivty.start(VisitorManageActivity.this, deviceInfo);
                         break;
                     case 2:
                         startActivity(new Intent(VisitorManageActivity.this, TempPasswordOpenLockActivity.class));

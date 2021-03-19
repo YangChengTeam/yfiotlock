@@ -83,6 +83,7 @@ public class Config {
     public static final String OPEN_LOCK_SINGLE_TYPE_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/pwdTypeList" + isRsa();
     public static final String OPEN_LOCK_MODIFY_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpd" + isRsa();
     public static final String OPEN_LOCK_DEL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDel" + isRsa();
+    public static final String OPEN_LOCK_LONG_OPEN_URL = getBaseUrl() + "/userapp/v1.Locker/longRangeOPen" + isRsa();
 
     //远程
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();

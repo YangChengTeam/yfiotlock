@@ -7,6 +7,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogListInfo;
 import com.yc.yfiotlock.model.engin.LogEngine;
@@ -32,7 +33,14 @@ public class LogFragment extends BaseFragment {
 
     private int page = 1;
     private int pageSize = 10;
-    private int lockerId = 3;
+    private DeviceInfo deviceInfo;
+
+    public LogFragment() {
+    }
+
+    public LogFragment(DeviceInfo deviceInfo) {
+        this.deviceInfo = deviceInfo;
+    }
 
     @Override
     protected int getLayoutId() {
@@ -69,7 +77,10 @@ public class LogFragment extends BaseFragment {
 
 
     private void loadData() {
-        logEngine.getOpenLog(lockerId, page, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
+        if (deviceInfo == null) {
+            return;
+        }
+        logEngine.getOpenLog(deviceInfo.getId(), page, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);

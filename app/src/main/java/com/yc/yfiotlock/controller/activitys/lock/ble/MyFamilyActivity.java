@@ -14,6 +14,7 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -22,6 +23,8 @@ import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.engin.HomeEngine;
 import com.yc.yfiotlock.view.adapters.MyFamilyAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
+import com.yc.yfiotlock.view.widgets.NoDataView;
+import com.yc.yfiotlock.view.widgets.NoWifiView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -120,7 +123,11 @@ public class MyFamilyActivity extends BaseActivity {
 
                             @Override
                             public void onNext(ResultInfo<String> stringResultInfo) {
-                                myFamilyAdapter.removeAt(position);
+                                if (stringResultInfo.getCode() == 1) {
+                                    myFamilyAdapter.removeAt(position);
+                                } else {
+                                    ToastUtil.toast2(MyFamilyActivity.this, stringResultInfo.getMsg());
+                                }
                             }
                         });
                     }
@@ -130,7 +137,7 @@ public class MyFamilyActivity extends BaseActivity {
 
             private void checkDefault(int position) {
                 FamilyInfo familyInfo = myFamilyAdapter.getData().get(position);
-                if (familyInfo.isIs_def() == 0) {
+                if (familyInfo.isDef() == 0) {
                     return;
                 }
                 mLoadingDialog.show("处理中...");
@@ -164,14 +171,30 @@ public class MyFamilyActivity extends BaseActivity {
             @Override
             public void onError(Throwable e) {
                 mSrlRefresh.setRefreshing(false);
+                loadDateFail();
             }
 
             @Override
             public void onNext(ResultInfo<List<FamilyInfo>> listResultInfo) {
+                if (listResultInfo.getData() == null || listResultInfo.getData().size() == 0) {
+                    loadDateEmpty();
+                    return;
+                }
+
                 List<FamilyInfo> data = listResultInfo.getData();
                 myFamilyAdapter.setNewInstance(data);
             }
         });
+    }
+
+    private void loadDateFail() {
+        myFamilyAdapter.setNewInstance(null);
+        myFamilyAdapter.setEmptyView(new NoWifiView(getContext()));
+    }
+
+    private void loadDateEmpty() {
+        myFamilyAdapter.setNewInstance(null);
+        myFamilyAdapter.setEmptyView(new NoDataView(getContext()));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -129,4 +129,16 @@ public class LockEngine extends BaseEngin {
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
+
+    // 远程开锁
+    public Observable<ResultInfo<String>> longOpenLock(String lockerId) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("locker_id", lockerId);
+        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_LONG_OPEN_URL,
+                new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
 }

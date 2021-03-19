@@ -38,6 +38,7 @@ import com.yc.yfiotlock.utils.CacheUtil;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -106,8 +107,14 @@ public class LockIndexActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        familyInfo = (FamilyInfo) getIntent().getSerializableExtra("device");
-        lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
+        Serializable device = getIntent().getSerializableExtra("device");
+        if (device instanceof DeviceInfo) {
+            lockInfo = (DeviceInfo) device;
+        }
+        Serializable family = getIntent().getSerializableExtra("family");
+        if (device instanceof FamilyInfo) {
+            familyInfo = (FamilyInfo) family;
+        }
         lockEngine = new LockEngine(this);
     }
 
@@ -330,16 +337,12 @@ public class LockIndexActivity extends BaseActivity {
 
     // 进入访客管理
     private void nav2Vm() {
-        Intent intent = new Intent(this, VisitorManageActivity.class);
-        intent.putExtra("device", lockInfo);
-        startActivity(intent);
+        VisitorManageActivity.start(this, lockInfo);
     }
 
     // 进入日志管理
     private void nav2Log() {
-        Intent intent = new Intent(this, LockLogActivity.class);
-        intent.putExtra("device", lockInfo);
-        startActivity(intent);
+        LockLogActivity.start(this, lockInfo);
     }
 
     // 进入设置
