@@ -8,7 +8,11 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -89,6 +93,7 @@ public class CommonUtil {
                 .setCountNotDraw(1);
         recyclerView.addItemDecoration(myItemDivider);
     }
+
     public static void setItemDivider3(Context context, RecyclerView recyclerView) {
         MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
                 .setPadding(ScreenUtil.dip2px(context, 15))
@@ -333,6 +338,12 @@ public class CommonUtil {
         }
 
         return null;
+    }
+
+    public static String getSsid(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = wifiManager.getConnectionInfo();
+        return info.getSSID();
     }
 
 }

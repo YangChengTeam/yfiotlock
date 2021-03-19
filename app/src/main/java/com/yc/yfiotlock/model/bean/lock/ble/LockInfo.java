@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.model.bean.lock.ble;
 
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 
 /**
@@ -9,5 +10,15 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 public class LockInfo extends DeviceInfo {
     public LockInfo(String name) {
         this.setName(name);
+    }
+
+    private transient BleDevice bleDevice;
+
+    public BleDevice getBleDevice() {
+        return bleDevice;
+    }
+
+    public void setBleDevice(BleDevice bleDevice) {
+        this.bleDevice = bleDevice;
     }
 }
