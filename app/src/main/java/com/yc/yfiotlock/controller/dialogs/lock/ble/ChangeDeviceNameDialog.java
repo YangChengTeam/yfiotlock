@@ -16,6 +16,7 @@ import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import java.util.concurrent.TimeUnit;
 
@@ -91,6 +92,7 @@ public class ChangeDeviceNameDialog extends Dialog {
             }
         });
         setClick(mIvCancel, this::dismiss);
+        CommonUtil.setEditTextLimit(mEtName,10,true);
     }
 
     public void show(@NonNull String name) {
