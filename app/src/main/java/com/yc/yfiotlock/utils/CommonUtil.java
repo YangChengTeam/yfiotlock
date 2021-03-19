@@ -58,6 +58,9 @@ import rx.Observer;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
+/**
+ *
+ */
 /*
  * Created by　Dullyoung on 2021/3/3
  */
@@ -417,5 +420,23 @@ public class CommonUtil {
         WifiInfo info = wifiManager.getConnectionInfo();
         return info.getSSID();
     }
+
+    /**
+     * 2.4 GHz band frequency of first channel in MHz
+     */
+    public static final int BAND_24_GHZ_START_FREQ_MHZ = 2412;
+    /**
+     * 2.4 GHz band frequency of last channel in MHz
+     */
+    public static final int BAND_24_GHZ_END_FREQ_MHZ = 2484;
+
+    /**
+     * @param freqMhz WiFi频率
+     * @return 是否是2.4G的WiFi
+     */
+    public static boolean is24GHz(int freqMhz) {
+        return freqMhz >= BAND_24_GHZ_START_FREQ_MHZ && freqMhz <= BAND_24_GHZ_END_FREQ_MHZ;
+    }
+
 
 }

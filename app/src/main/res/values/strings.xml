@@ -112,7 +112,7 @@
     <string name="rescan">再次扫描</string>
     <string name="choose_device_work_wifi">选择设备工作Wi-Fi</string>
     <string name="set_wifi_tip">此设备只支持使用2.4G Wi-Fi连接使用\nWi-Fi名称仅支持英文字符及数字</string>
-    <string name="please_input_wifi_name">请输入Wi-Fi名称</string>
+    <string name="please_input_wifi_name">请先选择Wi-Fi</string>
     <string name="please_input_wifi_pwd">请输入Wi-Fi密码</string>
     <string name="next">下一步</string>
     <string name="connecting_tip">设备连接中...请稍等</string>
