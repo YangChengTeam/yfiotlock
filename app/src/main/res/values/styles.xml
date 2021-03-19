@@ -18,9 +18,11 @@
 
     <style name="fullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowIsFloating">false</item>
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="colorPrimary">@color/white</item>
+        <item name="android:windowExitAnimation">@null</item>
         <item name="android:windowFullscreen">true</item>
         <item name="colorPrimaryDark">@color/white</item>
 

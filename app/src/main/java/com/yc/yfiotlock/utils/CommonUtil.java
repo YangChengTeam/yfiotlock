@@ -28,6 +28,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewKt;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,6 +36,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
+import com.kk.securityhttp.utils.VUiKit;
 import com.kk.utils.ScreenUtil;
 import com.kk.utils.ToastUtil;
 import com.mobile.auth.gatewayauth.AuthUIConfig;
@@ -306,16 +308,18 @@ public class CommonUtil {
             public void onNext(ResultInfo<UserInfo> info) {
                 Log.i("onekeylogin", "onNext: " + info);
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
-                    //hide loading
-                    PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
-                    //close one-key login page
-                    PhoneNumberAuthHelper.getInstance(context, listener).quitLoginPage();
-                    //avoid memory leak
-                    PhoneNumberAuthHelper.getInstance(context, listener).setAuthListener(null);
-
                     UserInfoCache.setUserInfo(info.getData());
-                    EventBus.getDefault().post(info.getData());
-                    context.startActivity(new Intent(context, MainActivity.class));
+
+                    VUiKit.postDelayed(200,() -> {
+                        context.startActivity(new Intent(context, MainActivity.class));
+                        //hide loading
+                        PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
+                        //close one-key login page
+                        PhoneNumberAuthHelper.getInstance(context, listener).quitLoginPage();
+                        //avoid memory leak
+                        PhoneNumberAuthHelper.getInstance(context, listener).setAuthListener(null);
+                        EventBus.getDefault().post(info.getData());
+                    });
                 } else {
                     ToastCompat.show(context, info == null ? "登陆失败" : info.getMsg());
                 }

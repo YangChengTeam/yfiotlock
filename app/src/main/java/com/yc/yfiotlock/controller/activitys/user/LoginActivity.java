@@ -175,6 +175,7 @@ public class LoginActivity extends BaseActivity {
             public void onNext(ResultInfo<UserInfo> info) {
                 if (info != null && info.getCode() == 1) {
                     UserInfoCache.setUserInfo(info.getData());
+                    startActivity(new Intent(getContext(), MainActivity.class));
                     EventBus.getDefault().post(info.getData());
                 } else {
                     ToastCompat.show(getContext(), info == null ? "登陆失败" : info.getMsg());
@@ -186,14 +187,13 @@ public class LoginActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLogin(UserInfo userInfo) {
         if (App.isLogin()) {
-            startActivity(new Intent(this, MainActivity.class));
             finish();
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onOneKeyLogin(LoginEvent event) {
-        Log.i("aaaa", "onOneKeyLogin: "+event);
+        Log.i("aaaa", "onOneKeyLogin: " + event);
         switch (event.getStateString()) {
             case FAILED:
             case EVOKE_SUCCESS:
