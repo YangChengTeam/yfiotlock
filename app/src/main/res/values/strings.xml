@@ -115,6 +115,13 @@
     <string name="please_input_wifi_name">请输入Wi-Fi名称</string>
     <string name="please_input_wifi_pwd">请输入Wi-Fi密码</string>
     <string name="next">下一步</string>
+    <string name="connecting_tip">设备连接中...请稍等</string>
+    <string name="connecting_tip_detail">尽量使您的路由器、手机和设备互相靠近</string>
+    <string name="device_add_success">设备添加成功</string>
+    <string name="edit_name">修改名称</string>
+    <string name="please_input_lock_name">请输入门锁名称</string>
+    <string name="device_connect_fail">设备连接失败</string>
+    <string name="please_reset_work_wifi">请重新设置工作WiFi</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>

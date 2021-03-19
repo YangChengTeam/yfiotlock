@@ -11,4 +11,38 @@
             <flag name="center" value="2" />
         </attr>
     </declare-styleable>
+
+    <dimen name="default_background_stroke_width">3dp</dimen>
+    <dimen name="default_stroke_width">7dp</dimen>
+    <declare-styleable name="CircularProgressBar">
+        <attr format="integer" name="cpb_progress"/>
+        <attr format="integer" name="cpb_progress_max"/>
+        <attr format="boolean" name="cpb_indeterminate_mode"/>
+        <attr format="color" name="cpb_progressbar_color"/>
+        <attr format="color" name="cpb_progressbar_color_start"/>
+        <attr format="color" name="cpb_progressbar_color_end"/>
+        <attr name="cpb_progressbar_color_direction">
+            <flag name="left_to_right" value="1"/>
+            <flag name="right_to_left" value="2"/>
+            <flag name="top_to_bottom" value="3"/>
+            <flag name="bottom_to_top" value="4"/>
+        </attr>
+        <attr format="color" name="cpb_background_progressbar_color"/>
+        <attr format="color" name="cpb_background_progressbar_color_start"/>
+        <attr format="color" name="cpb_background_progressbar_color_end"/>
+        <attr name="cpb_background_progressbar_color_direction">
+            <flag name="left_to_right" value="1"/>
+            <flag name="right_to_left" value="2"/>
+            <flag name="top_to_bottom" value="3"/>
+            <flag name="bottom_to_top" value="4"/>
+        </attr>
+        <attr format="dimension" name="cpb_progressbar_width"/>
+        <attr format="dimension" name="cpb_background_progressbar_width"/>
+        <attr format="boolean" name="cpb_round_border"/>
+        <attr format="float" name="cpb_start_angle"/>
+        <attr name="cpb_progress_direction">
+            <flag name="to_right" value="1"/>
+            <flag name="to_left" value="2"/>
+        </attr>
+    </declare-styleable>
 </resources>
