@@ -35,11 +35,7 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".controller.activitys.lock.ble.add.ConnectFailActivity" />
         <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".controller.activitys.lock.ble.add.Connect2Activity">
 
@@ -68,7 +64,11 @@
         <activity
             android:name=".controller.activitys.base.SplashActivity"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity
