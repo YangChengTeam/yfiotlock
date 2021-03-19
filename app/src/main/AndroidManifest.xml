@@ -209,13 +209,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <receiver android:name=".ble.BleConnectReceiver" >
-            <intent-filter>
-                <action android:name="android.bluetooth.device.action.PAIRING_REQUEST"/>
-                <action android:name="android.bluetooth.device.action.ACTION_DISCOVERY_STARTED" />
-            </intent-filter>
-        </receiver>
-
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"

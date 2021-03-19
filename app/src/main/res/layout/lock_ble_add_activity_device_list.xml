@@ -55,5 +55,4 @@
             app:stv_shaderMode="topToBottom"
             app:stv_shaderStartColor="@color/color_start" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

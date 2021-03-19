@@ -1,12 +1,28 @@
 package com.yc.yfiotlock.ble;
 
+import android.app.AlertDialog;
 import android.app.Application;
+import android.bluetooth.BluetoothGatt;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+import android.provider.Settings;
+import android.widget.Toast;
 
+import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
+import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.libs.fastble.BleManager;
+import com.yc.yfiotlock.libs.fastble.callback.BleGattCallback;
 import com.yc.yfiotlock.libs.fastble.callback.BleMtuChangedCallback;
+import com.yc.yfiotlock.libs.fastble.callback.BleScanCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.libs.fastble.scan.BleScanRuleConfig;
+
+import java.util.List;
 
 public class LockBLEManager {
     public static final String DEVICE_NAME = "YF-L1";
@@ -26,18 +42,25 @@ public class LockBLEManager {
                 .setSplitWriteNum(LockBLEPackage.getMtu())
                 .setConnectOverTime(10000)
                 .setOperateTimeout(5000).init(context);
-        initConfig();
     }
 
-    private static void initConfig() {
+    public static void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
-                .setDeviceMac("7D:B5:97:58:AB:92")
+                .setDeviceName(false, DEVICE_NAME)
                 .setScanTimeOut(10000);
         BleManager.getInstance().initScanRule(builder.build());
     }
 
-    public static boolean isConnected(BleDevice bleDevice){
+    public static void initConfig2(String mac) {
+        BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
+                .setAutoConnect(false)
+                .setDeviceMac(mac)
+                .setScanTimeOut(10000);
+        BleManager.getInstance().initScanRule(builder.build());
+    }
+
+    public static boolean isConnected(BleDevice bleDevice) {
         return BleManager.getInstance().isConnected(bleDevice);
     }
 
@@ -56,5 +79,119 @@ public class LockBLEManager {
         });
     }
 
+    public static final int REQUEST_GPS = 4;
+
+    public interface LockBLEScanCallbck {
+        void onScanStarted();
+
+        void onScanning(BleDevice bleDevice);
+
+        void onScanSuccess(List<BleDevice> scanResultList);
+
+        void onScanFailed();
+    }
+
+    public static void scan(BaseActivity activity, LockBLEScanCallbck callbck) {
+        PermissionHelper mPermissionHelper = activity.getPermissionHelper();
+        mPermissionHelper.checkAndRequestPermission(activity, new PermissionHelper.OnRequestPermissionsCallback() {
+            @Override
+            public void onRequestPermissionSuccess() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        && !LockBLEUtils.checkGPSIsOpen(activity)) {
+                    new AlertDialog.Builder(activity)
+                            .setTitle("提示")
+                            .setMessage("为了更精确的扫描到Bluetooth LE设备, 请打开GPS定位")
+                            .setPositiveButton("确定", (dialog, which) -> {
+                                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                activity.startActivityForResult(intent, REQUEST_GPS);
+                            })
+                            .setNegativeButton("取消", null)
+                            .create()
+                            .show();
+                    return;
+                }
+                startScan(activity, callbck);
+            }
+
+            @Override
+            public void onRequestPermissionError() {
+                ToastCompat.show(activity, "授权失败, 无法扫描蓝牙设备");
+            }
+        });
+    }
+
+    // 开始扫描
+    private static void startScan(Context context, LockBLEScanCallbck callbck) {
+        if (!BleManager.getInstance().isBlueEnable()) {
+            ToastCompat.show(context, "请先打开蓝牙", Toast.LENGTH_LONG);
+            BleManager.getInstance().enableBluetooth();
+            return;
+        }
+
+        // 设置搜索状态
+        callbck.onScanStarted();
+        // 开始搜索
+        BleManager.getInstance().scan(new BleScanCallback() {
+            @Override
+            public void onScanStarted(boolean success) {
+                callbck.onScanStarted();
+            }
+
+            @Override
+            public void onLeScan(BleDevice bleDevice) {
+                super.onLeScan(bleDevice);
+            }
+
+            @Override
+            public void onScanning(BleDevice bleDevice) {
+                callbck.onScanning(bleDevice);
+            }
+
+            @Override
+            public void onScanFinished(List<BleDevice> scanResultList) {
+                if (scanResultList.size() == 0) {
+                    // 搜索完成未发现设备
+                    callbck.onScanFailed();
+                } else {
+                    callbck.onScanSuccess(scanResultList);
+                }
+            }
+        });
+    }
+
+    public interface LockBLEConnectCallbck {
+        void onConnectStarted();
+
+        void onDisconnect(BleDevice bleDevice);
+
+        void onConnectSuccess(BleDevice bleDevice);
+
+        void onConnectFailed();
+    }
+
+    public static void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
+        BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
+            @Override
+            public void onStartConnect() {
+                callbck.onConnectStarted();
+            }
+
+            @Override
+            public void onConnectFail(BleDevice bleDevice, BleException exception) {
+                callbck.onConnectFailed();
+            }
+
+            @Override
+            public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                callbck.onConnectSuccess(bleDevice);
+            }
+
+            @Override
+            public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                // 设置连接失败状态
+                callbck.onDisconnect(bleDevice);
+            }
+        });
+    }
 
 }

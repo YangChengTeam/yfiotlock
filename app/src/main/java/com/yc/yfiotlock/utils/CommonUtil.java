@@ -8,7 +8,11 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
@@ -357,6 +361,12 @@ public class CommonUtil {
         }
 
         return null;
+    }
+
+    public static String getSsid(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = wifiManager.getConnectionInfo();
+        return info.getSSID();
     }
 
 }
