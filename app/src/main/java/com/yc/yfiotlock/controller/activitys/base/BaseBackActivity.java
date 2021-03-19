@@ -9,6 +9,7 @@ import butterknife.BindView;
 
 public abstract class BaseBackActivity extends BaseActivity {
     @BindView(R.id.view_nav_bar)
+    protected
     BackNavBar backNavBar;
 
     public void setNavTitle(String title){

@@ -32,6 +32,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" />
+        <activity android:name=".controller.activitys.lock.ble.add.Connect2Activity" />
         <activity android:name=".controller.activitys.lock.ble.add.DeviceListActivity" />
         <activity android:name=".controller.activitys.lock.ble.SafePwdCreateActivity" />
         <activity android:name=".controller.activitys.lock.ble.SafePwdSettingActivity" />
@@ -53,16 +55,14 @@
         <activity android:name=".controller.activitys.user.AboutUsActivity" />
         <activity android:name=".controller.activitys.user.SuggestActivity" />
         <activity android:name=".controller.activitys.user.PersonalInfoActivity" />
-        <activity android:name=".controller.activitys.base.SplashActivity" android:exported="true">
+        <activity android:name=".demo.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".demo.MainActivity" android:exported="true">
 
-        </activity>
         <activity
             android:name=".controller.activitys.user.LoginActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize"

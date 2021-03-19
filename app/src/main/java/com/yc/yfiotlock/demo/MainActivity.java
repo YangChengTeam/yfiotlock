@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleGattCallback;
 import com.yc.yfiotlock.libs.fastble.callback.BleMtuChangedCallback;
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
+                .setDeviceName(false, LockBLEManager.DEVICE_NAME)
                 .setScanTimeOut(10000);
 
         EditText nameEt = findViewById(R.id.et_name);

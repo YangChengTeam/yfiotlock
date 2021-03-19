@@ -110,6 +110,11 @@
     <string name="scan_qa_answer">可能由于当前网络环境较差或设备已被他人绑定。\n\n1、请确保手机与设备之间的距离足够近，并且周围网络环境没有强干扰。\n\n2、同时需确认扬飞智能应用的定位权限未被关闭。若手动关闭了应用定位权限可能会导致无法自动发现设备。\n\n3、如果仍始终无法发现设备，可能因为设备已经被他人绑定了。如果你并不清楚是谁连接了设备，可以进行重置，重置方式请查阅说明书。\n\n4、蓝牙设备请检查设备是否正常通电，手机蓝牙是否已经打开。</string>
     <string name="find_nearby_can_connect_devices">发现附近可以连接的设备</string>
     <string name="rescan">再次扫描</string>
+    <string name="choose_device_work_wifi">选择设备工作Wi-Fi</string>
+    <string name="set_wifi_tip">此设备只支持使用2.4G Wi-Fi连接使用\nWi-Fi名称仅支持英文字符及数字</string>
+    <string name="please_input_wifi_name">请输入Wi-Fi名称</string>
+    <string name="please_input_wifi_pwd">请输入Wi-Fi密码</string>
+    <string name="next">下一步</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>
