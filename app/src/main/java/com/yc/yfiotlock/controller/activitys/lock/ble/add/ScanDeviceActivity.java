@@ -40,10 +40,7 @@ public class ScanDeviceActivity extends BaseBackActivity {
 
     @Override
     protected void bindClick() {
-        setClick(mStvRescan, () -> {
-            setScanStartUi();
-            VUiKit.postDelayed(6000, this::setScanStopUi);
-        });
+        setClick(mStvRescan, this::setScanStartUi);
         setClick(mTvScanQa, () -> startActivity(new Intent(this, QaActivity.class)));
     }
 
@@ -51,7 +48,6 @@ public class ScanDeviceActivity extends BaseBackActivity {
     protected void onResume() {
         super.onResume();
         setScanStartUi();
-        VUiKit.postDelayed(6000, this::setScanStopUi);
     }
 
     private void setScanStartUi() {
@@ -59,7 +55,19 @@ public class ScanDeviceActivity extends BaseBackActivity {
         mStvRescan.setVisibility(View.GONE);
         mTvScanState.setText("开始扫描");
         mTvScanQa.setText("扫描不到怎么办？");
+        if (success) {
+            VUiKit.postDelayed(2000, this::setScanStopUi);
+            success = false;
+        } else {
+            VUiKit.postDelayed(2000, () -> {
+                startActivity(new Intent(this, DeviceListActivity.class));
+                setScanStopUi();
+            });
+            success = true;
+        }
     }
+
+    private boolean success = true;
 
     private void setScanStopUi() {
         mIvScanFlag.clearAnimation();

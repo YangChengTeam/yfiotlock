@@ -11,8 +11,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -89,6 +92,7 @@ public class CommonUtil {
                 .setCountNotDraw(1);
         recyclerView.addItemDecoration(myItemDivider);
     }
+
     public static void setItemDivider3(Context context, RecyclerView recyclerView) {
         MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
                 .setPadding(ScreenUtil.dip2px(context, 15))
@@ -206,6 +210,26 @@ public class CommonUtil {
         EventBus.getDefault().post(loginEvent);
     }
 
+    public static void setEditTextLimit(){
+
+    }
+
+    /**
+     * 查看、隐藏密码
+     *
+     * @param v 要操作的editText
+     */
+    public static void hiddenEditText(EditText v, ImageView imageView) {
+        //可见的时候设回密码不可见状态
+        if (v.getTransformationMethod() == PasswordTransformationMethod.getInstance()) {
+            v.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            imageView.setImageResource(R.mipmap.see);
+        } else {//不可见的时候设置为可见
+            v.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            imageView.setImageResource(R.mipmap.secret);
+        }
+        v.setSelection(v.getText().length());
+    }
 
     private static void startLoginWithToken(Context context, TokenResultListener listener, String token) {
         LoginEngin engin = new LoginEngin(context);

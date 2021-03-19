@@ -59,7 +59,7 @@ public class DeviceListActivity extends BaseBackActivity {
         mRvDevices.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvDevices);
         mDeviceAdapter.setOnItemClickListener((adapter, view, position) -> {
-
+            ConnectActivity.start(getContext(), mDeviceAdapter.getData().get(position));
         });
     }
 
