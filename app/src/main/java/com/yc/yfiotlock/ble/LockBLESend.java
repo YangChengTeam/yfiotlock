@@ -43,7 +43,6 @@ public class LockBLESend {
         loadingDialog = new LoadingDialog(context);
         // 开始监听
         bleNotify();
-        EventBus.getDefault().register(this);
     }
 
     // 伪发送数据
@@ -118,7 +117,6 @@ public class LockBLESend {
     // 清除操作
     public void clear() {
         BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_CHARACTERISTIC_UUID);
-        EventBus.getDefault().unregister(this);
     }
 
     // 持续唤醒
