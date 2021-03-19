@@ -7,6 +7,7 @@ import android.widget.EditText;
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import butterknife.BindView;
@@ -36,6 +37,7 @@ public class DeviceNameEditActivity extends BaseActivity {
             mEtName.setText(name);
             mEtName.setSelection(name.length());
         }
+        CommonUtil.setEditTextLimit(mEtName, 20, true);
         mEtName.requestFocus();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }

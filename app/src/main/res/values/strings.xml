@@ -91,7 +91,7 @@
     <string name="find_new_version">发现新版本</string>
     <string name="yf_smart_door_lock">扬飞智能门锁</string>
     <string name="upload_pic">上传图片</string>
-    <string name="contact_way">联系方式</string>
+    <string name="contact_way">联系方式&#12288;</string>
     <string name="feed_back_contact_et_hint">为快速解决问题，请留下联系方式</string>
     <string name="input_router_hint">请输入路由器型号（可选）</string>
     <string name="et_question_hint">请描述您遇到的问题...</string>

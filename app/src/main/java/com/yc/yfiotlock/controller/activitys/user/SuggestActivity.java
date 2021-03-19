@@ -11,6 +11,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.engin.FeedBackEngine;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import butterknife.BindView;
@@ -47,6 +48,8 @@ public class SuggestActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
+        CommonUtil.setEditTextLimit(mEtSuggest, 200, false);
+        CommonUtil.setEditTextLimit(mEtContact,20,true);
         mFeedBackEngine = new FeedBackEngine(getContext());
         setClick(R.id.stv_commit, () -> {
             if (mEtSuggest.getText().toString().length() < 10) {

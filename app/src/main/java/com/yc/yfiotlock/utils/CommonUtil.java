@@ -14,7 +14,11 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -214,7 +218,52 @@ public class CommonUtil {
         EventBus.getDefault().post(loginEvent);
     }
 
-    public static void setEditTextLimit(){
+    /**
+     * @param editText      要操作的文本框
+     * @param limit         输入字符限制
+     * @param doubleChinese 汉字是否占两个字符
+     */
+    public static void setEditTextLimit(EditText editText, int limit, boolean doubleChinese) {
+        if (!doubleChinese) {
+            editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(limit)});
+            return;
+        }
+        final int maxLen = limit;
+        InputFilter filter = (src, start, end, dest, dstart, dend) -> {
+            int dindex = 0;
+            int count = 0;
+
+            while (count <= maxLen && dindex < dest.length()) {
+                char c = dest.charAt(dindex++);
+                if (c < 128) {
+                    count = count + 1;
+                } else {
+                    count = count + 2;
+                }
+            }
+
+            if (count > maxLen) {
+                return dest.subSequence(0, dindex - 1);
+            }
+
+            int sindex = 0;
+            while (count <= maxLen && sindex < src.length()) {
+                char c = src.charAt(sindex++);
+                if (c < 128) {
+                    count = count + 1;
+                } else {
+                    count = count + 2;
+                }
+            }
+
+            if (count > maxLen) {
+                sindex--;
+            }
+
+            return src.subSequence(0, sindex);
+        };
+
+        editText.setFilters(new InputFilter[]{filter});
 
     }
 

@@ -28,6 +28,7 @@ import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.user.PicInfo;
 import com.yc.yfiotlock.model.engin.FeedBackEngine;
 import com.yc.yfiotlock.model.engin.UploadFileEngine;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.PictureUtil;
 import com.yc.yfiotlock.view.adapters.FeedBackAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -80,6 +81,9 @@ public class FeedBackActivity extends BaseActivity {
     protected void initViews() {
         setRvPic();
         mEtQuestion.requestFocus();
+        CommonUtil.setEditTextLimit(mEtQuestion, 200, false);
+        CommonUtil.setEditTextLimit(mEtContact,20,true);
+        CommonUtil.setEditTextLimit(mEtRouter,20,true);
     }
 
     FeedBackAdapter mFeedBackAdapter;
