@@ -167,7 +167,12 @@ public class ConnectActivity extends BaseBackActivity {
                     mTvName.setText(strings[which]);
                     dialog.dismiss();
                 }).create();
+        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
+        alertDialog.setOnDismissListener(dialog -> {
+            mEtPwd.requestFocus();
+            getWindow().setSoftInputMode(5);
+        });
         Window window = alertDialog.getWindow();
         if (window != null) {
             window.setLayout(ScreenUtil.getWidth(getContext()) - 100, ScreenUtil.getHeight(getContext()) / 2);
