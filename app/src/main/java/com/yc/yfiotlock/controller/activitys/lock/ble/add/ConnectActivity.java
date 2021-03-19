@@ -69,7 +69,7 @@ public class ConnectActivity extends BaseBackActivity {
     protected void initViews() {
         super.initViews();
         setClick(mStvNext, () -> Connect2Activity.start(getContext(), bleDevice));
-        //  backNavBar.setTitle(bleDevice.getName());
+          backNavBar.setTitle(bleDevice.getName());
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
