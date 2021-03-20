@@ -7,8 +7,8 @@
     android:background="@color/grayBg"
     tools:context=".controller.activitys.user.MainActivity">
 
-    <FrameLayout
-        android:id="@+id/fl_content"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/vp_index"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/ll_bottom"

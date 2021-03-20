@@ -4,26 +4,30 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.IntRange;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
 
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
 import com.yc.yfiotlock.controller.fragments.user.MyFragment;
 import com.yc.yfiotlock.helper.ThreadPoolExecutorImpl;
+import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity {
 
@@ -32,14 +36,14 @@ public class MainActivity extends BaseActivity {
     TextView mTvIndex;
     @BindView(R.id.tv_mine)
     TextView mTvMine;
+    @BindView(R.id.vp_index)
+    ViewPager mVpIndex;
 
     @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
     }
 
-    private int selectedIndex = -1;
-    private BaseFragment[] mContentFragments;
 
     private static WeakReference<MainActivity> instance;
 
@@ -51,38 +55,39 @@ public class MainActivity extends BaseActivity {
     protected void initViews() {
         setFullScreen();
         instance = new WeakReference<>(this);
-        mContentFragments = new BaseFragment[]{
-                new IndexFragment(), new MyFragment()
-        };
+        setVp();
         onSelected(0);
         ThreadPoolExecutorImpl.getImpl().execute(this::deleteLowerVersionApkFile);
     }
 
+    private void setVp() {
+        List<BaseFragment> fragments = new ArrayList<>();
+        fragments.add(new IndexFragment());
+        fragments.add(new MyFragment());
+        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(fragments, new String[0], getSupportFragmentManager(), 1);
+        mVpIndex.setAdapter(pagerAdapter);
+        mVpIndex.setOffscreenPageLimit(1);
+        mVpIndex.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-    private BaseFragment getFragment(@IntRange(from = 0) int idx) {
-        return mContentFragments[idx];
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                onSelected(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
+
     private void onSelected(@IntRange(from = 0) int index) {
-        if (selectedIndex == index) {
-            return;
-        }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        BaseFragment fragment = getFragment(index);
-
-        if (selectedIndex == -1) {
-            transaction.add(R.id.fl_content, fragment).commitAllowingStateLoss();
-            selectedIndex = index;
-            return;
-        }
-        BaseFragment currentFragment = getFragment(selectedIndex);
-        selectedIndex = index;
-
-        if (!fragment.isAdded() && getSupportFragmentManager().findFragmentByTag("" + selectedIndex) == null) {
-            transaction.hide(currentFragment).add(R.id.fl_content, fragment, "" + selectedIndex).commitAllowingStateLoss();
-        } else {
-            transaction.hide(currentFragment).show(fragment).commitAllowingStateLoss();
-        }
+        mVpIndex.setCurrentItem(index);
         resetItem();
         setItem(index);
     }
@@ -167,8 +172,4 @@ public class MainActivity extends BaseActivity {
         startActivity(home);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }
