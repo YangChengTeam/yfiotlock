@@ -3,6 +3,8 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.app.Dialog;
 import android.content.Intent;
 import android.hardware.SensorEvent;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -170,9 +172,17 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 if (LockBLEManager.isConnected(bleDevice)) {
                     // 开门
                     open();
+                    vibrate();
                 }
             }
         });
+    }
+
+    private void vibrate() {
+        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        if (vibrator.hasVibrator()) {
+            vibrator.vibrate(new long[]{200, 500}, -1);
+        }
     }
 
     @Override

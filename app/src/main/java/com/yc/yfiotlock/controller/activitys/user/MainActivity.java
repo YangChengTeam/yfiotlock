@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity {
 
