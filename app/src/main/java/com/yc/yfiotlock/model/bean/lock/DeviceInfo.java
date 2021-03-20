@@ -6,6 +6,8 @@ import java.io.Serializable;
 
 public class DeviceInfo implements Serializable {
     private String id;
+    @JSONField(name = "locker_id")
+    private String lockerId;
     private String name;
     @JSONField(name = "firmware_version")
     private String firmwareVersion;
@@ -30,6 +32,14 @@ public class DeviceInfo implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getLockerId() {
+        return lockerId;
+    }
+
+    public void setLockerId(String lockerId) {
+        this.lockerId = lockerId;
     }
 
     public String getName() {

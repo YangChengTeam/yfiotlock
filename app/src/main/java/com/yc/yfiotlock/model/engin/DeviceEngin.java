@@ -10,6 +10,7 @@ import com.kk.securityhttp.engin.BaseEngin;
 import com.kk.securityhttp.engin.HttpCoreEngin;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
@@ -27,17 +28,18 @@ public class DeviceEngin extends BaseEngin {
         return null;
     }
 
-    public Observable<ResultInfo<String>> addDeviceInfo(String userId, String familyId, String name) {
+    public Observable<ResultInfo<DeviceInfo>> addDeviceInfo(String familyId, String name, String mac, String deviceId) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        map.put("master_id", userId);
         map.put("family_id", familyId);
-        map.put("name", "name");
-        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_ADD_URL,
-                new TypeReference<ResultInfo<String>>() {
+        map.put("name", name);
+        map.put("device_id", deviceId);
+        map.put("mac_address",  mac);
+        return new HttpCoreEngin<ResultInfo<DeviceInfo>>(getContext()).rxpost(Config.DEVICE_ADD_URL,
+                new TypeReference<ResultInfo<DeviceInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 

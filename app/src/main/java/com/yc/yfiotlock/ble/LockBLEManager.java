@@ -58,6 +58,7 @@ public class LockBLEManager {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
                 .setDeviceMac(mac)
+                .setDeviceName(false, DEVICE_NAME)
                 .setScanTimeOut(10000);
         BleManager.getInstance().initScanRule(builder.build());
     }

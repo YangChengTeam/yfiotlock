@@ -14,8 +14,10 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
@@ -23,6 +25,7 @@ import com.yc.yfiotlock.view.BaseExtendAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +37,7 @@ import butterknife.ButterKnife;
  *
  * @author Dullyoung
  */
-public class DeviceListActivity extends BaseBackActivity {
+public class DeviceListActivity extends BaseAddActivity {
     @BindView(R.id.tv_scan_title)
     TextView mTvScanTitle;
     @BindView(R.id.rv_devices)
@@ -42,9 +45,14 @@ public class DeviceListActivity extends BaseBackActivity {
     @BindView(R.id.stv_scan)
     SuperTextView mStvScan;
 
-
     private DeviceAdapter mDeviceAdapter;
 
+    private static WeakReference<DeviceListActivity> mInstance;
+    public static void finish2(){
+        if(mInstance != null && mInstance.get() != null){
+            mInstance.get().finish();
+        }
+    }
 
     @Override
     protected int getLayoutId() {
@@ -53,6 +61,7 @@ public class DeviceListActivity extends BaseBackActivity {
 
     @Override
     protected void initViews() {
+        mInstance = new WeakReference<>(this);
         super.initViews();
         setRvDevices();
     }
@@ -106,18 +115,13 @@ public class DeviceListActivity extends BaseBackActivity {
     private void nav2Connect(BleDevice bleDevice) {
         Intent intent = new Intent(this, ConnectActivity.class);
         intent.putExtra("bleDevice", bleDevice);
-        startActivity(intent);
-    }
-
-    private void nav2Scan() {
-        Intent intent = new Intent(this, ScanDeviceActivity.class);
+        intent.putExtra("family", familyInfo);
         startActivity(intent);
     }
 
     @Override
     protected void bindClick() {
         setClick(mStvScan, () -> {
-            nav2Scan();
             finish();
         });
     }

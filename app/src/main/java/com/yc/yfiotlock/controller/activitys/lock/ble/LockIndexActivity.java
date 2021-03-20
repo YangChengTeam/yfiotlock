@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import rx.functions.Action1;
 
-public class LockIndexActivity extends BaseActivity {
+public class LockIndexActivity extends BaseActivity implements LockBLESend.NotifyCallback {
     @BindView(R.id.iv_back)
     View backBtn;
     @BindView(R.id.iv_setting)
@@ -109,16 +109,11 @@ public class LockIndexActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        Serializable device = getIntent().getSerializableExtra("device");
-        if (device instanceof DeviceInfo) {
-            lockInfo = (DeviceInfo) device;
-        }
-        Serializable family = getIntent().getSerializableExtra("family");
-        if (device instanceof FamilyInfo) {
-            familyInfo = (FamilyInfo) family;
-        }
-        lockEngine = new LockEngine(this);
+        lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
+        familyInfo = (FamilyInfo) getIntent().getSerializableExtra("family");
         bleDevice = getIntent().getParcelableExtra("bleDevice");
+        lockEngine = new LockEngine(this);
+
     }
 
     @Override
@@ -161,7 +156,13 @@ public class LockIndexActivity extends BaseActivity {
 
         if (bleDevice == null) {
             scan();
+        } else {
+            if (LockBLEManager.isConnected(bleDevice)) {
+                lockBleSend = new LockBLESend(this, bleDevice);
+                lockBleSend.setNotifyCallback(this);
+            }
         }
+
 
         shakeSensor = new ShakeSensor(this);
         shakeSensor.setShakeListener(new ShakeSensor.OnShakeListener() {
@@ -181,7 +182,7 @@ public class LockIndexActivity extends BaseActivity {
         shakeSensor.register();
 
         // 重新连接
-        if (LockBLEManager.isConnected(bleDevice)) {
+        if (bleDevice != null && !LockBLEManager.isConnected(bleDevice)) {
             reconnect();
         }
     }
@@ -205,7 +206,7 @@ public class LockIndexActivity extends BaseActivity {
     }
 
     private void open() {
-        if(isOpening) return;
+        if (isOpening) return;
         isOpening = true;
 
         loadingIv.setImageResource(R.mipmap.three);
@@ -281,7 +282,7 @@ public class LockIndexActivity extends BaseActivity {
             public void onConnectSuccess(BleDevice bleDevice) {
                 LockIndexActivity.this.bleDevice = bleDevice;
                 lockBleSend = new LockBLESend(LockIndexActivity.this, bleDevice);
-
+                lockBleSend.setNotifyCallback(LockIndexActivity.this);
                 // 设置连接成功状态
                 stopAnimations();
                 statusTitleTv.setText("已连接门锁");
@@ -315,21 +316,6 @@ public class LockIndexActivity extends BaseActivity {
             }
         });
         generalDialog.show();
-    }
-
-    // 处理响应
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onProcess(LockBLEData bleData) {
-        if (bleData != null && bleData.getMcmd() == (byte) 0x02 && bleData.getScmd() == (byte) 0x01) {
-            isOpening = false;
-            stopAnimations();
-            if (bleData.getStatus() == (byte) 0x00) {
-                statusTitleTv.setText("门锁已打开");
-            } else {
-                statusTitleTv.setText("门锁已连接");
-                loadingIv.setImageResource(R.mipmap.one);
-            }
-        }
     }
 
     // 进入开门方式管理
@@ -394,5 +380,25 @@ public class LockIndexActivity extends BaseActivity {
         }
         // 处理授权回调
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
+    }
+
+    @Override
+    public void onNotifyReady() {
+
+    }
+
+    @Override
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
+            isOpening = false;
+            stopAnimations();
+            statusTitleTv.setText("门锁已打开");
+        }
+    }
+
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        statusTitleTv.setText("门锁已连接");
+        loadingIv.setImageResource(R.mipmap.one);
     }
 }

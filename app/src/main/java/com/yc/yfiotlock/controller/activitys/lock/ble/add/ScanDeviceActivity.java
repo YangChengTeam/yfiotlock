@@ -11,6 +11,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class ScanDeviceActivity extends BaseBackActivity {
+public class ScanDeviceActivity extends BaseAddActivity {
 
 
     @BindView(R.id.iv_scan_bg)
@@ -31,7 +32,6 @@ public class ScanDeviceActivity extends BaseBackActivity {
     TextView mTvScanQa;
     @BindView(R.id.stv_rescan)
     SuperTextView mStvRescan;
-
 
     @Override
     protected int getLayoutId() {
@@ -96,6 +96,7 @@ public class ScanDeviceActivity extends BaseBackActivity {
     private void nav2List(ArrayList<BleDevice> bleDevices) {
         Intent intent = new Intent(this, DeviceListActivity.class);
         intent.putParcelableArrayListExtra("bleDevices",  bleDevices);
+        intent.putExtra("family", familyInfo);
         startActivity(intent);
     }
 }
