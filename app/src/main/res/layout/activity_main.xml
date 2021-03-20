@@ -11,6 +11,7 @@
         android:id="@+id/vp_index"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:overScrollMode="never"
         app:layout_constraintBottom_toTopOf="@id/ll_bottom"
         app:layout_constraintTop_toTopOf="parent" />
 
