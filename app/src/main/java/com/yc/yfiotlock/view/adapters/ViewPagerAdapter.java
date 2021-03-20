@@ -12,6 +12,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * FragmentPagerAdapter适用于少量Fragment ,Fragment对象会一直存留在内存中
+ * 如大量fragment 则用{@link androidx.fragment.app.FragmentStatePagerAdapter}
+ * 当使用FragmentStatePagerAdapter 时，如果Fragment不显示，那么Fragment对象会被销毁
+ */
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     private List<BaseFragment> fragments;
