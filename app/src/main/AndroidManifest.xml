@@ -34,7 +34,9 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".controller.activitys.lock.ble.add.ConnectFailActivity" />
-        <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" />
+        <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" >
+
+        </activity>
         <activity android:name=".controller.activitys.lock.ble.add.Connect2Activity">
 
         </activity>

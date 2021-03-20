@@ -11,6 +11,7 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.UserEngine;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
@@ -19,6 +20,7 @@ import org.greenrobot.eventbus.EventBus;
 import butterknife.BindView;
 import butterknife.OnClick;
 import rx.Observer;
+
 /**
  * @author Dullyoung
  */
@@ -43,6 +45,7 @@ public class EditNameActivity extends BaseActivity {
         if (UserInfoCache.getUserInfo() != null) {
             name = UserInfoCache.getUserInfo().getNickName();
         }
+        CommonUtil.setEditTextLimit(mEtName, 20, true);
         mEtName.setText(name);
         mEtName.setSelection(name.length());
         mEtName.requestFocus();
@@ -61,7 +64,7 @@ public class EditNameActivity extends BaseActivity {
     protected void bindClick() {
         setClick(R.id.stv_sure, this::commit);
     }
-    
+
     public void commit() {
         if (mEtName.getText().toString().length() == 0) {
             ToastCompat.showCenter(getContext(), "用户名不能为空");

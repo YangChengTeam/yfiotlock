@@ -14,7 +14,11 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -24,6 +28,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewKt;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,6 +36,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
+import com.kk.securityhttp.utils.VUiKit;
 import com.kk.utils.ScreenUtil;
 import com.kk.utils.ToastUtil;
 import com.mobile.auth.gatewayauth.AuthUIConfig;
@@ -54,6 +60,9 @@ import rx.Observer;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
+/**
+ *
+ */
 /*
  * Created by　Dullyoung on 2021/3/3
  */
@@ -214,7 +223,52 @@ public class CommonUtil {
         EventBus.getDefault().post(loginEvent);
     }
 
-    public static void setEditTextLimit(){
+    /**
+     * @param editText      要操作的文本框
+     * @param limit         输入字符限制
+     * @param doubleChinese 汉字是否占两个字符
+     */
+    public static void setEditTextLimit(EditText editText, int limit, boolean doubleChinese) {
+        if (!doubleChinese) {
+            editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(limit)});
+            return;
+        }
+        final int maxLen = limit;
+        InputFilter filter = (src, start, end, dest, dstart, dend) -> {
+            int dindex = 0;
+            int count = 0;
+
+            while (count <= maxLen && dindex < dest.length()) {
+                char c = dest.charAt(dindex++);
+                if (c < 128) {
+                    count = count + 1;
+                } else {
+                    count = count + 2;
+                }
+            }
+
+            if (count > maxLen) {
+                return dest.subSequence(0, dindex - 1);
+            }
+
+            int sindex = 0;
+            while (count <= maxLen && sindex < src.length()) {
+                char c = src.charAt(sindex++);
+                if (c < 128) {
+                    count = count + 1;
+                } else {
+                    count = count + 2;
+                }
+            }
+
+            if (count > maxLen) {
+                sindex--;
+            }
+
+            return src.subSequence(0, sindex);
+        };
+
+        editText.setFilters(new InputFilter[]{filter});
 
     }
 
@@ -254,16 +308,18 @@ public class CommonUtil {
             public void onNext(ResultInfo<UserInfo> info) {
                 Log.i("onekeylogin", "onNext: " + info);
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
-                    //hide loading
-                    PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
-                    //close one-key login page
-                    PhoneNumberAuthHelper.getInstance(context, listener).quitLoginPage();
-                    //avoid memory leak
-                    PhoneNumberAuthHelper.getInstance(context, listener).setAuthListener(null);
-
                     UserInfoCache.setUserInfo(info.getData());
-                    EventBus.getDefault().post(info.getData());
-                    context.startActivity(new Intent(context, MainActivity.class));
+
+                    VUiKit.postDelayed(200,() -> {
+                        context.startActivity(new Intent(context, MainActivity.class));
+                        //hide loading
+                        PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
+                        //close one-key login page
+                        PhoneNumberAuthHelper.getInstance(context, listener).quitLoginPage();
+                        //avoid memory leak
+                        PhoneNumberAuthHelper.getInstance(context, listener).setAuthListener(null);
+                        EventBus.getDefault().post(info.getData());
+                    });
                 } else {
                     ToastCompat.show(context, info == null ? "登陆失败" : info.getMsg());
                 }
@@ -372,5 +428,23 @@ public class CommonUtil {
         }
         return ssid;
     }
+
+    /**
+     * 2.4 GHz band frequency of first channel in MHz
+     */
+    public static final int BAND_24_GHZ_START_FREQ_MHZ = 2412;
+    /**
+     * 2.4 GHz band frequency of last channel in MHz
+     */
+    public static final int BAND_24_GHZ_END_FREQ_MHZ = 2484;
+
+    /**
+     * @param freqMhz WiFi频率
+     * @return 是否是2.4G的WiFi
+     */
+    public static boolean is24GHz(int freqMhz) {
+        return freqMhz >= BAND_24_GHZ_START_FREQ_MHZ && freqMhz <= BAND_24_GHZ_END_FREQ_MHZ;
+    }
+
 
 }
