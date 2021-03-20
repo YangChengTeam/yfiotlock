@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleNotifyCallback;
 import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
@@ -117,7 +118,10 @@ public class LockBLESend {
     // 清除操作
     public void clear() {
         BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_CHARACTERISTIC_UUID);
+        BleManager.getInstance().disconnect(bleDevice);
     }
+
+    private int wakeUpCount = 0;
 
     // 持续唤醒
     private void wakeup() {
@@ -125,8 +129,14 @@ public class LockBLESend {
         Log.d(TAG, "发送唤醒指令");
         byte[] bytes = LockBLEOpCmd.wakeup(context);
         op(bytes);
-        VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, ()->{
+        VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
             if (waupStatus && isSend) return;
+            if (wakeUpCount++ > 15) {
+                ToastCompat.show(context, "唤醒门锁失败,无法发送指令");
+                wakeupFailureResponse();
+                wakeUpCount = 0;
+                return;
+            }
             wakeup();
         });
     }
@@ -187,22 +197,13 @@ public class LockBLESend {
                 if (notifyCallback != null) {
                     notifyCallback.onNotifySuccess(lockBLEData);
                 }
-            } else if (lockBLEData.getStatus() == (byte) 0x01) {
-                if (notifyCallback != null) {
-                    notifyCallback.onNotifyFailure(lockBLEData);
-                }
-            } else if (lockBLEData.getStatus() == (byte) 0x10) {
-                if (notifyCallback != null) {
-                    notifyCallback.onNotifyFailure(lockBLEData);
-                }
-            } else if (lockBLEData.getStatus() == (byte) 0x11) {
+            } else {
                 if (notifyCallback == null) {
                     notifyCallback.onNotifyFailure(lockBLEData);
                 }
             }
-
         } else {
-            if(waupStatus){
+            if (waupStatus) {
                 if (notifyCallback == null) {
                     notifyCallback.onNotifyFailure(lockBLEData);
                 }
@@ -219,6 +220,15 @@ public class LockBLESend {
         mcmd = 0x00;
         scmd = 0x00;
         cmdBytes = null;
+    }
+
+    // 唤醒失败
+    private void wakeupFailureResponse() {
+        LockBLEData lockBLEData = new LockBLEData();
+        lockBLEData.setMcmd(mcmd);
+        lockBLEData.setScmd(scmd);
+        lockBLEData.setStatus((byte) 0x12);
+        processNotify(lockBLEData);
     }
 
     // 写入失败

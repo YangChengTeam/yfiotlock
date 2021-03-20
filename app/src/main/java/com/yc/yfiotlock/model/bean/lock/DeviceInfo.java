@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.model.bean.lock;
 
+import android.text.TextUtils;
+
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
@@ -27,6 +29,9 @@ public class DeviceInfo implements Serializable {
     }
 
     public String getId() {
+        if(TextUtils.isEmpty(id)){
+            id = lockerId;
+        }
         return id;
     }
 

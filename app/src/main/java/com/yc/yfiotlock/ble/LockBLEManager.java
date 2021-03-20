@@ -63,6 +63,10 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
+    public static void clear(){
+        BleManager.getInstance().disconnectAllDevice();
+    }
+
     public static boolean isConnected(BleDevice bleDevice) {
         return BleManager.getInstance().isConnected(bleDevice);
     }

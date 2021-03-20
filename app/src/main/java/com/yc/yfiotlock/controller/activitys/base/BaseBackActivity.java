@@ -12,7 +12,7 @@ public abstract class BaseBackActivity extends BaseActivity {
     protected
     BackNavBar backNavBar;
 
-    public void setNavTitle(String title){
+    public void setNavTitle(String title) {
         backNavBar.setTitle(title);
     }
 
@@ -21,8 +21,12 @@ public abstract class BaseBackActivity extends BaseActivity {
         backNavBar.setBackListener(new BackNavBar.BackListener() {
             @Override
             public void onBack(View view) {
-                finish();
+                back();
             }
         });
+    }
+
+    protected void back() {
+        onBackPressed();
     }
 }

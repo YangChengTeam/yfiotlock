@@ -60,7 +60,7 @@ public class DeviceEngin extends BaseEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        map.put("id", id);
+        map.put("locker_id", id);
         map.put("name", name);
         return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_MODIFY_URL,
                 new TypeReference<ResultInfo<String>>() {

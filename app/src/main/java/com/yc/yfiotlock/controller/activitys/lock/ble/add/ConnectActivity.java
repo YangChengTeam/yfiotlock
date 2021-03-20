@@ -43,9 +43,6 @@ public class ConnectActivity extends BaseAddActivity {
     ImageView mIvSecret;
     @BindView(R.id.stv_next)
     SuperTextView mStvNext;
-    @BindView(R.id.tv_name)
-    TextView mTvName;
-
 
     private BleDevice bleDevice;
 
@@ -105,6 +102,7 @@ public class ConnectActivity extends BaseAddActivity {
         intent.putExtra("ssid", ssid);
         intent.putExtra("pwd", pwd);
         startActivity(intent);
+        finish();
     }
 
     private void scanWifi() {
@@ -180,9 +178,8 @@ public class ConnectActivity extends BaseAddActivity {
         setClick(mIvSecret, () -> CommonUtil.hiddenEditText(mEtPwd, mIvSecret));
         setClick(mStvNext, () -> {
             nav2next();
-            finish();
         });
-        setClick(R.id.tv_name, () -> {
+        setClick(R.id.iv_scan_wifi, () -> {
             mLoadingDialog.show("扫描中...");
             mLoadingDialog.setCanCancel(false);
             scanWifi();
@@ -193,7 +190,7 @@ public class ConnectActivity extends BaseAddActivity {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle("可用网络列表(2.4G)")
                 .setItems(strings, (DialogInterface.OnClickListener) (dialog, which) -> {
-                    mTvName.setText(strings[which]);
+                    mEtSsid.setText(strings[which]);
                     dialog.dismiss();
                 }).create();
         alertDialog.setCanceledOnTouchOutside(false);

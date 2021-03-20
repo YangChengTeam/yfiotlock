@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.dialogs.lock.ble.ChangeDeviceNameDialog;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
@@ -37,10 +39,14 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     LinearLayout mLlConnected;
 
     private BleDevice bleDevice;
+    private DeviceInfo deviceInfo;
     private LockBLESend lockBleSend;
     private DeviceEngin deviceEngin;
 
     private ValueAnimator valueAnimator;
+    private ChangeDeviceNameDialog deviceNameDialog;
+
+    private boolean isConnected = false;
 
     @Override
     protected void initVars() {
@@ -62,6 +68,10 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
         super.initViews();
         backNavBar.setTitle(bleDevice.getName());
         initProcessAnimate();
+        deviceNameDialog = new ChangeDeviceNameDialog(this);
+        deviceNameDialog.setOnSureClick(name -> {
+            cloudModifyDeivceName(name);
+        });
     }
 
     private void initProcessAnimate() {
@@ -106,13 +116,10 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     protected void bindClick() {
         super.bindClick();
         setClick(mTvEdit, () -> {
-            ChangeDeviceNameDialog deviceNameDialog = new ChangeDeviceNameDialog(this);
-            deviceNameDialog.setOnSureClick(name -> {
-
-            });
             deviceNameDialog.show(mTvEdit.getText().toString());
         });
     }
+
 
     private void bleBindWifi() {
         if (lockBleSend != null) {
@@ -122,14 +129,6 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
             showConnectingUi();
             byte[] cmdBytes = LockBLESettingCmd.wiftDistributionNetwork(this, ssid, pwd);
             lockBleSend.send((byte) 0x01, (byte) 0x02, cmdBytes);
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (lockBleSend != null) {
-            lockBleSend.clear();
         }
     }
 
@@ -157,6 +156,37 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
         });
     }
 
+    private void cloudModifyDeivceName(String name) {
+        if (deviceInfo != null && !TextUtils.isEmpty(deviceInfo.getDeviceId())) {
+            mLoadingDialog.show("正在修改");
+            deviceEngin.updateDeviceInfo(deviceInfo.getId(), name).subscribe(new Subscriber<ResultInfo<String>>() {
+                @Override
+                public void onCompleted() {
+                    mLoadingDialog.dismiss();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    mLoadingDialog.dismiss();
+                }
+
+                @Override
+                public void onNext(ResultInfo<String> resultInfo) {
+                    String msg = "服务器错误";
+                    if (resultInfo != null && resultInfo.getCode() == 1) {
+                        mTvEdit.setText(name);
+                        deviceNameDialog.dismiss();
+                        ToastCompat.show(getContext(), "修改成功");
+                    } else {
+                        msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
+                        ToastCompat.show(getContext(), msg);
+                    }
+                }
+            });
+        }
+
+    }
+
     private String aliDeviceName = "YF-LOCK";
 
     private void bleGetAliDeviceName() {
@@ -168,19 +198,34 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
 
     @Override
     public void success(Object data) {
-        DeviceInfo deviceInfo = (DeviceInfo) data;
+        deviceInfo = (DeviceInfo) data;
         deviceInfo.setName(bleDevice.getName());
         deviceInfo.setDeviceId(aliDeviceName);
-        nav2Index(deviceInfo);
     }
 
-    private void nav2Index(DeviceInfo deviceInfo) {
+    private void nav2Index() {
         Intent intent = new Intent(this, LockIndexActivity.class);
         intent.putExtra("family", familyInfo);
         intent.putExtra("bleDevice", bleDevice);
+        intent.putExtra("device", deviceInfo);
         startActivity(intent);
         DeviceListActivity.finish2();
         ConnectActivity.finish2();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isConnected) {
+            nav2Index();
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -195,7 +240,12 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
         } else {
             valueAnimator.end();
             showConnectedUi();
+
+            deviceInfo = new DeviceInfo();
+            deviceInfo.setName(bleDevice.getName());
+            deviceInfo.setDeviceId(aliDeviceName);
             cloudAddDevice();
+            isConnected = true;
         }
     }
 

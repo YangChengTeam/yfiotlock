@@ -38,31 +38,44 @@
             android:textSize="13dp" />
     </LinearLayout>
 
+
+
     <EditText
         android:id="@+id/et_ssid"
         android:layout_width="match_parent"
         android:layout_height="54dp"
-        android:paddingStart="15dp"
-        android:layout_marginTop="50dp"
-        android:paddingEnd="15dp"
-        android:gravity="center_vertical"
-        android:background="?android:selectableItemBackground"
+        android:layout_marginStart="15dp"
+        android:background="@drawable/et_bg2"
         android:hint="@string/please_input_wifi_name"
+        android:inputType="text"
         android:maxLength="20"
         android:singleLine="true"
         android:textColor="#222222"
         android:textColorHint="#999999"
         android:textSize="14dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="15dp"
         app:layout_constraintTop_toBottomOf="@id/ll_title" />
 
     <ImageView
+        android:id="@+id/iv_scan_wifi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/icon_arrow"
-        android:layout_marginRight="16dp"
+        android:padding="5dp"
+        android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="@id/et_ssid"
         app:layout_constraintEnd_toEndOf="@id/et_ssid"
-        app:layout_constraintTop_toTopOf="@id/et_ssid" />
+        app:layout_constraintTop_toTopOf="@id/et_ssid"
+        android:background="?android:selectableItemBackgroundBorderless"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="80dp"
+        android:background="?android:selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toBottomOf="@id/ll_title"></View>
 
     <EditText
         android:id="@+id/et_pwd"
