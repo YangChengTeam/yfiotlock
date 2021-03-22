@@ -40,6 +40,7 @@ import com.yc.yfiotlock.utils.CacheUtil;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -96,10 +97,13 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         return familyInfo;
     }
 
-    private static LockIndexActivity mInstance;
+    private static WeakReference<LockIndexActivity> mInstance;
 
     public static LockIndexActivity getInstance() {
-        return mInstance;
+        if (mInstance != null && mInstance.get() != null) {
+            return mInstance.get();
+        }
+        return null;
     }
 
     @Override
@@ -118,7 +122,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @Override
     protected void initViews() {
-        mInstance = this;
+        mInstance = new WeakReference<>(this);
         setFullScreen();
 
         loadLockOpenCountInfo();
@@ -219,7 +223,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     }
 
     private void open() {
-        if (isOpening) return;
+        if (isOpening) {
+            return;
+        }
         isOpening = true;
 
         loadingIv.setImageResource(R.mipmap.three);
@@ -364,6 +370,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     // 进入设置
     private void nav2setting() {
         Intent intent = new Intent(this, LockSettingActivity.class);
+        intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
 

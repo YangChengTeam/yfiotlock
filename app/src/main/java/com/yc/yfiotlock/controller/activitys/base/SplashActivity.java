@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.activitys.base;
 
 import android.content.Intent;
 
+import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
@@ -24,12 +25,17 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void initViews() {
         DownloadManager.init(new WeakReference<>(this));
+        setFullScreen();
+        VUiKit.postDelayed(1000,this::next);
+    }
+
+    private void next(){
         if (App.isLogin()) {
             startActivity(new Intent(this, MainActivity.class));
-            finish();
         } else {
             CommonUtil.startLogin(this);
         }
+        finish();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

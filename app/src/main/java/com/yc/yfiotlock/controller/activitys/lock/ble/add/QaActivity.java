@@ -11,6 +11,6 @@ public class QaActivity  extends BaseBackActivity {
 
     @Override
     protected void initViews() {
-
+            setClick(R.id.view_nav_bar, this::finish);
     }
 }

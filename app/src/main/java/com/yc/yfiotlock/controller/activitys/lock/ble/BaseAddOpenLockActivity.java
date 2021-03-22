@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import androidx.annotation.Nullable;
+
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -35,12 +37,27 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
     protected void initVars() {
         super.initVars();
         lockEngine = new LockEngine(this);
-        lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
+        lockInfo = getLockInfo();
+        BleDevice bleDevice = getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
-
         Random rand = new Random();
         number = rand.nextInt(100000000) + "";
+    }
+
+    protected DeviceInfo getLockInfo() {
+        LockIndexActivity lockIndexActivity = LockIndexActivity.getInstance();
+        if (lockIndexActivity != null) {
+            return lockIndexActivity.getLockInfo();
+        }
+        return null;
+    }
+
+    protected BleDevice getBleDevice() {
+        LockIndexActivity lockIndexActivity = LockIndexActivity.getInstance();
+        if (lockIndexActivity != null) {
+            return lockIndexActivity.getBleDevice();
+        }
+        return null;
     }
 
     protected abstract void cloudAddSucc();
@@ -83,7 +100,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
             if (bleData.getStatus() == (byte) 0x00 && bleData.getOther() != null) {
                 String number = new String(Arrays.copyOfRange(bleData.getOther(), 0, 5));
                 byte keyId = bleData.getOther()[6];
-                if (this.number.equals(number)) { // 验证流水号
+                // 验证流水号
+                if (this.number.equals(number)) {
                     cloudAdd(keyId + "");
                 }
             } else if (bleData.getStatus() == (byte) 0x01) {

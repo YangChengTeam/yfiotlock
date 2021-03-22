@@ -36,8 +36,7 @@ import rx.Subscriber;
 
 public class IndexFragment extends BaseFragment {
 
-    @BindView(R.id.ll_my_family)
-    View myFamilyBtn;
+
     @BindView(R.id.iv_device_add)
     View deviceAddBtn;
 
@@ -64,17 +63,20 @@ public class IndexFragment extends BaseFragment {
     protected void initViews() {
         setRv();
 
+        loadData();
+    }
+
+    @Override
+    protected void bindClick() {
+        setClick(R.id.tv_my_family, () -> {
+            //            nav2MyFamily();
+
+            nav2LockIndex(new DeviceInfo());
         RxView.clicks(myFamilyBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             nav2MyFamily();
         });
 
-        RxView.clicks(deviceAddBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            nav2AddDevice();
-        });
-
-        loadData();
-
-
+        setClick(deviceAddBtn, this::nav2AddDevice);
     }
 
     private void setRv() {

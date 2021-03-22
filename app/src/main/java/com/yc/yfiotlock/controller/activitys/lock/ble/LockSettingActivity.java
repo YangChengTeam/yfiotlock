@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.SettingSoundView;
@@ -32,8 +34,11 @@ public class LockSettingActivity extends BaseBackActivity {
     @Override
     protected void initViews() {
         super.initViews();
+        lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
         setRvSetting();
     }
+
+    private DeviceInfo lockInfo;
 
     private SettingAdapter mSettingAdapter;
 
@@ -54,11 +59,13 @@ public class LockSettingActivity extends BaseBackActivity {
                     startActivity(new Intent(this, AlarmOpenLockManagerActivity.class));
                     break;
                 case "设备信息":
-                    startActivity(new Intent(this, DeviceInfoActivity.class));
+                    Intent deviceInfoIntent = new Intent(this, DeviceInfoActivity.class);
+                    deviceInfoIntent.putExtra("device", lockInfo);
+                    startActivity(deviceInfoIntent);
                     break;
                 case "设备名称":
                     Intent intent = new Intent(this, DeviceNameEditActivity.class);
-                    intent.putExtra("name", settingInfo.getValue());
+                    intent.putExtra("name", lockInfo.getName());
                     startActivity(intent);
                     break;
                 case "安全设置":
@@ -75,7 +82,7 @@ public class LockSettingActivity extends BaseBackActivity {
         List<SettingInfo> settingInfos = new ArrayList<>();
         settingInfos.add(new SettingInfo("报警管理", ""));
         settingInfos.add(new SettingInfo("设备信息", ""));
-        settingInfos.add(new SettingInfo("设备名称", "智能门锁09"));
+        settingInfos.add(new SettingInfo("设备名称", lockInfo.getName()));
         settingInfos.add(new SettingInfo("安全设置", ""));
         settingInfos.add(new SettingInfo("帮助与反馈", ""));
         mSettingAdapter.setNewInstance(settingInfos);

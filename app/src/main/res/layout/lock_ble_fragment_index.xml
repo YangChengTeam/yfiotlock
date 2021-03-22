@@ -2,61 +2,62 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#25a58e">
+    android:layout_height="match_parent">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@mipmap/home_bg"></ImageView>
+        android:src="@mipmap/home_bg" />
 
     <com.yc.yfiotlock.view.widgets.StatusBar
         android:id="@+id/view_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></com.yc.yfiotlock.view.widgets.StatusBar>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/ll_my_family"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:background="?android:selectableItemBackgroundBorderless"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/transparent"
         app:layout_constraintTop_toBottomOf="@id/view_status">
 
         <TextView
+            android:id="@+id/tv_my_family"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="5dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:drawablePadding="5dp"
             android:text="我的家庭"
             android:textColor="#ffffffff"
-            android:textSize="17dp" />
+            android:textSize="17dp"
+            app:drawableEndCompat="@mipmap/home_icon_arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <ImageView
+            android:id="@+id/iv_device_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="5dp"
-            android:src="@mipmap/home_icon_arrow"></ImageView>
-    </LinearLayout>
+            android:layout_marginEnd="11dp"
+            android:padding="5dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:scaleType="center"
+            android:src="@mipmap/home_icon_add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
-    <ImageView
-        android:id="@+id/iv_device_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginRight="16dp"
-        android:background="?android:selectableItemBackgroundBorderless"
-        android:scaleType="center"
-        android:src="@mipmap/home_icon_add"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/view_status"></ImageView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_devices"
@@ -64,6 +65,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="345dp"
         android:layout_marginBottom="16dp"
+        android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent">

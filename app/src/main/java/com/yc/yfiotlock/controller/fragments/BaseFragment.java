@@ -126,7 +126,15 @@ public abstract class BaseFragment extends Fragment implements ILoadData {
         });
     }
 
-
+    /**
+     * @param view click view
+     * @param runnable when click to do sth.
+     */
+    protected void setClick(View view, @NonNull Runnable runnable) {
+        RxView.clicks(view).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view1 -> {
+            runnable.run();
+        });
+    }
 
 
     @Override
