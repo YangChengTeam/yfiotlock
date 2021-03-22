@@ -14,8 +14,10 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
@@ -38,6 +40,7 @@ public class BaseOpenLockManagerActivity extends BaseBackActivity {
     RecyclerView openLockRecyclerView;
 
     protected DeviceInfo lockInfo;
+    protected BleDevice bleDevice;
     protected OpenLockAdapter openLockAdapter;
 
     @Override
@@ -48,6 +51,7 @@ public class BaseOpenLockManagerActivity extends BaseBackActivity {
     @Override
     protected void initVars() {
         super.initVars();
+        bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
         LockBLEManager.GROUP_TYPE = LockBLEManager.GROUP_ADMIN;
     }
@@ -66,6 +70,10 @@ public class BaseOpenLockManagerActivity extends BaseBackActivity {
         openLockAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
+                if(!LockBLEManager.isConnected(bleDevice)){
+                    ToastCompat.show(getContext(),  "蓝牙未连接");
+                    return;
+                }
                 Class clazz = null;
                 if (position == 0) {
                     clazz = FingerprintOpenLockActivity.class;
