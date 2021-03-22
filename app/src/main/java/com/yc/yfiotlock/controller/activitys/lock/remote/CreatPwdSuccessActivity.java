@@ -1,17 +1,21 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.demo.OperationActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -45,9 +49,6 @@ public class CreatPwdSuccessActivity extends BaseActivity {
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
 
-        RxView.clicks(tvCopy).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-
-        });
 
         Serializable passwordInfo = getIntent().getSerializableExtra("password_info");
         if (!(passwordInfo instanceof PassWordInfo)) {
@@ -74,5 +75,12 @@ public class CreatPwdSuccessActivity extends BaseActivity {
                 ((TextView) childAt).setText(pwd.substring(i, i + 1));
             }
         }
+
+        RxView.clicks(tvCopy).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("ble", pwd);
+            clipboard.setPrimaryClip(clip);
+            ToastUtil.toast2(CreatPwdSuccessActivity.this, "复制成功");
+        });
     }
 }

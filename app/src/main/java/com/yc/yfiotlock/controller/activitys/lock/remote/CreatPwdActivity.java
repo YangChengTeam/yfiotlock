@@ -23,11 +23,14 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.LeftNextTextView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -178,6 +181,7 @@ public class CreatPwdActivity extends BaseActivity {
                             CreatPwdSuccessActivity.start(CreatPwdActivity.this, passWordInfo);
 
                             mLoadingDialog.dismiss();
+                            EventBus.getDefault().post(new OpenLockRefreshEvent());
                             finish();
                         }
                     }

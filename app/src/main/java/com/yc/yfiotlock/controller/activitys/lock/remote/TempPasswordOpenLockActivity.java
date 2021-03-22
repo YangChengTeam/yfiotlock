@@ -18,6 +18,7 @@ import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.WarnInfo;
@@ -27,6 +28,8 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -174,5 +177,11 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(OpenLockRefreshEvent object) {
+        page = 1;
+        loadData();
     }
 }

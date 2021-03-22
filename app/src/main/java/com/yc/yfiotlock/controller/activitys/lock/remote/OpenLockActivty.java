@@ -81,6 +81,8 @@ public class OpenLockActivty extends BaseActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
+
+                tvHint.setText("开锁指令下发失败");
             }
 
             @Override
