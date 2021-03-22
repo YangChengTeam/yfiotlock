@@ -370,6 +370,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     // 进入设置
     private void nav2setting() {
         Intent intent = new Intent(this, LockSettingActivity.class);
+        intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
 
