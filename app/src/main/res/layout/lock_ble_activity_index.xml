@@ -21,6 +21,7 @@
         android:id="@+id/view_nav_bar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/transparent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view_status">
 
@@ -28,10 +29,11 @@
             android:id="@+id/iv_back"
             android:layout_width="48dp"
             android:layout_height="match_parent"
+            android:background="?android:selectableItemBackgroundBorderless"
             android:scaleType="center"
             android:src="@mipmap/icon_back_white"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></ImageView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_title"
@@ -41,16 +43,20 @@
             android:text="扬飞智家"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="18dp"></TextView>
+            android:textSize="18dp" />
 
         <ImageView
             android:id="@+id/iv_setting"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:padding="5dp"
             android:scaleType="center"
             android:src="@mipmap/icon_set"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></ImageView>
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -132,6 +138,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:background="?android:selectableItemBackground"
             android:layout_height="match_parent">
 
             <TextView
@@ -190,6 +197,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
+                android:background="?android:selectableItemBackground"
                 android:layout_height="match_parent">
 
                 <TextView
@@ -225,6 +233,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
+                android:background="?android:selectableItemBackground"
                 android:layout_height="match_parent">
 
                 <TextView
