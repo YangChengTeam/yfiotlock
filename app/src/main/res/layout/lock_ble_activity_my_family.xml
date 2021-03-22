@@ -29,7 +29,7 @@
         android:id="@+id/srl_refresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/fl_my_family_bottom"
+        app:layout_constraintBottom_toTopOf="@id/fl_add_pwd_bottom"
         app:layout_constraintTop_toBottomOf="@id/tv_my_family_des">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -40,7 +40,7 @@
 
 
     <FrameLayout
-        android:id="@+id/fl_my_family_bottom"
+        android:id="@+id/fl_add_pwd_bottom"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:background="@color/white"

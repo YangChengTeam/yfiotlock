@@ -13,6 +13,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.PasswordModifyOpenLockActivity;
 import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
 import com.yc.yfiotlock.view.adapters.ItemAdapter;
@@ -63,10 +64,11 @@ public class TempPwdDetailActivity extends BaseActivity {
         itemAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-                Serializable serializable = getIntent().getSerializableExtra("password_info");
-                if (serializable instanceof PassWordInfo) {
-                    CreatPwdActivity.start(TempPwdDetailActivity.this, (PassWordInfo) serializable);
-                }
+//                Serializable serializable = getIntent().getSerializableExtra("password_info");
+//                if (serializable instanceof PassWordInfo) {
+//                    CreatPwdActivity.start(TempPwdDetailActivity.this, (PassWordInfo) serializable);
+//                }
+                startActivity(new Intent(TempPwdDetailActivity.this, PasswordModifyOpenLockActivity.class));
             }
         });
     }

@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
+import android.content.Intent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -8,8 +9,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
+import com.coorchice.library.SuperTextView;
+import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyAddActivity;
 import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
 import com.yc.yfiotlock.view.adapters.TempPwdAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -18,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 
@@ -26,6 +33,9 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
     BackNavBar mBnbTitle;
     @BindView(R.id.rv_temp_pwd)
     RecyclerView recyclerView;
+    @BindView(R.id.stv_add)
+    SuperTextView stvAdd;
+
     private TempPwdAdapter tempPwdAdapter;
 
     @Override
@@ -37,6 +47,10 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
         initRv();
+
+        RxView.clicks(stvAdd).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            startActivity(new Intent(TempPasswordOpenLockActivity.this, CreatPwdActivity.class));
+        });
 
         loadData();
     }

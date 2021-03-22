@@ -4,7 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.text.TextUtils;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -13,6 +17,7 @@ import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.view.TimePickerView;
 import com.contrarywind.view.WheelView;
 import com.jakewharton.rxbinding4.view.RxView;
+import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -47,6 +52,12 @@ public class CreatPwdActivity extends BaseActivity {
     LeftNextTextView ltvEndTime;
     @BindView(R.id.cl_custom)
     ConstraintLayout clCustom;
+    @BindView(R.id.iv_pass_show_status)
+    ImageView statusIv;
+    @BindView(R.id.et_pwd_number)
+    EditText passEt;
+    @BindView(R.id.et_pwd_name)
+    EditText nameEt;
 
     public static void start(Context context, PassWordInfo passWordInfo) {
         Intent intent = new Intent(context, CreatPwdActivity.class);
@@ -70,22 +81,14 @@ public class CreatPwdActivity extends BaseActivity {
         timeViews = new LeftNextTextView[]{ltvStartDate, ltvEndDate, ltvStartTime, ltvEndTime};
 
         RxView.clicks(tvNext).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            Serializable serializable = getIntent().getSerializableExtra("password_info");
-            if (serializable instanceof PassWordInfo) {
-                CreatPwdSuccessActivity.start(CreatPwdActivity.this, (PassWordInfo) serializable);
-            }
+            toSubmit();
         });
         RxView.clicks(tvTypeTheOne).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            isSelTheOne = true;
-
-            chengUi();
+            chengUi(true);
         });
         RxView.clicks(tvTypeCustom).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            isSelTheOne = false;
-
-            chengUi();
+            chengUi(false);
         });
-
         RxView.clicks(ltvStartDate).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             showTimePickerView(0);
         });
@@ -98,9 +101,53 @@ public class CreatPwdActivity extends BaseActivity {
         RxView.clicks(ltvEndTime).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             showTimePickerView(3);
         });
+
+        statusIv.setSelected(true);
+        RxView.clicks(statusIv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            if (statusIv.isSelected()) {
+                passEt.setTransformationMethod(null);
+                statusIv.setImageResource(R.mipmap.secret_see);
+                statusIv.setSelected(false);
+                passEt.setSelection(passEt.getText().length());
+            } else {
+                passEt.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                statusIv.setImageResource(R.mipmap.secret_hide);
+                statusIv.setSelected(true);
+                passEt.setSelection(passEt.getText().length());
+            }
+        });
+
+        chengUi(true);
     }
 
-    private void chengUi() {
+    private void toSubmit() {
+        if (isSelTheOne) {
+            String trimName = nameEt.getText().toString().trim();
+            if (TextUtils.isEmpty(trimName)) {
+                ToastUtil.toast2(CreatPwdActivity.this, "请输入密码名称");
+                return;
+            }
+            String trimPwd = passEt.getText().toString().trim();
+            if (TextUtils.isEmpty(trimPwd)) {
+                ToastUtil.toast2(CreatPwdActivity.this, "请输入密码");
+                return;
+            }
+            if (trimPwd.length() != 6) {
+                ToastUtil.toast2(CreatPwdActivity.this, "密码长度不合规");
+                return;
+            }
+        } else {
+            return;
+        }
+        Serializable serializable = getIntent().getSerializableExtra("password_info");
+        if (serializable instanceof PassWordInfo) {
+            CreatPwdSuccessActivity.start(CreatPwdActivity.this, (PassWordInfo) serializable);
+        }
+    }
+
+    private void chengUi(boolean selTheOne) {
+        isSelTheOne = selTheOne;
+
         if (isSelTheOne) {
             clCustom.setVisibility(View.GONE);
 
