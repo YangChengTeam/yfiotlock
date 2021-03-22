@@ -48,6 +48,7 @@ public class SafePwdCreateActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
+        mBnbTitle.setBackListener(view -> finish());
         mEtPwd.setOnLongClickListener(v -> true);
         setRvPwd();
         showInput();

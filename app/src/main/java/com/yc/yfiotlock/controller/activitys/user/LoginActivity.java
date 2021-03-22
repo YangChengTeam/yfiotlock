@@ -75,19 +75,13 @@ public class LoginActivity extends BaseActivity {
     }
 
 
-    private long lastTime = 0;
 
     @Override
     public void onBackPressed() {
-        if (System.currentTimeMillis() - lastTime > 2000) {
-            ToastCompat.show(getContext(), "再按一次退出");
-            lastTime = System.currentTimeMillis();
-        } else {
-            if (MainActivity.getInstance() != null && MainActivity.getInstance().get() != null) {
-                MainActivity.getInstance().get().finish();
-            }
-            System.exit(0);
-        }
+        Intent home = new Intent(Intent.ACTION_MAIN);
+        home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        home.addCategory(Intent.CATEGORY_HOME);
+        startActivity(home);
     }
 
     @Override

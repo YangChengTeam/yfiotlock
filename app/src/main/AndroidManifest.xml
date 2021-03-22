@@ -64,6 +64,7 @@
         <activity android:name=".controller.activitys.user.PersonalInfoActivity" />
         <activity
             android:name=".controller.activitys.base.SplashActivity"
+            android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
