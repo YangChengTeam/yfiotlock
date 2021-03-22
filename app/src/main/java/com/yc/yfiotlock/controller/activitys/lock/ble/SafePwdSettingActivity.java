@@ -100,6 +100,13 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
                 ToastCompat.show(getContext(), "密码错误");
             }
         }
+        if (OPEN_WITH_NO_PWD_BEFORE == requestCode) {
+            if (resultCode == RESULT_OK && data != null) {
+                SafeUtils.setSafePwd(mDeviceInfo, data.getStringExtra("pwd"));
+                mSafePwd.setChecked(true);
+                setSaveType(SafeUtils.PASSWORD_TYPE);
+            }
+        }
     }
 
     @Override
@@ -122,6 +129,11 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
             //密码
             case R.id.s_safe_pwd:
                 if (isChecked) {
+                    if (SafeUtils.DEFAULT.equals(SafeUtils.getSafePwd(mDeviceInfo))) {
+                        startActivityForResult(new Intent(this, SafePwdCreateActivity.class),
+                                OPEN_WITH_NO_PWD_BEFORE);
+                        return;
+                    }
                     SafePwdCreateActivity.startCheck(this);
                 }
                 break;
@@ -133,6 +145,11 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
             SafeUtils.setSafePwdType(mDeviceInfo, SafeUtils.NO_PASSWORD);
         }
     }
+
+    /**
+     * 之前没有设置过密码 打开的时候应该是创建新密码
+     */
+    private static final int OPEN_WITH_NO_PWD_BEFORE = 112;
 
     private void checkFinger() {
         SafeUtils.useFinger(this, new Callback<String>() {

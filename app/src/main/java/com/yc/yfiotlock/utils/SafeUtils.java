@@ -67,6 +67,11 @@ public class SafeUtils {
     }
 
     /**
+     * 密码默认值
+     */
+    public static final String DEFAULT = "default";
+
+    /**
      * @param deviceInfo 设备信息
      * @param pwd        保存安全密码
      */
