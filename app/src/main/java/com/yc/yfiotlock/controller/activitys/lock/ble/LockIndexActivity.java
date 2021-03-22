@@ -271,6 +271,15 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this));
         }
 
+        VUiKit.postDelayed(8000, () -> {
+            if (isOpening) {
+                isOpening = false;
+                if (LockBLEManager.isConnected(bleDevice)) {
+                    setConnectedInfo();
+                }
+                ToastCompat.show(getContext(), "操作超时");
+            }
+        });
     }
 
 
