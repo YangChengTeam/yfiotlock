@@ -38,6 +38,13 @@ public class LockSettingActivity extends BaseBackActivity {
         setRvSetting();
     }
 
+    @Override
+    protected void bindClick() {
+        setClick(R.id.stv_del,() -> {
+            //todo delete device
+        });
+    }
+
     private DeviceInfo lockInfo;
 
     private SettingAdapter mSettingAdapter;
@@ -69,7 +76,9 @@ public class LockSettingActivity extends BaseBackActivity {
                     startActivity(intent);
                     break;
                 case "安全设置":
-                    startActivity(new Intent(this, SafePwdSettingActivity.class));
+                    Intent safeIntent = new Intent(this, SafePwdSettingActivity.class);
+                    safeIntent.putExtra("device", lockInfo);
+                    startActivity(safeIntent);
                     break;
                 case "帮助与反馈":
                     startActivity(new Intent(this, FAQActivity.class));

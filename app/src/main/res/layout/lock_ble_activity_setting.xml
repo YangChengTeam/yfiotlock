@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/grayBg">
 
     <com.yc.yfiotlock.view.widgets.BackNavBar
         android:id="@+id/view_nav_bar"
@@ -16,7 +17,35 @@
         android:id="@+id/rv_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         app:layout_constraintTop_toBottomOf="@id/view_nav_bar" />
 
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.coorchice.library.SuperTextView
+            android:id="@+id/stv_del"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center"
+            android:text="@string/delete_device"
+            android:textColor="@color/white"
+            android:textSize="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:stv_corner="18dp"
+            app:stv_pressBgColor="@color/pressedColor"
+            app:stv_shaderEnable="true"
+            app:stv_shaderEndColor="#FE3737"
+            app:stv_shaderMode="topToBottom"
+            app:stv_shaderStartColor="#FE3737" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

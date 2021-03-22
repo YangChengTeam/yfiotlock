@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.base;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.App;
@@ -26,10 +27,31 @@ public class SplashActivity extends BaseActivity {
     protected void initViews() {
         DownloadManager.init(new WeakReference<>(this));
         setFullScreen();
-        VUiKit.postDelayed(1000,this::next);
+        VUiKit.postDelayed(1000, () -> {
+            navToMain = true;
+            if (this.hasWindowFocus()) {
+                navToMain();
+            }
+        });
     }
 
-    private void next(){
+    /**
+     * 加入这个判断是用来解决：若用户在开屏跳转中途返回桌面，还会跳转到主页的问题
+     * 更加符合用户需求（暂时有别的事要处理），而不是用户返回桌面了，过一会又打开app了
+     * 如果在跳转的时候返回了，就加个标识，当用户再次切换回app的时候再跳转
+     */
+    private boolean navToMain = false;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (navToMain) {
+            navToMain();
+        }
+    }
+
+    private void navToMain() {
+        navToMain = false;
         if (App.isLogin()) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
@@ -45,4 +67,11 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent home = new Intent(Intent.ACTION_MAIN);
+        home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        home.addCategory(Intent.CATEGORY_HOME);
+        startActivity(home);
+    }
 }
