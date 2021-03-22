@@ -4,9 +4,16 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 
 import androidx.annotation.IntRange;
@@ -27,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity {
 
@@ -87,22 +93,38 @@ public class MainActivity extends BaseActivity {
 
 
     private void onSelected(@IntRange(from = 0) int index) {
-        mVpIndex.setCurrentItem(index);
-        resetItem();
         setItem(index);
+        mVpIndex.setCurrentItem(index, false);
+    }
+
+    private void setAnim(View view) {
+        ScaleAnimation scaleAnimation = new ScaleAnimation(0.5f, 1.1f,
+                0.5f, 1.1f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        scaleAnimation.setInterpolator(new BounceInterpolator());
+        scaleAnimation.setDuration(500);
+        view.setAnimation(scaleAnimation);
+        scaleAnimation.start();
     }
 
     private void setItem(int index) {
+        if (mVpIndex.getCurrentItem() == index) {
+            return;
+        }
+        resetItem();
         switch (index) {
             case 0:
                 mTvIndex.setTextColor(Color.parseColor("#222222"));
                 mTvIndex.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
                         ContextCompat.getDrawable(this, R.mipmap.icon_home_sel), null, null);
+                setAnim(mTvIndex);
                 break;
             case 1:
                 mTvMine.setTextColor(Color.parseColor("#222222"));
                 mTvMine.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
                         ContextCompat.getDrawable(this, R.mipmap.icon_personal_sel), null, null);
+                setAnim(mTvMine);
                 break;
             default:
                 break;
@@ -110,6 +132,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void resetItem() {
+        mTvIndex.clearAnimation();
+        mTvMine.clearAnimation();
         mTvIndex.setTextColor(Color.parseColor("#909090"));
         mTvMine.setTextColor(Color.parseColor("#909090"));
         mTvIndex.setCompoundDrawablesRelativeWithIntrinsicBounds(null,

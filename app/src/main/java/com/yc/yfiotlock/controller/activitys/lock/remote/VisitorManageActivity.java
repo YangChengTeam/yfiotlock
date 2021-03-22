@@ -78,7 +78,7 @@ public class VisitorManageActivity extends BaseActivity {
                         OpenLockActivty.start(VisitorManageActivity.this, deviceInfo);
                         break;
                     case 2:
-                        startActivity(new Intent(VisitorManageActivity.this, TempPasswordOpenLockActivity.class));
+                        TempPasswordOpenLockActivity.start(VisitorManageActivity.this, deviceInfo);
                         break;
                 }
             }

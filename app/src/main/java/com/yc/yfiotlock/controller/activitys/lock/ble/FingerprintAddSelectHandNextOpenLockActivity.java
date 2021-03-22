@@ -63,7 +63,7 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
     protected void cloudAddSucc() {
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
-            countInfo.setPasswordCount(countInfo.getFingerprintCount() + 1);
+            countInfo.setFingerprintCount(countInfo.getFingerprintCount() + 1);
             CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
         }
     }

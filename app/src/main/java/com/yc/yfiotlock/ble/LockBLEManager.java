@@ -37,6 +37,7 @@ public class LockBLEManager {
     public static final int OP_INTERVAL_TIME = 200;
     public static final String PIN_CODE = "123456";
     public static byte GROUP_TYPE = 0;
+    public static byte GROUP_TYPE_TEMP_PWD = 2;
     public static final byte GROUP_ADMIN = 0;
     public static final byte GROUP_HIJACK = 3;
     public static int OP_TIMEOUT = 20000;
@@ -205,7 +206,7 @@ public class LockBLEManager {
             public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
                 // 设置连接失败状态
                 callbck.onDisconnect(bleDevice);
-                ObserverManager.getInstance().notifyObserver(bleDevice);
+                BleManager.getInstance().disconnect(bleDevice);
             }
         });
     }

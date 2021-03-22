@@ -92,7 +92,7 @@ public class ChangeDeviceNameDialog extends Dialog {
             }
         });
         setClick(mIvCancel, this::dismiss);
-        CommonUtil.setEditTextLimit(mEtName,10,true);
+        CommonUtil.setEditTextLimit(mEtName,20,true);
     }
 
     public void show(@NonNull String name) {

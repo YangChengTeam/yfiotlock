@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 
-public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity  {
+public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     @BindView(R.id.iv_pass_show_status)
     ImageView statusIv;
 
@@ -102,4 +102,11 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity  {
         cloudAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
     }
 
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        super.onNotifyFailure(lockBLEData);
+        if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            finish();
+        }
+    }
 }

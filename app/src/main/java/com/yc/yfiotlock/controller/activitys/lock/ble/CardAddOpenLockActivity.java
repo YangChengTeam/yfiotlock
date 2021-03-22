@@ -35,9 +35,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         String name = "NFC门卡" + ((cardCount) > 9 ? cardCount + "" : "0" + cardCount);
         nameTv.setText(name);
 
-        VUiKit.postDelayed(1000, () -> {
-            bleAddCard();
-        });
+        bleAddCard();
     }
 
     private void bleAddCard() {
@@ -49,7 +47,8 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         VUiKit.postDelayed(15 * 1000, () -> {
             if (!isOpOver) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "已超时");
+                ToastCompat.show(getContext(), "操作超时");
+                finish();
             }
         });
     }

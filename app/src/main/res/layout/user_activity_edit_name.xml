@@ -11,35 +11,43 @@
         android:id="@+id/bnb_title"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:text="设置您的昵称" />
 
-    <com.coorchice.library.SuperTextView
-        android:id="@+id/stv_sure"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:paddingEnd="25dp"
-        android:paddingStart="25dp"
-        android:gravity="center"
-        app:stv_corner="50dp"
-        app:stv_pressBgColor="@color/ripper_bg"
-        android:text="@string/sure"
-        android:textColor="#222222"
-        android:textSize="15dp"
+        android:background="@color/transparent"
         app:layout_constraintBottom_toBottomOf="@id/bnb_title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/bnb_title" />
+        app:layout_constraintTop_toTopOf="@id/bnb_title">
+
+        <TextView
+            android:id="@+id/stv_sure"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:text="@string/sure"
+            android:textColor="#222222"
+            android:textSize="15dp"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <EditText
         android:id="@+id/et_name"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:singleLine="true"
         android:layout_marginTop="10dp"
         android:background="@color/white"
         android:hint="@string/edit_name_hint"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
+        android:singleLine="true"
         android:textColor="#222222"
         android:textColorHint="#999999"
         android:textSize="14dp"

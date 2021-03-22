@@ -3,6 +3,7 @@ package com.yc.yfiotlock.controller.activitys.lock.remote;
 import android.content.Context;
 import android.content.Intent;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -10,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.VUiKit;
+import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
@@ -31,6 +33,10 @@ public class OpenLockActivty extends BaseActivity {
     ConstraintLayout clOpenLock;
     @BindView(R.id.cl_open_fail)
     ConstraintLayout clOpenFail;
+    @BindView(R.id.tv_open_fail_des)
+    TextView tvFailDes;
+
+
     private LockEngine lockEngine;
 
     public static void start(Context context, DeviceInfo deviceInfo) {
@@ -62,6 +68,10 @@ public class OpenLockActivty extends BaseActivity {
     }
 
     private void open(String id) {
+        if (TextUtils.isEmpty(id)) {
+            ToastUtil.toast2(OpenLockActivty.this, "没找到门锁");
+            return;
+        }
         mLoadingDialog.show("开锁中...");
         lockEngine.longOpenLock(id).subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
@@ -71,33 +81,38 @@ public class OpenLockActivty extends BaseActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
+
+                tvHint.setText("开锁指令下发失败");
             }
 
             @Override
             public void onNext(ResultInfo<String> resultInfo) {
-                if (resultInfo != null && resultInfo.getCode() == 1) {
+                if (resultInfo != null) {
+                    if (resultInfo.getCode() == 1) {
+                        mLoadingDialog.setIcon(R.mipmap.icon_finish);
+                        mLoadingDialog.show("开锁指令已下发");
 
-                    mLoadingDialog.setIcon(R.mipmap.icon_finish);
-                    mLoadingDialog.show("开锁成功");
-
-                    VUiKit.postDelayed(1500, new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isDestroyed()) {
-                                return;
+                        VUiKit.postDelayed(1500, new Runnable() {
+                            @Override
+                            public void run() {
+                                if (isDestroyed()) {
+                                    return;
+                                }
+                                mLoadingDialog.dismiss();
                             }
-                            mLoadingDialog.dismiss();
-                        }
-                    });
+                        });
 
-                    String text = "开锁指令已下发<br>在门锁上输入" +
-                            "<font color='#3395FD'>5#</font>" +
-                            "后开启门锁";
-                    tvHint.setText(Html.fromHtml(text));
-                } else {
-                    mLoadingDialog.dismiss();
-                    clOpenLock.setVisibility(View.GONE);
-                    clOpenFail.setVisibility(View.VISIBLE);
+                        String text = "开锁指令已下发<br>在门锁上输入" +
+                                "<font color='#3395FD'>5#</font>" +
+                                "后开启门锁";
+                        tvHint.setText(Html.fromHtml(text));
+                    } else {
+                        mLoadingDialog.dismiss();
+                        clOpenLock.setVisibility(View.GONE);
+                        clOpenFail.setVisibility(View.VISIBLE);
+
+                        tvFailDes.setText(resultInfo.getMsg());
+                    }
                 }
             }
         });

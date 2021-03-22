@@ -56,6 +56,7 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
         super.initVars();
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         lockBleSend = new LockBLESend(this, bleDevice);
+        LockBLESend.bleNotify(bleDevice);
         lockBleSend.setNotifyCallback(this);
         deviceEngin = new DeviceEngin(this);
     }
@@ -191,7 +192,6 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     }
 
     private String aliDeviceName = "YF-LOCK";
-
     private void bleGetAliDeviceName() {
         if (lockBleSend != null) {
             byte[] cmdBytes = LockBLESettingCmd.getAlDeviceName(this);

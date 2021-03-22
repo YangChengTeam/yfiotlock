@@ -3,6 +3,8 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.app.Dialog;
 import android.content.Intent;
 import android.hardware.SensorEvent;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,6 +17,7 @@ import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtils;
@@ -38,6 +41,7 @@ import com.yc.yfiotlock.utils.CacheUtil;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -94,14 +98,18 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         return familyInfo;
     }
 
+
     public LockBLESend getLockBleSend() {
         return lockBleSend;
     }
 
-    private static LockIndexActivity mInstance;
+    private static WeakReference<LockIndexActivity> mInstance;
 
     public static LockIndexActivity getInstance() {
-        return mInstance;
+        if (mInstance != null && mInstance.get() != null) {
+            return mInstance.get();
+        }
+        return null;
     }
 
     @Override
@@ -120,7 +128,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @Override
     protected void initViews() {
-        mInstance = this;
+        mInstance = new WeakReference<>(this);
         setFullScreen();
 
         loadLockOpenCountInfo();
@@ -180,6 +188,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 if (LockBLEManager.isConnected(bleDevice)) {
                     // 开门
                     open();
+                    vibrate();
                 }
             }
         });
@@ -195,12 +204,19 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         });
     }
 
+    private void vibrate() {
+        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        if (vibrator.hasVibrator()) {
+            vibrator.vibrate(new long[]{200, 500}, -1);
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         shakeSensor.register();
 
-        if(lockBleSend != null){
+        if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
@@ -213,7 +229,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     protected void onStop() {
         super.onStop();
-        if(lockBleSend != null){
+        if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(null);
             lockBleSend.unregisterNotify();
         }
@@ -242,7 +258,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     }
 
     private void open() {
-        if (isOpening) return;
+        if (isOpening) {
+            return;
+        }
         isOpening = true;
 
         loadingIv.setImageResource(R.mipmap.three);
@@ -250,8 +268,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startAnimations();
 
         if (lockBleSend != null) {
-            lockBleSend.send((byte) 0x01, (byte) 0x01, LockBLESettingCmd.reset(this));
+            lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this));
         }
+
     }
 
 
@@ -334,17 +353,20 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
                 statusIv.setImageResource(R.mipmap.icon_nolink);
                 loadingIv.setImageResource(R.mipmap.one);
+
             }
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
                 LockIndexActivity.this.bleDevice = bleDevice;
-                lockBleSend = new LockBLESend(LockIndexActivity.this, bleDevice);
-                lockBleSend.registerNotify();
-                lockBleSend.setNotifyCallback(LockIndexActivity.this);
-                VUiKit.postDelayed(1000, ()->{
-                    LockBLESend.bleNotify(bleDevice);
-                });
+                if (lockBleSend == null) {
+                    lockBleSend = new LockBLESend(LockIndexActivity.this, bleDevice);
+                    lockBleSend.registerNotify();
+                    lockBleSend.setNotifyCallback(LockIndexActivity.this);
+                    VUiKit.postDelayed(1000, () -> {
+                        LockBLESend.bleNotify(bleDevice);
+                    });
+                }
                 // 设置连接成功状态
                 setConnectedInfo();
 
@@ -390,6 +412,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     // 进入设置
     private void nav2setting() {
         Intent intent = new Intent(this, LockSettingActivity.class);
+        intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
 

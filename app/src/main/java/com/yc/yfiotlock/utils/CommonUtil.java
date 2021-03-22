@@ -217,7 +217,7 @@ public class CommonUtil {
         });
 
         phoneNumberAuthHelper.setAuthSDKInfo(Config.ALI_PHONE_SDK_APPID);
-        phoneNumberAuthHelper.getReporter().setLoggerEnable(true);
+        //DEBUG mode phoneNumberAuthHelper.getReporter().setLoggerEnable(true);
         phoneNumberAuthHelper.checkEnvAvailable(2);
         loginEvent.setStateString(LoginEvent.State.CHECKING);
         EventBus.getDefault().post(loginEvent);
@@ -310,7 +310,7 @@ public class CommonUtil {
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
                     UserInfoCache.setUserInfo(info.getData());
 
-                    VUiKit.postDelayed(200,() -> {
+                    VUiKit.postDelayed(200, () -> {
                         context.startActivity(new Intent(context, MainActivity.class));
                         //hide loading
                         PhoneNumberAuthHelper.getInstance(context, listener).hideLoginLoading();
@@ -423,8 +423,8 @@ public class CommonUtil {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();
         String ssid = info.getSSID();
-        if(!TextUtils.isEmpty(ssid)){
-            ssid =ssid.replace("\"", "");
+        if (!TextUtils.isEmpty(ssid)) {
+            ssid = ssid.replace("\"", "");
         }
         return ssid;
     }

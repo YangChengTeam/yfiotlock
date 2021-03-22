@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import rx.Subscriber;
 
-public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
+public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
     @BindView(R.id.rv_open_lock)
     RecyclerView openLockRecyclerView;
     @BindView(R.id.stv_del)
@@ -51,6 +52,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     protected byte scmd;
 
     protected String title;
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -74,7 +76,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         super.initViews();
         setNavTitle(title + "详情");
         delTv.setText(delTv.getText() + title);
-
         RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             GeneralDialog generalDialog = new GeneralDialog(BaseDetailOpenLockActivity.this);
             generalDialog.setTitle("温馨提示");
@@ -82,7 +83,8 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
-                    cloudDel();
+                    mLoadingDialog.show("删除中...");
+                    bleDel();
                 }
             });
             generalDialog.show();
@@ -93,11 +95,11 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     }
 
     protected abstract void bleDel();
+
     protected abstract void cloudDelSucc();
 
 
     protected void cloudDel() {
-        mLoadingDialog.show("删除中...");
         lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
@@ -121,21 +123,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onProcess(LockBLEData bleData) {
-        if (bleData != null && bleData.getMcmd() == mcmd && bleData.getScmd() == scmd) {
-            if (bleData.getStatus() == (byte) 0x00) {
-                cloudDel();
-            } else if (bleData.getStatus() == (byte) 0x01) {
-
-            } else if (bleData.getStatus() == (byte) 0x10) {
-
-            } else if (bleData.getStatus() == (byte) 0x11) {
-
-            }
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockInfo openLockInfo) {
         List<OpenLockInfo> openLockTypeInfos = new ArrayList<>();
         openLockTypeInfos.add(openLockInfo);
@@ -143,10 +130,24 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
         EventBus.getDefault().post(new OpenLockRefreshEvent());
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(lockBleSend != null){
+            lockBleSend.setNotifyCallback(this);
+            lockBleSend.registerNotify();
+        }
+
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
-        lockBleSend.clear();
+        if(lockBleSend != null){
+            lockBleSend.setNotifyCallback(null);
+            lockBleSend.unregisterNotify();
+        }
     }
 
     private void setRv() {
@@ -171,5 +172,25 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity {
                 holder.setVisible(R.id.view_line, true);
             }
         }
+    }
+
+    @Override
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            cloudDel();
+        }
+    }
+
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            mLoadingDialog.dismiss();
+            ToastCompat.show(getContext(), "删除失败");
+        }
+    }
+
+    @Override
+    public void onNotifyReady() {
+
     }
 }

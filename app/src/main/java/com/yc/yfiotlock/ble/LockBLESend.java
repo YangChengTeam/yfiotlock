@@ -205,7 +205,6 @@ public class LockBLESend {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNotifySuccess(LockBLEData lockBLEData) {
         processNotify(lockBLEData);
-        Log.d(TAG, lockBLEData.getMcmd() + "-" + lockBLEData.getScmd());
     }
 
     // 处理响应

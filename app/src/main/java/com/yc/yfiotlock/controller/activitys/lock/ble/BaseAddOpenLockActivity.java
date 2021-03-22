@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.kk.securityhttp.domain.ResultInfo;
@@ -36,12 +37,28 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     protected void initVars() {
         super.initVars();
         lockEngine = new LockEngine(this);
-        lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
+        lockInfo = getLockInfo();
+        BleDevice bleDevice = getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
         lockBleSend.setNotifyCallback(this);
         Random rand = new Random();
         number = (10000000 + rand.nextInt(90000000)) + "";
+    }
+
+    protected DeviceInfo getLockInfo() {
+        LockIndexActivity lockIndexActivity = LockIndexActivity.getInstance();
+        if (lockIndexActivity != null) {
+            return lockIndexActivity.getLockInfo();
+        }
+        return null;
+    }
+
+    protected BleDevice getBleDevice() {
+        LockIndexActivity lockIndexActivity = LockIndexActivity.getInstance();
+        if (lockIndexActivity != null) {
+            return lockIndexActivity.getBleDevice();
+        }
+        return null;
     }
 
     protected abstract void cloudAddSucc();
@@ -86,9 +103,11 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         lockBleSend.unregisterNotify();
     }
 
+
     @Override
     public void onNotifyReady() {
     }
+
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {

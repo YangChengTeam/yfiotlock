@@ -21,5 +21,7 @@ public class LocationAdapter extends BaseExtendAdapter<PoiInfo> {
     protected void convert(@NotNull BaseViewHolder baseViewHolder, PoiInfo poiInfo) {
         baseViewHolder.setText(R.id.tv_location_name, poiInfo.getName())
                 .setText(R.id.tv_location_des, poiInfo.getAddress());
+
+        baseViewHolder.setGone(R.id.view_line_location, baseViewHolder.getLayoutPosition() == 0);
     }
 }

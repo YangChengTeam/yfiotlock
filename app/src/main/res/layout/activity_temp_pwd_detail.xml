@@ -21,4 +21,30 @@
         android:background="@color/white"
         app:layout_constraintTop_toBottomOf="@id/bnb_title" />
 
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.coorchice.library.SuperTextView
+            android:id="@+id/stv_del"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center"
+            android:text="@string/del_open_type"
+            android:textColor="@color/white"
+            android:textSize="15dp"
+            app:stv_corner="18dp"
+            app:stv_pressBgColor="@color/pressedColor"
+            app:stv_shaderEnable="true"
+            app:stv_shaderEndColor="#FE3737"
+            app:stv_shaderMode="topToBottom"
+            app:stv_shaderStartColor="#FE3737" />
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
