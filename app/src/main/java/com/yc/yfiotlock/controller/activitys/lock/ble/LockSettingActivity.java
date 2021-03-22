@@ -38,6 +38,13 @@ public class LockSettingActivity extends BaseBackActivity {
         setRvSetting();
     }
 
+    @Override
+    protected void bindClick() {
+        setClick(R.id.stv_del,() -> {
+            //todo delete device
+        });
+    }
+
     private DeviceInfo lockInfo;
 
     private SettingAdapter mSettingAdapter;

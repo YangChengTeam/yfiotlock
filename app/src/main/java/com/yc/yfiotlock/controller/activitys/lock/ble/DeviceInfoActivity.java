@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
@@ -38,7 +39,11 @@ public class DeviceInfoActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        deviceInfo = CacheUtil.getCache("deviceInfo", DeviceInfo.class);
+        deviceInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
+        if (deviceInfo == null) {
+            ToastCompat.show(getContext(), "设备信息异常");
+            finish();
+        }
     }
 
     @Override
@@ -60,19 +65,23 @@ public class DeviceInfoActivity extends BaseActivity {
         });
         CommonUtil.setItemDivider(getContext(), mRvDeviceInfo);
         List<ItemInfo> itemInfos = new ArrayList<>();
-        itemInfos.add(new ItemInfo("固件版本", "V20:R6.00.9.12"));
-        itemInfos.add(new ItemInfo("协议版本", "2.7"));
-        itemInfos.add(new ItemInfo("注册时间", "2020-10-28 16:04:02"));
-        itemInfos.add(new ItemInfo("剩余电量", "高"));
-        itemInfos.add(new ItemInfo("设备id", "BOF8937BAC56"));
+        itemInfos.add(new ItemInfo("固件版本", deviceInfo.getFirmwareVersion()));
+        itemInfos.add(new ItemInfo("协议版本", deviceInfo.getProtocolVersion()));
+        itemInfos.add(new ItemInfo("注册时间", deviceInfo.getRegtime()));
+        itemInfos.add(new ItemInfo("剩余电量", getBatteryString(deviceInfo.getBattery())));
+        itemInfos.add(new ItemInfo("设备id", deviceInfo.getMacAddress()));
         mAdapter.setNewInstance(itemInfos);
+    }
+
+    private String getBatteryString(int battery) {
+        return "高中低？";
     }
 
     public class ItemInfo {
         private String name;
         private String value;
 
-        public ItemInfo(String name, String value){
+        public ItemInfo(String name, String value) {
             this.name = name;
             this.value = value;
         }
