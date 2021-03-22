@@ -17,6 +17,7 @@ import android.view.animation.ScaleAnimation;
 import android.widget.TextView;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
@@ -196,4 +197,15 @@ public class MainActivity extends BaseActivity {
         startActivity(home);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (mVpIndex != null && mVpIndex.getAdapter() instanceof ViewPagerAdapter) {
+            ViewPagerAdapter adapter = (ViewPagerAdapter) mVpIndex.getAdapter();
+            if (adapter.getItem(0) instanceof IndexFragment) {
+                IndexFragment indexFragment = (IndexFragment) adapter.getItem(0);
+                indexFragment.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
 }

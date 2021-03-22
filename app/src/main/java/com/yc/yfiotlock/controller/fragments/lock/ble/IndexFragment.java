@@ -1,27 +1,35 @@
 package com.yc.yfiotlock.controller.fragments.lock.ble;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.securityhttp.listeners.Callback;
+import com.kk.securityhttp.net.entry.Response;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockSettingActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.SafePwdCreateActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.add.ScanDeviceActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyActivity;
 import com.yc.yfiotlock.controller.fragments.BaseFragment;
+import com.yc.yfiotlock.libs.fingerprintcompat.FingerManager;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.utils.SafeUtils;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -33,6 +41,8 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import rx.Subscriber;
+
+import static android.app.Activity.RESULT_OK;
 
 public class IndexFragment extends BaseFragment {
 
@@ -47,6 +57,7 @@ public class IndexFragment extends BaseFragment {
     private IndexEngin indexEngin;
 
     private FamilyInfo familyInfo;
+    private DeviceInfo mDeviceInfo;
 
     @Override
     protected int getLayoutId() {
@@ -83,7 +94,8 @@ public class IndexFragment extends BaseFragment {
             if (position == adapter.getData().size() - 1) {
                 nav2AddDevice();
             } else {
-                nav2LockIndex((DeviceInfo) adapter.getData().get(position));
+                mDeviceInfo = (DeviceInfo) adapter.getData().get(position);
+                nav2LockIndex();
             }
         });
     }
@@ -134,7 +146,34 @@ public class IndexFragment extends BaseFragment {
         startActivity(intent);
     }
 
-    private void nav2LockIndex(DeviceInfo deviceInfo) {
+    private void nav2LockIndex() {
+        switch (SafeUtils.getSafePwdType(mDeviceInfo)) {
+            case SafeUtils.NO_PASSWORD:
+                real2LockIndex(mDeviceInfo);
+                break;
+            case SafeUtils.PASSWORD_TYPE:
+                SafePwdCreateActivity.startCheck(getActivity());
+                break;
+            case SafeUtils.FINGERPRINT_TYPE:
+                SafeUtils.useFinger(getActivity(), new Callback<String>() {
+                    @Override
+                    public void onSuccess(String resultInfo) {
+                        real2LockIndex(mDeviceInfo);
+                    }
+
+                    @Override
+                    public void onFailure(Response response) {
+
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private void real2LockIndex(DeviceInfo deviceInfo) {
         Intent intent = new Intent(getActivity(), LockIndexActivity.class);
         intent.putExtra("family", familyInfo);
         intent.putExtra("device", deviceInfo);
@@ -151,4 +190,18 @@ public class IndexFragment extends BaseFragment {
         startActivity(intent);
     }
 
+    public static final int CHECK_PWD = 111;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CHECK_PWD) {
+            if (resultCode == RESULT_OK && data != null
+                    && SafeUtils.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
+                real2LockIndex(mDeviceInfo);
+            } else {
+                ToastCompat.show(getContext(), "密码错误");
+            }
+        }
+    }
 }

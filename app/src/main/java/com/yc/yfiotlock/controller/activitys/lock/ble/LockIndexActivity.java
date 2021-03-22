@@ -36,6 +36,7 @@ import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.utils.SafeUtils;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -373,6 +374,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
+
 
     private int setCountInfo() {
         int type = 1;

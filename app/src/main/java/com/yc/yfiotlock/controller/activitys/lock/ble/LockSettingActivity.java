@@ -69,7 +69,9 @@ public class LockSettingActivity extends BaseBackActivity {
                     startActivity(intent);
                     break;
                 case "安全设置":
-                    startActivity(new Intent(this, SafePwdSettingActivity.class));
+                    Intent safeIntent = new Intent(this, SafePwdSettingActivity.class);
+                    safeIntent.putExtra("device", lockInfo);
+                    startActivity(safeIntent);
                     break;
                 case "帮助与反馈":
                     startActivity(new Intent(this, FAQActivity.class));
