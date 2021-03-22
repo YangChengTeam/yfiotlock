@@ -82,6 +82,7 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //设置密码的回调
         if (requestCode == REQUEST_PWD_CODE) {
             if (resultCode == RESULT_OK && data != null) {
                 String pwd = data.getStringExtra("pwd");
@@ -89,6 +90,7 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
                 ToastCompat.show(getContext(), "新密码设置成功");
             }
         }
+        //检验密码的回调
         if (requestCode == CHECK_PWD) {
             if (resultCode == RESULT_OK && data != null
                     && SafeUtils.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
@@ -102,9 +104,11 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        //过滤掉代码引起的变化 仅处理用户手动点击的
         if (!buttonView.isPressed()) {
             return;
         }
+        //开启开关之前 先验证对应的安全方式，在安全方式验证成功的回调中再通过代码打开开关
         if (isChecked) {
             buttonView.setChecked(false);
         }
@@ -124,6 +128,7 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
             default:
                 break;
         }
+        //都没有开就是无密方式
         if (!mFingerprintUnlock.isChecked() && !mSafePwd.isChecked()) {
             SafeUtils.setSafePwdType(mDeviceInfo, SafeUtils.NO_PASSWORD);
         }
@@ -146,12 +151,14 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
 
 
     private void setSaveType(@IntRange(from = 1, to = 2) int type) {
+        //切换为密码验证 设置指纹开关为关闭
         if (type == SafeUtils.PASSWORD_TYPE) {
             SafeUtils.setSafePwdType(mDeviceInfo, SafeUtils.PASSWORD_TYPE);
             if (mFingerprintUnlock.isChecked()) {
                 mFingerprintUnlock.setChecked(false);
             }
         } else {
+            //切换为指纹验证 设置密码开关为关闭
             SafeUtils.setSafePwdType(mDeviceInfo, SafeUtils.FINGERPRINT_TYPE);
             if (mSafePwd.isChecked()) {
                 mSafePwd.setChecked(false);
