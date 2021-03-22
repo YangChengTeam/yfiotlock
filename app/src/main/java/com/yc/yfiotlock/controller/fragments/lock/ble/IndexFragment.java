@@ -68,13 +68,7 @@ public class IndexFragment extends BaseFragment {
 
     @Override
     protected void bindClick() {
-        setClick(R.id.tv_my_family, () -> {
-            //            nav2MyFamily();
-
-            nav2LockIndex(new DeviceInfo());
-        RxView.clicks(myFamilyBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            nav2MyFamily();
-        });
+        setClick(R.id.tv_my_family, this::nav2MyFamily);
 
         setClick(deviceAddBtn, this::nav2AddDevice);
     }
