@@ -19,6 +19,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.engin.HomeEngine;
 import com.yc.yfiotlock.view.adapters.MyFamilyAdapter;
@@ -26,6 +27,7 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
@@ -155,6 +157,8 @@ public class MyFamilyActivity extends BaseActivity {
                     @Override
                     public void onNext(ResultInfo<String> stringResultInfo) {
                         myFamilyAdapter.updateCheck(familyInfo);
+
+                        EventBus.getDefault().post(new IndexRefreshEvent());
                     }
                 });
             }
