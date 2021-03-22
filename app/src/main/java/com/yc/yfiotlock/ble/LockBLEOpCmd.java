@@ -24,14 +24,14 @@ public class LockBLEOpCmd {
 
     // 2.2添加密码(0x02)
     public static byte[] addPwd(Context context, byte type, String number, String pwd, byte[] startTime, byte[] endTime) {
-        ByteBuffer bodyBuffer = ByteBuffer.allocate(pwd.length() + startTime.length + endTime.length + number.length() + 1).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer bodyBuffer = ByteBuffer.allocate(pwd.length() + startTime.length + endTime.length + number.length() + 1).order(ByteOrder.BIG_ENDIAN);
         byte[] bytes = bodyBuffer.put(type).put(number.getBytes()).put(pwd.getBytes()).put(startTime).put(endTime).array();
         return op(context, (byte) 0x02, new String(bytes));
     }
 
     // 2.3修改密码(0x03)
     public static byte[] modPwd(Context context, byte type, byte id, String pwd, byte[] startTime, byte[] endTime) {
-        ByteBuffer bodyBuffer = ByteBuffer.allocate(pwd.length() + startTime.length + endTime.length + 2).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer bodyBuffer = ByteBuffer.allocate(pwd.length() + startTime.length + endTime.length + 2).order(ByteOrder.BIG_ENDIAN);
         byte[] bytes = bodyBuffer.put(type).put(id).put(pwd.getBytes()).put(startTime).put(endTime).array();
         return op(context, (byte) 0x03, new String(bytes));
     }
@@ -43,7 +43,7 @@ public class LockBLEOpCmd {
 
     // 2.5添加管理员卡(0x05)
     public static byte[] addCard(Context context, byte type, String number) {
-        ByteBuffer bodyBuffer = ByteBuffer.allocate(number.length() + 1).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer bodyBuffer = ByteBuffer.allocate(number.length() + 1).order(ByteOrder.BIG_ENDIAN);
         byte[] bytes = bodyBuffer.put(type).put(number.getBytes()).array();
         return op(context, (byte) 0x05, new String(bytes));
     }
@@ -60,7 +60,7 @@ public class LockBLEOpCmd {
 
     // 2.8添加管理员指纹(0x08)
     public static byte[] addFingerprint(Context context, byte type, String number) {
-        ByteBuffer bodyBuffer = ByteBuffer.allocate(number.length() + 1).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer bodyBuffer = ByteBuffer.allocate(number.length() + 1).order(ByteOrder.BIG_ENDIAN);
         byte[] bytes = bodyBuffer.put(type).put(number.getBytes()).array();
         return op(context, (byte) 0x08, new String(bytes));
     }

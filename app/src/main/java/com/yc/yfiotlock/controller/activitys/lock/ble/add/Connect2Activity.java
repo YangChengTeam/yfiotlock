@@ -19,7 +19,10 @@ import com.yc.yfiotlock.controller.dialogs.lock.ble.ChangeDeviceNameDialog;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import rx.Subscriber;
@@ -199,8 +202,16 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     @Override
     public void success(Object data) {
         deviceInfo = (DeviceInfo) data;
+        deviceInfo.setMacAddress(bleDevice.getMac());
         deviceInfo.setName(bleDevice.getName());
         deviceInfo.setDeviceId(aliDeviceName);
+        EventBus.getDefault().post(deviceInfo);
+    }
+
+    @Override
+    public void fail() {
+        super.fail();
+        EventBus.getDefault().post(deviceInfo);
     }
 
     private void nav2Index() {
@@ -237,15 +248,19 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
             aliDeviceName = new String(lockBLEData.getOther());
+            cloudAddDevice();
         } else {
             valueAnimator.end();
             showConnectedUi();
 
             deviceInfo = new DeviceInfo();
+            deviceInfo.setMacAddress(bleDevice.getMac());
             deviceInfo.setName(bleDevice.getName());
             deviceInfo.setDeviceId(aliDeviceName);
-            cloudAddDevice();
+            bleGetAliDeviceName();
             isConnected = true;
+
+            CacheUtil.setCache(bleDevice.getMac(), deviceInfo);
         }
     }
 
@@ -253,7 +268,7 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
 
-        } else {
+        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
             valueAnimator.end();
             onConnectFail();
         }

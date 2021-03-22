@@ -16,12 +16,15 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,8 +51,9 @@ public class DeviceListActivity extends BaseAddActivity {
     private DeviceAdapter mDeviceAdapter;
 
     private static WeakReference<DeviceListActivity> mInstance;
-    public static void finish2(){
-        if(mInstance != null && mInstance.get() != null){
+
+    public static void finish2() {
+        if (mInstance != null && mInstance.get() != null) {
             mInstance.get().finish();
         }
     }
@@ -68,22 +72,21 @@ public class DeviceListActivity extends BaseAddActivity {
 
     private void setRvDevices() {
         List<LockInfo> lockInfos = new ArrayList<>();
-        List<BleDevice> bleDevices = getIntent().getParcelableArrayListExtra("bleDevices");
-        for (BleDevice bleDevice : bleDevices) {
-            LockInfo lockInfo = new LockInfo(bleDevice.getName());
-            lockInfo.setBleDevice(bleDevice);
-            lockInfo.setMacAddress(bleDevice.getMac());
-            lockInfos.add(lockInfo);
-        }
+        BleDevice bleDevice = getIntent().getParcelableExtra("bleDevice");
+        LockInfo lockInfo = new LockInfo(bleDevice.getName());
+        lockInfo.setBleDevice(bleDevice);
+        lockInfo.setMacAddress(bleDevice.getMac());
+        lockInfos.add(lockInfo);
         mDeviceAdapter = new DeviceAdapter(lockInfos);
         mRvDevices.setAdapter(mDeviceAdapter);
         mRvDevices.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvDevices);
         mDeviceAdapter.setOnItemClickListener((adapter, view, position) -> {
-            LockInfo lockInfo = (LockInfo) adapter.getData().get(position);
-            connect(lockInfo.getBleDevice());
+            LockInfo tlockInfo = (LockInfo) adapter.getData().get(position);
+            connect(tlockInfo.getBleDevice());
         });
     }
+
 
     private void connect(BleDevice bleDevice) {
         LockBLEManager.connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
@@ -119,6 +122,14 @@ public class DeviceListActivity extends BaseAddActivity {
         startActivity(intent);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(BleDevice bleDevice) {
+        LockInfo lockInfo = new LockInfo(bleDevice.getName());
+        lockInfo.setBleDevice(bleDevice);
+        lockInfo.setMacAddress(bleDevice.getMac());
+        mDeviceAdapter.addData(lockInfo);
+    }
+
     @Override
     protected void bindClick() {
         setClick(mStvScan, () -> {
@@ -136,4 +147,6 @@ public class DeviceListActivity extends BaseAddActivity {
             holder.setText(R.id.tv_name, lockInfo.getName());
         }
     }
+
+
 }

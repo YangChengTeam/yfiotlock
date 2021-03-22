@@ -14,12 +14,13 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindViews;
 
-public class FingerprintAddSelectHandNextOpenLockActivity extends BaseAddOpenLockActivity {
+public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprintAddOpenLockActivity {
 
     @BindViews({R.id.iv_finger1, R.id.iv_finger2, R.id.iv_finger3, R.id.iv_finger4, R.id.iv_finger5})
     View[] fingerBtns;
 
     private String name;
+    private String keyid;
 
     @Override
     protected int getLayoutId() {
@@ -30,6 +31,7 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseAddOpenLoc
     protected void initVars() {
         super.initVars();
         name = getIntent().getStringExtra("name");
+        keyid = getIntent().getStringExtra("keyid");
     }
 
     @Override
@@ -39,17 +41,11 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseAddOpenLoc
             final View fingerBtn = fingerBtns[i];
             RxView.clicks(fingerBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
                 name += fingerBtn.getTag() + "";
-                bleAddFingerprint();
+                cloudAdd(keyid);
             });
         }
     }
 
-    private void bleAddFingerprint() {
-        this.mcmd = (byte) 0x02;
-        this.scmd = (byte) 0x08;
-        byte[] bytes = LockBLEOpCmd.addFingerprint(this, LockBLEManager.GROUP_TYPE, number);
-        lockBleSend.send(scmd, mcmd, bytes);
-    }
 
     @Override
     protected void cloudAdd(String keyid) {

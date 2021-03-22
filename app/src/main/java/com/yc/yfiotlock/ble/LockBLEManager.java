@@ -9,8 +9,12 @@ import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.demo.comm.ObserverManager;
@@ -22,6 +26,9 @@ import com.yc.yfiotlock.libs.fastble.callback.BleScanCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.libs.fastble.scan.BleScanRuleConfig;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.user.IndexInfo;
+import com.yc.yfiotlock.utils.CacheUtil;
 
 import java.util.List;
 
@@ -57,8 +64,8 @@ public class LockBLEManager {
     public static void initConfig2(String mac) {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
-                .setDeviceMac(mac)
                 .setDeviceName(false, DEVICE_NAME)
+                .setDeviceMac(mac)
                 .setScanTimeOut(10000);
         BleManager.getInstance().initScanRule(builder.build());
     }
@@ -147,6 +154,7 @@ public class LockBLEManager {
             @Override
             public void onLeScan(BleDevice bleDevice) {
                 super.onLeScan(bleDevice);
+                callbck.onScanning(bleDevice);
             }
 
             @Override
@@ -197,11 +205,26 @@ public class LockBLEManager {
             public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
                 // 设置连接失败状态
                 callbck.onDisconnect(bleDevice);
-                if (!isActiveDisConnected) {
-                    ObserverManager.getInstance().notifyObserver(bleDevice);
-                }
+                ObserverManager.getInstance().notifyObserver(bleDevice);
             }
         });
     }
+
+    public static boolean isFoundDevice(@NonNull String mac){
+        boolean isFound = CacheUtil.getCache(mac, DeviceInfo.class) != null;
+        if(isFound) return true;
+
+        IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
+        if(indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0){
+            for(DeviceInfo deviceInfo : indexInfo.getDeviceInfos()){
+                if(mac.equals(deviceInfo.getMacAddress())){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
 
 }

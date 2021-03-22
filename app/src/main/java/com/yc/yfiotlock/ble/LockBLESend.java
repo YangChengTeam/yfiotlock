@@ -13,6 +13,12 @@ import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
+import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class LockBLESend {
     private static final String TAG = "LockBleSend";
@@ -36,8 +42,14 @@ public class LockBLESend {
         this.context = context;
         this.bleDevice = bleDevice;
         loadingDialog = new LoadingDialog(context);
-        // 开始监听
-        bleNotify();
+    }
+
+    public void setMcmd(byte mcmd) {
+        this.mcmd = mcmd;
+    }
+
+    public void setScmd(byte scmd) {
+        this.scmd = scmd;
     }
 
     // 伪发送数据
@@ -61,7 +73,6 @@ public class LockBLESend {
             this.mcmd = mcmd;
             this.scmd = scmd;
             this.cmdBytes = cmdBytes;
-
             wakeup();
         } else {
             Log.d(TAG, "发送未完毕");
@@ -117,8 +128,17 @@ public class LockBLESend {
 
     // 清除操作
     public void clear() {
-        BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_CHARACTERISTIC_UUID);
         BleManager.getInstance().disconnect(bleDevice);
+        BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_CHARACTERISTIC_UUID);
+    }
+
+    public void registerNotify() {
+        EventBus.getDefault().register(this);
+    }
+
+    // 清除eventbug
+    public void unregisterNotify() {
+        EventBus.getDefault().unregister(this);
     }
 
     private int wakeUpCount = 0;
@@ -131,10 +151,10 @@ public class LockBLESend {
         op(bytes);
         VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
             if (waupStatus && isSend) return;
-            if (wakeUpCount++ > 15) {
+            if (wakeUpCount++ >= 10) {
                 ToastCompat.show(context, "唤醒门锁失败,无法发送指令");
-                wakeupFailureResponse();
                 wakeUpCount = 0;
+                wakeupFailureResponse();
                 return;
             }
             wakeup();
@@ -142,7 +162,7 @@ public class LockBLESend {
     }
 
     // 监听
-    private void bleNotify() {
+    public static void bleNotify(BleDevice bleDevice) {
         BleManager.getInstance().notify(
                 bleDevice,
                 NOTIFY_SERVICE_UUID,
@@ -150,15 +170,11 @@ public class LockBLESend {
                 new BleNotifyCallback() {
                     @Override
                     public void onNotifySuccess() {
-                        if (notifyCallback != null) {
-                            notifyCallback.onNotifyReady();
-                        }
+                        EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifySuccess));
                     }
 
                     @Override
                     public void onNotifyFailure(BleException exception) {
-                        Log.d(TAG, exception.getDescription());
-                        notifyErrorResponse(exception.getDescription());
                     }
 
                     @Override
@@ -167,12 +183,29 @@ public class LockBLESend {
                         // 解析响应
                         LockBLEData lockBLEData = LockBLEPackage.getData(data);
                         if (lockBLEData != null) {
-                            processNotify(lockBLEData);
+                            EventBus.getDefault().post(lockBLEData);
                         } else {
-                            notifyErrorResponse("lockBLEData format error");
+                            EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyFailure, "lockBLEData format error"));
                         }
                     }
                 });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNotify(BleNotifyEvent bleNotifyEvent) {
+        if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
+            if (notifyCallback != null) {
+                notifyCallback.onNotifyReady();
+            }
+        } else if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifyFailure) {
+            notifyErrorResponse(bleNotifyEvent.getDesp());
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        processNotify(lockBLEData);
+        Log.d(TAG, lockBLEData.getMcmd() + "-" + lockBLEData.getScmd());
     }
 
     // 处理响应
@@ -182,12 +215,13 @@ public class LockBLESend {
             if (lockBLEData.getStatus() == (byte) 0x00) {
                 if (!waupStatus) {
                     waupStatus = true;
-                    op(cmdBytes);
                     Log.d(TAG, "唤醒成功,发送真正指令");
+                    op(cmdBytes);
                 }
-            } else {
-                wakeup();
-                Log.d(TAG, "唤醒失败");
+            }
+        } else if (lockBLEData.getMcmd() == 0x08 && lockBLEData.getScmd() == 0x01) {
+            if (notifyCallback != null) {
+                notifyCallback.onNotifySuccess(lockBLEData);
             }
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd && (mcmd != 0x00 || scmd != 0x00)) {
             Log.d(TAG, "命令匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
@@ -198,17 +232,21 @@ public class LockBLESend {
                     notifyCallback.onNotifySuccess(lockBLEData);
                 }
             } else {
-                if (notifyCallback == null) {
+                Log.d(TAG, "响应失败状态:" + lockBLEData.getStatus());
+                if (notifyCallback != null) {
                     notifyCallback.onNotifyFailure(lockBLEData);
                 }
             }
         } else {
             if (waupStatus) {
-                if (notifyCallback == null) {
+                reset();
+                if (notifyCallback != null) {
                     notifyCallback.onNotifyFailure(lockBLEData);
                 }
+                Log.d(TAG, "命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
+            } else {
+                Log.d(TAG, "未唤醒命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + "-" + mcmd + " scmd:" + lockBLEData.getScmd()+ "-" + mcmd );
             }
-            Log.d(TAG, "命令不匹配:" + LockBLEUtils.toHexString(lockBLEData.build(context)));
         }
     }
 
@@ -265,6 +303,7 @@ public class LockBLESend {
 
                     @Override
                     public void onWriteFailure(final BleException exception) {
+                        Log.d(TAG, "写入数据:" + exception.getDescription());
                         writeFailureResponse();
                     }
                 });

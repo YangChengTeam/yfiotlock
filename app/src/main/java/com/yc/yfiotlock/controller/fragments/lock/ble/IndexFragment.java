@@ -135,6 +135,11 @@ public class IndexFragment extends BaseFragment {
         loadData();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onAddDevice(DeviceInfo deviceInfo) {
+        indexDeviceAdapter.addData(0, deviceInfo);
+    }
+
     private void nav2MyFamily() {
         Intent intent = new Intent(getActivity(), MyFamilyActivity.class);
         startActivity(intent);

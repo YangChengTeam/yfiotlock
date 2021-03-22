@@ -2,14 +2,17 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Intent;
 
+import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class FingerprintAddOpenLockActivity extends BaseBackActivity {
+public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockActivity {
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_fingerprint_add_open_lock;
@@ -19,13 +22,23 @@ public class FingerprintAddOpenLockActivity extends BaseBackActivity {
     @Override
     protected void initViews() {
         super.initViews();
+        VUiKit.postDelayed(1000, () -> {
+            bleAddFingerprint();
+        });
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onProcess(LockBLEData bleData) {
-        if (bleData != null && bleData.getMcmd() == (byte) 0x08 && bleData.getScmd() == (byte) 0x01 && bleData.getStatus() == (byte) 0x01) {
-            Intent intent = new Intent(FingerprintAddOpenLockActivity.this, FingerprintAddNextOpenLockActivity.class);
+    private void bleAddFingerprint() {
+        byte[] bytes = LockBLEOpCmd.addFingerprint(this, LockBLEManager.GROUP_TYPE, number);
+        lockBleSend.send(mcmd, scmd, bytes);
+    }
+
+    @Override
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        if (lockBLEData != null && lockBLEData.getMcmd() == (byte) 0x08 && lockBLEData.getScmd() == (byte) 0x01 && lockBLEData.getStatus() == (byte) 0x01) {
+            Intent intent = new Intent(getContext(), FingerprintAddNextOpenLockActivity.class);
+            intent.putExtra("number", number);
             startActivity(intent);
+            finish();
         }
     }
 }

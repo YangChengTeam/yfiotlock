@@ -9,17 +9,23 @@ import android.widget.ImageView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
+import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 
-public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
+public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity  {
     @BindView(R.id.iv_pass_show_status)
     ImageView statusIv;
 
@@ -47,7 +53,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
                 ToastUtil.toast2(getContext(), "密码必需是长度为6位数字");
                 return;
             }
-            cloudAdd("1");
+            bleAddPwd();
         });
 
         statusIv.setSelected(true);
@@ -67,16 +73,18 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     private void bleAddPwd() {
-        this.mcmd = (byte)0x02;
-        this.scmd = (byte)0x01;
-        byte[] bytes = LockBLEOpCmd.addPwd(this, LockBLEManager.GROUP_TYPE, number, passEt.getText() + "", new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
-        lockBleSend.send(mcmd, scmd, bytes);
+        if (lockBleSend != null) {
+            this.mcmd = (byte) 0x02;
+            this.scmd = (byte) 0x02;
+            byte[] bytes = LockBLEOpCmd.addPwd(this, LockBLEManager.GROUP_TYPE, number, passEt.getText() + "", new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
+            lockBleSend.send(mcmd, scmd, bytes);
+        }
     }
 
     @Override
     protected void cloudAddSucc() {
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
-        if(countInfo != null){
+        if (countInfo != null) {
             countInfo.setPasswordCount(countInfo.getPasswordCount() + 1);
             CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
         }
@@ -93,6 +101,5 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
         String name = "密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount);
         cloudAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
     }
-
 
 }

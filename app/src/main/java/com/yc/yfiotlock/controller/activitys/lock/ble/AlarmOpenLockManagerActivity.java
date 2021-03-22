@@ -19,7 +19,7 @@ import java.util.List;
 
 import rx.Subscriber;
 
-public class AlarmOpenLockManagerActivity extends BaseOpenLockManagerActivity {
+public class AlarmOpenLockManagerActivity extends OpenLockManagerActivity {
 
     private LockEngine lockEngine;
 

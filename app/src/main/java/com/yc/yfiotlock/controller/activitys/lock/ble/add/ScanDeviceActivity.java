@@ -9,12 +9,16 @@ import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
-import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.utils.AnimatinUtil;
+import com.yc.yfiotlock.utils.CacheUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -33,9 +37,16 @@ public class ScanDeviceActivity extends BaseAddActivity {
     @BindView(R.id.stv_rescan)
     SuperTextView mStvRescan;
 
+    private boolean isFoundOne;
+
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_add_scan_device;
+    }
+
+    @Override
+    protected void initVars() {
+        super.initVars();
     }
 
     @Override
@@ -43,6 +54,8 @@ public class ScanDeviceActivity extends BaseAddActivity {
         super.initViews();
         scan();
     }
+
+    private HashMap<String, BleDevice> deviceHashMap = new LinkedHashMap<>();
 
     private void scan() {
         LockBLEManager.initConfig();
@@ -54,13 +67,31 @@ public class ScanDeviceActivity extends BaseAddActivity {
 
             @Override
             public void onScanning(BleDevice bleDevice) {
-
+                if (deviceHashMap.get(bleDevice.getMac()) != null || !LockBLEManager.DEVICE_NAME.equals(bleDevice.getName() + "")) {
+                    return;
+                }
+                if (!LockBLEManager.isFoundDevice(bleDevice.getMac())) {
+                    if (!isFoundOne) {
+                        isFoundOne = true;
+                        deviceHashMap.put(bleDevice.getMac(), bleDevice);
+                        nav2List(bleDevice);
+                    } else {
+                        deviceHashMap.put(bleDevice.getMac(), bleDevice);
+                        EventBus.getDefault().post(bleDevice);
+                    }
+                }
             }
 
             @Override
             public void onScanSuccess(List<BleDevice> bleDevices) {
-                finish();
-                nav2List((ArrayList<BleDevice>) bleDevices);
+                if (isFoundOne) {
+                    finish();
+                    deviceHashMap.clear();
+                    deviceHashMap = null;
+                    isFoundOne = false;
+                } else {
+                    setFailInfo();
+                }
             }
 
             @Override
@@ -93,9 +124,9 @@ public class ScanDeviceActivity extends BaseAddActivity {
         mTvScanQa.setText("无法扫到设备怎么办？");
     }
 
-    private void nav2List(ArrayList<BleDevice> bleDevices) {
+    private void nav2List(BleDevice bleDevice) {
         Intent intent = new Intent(this, DeviceListActivity.class);
-        intent.putParcelableArrayListExtra("bleDevices",  bleDevices);
+        intent.putExtra("bleDevice", bleDevice);
         intent.putExtra("family", familyInfo);
         startActivity(intent);
     }

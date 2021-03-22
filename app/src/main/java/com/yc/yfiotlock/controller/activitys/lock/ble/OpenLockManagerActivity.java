@@ -34,7 +34,7 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class BaseOpenLockManagerActivity extends BaseBackActivity {
+public class OpenLockManagerActivity extends BaseBackActivity {
 
     @BindView(R.id.rv_open_lock)
     RecyclerView openLockRecyclerView;
@@ -82,7 +82,7 @@ public class BaseOpenLockManagerActivity extends BaseBackActivity {
                 } else if (position == 2) {
                     clazz = CardOpenLockActivity.class;
                 }
-                Intent intent = new Intent(BaseOpenLockManagerActivity.this, clazz);
+                Intent intent = new Intent(OpenLockManagerActivity.this, clazz);
                 startActivity(intent);
             }
         });
@@ -168,7 +168,7 @@ public class BaseOpenLockManagerActivity extends BaseBackActivity {
 
         @Override
         protected void convert(@NotNull BaseViewHolder holder, OpenLockTypeInfo openLockTypeInfo) {
-            Glide.with(BaseOpenLockManagerActivity.this).load(openLockTypeInfo.getIcon()).into((ImageView) holder.getView(R.id.iv_icon));
+            Glide.with(OpenLockManagerActivity.this).load(openLockTypeInfo.getIcon()).into((ImageView) holder.getView(R.id.iv_icon));
             holder.setText(R.id.tv_name, openLockTypeInfo.getName());
             holder.setText(R.id.tv_desp, openLockTypeInfo.getDesp());
             if (holder.getAdapterPosition() == getData().size() - 1) {

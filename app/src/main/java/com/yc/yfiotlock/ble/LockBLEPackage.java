@@ -101,6 +101,7 @@ public class LockBLEPackage {
 
         // position package LENGTH = 2,3
         short len = ByteBuffer.wrap(new byte[]{response[2], response[3]}).order(ByteOrder.BIG_ENDIAN).getShort();
+        short tlen = len;
         if (len != response.length) {
             LogUtil.msg("LockBLEPackage-> LENGTH is not package length!");
             return null;
@@ -136,8 +137,8 @@ public class LockBLEPackage {
         lockBLEData.setScmd(response[11]);
         lockBLEData.setStatus(response[12]);
         // LENGHT = 2 SEQ = 4 MCMD = 1 SCMD = 1 DATA STATUS = 1 CRC16 = 2
-        if (len - 11 > 0) {
-            lockBLEData.setOther(Arrays.copyOfRange(response, 11, len - 12));
+        if (tlen - 18 > 0) {
+            lockBLEData.setOther(Arrays.copyOfRange(response, 13, tlen - 5));
         }
         return lockBLEData;
     }

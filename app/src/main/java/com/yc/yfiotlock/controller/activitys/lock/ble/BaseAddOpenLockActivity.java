@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -11,15 +12,13 @@ import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.engin.LockEngine;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import rx.Subscriber;
 
-public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
+public abstract class BaseAddOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
     protected LockEngine lockEngine;
     protected DeviceInfo lockInfo;
     protected LockBLESend lockBleSend;
@@ -28,6 +27,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
     protected byte scmd;
 
     protected String number;
+    protected boolean isOpOver;
+
 
     protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
 
@@ -38,9 +39,9 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
-
+        lockBleSend.setNotifyCallback(this);
         Random rand = new Random();
-        number = rand.nextInt(100000000) + "";
+        number = (10000000 + rand.nextInt(90000000)) + "";
     }
 
     protected abstract void cloudAddSucc();
@@ -72,27 +73,47 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        lockBleSend.clear();
+    protected void onResume() {
+        super.onResume();
+        lockBleSend.setNotifyCallback(this);
+        lockBleSend.registerNotify();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onProcess(LockBLEData bleData) {
-        if (bleData != null && bleData.getMcmd() == mcmd && bleData.getScmd() == scmd) {
-            if (bleData.getStatus() == (byte) 0x00 && bleData.getOther() != null) {
-                String number = new String(Arrays.copyOfRange(bleData.getOther(), 0, 5));
-                byte keyId = bleData.getOther()[6];
-                if (this.number.equals(number)) { // 验证流水号
-                    cloudAdd(keyId + "");
+    @Override
+    protected void onStop() {
+        super.onStop();
+        lockBleSend.setNotifyCallback(null);
+        lockBleSend.unregisterNotify();
+    }
+
+    @Override
+    public void onNotifyReady() {
+    }
+
+    @Override
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            isOpOver = true;
+            mLoadingDialog.dismiss();
+            if (lockBLEData.getOther() != null) {
+                String number = new String(Arrays.copyOfRange(lockBLEData.getOther(), 0, 8));
+                if (number.equals(this.number)) {
+                    int id = lockBLEData.getOther()[8];
+                    cloudAdd(id + "");
+                } else {
+                    ToastCompat.show(getContext(), "流水号匹配不成功");
                 }
-            } else if (bleData.getStatus() == (byte) 0x01) {
-
-            } else if (bleData.getStatus() == (byte) 0x10) {
-
-            } else if (bleData.getStatus() == (byte) 0x11) {
-
             }
+        }
+    }
+
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            ToastCompat.show(getContext(), "添加失败");
+
+            mLoadingDialog.dismiss();
+            isOpOver = true;
         }
     }
 

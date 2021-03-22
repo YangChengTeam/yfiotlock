@@ -15,8 +15,8 @@ import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
@@ -94,6 +94,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         return familyInfo;
     }
 
+    public LockBLESend getLockBleSend() {
+        return lockBleSend;
+    }
+
     private static LockIndexActivity mInstance;
 
     public static LockIndexActivity getInstance() {
@@ -141,8 +145,13 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         });
 
         RxView.clicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (!LockBLEManager.isConnected(bleDevice)) {
+            if (LockBLEManager.isConnected(bleDevice)) return;
+            if (statusTitleTv.getText().equals("连接门锁中...")) return;
+
+            if (bleDevice == null) {
                 scan();
+            } else {
+                connect(bleDevice);
             }
         });
 
@@ -157,6 +166,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         } else {
             if (LockBLEManager.isConnected(bleDevice)) {
                 lockBleSend = new LockBLESend(this, bleDevice);
+                lockBleSend.registerNotify();
                 lockBleSend.setNotifyCallback(this);
                 setConnectedInfo();
             }
@@ -173,6 +183,16 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 }
             }
         });
+
+        generalDialog = new GeneralDialog(this);
+        generalDialog.setTitle("温馨提示");
+        generalDialog.setMsg("蓝牙连接已断开，请将手机靠近 门锁后重试");
+        generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+            @Override
+            public void onClick(Dialog dialog) {
+                connect(bleDevice);
+            }
+        });
     }
 
     @Override
@@ -180,6 +200,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         super.onResume();
         shakeSensor.register();
 
+        if(lockBleSend != null){
+            lockBleSend.setNotifyCallback(this);
+            lockBleSend.registerNotify();
+        }
         // 重新连接
         if (bleDevice != null && !LockBLEManager.isConnected(bleDevice)) {
             reconnect();
@@ -189,7 +213,16 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     protected void onStop() {
         super.onStop();
+        if(lockBleSend != null){
+            lockBleSend.setNotifyCallback(null);
+            lockBleSend.unregisterNotify();
+        }
         shakeSensor.unregister();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         if (lockBleSend != null) {
             lockBleSend.clear();
         }
@@ -217,7 +250,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startAnimations();
 
         if (lockBleSend != null) {
-            lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this));
+            lockBleSend.send((byte) 0x01, (byte) 0x01, LockBLESettingCmd.reset(this));
         }
     }
 
@@ -243,6 +276,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             @Override
             public void onScanning(BleDevice bleDevice) {
                 // 搜索到后开始连接
+                if (!bleDevice.getMac().equals(lockInfo.getMacAddress())) {
+                    return;
+                }
                 connect(bleDevice);
             }
 
@@ -283,6 +319,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     // 连接蓝牙
     private void connect(final BleDevice bleDevice) {
+        isOpening = false;
         LockBLEManager.connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
             @Override
             public void onConnectStarted() {
@@ -303,7 +340,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             public void onConnectSuccess(BleDevice bleDevice) {
                 LockIndexActivity.this.bleDevice = bleDevice;
                 lockBleSend = new LockBLESend(LockIndexActivity.this, bleDevice);
+                lockBleSend.registerNotify();
                 lockBleSend.setNotifyCallback(LockIndexActivity.this);
+                VUiKit.postDelayed(1000, ()->{
+                    LockBLESend.bleNotify(bleDevice);
+                });
                 // 设置连接成功状态
                 setConnectedInfo();
 
@@ -322,22 +363,17 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     }
 
     // 重新逻辑
+    private GeneralDialog generalDialog;
+
     private void reconnect() {
-        GeneralDialog generalDialog = new GeneralDialog(this);
-        generalDialog.setTitle("温馨提示");
-        generalDialog.setMsg("蓝牙连接已断开，请将手机靠近 门锁后重试");
-        generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-            @Override
-            public void onClick(Dialog dialog) {
-                connect(bleDevice);
-            }
-        });
-        generalDialog.show();
+        if (generalDialog.isShowing()) {
+            generalDialog.show();
+        }
     }
 
     // 进入开门方式管理
     private void nav2OpenLock() {
-        Intent intent = new Intent(this, BaseOpenLockManagerActivity.class);
+        Intent intent = new Intent(this, OpenLockManagerActivity.class);
         startActivity(intent);
     }
 
@@ -401,7 +437,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @Override
     public void onNotifyReady() {
-
     }
 
     @Override
@@ -421,8 +456,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        statusTitleTv.setText("门锁已连接");
-        loadingIv.setImageResource(R.mipmap.one);
-        isOpening = false;
+        if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
+            setConnectedInfo();
+            isOpening = false;
+        }
     }
 }
