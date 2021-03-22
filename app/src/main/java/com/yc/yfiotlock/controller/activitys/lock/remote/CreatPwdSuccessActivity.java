@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
@@ -33,6 +34,10 @@ public class CreatPwdSuccessActivity extends BaseActivity {
     LinearLayout llPwds;
     @BindView(R.id.tv_creat_success_copy)
     TextView tvCopy;
+    @BindView(R.id.stv_btn_share)
+    SuperTextView stvShare;
+    @BindView(R.id.stv_btn_finish)
+    SuperTextView stvFinish;
 
     public static void start(Context context, PassWordInfo passWordInfo) {
         Intent intent = new Intent(context, CreatPwdSuccessActivity.class);
@@ -81,6 +86,12 @@ public class CreatPwdSuccessActivity extends BaseActivity {
             ClipData clip = ClipData.newPlainText("ble", pwd);
             clipboard.setPrimaryClip(clip);
             ToastUtil.toast2(CreatPwdSuccessActivity.this, "复制成功");
+        });
+        RxView.clicks(stvShare).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            ToastUtil.toast2(CreatPwdSuccessActivity.this, "分享");
+        });
+        RxView.clicks(stvFinish).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            finish();
         });
     }
 }

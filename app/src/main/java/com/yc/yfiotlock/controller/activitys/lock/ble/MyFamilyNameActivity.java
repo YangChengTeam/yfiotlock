@@ -3,6 +3,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -52,6 +53,7 @@ public class MyFamilyNameActivity extends BaseActivity {
         if (serializable instanceof FamilyInfo) {
             this.familyInfo = (FamilyInfo) serializable;
             editText.setText(familyInfo.getName());
+            editText.setSelection(familyInfo.getName().length());
         }
 
         RxView.clicks(tvSure).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
@@ -64,5 +66,8 @@ public class MyFamilyNameActivity extends BaseActivity {
             EventBus.getDefault().post(familyInfo);
             finish();
         });
+
+        editText.requestFocus();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 }

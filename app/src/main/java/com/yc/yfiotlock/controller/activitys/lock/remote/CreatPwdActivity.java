@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -134,6 +135,9 @@ public class CreatPwdActivity extends BaseActivity {
         });
 
         chengUi(true);
+
+        nameEt.requestFocus();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
     private void toSubmit() {
