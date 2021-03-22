@@ -58,7 +58,7 @@
         android:id="@+id/view_item_log_line"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="#EDEDED"
+        android:background="@color/grayBg"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
