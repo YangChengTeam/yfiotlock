@@ -1,37 +1,18 @@
 package com.yc.yfiotlock.model.bean.lock.remote;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.io.Serializable;
 
 public class PassWordInfo implements Serializable {
-    private String name;
-    private String validity;
-    private String stateDes;
-    private int state;
     private int id;
+    private String name;
+    @JSONField(name = "temporary_pwd_status")
+    private int temporaryPwdStatus;
+    private String pwd;
+    private String model;
+    private String stateDes;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getValidity() {
-        return validity;
-    }
-
-    public void setValidity(String validity) {
-        this.validity = validity;
-    }
-
-    public String getStateDes() {
-        return stateDes;
-    }
-
-    public void setStateDes(String stateDes) {
-        this.stateDes = stateDes;
-    }
 
     public int getId() {
         return id;
@@ -41,18 +22,43 @@ public class PassWordInfo implements Serializable {
         this.id = id;
     }
 
-    public int getState() {
-        return state;
+    public String getName() {
+        return name;
     }
 
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public PassWordInfo(String name, String validity, int state, int id) {
+    public void setName(String name) {
         this.name = name;
-        this.validity = validity;
-        this.state = state;
-        this.id = id;
+    }
+
+    public int getTemporaryPwdStatus() {
+        return temporaryPwdStatus;
+    }
+
+    public void setTemporaryPwdStatus(int temporaryPwdStatus) {
+        this.temporaryPwdStatus = temporaryPwdStatus;
+    }
+
+    public String getPwd() {
+        return pwd;
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getStateDes() {
+        return stateDes;
+    }
+
+    public void setStateDes(String stateDes) {
+        this.stateDes = stateDes;
     }
 }

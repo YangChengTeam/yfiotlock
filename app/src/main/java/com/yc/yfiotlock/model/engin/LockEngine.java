@@ -12,6 +12,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
@@ -139,6 +140,20 @@ public class LockEngine extends BaseEngin {
         map.put("locker_id", lockerId);
         return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_LONG_OPEN_URL,
                 new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    // 临时密码列表
+    public Observable<ResultInfo<List<PassWordInfo>>> temporaryPwdList(String lockerId, int page, int pageSize) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("locker_id", lockerId);
+        map.put("page", String.valueOf(page));
+        map.put("page_size", String.valueOf(pageSize));
+        return new HttpCoreEngin<ResultInfo<List<PassWordInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_TEMPORARY_PWD_LIST_URL,
+                new TypeReference<ResultInfo<List<PassWordInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }

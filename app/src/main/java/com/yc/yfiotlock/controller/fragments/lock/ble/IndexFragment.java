@@ -65,9 +65,7 @@ public class IndexFragment extends BaseFragment {
         setRv();
 
         RxView.clicks(myFamilyBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-//            nav2MyFamily();
-
-            nav2LockIndex(new DeviceInfo());
+            nav2MyFamily();
         });
 
         RxView.clicks(deviceAddBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {

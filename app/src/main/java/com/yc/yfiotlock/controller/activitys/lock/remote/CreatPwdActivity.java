@@ -17,11 +17,15 @@ import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.view.TimePickerView;
 import com.contrarywind.view.WheelView;
 import com.jakewharton.rxbinding4.view.RxView;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
+import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.LeftNextTextView;
 
@@ -31,6 +35,7 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import rx.Subscriber;
 
 public class CreatPwdActivity extends BaseActivity {
 
@@ -59,10 +64,18 @@ public class CreatPwdActivity extends BaseActivity {
     @BindView(R.id.et_pwd_name)
     EditText nameEt;
 
-    public static void start(Context context, PassWordInfo passWordInfo) {
+    private LockEngine lockEngine;
+
+    public static void start(Context context, DeviceInfo deviceInfo) {
         Intent intent = new Intent(context, CreatPwdActivity.class);
-        intent.putExtra("password_info", passWordInfo);
+        intent.putExtra("device", deviceInfo);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void initVars() {
+        super.initVars();
+        lockEngine = new LockEngine(this);
     }
 
     private boolean isSelTheOne = true;
@@ -136,12 +149,42 @@ public class CreatPwdActivity extends BaseActivity {
                 ToastUtil.toast2(CreatPwdActivity.this, "密码长度不合规");
                 return;
             }
+            Serializable device = getIntent().getSerializableExtra("device");
+            if (!(device instanceof DeviceInfo)) {
+                ToastUtil.toast2(CreatPwdActivity.this, "未连接设备");
+                return;
+            }
+            mLoadingDialog.show("添加中...");
+            lockEngine.addOpenLockWay(((DeviceInfo) device).getId(), trimName, "",
+                    LockBLEManager.OPEN_LOCK_PASSWORD, String.valueOf(LockBLEManager.GROUP_TYPE_TEMP_PWD),
+                    trimPwd).subscribe(new Subscriber<ResultInfo<String>>() {
+                @Override
+                public void onCompleted() {
+                    mLoadingDialog.dismiss();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    mLoadingDialog.dismiss();
+                }
+
+                @Override
+                public void onNext(ResultInfo<String> stringResultInfo) {
+                    if (stringResultInfo != null) {
+                        if (stringResultInfo.getCode() == 1) {
+                            PassWordInfo passWordInfo = new PassWordInfo();
+                            passWordInfo.setName(trimName);
+                            passWordInfo.setPwd(trimPwd);
+                            CreatPwdSuccessActivity.start(CreatPwdActivity.this, passWordInfo);
+
+                            mLoadingDialog.dismiss();
+                            finish();
+                        }
+                    }
+                }
+            });
         } else {
-            return;
-        }
-        Serializable serializable = getIntent().getSerializableExtra("password_info");
-        if (serializable instanceof PassWordInfo) {
-            CreatPwdSuccessActivity.start(CreatPwdActivity.this, (PassWordInfo) serializable);
+            ToastUtil.toast2(CreatPwdActivity.this, "无法创建自定义密码");
         }
     }
 
