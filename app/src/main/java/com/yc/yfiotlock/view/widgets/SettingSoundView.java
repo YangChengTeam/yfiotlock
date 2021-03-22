@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 
 import java.net.BindException;
@@ -30,6 +31,18 @@ public class SettingSoundView extends BaseView {
     @BindView(R.id.cv_high)
     CardView mCvHigh;
 
+    private int volume = 2;
+
+    public void setVolume(int volume) {
+        MMKV.defaultMMKV().putInt("volume", volume);
+        this.volume = volume;
+    }
+
+
+    public void resetVolume() {
+        onSelect(volume);
+    }
+
     public SettingSoundView(Context context) {
         super(context);
     }
@@ -42,20 +55,21 @@ public class SettingSoundView extends BaseView {
     @Override
     protected void initViews(Context context) {
         super.initViews(context);
-        onSelect(0);
+        volume = MMKV.defaultMMKV().getInt("volume", 2);
+        onSelect(volume);
     }
 
     @OnClick({R.id.ll_low, R.id.ll_mid, R.id.ll_high})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.ll_low:
-                onSelect(0);
-                break;
-            case R.id.ll_mid:
                 onSelect(1);
                 break;
-            case R.id.ll_high:
+            case R.id.ll_mid:
                 onSelect(2);
+                break;
+            case R.id.ll_high:
+                onSelect(3);
                 break;
         }
     }
@@ -63,15 +77,15 @@ public class SettingSoundView extends BaseView {
     public void onSelect(int index) {
         reset();
         switch (index) {
-            case 0:
+            case 1:
                 mCvLow.setVisibility(VISIBLE);
                 mTvLow.setTextColor(0xff3091F8);
                 break;
-            case 1:
+            case 2:
                 mCvMid.setVisibility(VISIBLE);
                 mTvMid.setTextColor(0xff3091F8);
                 break;
-            case 2:
+            case 3:
                 mCvHigh.setVisibility(VISIBLE);
                 mTvHigh.setTextColor(0xff3091F8);
                 break;

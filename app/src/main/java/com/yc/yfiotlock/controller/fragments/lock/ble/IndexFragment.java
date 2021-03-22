@@ -1,6 +1,8 @@
 package com.yc.yfiotlock.controller.fragments.lock.ble;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 

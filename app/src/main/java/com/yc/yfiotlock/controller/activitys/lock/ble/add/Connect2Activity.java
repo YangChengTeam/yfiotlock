@@ -161,7 +161,7 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     }
 
     private void cloudModifyDeivceName(String name) {
-        if (deviceInfo != null && !TextUtils.isEmpty(deviceInfo.getDeviceId())) {
+        if (deviceInfo != null && !TextUtils.isEmpty(deviceInfo.getId())) {
             mLoadingDialog.show("正在修改");
             deviceEngin.updateDeviceInfo(deviceInfo.getId(), name).subscribe(new Subscriber<ResultInfo<String>>() {
                 @Override
@@ -178,9 +178,11 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
                 public void onNext(ResultInfo<String> resultInfo) {
                     String msg = "服务器错误";
                     if (resultInfo != null && resultInfo.getCode() == 1) {
-                        mTvEdit.setText(name);
                         deviceNameDialog.dismiss();
                         ToastCompat.show(getContext(), "修改成功");
+                        deviceInfo.setName(name);
+                        EventBus.getDefault().post(deviceInfo);
+                        finish();
                     } else {
                         msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
                         ToastCompat.show(getContext(), msg);
@@ -192,6 +194,7 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     }
 
     private String aliDeviceName = "YF-LOCK";
+
     private void bleGetAliDeviceName() {
         if (lockBleSend != null) {
             byte[] cmdBytes = LockBLESettingCmd.getAlDeviceName(this);
