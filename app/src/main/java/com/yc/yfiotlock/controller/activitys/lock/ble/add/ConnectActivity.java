@@ -75,7 +75,7 @@ public class ConnectActivity extends BaseAddActivity {
 
     @Override
     protected void initViews() {
-        mInstance = new WeakReference<ConnectActivity>(this);
+        mInstance = new WeakReference<>(this);
         super.initViews();
         backNavBar.setTitle(bleDevice.getName());
         setInfo();
@@ -176,9 +176,7 @@ public class ConnectActivity extends BaseAddActivity {
     protected void bindClick() {
         super.bindClick();
         setClick(mIvSecret, () -> CommonUtil.hiddenEditText(mEtPwd, mIvSecret));
-        setClick(mStvNext, () -> {
-            nav2next();
-        });
+        setClick(mStvNext, this::nav2next);
         setClick(R.id.iv_scan_wifi, () -> {
             mLoadingDialog.show("扫描中...");
             mLoadingDialog.setCanCancel(false);
@@ -189,11 +187,10 @@ public class ConnectActivity extends BaseAddActivity {
     private void showChooseList(CharSequence[] strings) {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle("可用网络列表(2.4G)")
-                .setItems(strings, (DialogInterface.OnClickListener) (dialog, which) -> {
+                .setItems(strings, (dialog, which) -> {
                     mEtSsid.setText(strings[which]);
                     dialog.dismiss();
                 }).create();
-        alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
         alertDialog.setOnDismissListener(dialog -> {
             mEtPwd.requestFocus();
