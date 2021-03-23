@@ -15,7 +15,8 @@ public class DeviceInfo implements Serializable {
     private String firmwareVersion;
     @JSONField(name = "protocol_version")
     private String protocolVersion;
-    private String regtime;
+    @JSONField(name = "add_time")
+    private int regtime;
     private int battery;
     @JSONField(name = "device_id")
     private String deviceId;
@@ -29,7 +30,7 @@ public class DeviceInfo implements Serializable {
     }
 
     public String getId() {
-        if(TextUtils.isEmpty(id)){
+        if (TextUtils.isEmpty(id)) {
             id = lockerId;
         }
         return id;
@@ -56,6 +57,9 @@ public class DeviceInfo implements Serializable {
     }
 
     public String getFirmwareVersion() {
+        if (TextUtils.isEmpty(firmwareVersion)) {
+            firmwareVersion = "v1.0";
+        }
         return firmwareVersion;
     }
 
@@ -64,6 +68,9 @@ public class DeviceInfo implements Serializable {
     }
 
     public String getProtocolVersion() {
+        if (TextUtils.isEmpty(protocolVersion)) {
+            protocolVersion = "v1.1";
+        }
         return protocolVersion;
     }
 
@@ -71,15 +78,18 @@ public class DeviceInfo implements Serializable {
         this.protocolVersion = protocolVersion;
     }
 
-    public String getRegtime() {
+    public int getRegtime() {
         return regtime;
     }
 
-    public void setRegtime(String regtime) {
+    public void setRegtime(int regtime) {
         this.regtime = regtime;
     }
 
     public int getBattery() {
+        if (battery == 0) {
+            battery = 3;
+        }
         return battery;
     }
 

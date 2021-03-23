@@ -1,7 +1,11 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 
+import android.app.Dialog;
+
+import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -76,6 +80,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
+                fail(name, type, keyid, password);
             }
 
             @Override
@@ -84,10 +89,33 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                     finish();
                     cloudAddSucc();
                     EventBus.getDefault().post(new OpenLockRefreshEvent());
+                } else {
+                    fail(name, type, keyid, password);
                 }
             }
         });
     }
+
+    public void fail(String name, int type, String keyid, String password) {
+        if (retryCount-- > 0) {
+            VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
+                cloudAdd(name, type, keyid, password);
+            });
+        } else {
+            retryCount = 3;
+            GeneralDialog generalDialog = new GeneralDialog(getContext());
+            generalDialog.setTitle("温馨提示");
+            generalDialog.setMsg("同步云端失败, 请重试");
+            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+                @Override
+                public void onClick(Dialog dialog) {
+                    cloudAdd(name, type, keyid, password);
+                }
+            });
+            generalDialog.show();
+        }
+    }
+
 
     @Override
     protected void onResume() {

@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.coorchice.library.SuperTextView;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
@@ -45,6 +46,8 @@ public class ConnectActivity extends BaseAddActivity {
     SuperTextView mStvNext;
 
     private BleDevice bleDevice;
+    private WifiManager mWifiManager;
+
 
     private static WeakReference<ConnectActivity> mInstance;
 
@@ -60,18 +63,17 @@ public class ConnectActivity extends BaseAddActivity {
         return R.layout.lock_ble_activity_add_connect;
     }
 
-    WifiManager mWifiManager;
 
     @Override
     protected void initVars() {
         super.initVars();
         bleDevice = getIntent().getParcelableExtra("bleDevice");
+        LockBLESend.bleNotify(bleDevice);
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(wifiScanReceiver, intentFilter);
     }
-
 
     @Override
     protected void initViews() {
@@ -102,7 +104,6 @@ public class ConnectActivity extends BaseAddActivity {
         intent.putExtra("ssid", ssid);
         intent.putExtra("pwd", pwd);
         startActivity(intent);
-        finish();
     }
 
     private void scanWifi() {
@@ -180,14 +181,18 @@ public class ConnectActivity extends BaseAddActivity {
             nav2next();
         });
         setClick(R.id.iv_scan_wifi, () -> {
+            if (mLoadingDialog.isShowing()) return;
             mLoadingDialog.show("扫描中...");
             mLoadingDialog.setCanCancel(false);
             scanWifi();
         });
     }
 
+    private AlertDialog alertDialog;
+
     private void showChooseList(CharSequence[] strings) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
+        if (alertDialog != null && alertDialog.isShowing()) return;
+        alertDialog = new AlertDialog.Builder(this)
                 .setTitle("可用网络列表(2.4G)")
                 .setItems(strings, (DialogInterface.OnClickListener) (dialog, which) -> {
                     mEtSsid.setText(strings[which]);

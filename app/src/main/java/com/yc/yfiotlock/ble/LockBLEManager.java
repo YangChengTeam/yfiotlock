@@ -62,6 +62,10 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
+    public static void cancelScan(){
+        BleManager.getInstance().cancelScan();
+    }
+
     public static void initConfig2(String mac) {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
@@ -71,7 +75,7 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
-    public static void clear(){
+    public static void clear() {
         BleManager.getInstance().disconnectAllDevice();
     }
 
@@ -211,21 +215,17 @@ public class LockBLEManager {
         });
     }
 
-    public static boolean isFoundDevice(@NonNull String mac){
-        boolean isFound = CacheUtil.getCache(mac, DeviceInfo.class) != null;
-        if(isFound) return true;
-
+    public static boolean isFoundDevice(@NonNull String mac) {
         IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
-        if(indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0){
-            for(DeviceInfo deviceInfo : indexInfo.getDeviceInfos()){
-                if(mac.equals(deviceInfo.getMacAddress())){
+        if (indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0) {
+            for (DeviceInfo deviceInfo : indexInfo.getDeviceInfos()) {
+                if (mac.equals(deviceInfo.getMacAddress())) {
                     return true;
                 }
             }
         }
         return false;
     }
-
 
 
 }

@@ -31,13 +31,16 @@ public class SettingSoundView extends BaseView {
     @BindView(R.id.cv_high)
     CardView mCvHigh;
 
-    private int volume = 2;
+    private int volume = 3;
 
     public void setVolume(int volume) {
         MMKV.defaultMMKV().putInt("volume", volume);
         this.volume = volume;
     }
 
+    public int getVolume() {
+        return volume;
+    }
 
     public void resetVolume() {
         onSelect(volume);

@@ -5,6 +5,7 @@ import android.content.Context;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Calendar;
+import java.util.Locale;
 
 
 public class LockBLESettingCmd {
@@ -51,7 +52,9 @@ public class LockBLESettingCmd {
     }
 
     // 1.5同步时间(0x05)
-    public static byte[] syncTime(Context context) {
+    public static byte[] syncTime(Context context, long timestamp) {
+        Calendar cal = Calendar.getInstance(Locale.CHINA);
+        cal.setTimeInMillis(timestamp * 1000L);
         int year = Calendar.getInstance().get(Calendar.YEAR);
         year = getYearSuff(year, 1000);
         int month = Calendar.getInstance().get(Calendar.MONTH);

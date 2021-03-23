@@ -19,6 +19,7 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -56,6 +57,9 @@ import com.yc.yfiotlock.view.widgets.MyItemDivider;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 import rx.Observer;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -86,36 +90,6 @@ public class CommonUtil {
     public static void setItemDivider(Context context, RecyclerView recyclerView) {
         MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
                 .setPadding(ScreenUtil.dip2px(context, 15))
-                .setDrawable(ContextCompat.getDrawable(context, R.drawable.shape_line_divide))
-                .setCountNotDraw(1);
-        recyclerView.addItemDecoration(myItemDivider);
-    }
-
-    public static void setItemDividerFull(Context context, RecyclerView recyclerView) {
-        MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
-                .setDrawable(ContextCompat.getDrawable(context, R.drawable.shape_line_divide));
-        recyclerView.addItemDecoration(myItemDivider);
-    }
-
-    public static void setItemDivider2(Context context, RecyclerView recyclerView, int notDrawCount) {
-        MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
-                .setPadding(ScreenUtil.dip2px(context, 15))
-                .setDrawable(ContextCompat.getDrawable(context, R.drawable.shape_line_divide))
-                .setHeadNotDraw(notDrawCount)
-                .setCountNotDraw(1);
-        recyclerView.addItemDecoration(myItemDivider);
-    }
-
-    public static void setItemDivider3(Context context, RecyclerView recyclerView) {
-        MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
-                .setPadding(ScreenUtil.dip2px(context, 15))
-                .setDrawable(ContextCompat.getDrawable(context, R.drawable.shape_line_divide))
-                .setCountNotDraw(0);
-        recyclerView.addItemDecoration(myItemDivider);
-    }
-
-    public static void setItemDividerWithNoPadding(Context context, RecyclerView recyclerView) {
-        MyItemDivider myItemDivider = new MyItemDivider(context, DividerItemDecoration.VERTICAL)
                 .setDrawable(ContextCompat.getDrawable(context, R.drawable.shape_line_divide))
                 .setCountNotDraw(1);
         recyclerView.addItemDecoration(myItemDivider);
@@ -444,6 +418,12 @@ public class CommonUtil {
      */
     public static boolean is24GHz(int freqMhz) {
         return freqMhz >= BAND_24_GHZ_START_FREQ_MHZ && freqMhz <= BAND_24_GHZ_END_FREQ_MHZ;
+    }
+
+    public static String formatTime(int timestamp) {
+        Calendar cal = Calendar.getInstance(Locale.CHINA);
+        cal.setTimeInMillis(timestamp * 1000L);
+        return DateFormat.format("yyyy-MM-dd hh:mm:ss", cal).toString();
     }
 
 

@@ -30,6 +30,7 @@ public class DeviceInfoActivity extends BaseActivity {
     RecyclerView mRvDeviceInfo;
 
     private DeviceInfo deviceInfo;
+    private ItemInfoAdapter mAdapter;
 
     @Override
     protected int getLayoutId() {
@@ -39,11 +40,7 @@ public class DeviceInfoActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        deviceInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
-        if (deviceInfo == null) {
-            ToastCompat.show(getContext(), "设备信息异常");
-            finish();
-        }
+        deviceInfo = LockIndexActivity.getInstance().getLockInfo();
     }
 
     @Override
@@ -52,7 +49,6 @@ public class DeviceInfoActivity extends BaseActivity {
         setRvDeviceInfo();
     }
 
-    private ItemInfoAdapter mAdapter;
 
     private void setRvDeviceInfo() {
         mAdapter = new ItemInfoAdapter(null);
@@ -67,14 +63,14 @@ public class DeviceInfoActivity extends BaseActivity {
         List<ItemInfo> itemInfos = new ArrayList<>();
         itemInfos.add(new ItemInfo("固件版本", deviceInfo.getFirmwareVersion()));
         itemInfos.add(new ItemInfo("协议版本", deviceInfo.getProtocolVersion()));
-        itemInfos.add(new ItemInfo("注册时间", deviceInfo.getRegtime()));
+        itemInfos.add(new ItemInfo("注册时间", CommonUtil.formatTime(deviceInfo.getRegtime())));
         itemInfos.add(new ItemInfo("剩余电量", getBatteryString(deviceInfo.getBattery())));
-        itemInfos.add(new ItemInfo("设备id", deviceInfo.getMacAddress()));
+        itemInfos.add(new ItemInfo("设备id", deviceInfo.getMacAddress().replaceAll(":", "")));
         mAdapter.setNewInstance(itemInfos);
     }
 
     private String getBatteryString(int battery) {
-        return "高中低？";
+        return "高中低".substring(3 - battery, 3 - battery + 1);
     }
 
     public class ItemInfo {
@@ -114,6 +110,5 @@ public class DeviceInfoActivity extends BaseActivity {
             holder.setText(R.id.tv_value, deviceInfo.getValue());
         }
     }
-
 
 }

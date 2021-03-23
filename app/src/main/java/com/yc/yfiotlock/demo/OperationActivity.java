@@ -309,7 +309,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
                 break;
             }
             case R.id.btn_synctime: {
-                byte[] bytes = LockBLESettingCmd.syncTime(OperationActivity.this);
+                byte[] bytes = LockBLESettingCmd.syncTime(OperationActivity.this, System.currentTimeMillis()/1000);
                 op(bytes);
                 break;
             }

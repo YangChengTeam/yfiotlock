@@ -10,10 +10,13 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -32,6 +35,7 @@ public class DeviceNameEditActivity extends BaseActivity {
 
     private DeviceInfo deviceInfo;
     private DeviceEngin deviceEngin;
+
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_edit_device_name;
@@ -47,11 +51,8 @@ public class DeviceNameEditActivity extends BaseActivity {
     @Override
     protected void initViews() {
         mBnbTitle.setBackListener(view -> finish());
-        String name = getIntent().getStringExtra("name");
-        if (name != null) {
-            mEtName.setText(name);
-            mEtName.setSelection(name.length());
-        }
+        mEtName.setText(deviceInfo.getName());
+        mEtName.setSelection(mEtName.getText().length());
         CommonUtil.setEditTextLimit(mEtName, 20, true);
         mEtName.requestFocus();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -74,10 +75,14 @@ public class DeviceNameEditActivity extends BaseActivity {
 
                 @Override
                 public void onNext(ResultInfo<String> resultInfo) {
-                    String msg = "服务器错误";
                     if (resultInfo != null && resultInfo.getCode() == 1) {
+                        deviceInfo.setName(name);
                         ToastCompat.show(getContext(), "修改成功");
+                        finish();
+                        EventBus.getDefault().post(deviceInfo);
+                        EventBus.getDefault().post(new IndexRefreshEvent());
                     } else {
+                        String msg = "更新出错";
                         msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
                         ToastCompat.show(getContext(), msg);
                     }
@@ -88,10 +93,8 @@ public class DeviceNameEditActivity extends BaseActivity {
 
     @Override
     protected void bindClick() {
-        setClick(R.id.stv_sure, ()->{
+        setClick(R.id.stv_sure, () -> {
             cloudModifyDeivceName();
         });
     }
-
-
 }
