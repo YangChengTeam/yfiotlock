@@ -27,6 +27,7 @@ public class SplashActivity extends BaseActivity {
     protected void initViews() {
         DownloadManager.init(new WeakReference<>(this));
         setFullScreen();
+        setFullScreenWithCutOutScreen();
         VUiKit.postDelayed(1000, () -> {
             navToMain = true;
             if (this.hasWindowFocus()) {

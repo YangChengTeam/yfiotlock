@@ -157,6 +157,17 @@ public abstract class BaseActivity extends BaseSendActivity implements ILoadData
         getWindow().getDecorView().setSystemUiVisibility(1280 | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
     }
 
+    /**
+     * 刘海屏全屏
+     */
+    public void setFullScreenWithCutOutScreen() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            getWindow().setAttributes(lp);
+        }
+    }
+
     @Override
     public void success(Object data) {
 
