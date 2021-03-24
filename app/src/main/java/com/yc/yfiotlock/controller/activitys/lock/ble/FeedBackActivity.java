@@ -177,7 +177,6 @@ public class FeedBackActivity extends BaseActivity {
         PictureUtil.zipPic(getContext(), uris, new Callback<List<File>>() {
             @Override
             public void onSuccess(List<File> resultInfo) {
-                Log.i("aaaa", "onSuccess: " + resultInfo.size());
                 uploadPic(resultInfo);
             }
 
@@ -201,7 +200,7 @@ public class FeedBackActivity extends BaseActivity {
                                 ResultInfo<PicInfo> info = JSONObject.parseObject(resultInfo, new TypeReference<ResultInfo<PicInfo>>() {
                                 }.getType());
                                 if (info.getCode() == 1) {
-                                    Log.i("aaaa", "onSuccess: " + info.getData().getPath());
+                                    Log.d("aaaa", "onSuccess: " + info.getData().getPath());
                                     backImgs.add(info.getData().getUrl());
                                     uploadPic(files);
                                 } else {

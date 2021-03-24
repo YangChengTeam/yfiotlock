@@ -178,7 +178,7 @@ public class MainActivity extends BaseActivity {
                     PackageInfo packageInfo = packageManager.getPackageArchiveInfo(file.getAbsolutePath(),
                             PackageManager.GET_CONFIGURATIONS);
                     if (packageInfo != null && versionCode > packageInfo.versionCode && file.delete()) {
-                        Log.i("aaaa", "deleteLowerVersionApkFile: " + file.getAbsolutePath());
+                        Log.d("aaaa", "deleteLowerVersionApkFile: " + file.getAbsolutePath());
                     }
                 }
             }

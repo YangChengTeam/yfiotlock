@@ -112,7 +112,6 @@ public class SafePwdCreateActivity extends BaseActivity {
                 if (s.toString().length() == 6) {
                     onInputResult(s.toString());
                 }
-                Log.i("aaaa", "afterTextChanged: " + stringList.toString());
             }
         });
     }
