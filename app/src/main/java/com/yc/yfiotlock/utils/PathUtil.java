@@ -95,7 +95,7 @@ public class PathUtil {
             String path = getRealPathFromUri_AboveApi19(context, uri);
             if (TextUtils.isEmpty(path)) {
                 path = getFilePathFromUriByContentProvider(context, uri, imageName);
-                Log.i("aaaa", "getFilePathFromUriByContentProvider: 通过contentProvider获取path" + path);
+                Log.d("aaaa", "getFilePathFromUriByContentProvider: 通过contentProvider获取path" + path);
             }
             return path;
         }
@@ -274,7 +274,7 @@ public class PathUtil {
             try {
                 inputStream = context.getContentResolver().openInputStream(uri);
                 File file = createTemporalFileFrom(context, inputStream, fileName);
-                Log.i("aaaa", "PathUtils: 复制目标apk到自身目录下");
+                Log.d("aaaa", "PathUtils: 复制目标apk到自身目录下");
                 return file.getAbsolutePath();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -323,20 +323,7 @@ public class PathUtil {
         File file = new File(context.getExternalCacheDir(), fileName);
         if (file.exists()) {
             file.delete();
-            Log.i("aaaa", "PathUtils:  删除自身目录下目标");
         }
-    }
-
-    public static void deleteFile(Context context, List<String> fileName) {
-        new Thread(() -> {
-            for (String s : fileName) {
-                File file = new File(context.getExternalCacheDir(), s);
-                if (file.exists()) {
-                    file.delete();
-                    Log.i("aaaa", "PathUtils:  删除自身目录下目标");
-                }
-            }
-        }).start();
     }
 
     public static File copyFileToDCIM(File file, String name) {

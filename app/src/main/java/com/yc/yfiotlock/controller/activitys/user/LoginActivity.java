@@ -156,7 +156,7 @@ public class LoginActivity extends BaseActivity {
         mLoginEngin.smsCodeLogin(phone, code).subscribe(new Observer<ResultInfo<UserInfo>>() {
             @Override
             public void onCompleted() {
-                mLoadingDialog.dismiss();
+
             }
 
             @Override
@@ -168,6 +168,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onNext(ResultInfo<UserInfo> info) {
                 if (info != null && info.getCode() == 1) {
+                    mLoadingDialog.dismiss();
                     UserInfoCache.setUserInfo(info.getData());
                     startActivity(new Intent(getContext(), MainActivity.class));
                     EventBus.getDefault().post(info.getData());
@@ -187,7 +188,6 @@ public class LoginActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onOneKeyLogin(LoginEvent event) {
-        Log.i("aaaa", "onOneKeyLogin: " + event);
         switch (event.getStateString()) {
             case FAILED:
             case EVOKE_SUCCESS:
