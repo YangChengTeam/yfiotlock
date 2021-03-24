@@ -153,7 +153,7 @@ public class CommonUtil {
         PhoneNumberAuthHelper phoneNumberAuthHelper = PhoneNumberAuthHelper.getInstance(context, new TokenResultListener() {
             @Override
             public void onTokenSuccess(String s) {
-                Log.i("onekeylogin", "onTokenSuccess: " + s);
+                Log.d("onekeylogin", "onTokenSuccess: " + s);
                 try {
                     PhoneTokenInfo tokenInfo = JSONObject.parseObject(s, PhoneTokenInfo.class);
                     switch (tokenInfo.getCode()) {
@@ -170,13 +170,13 @@ public class CommonUtil {
                             startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
                         default:
-                            this.onTokenFailed("");
+                            this.onTokenFailed(s);
                             break;
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    this.onTokenFailed("");
+                    this.onTokenFailed(s);
                 }
             }
 
