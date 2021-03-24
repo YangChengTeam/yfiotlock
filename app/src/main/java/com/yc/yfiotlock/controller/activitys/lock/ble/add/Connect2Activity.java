@@ -5,14 +5,15 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.kk.securityhttp.utils.LogUtil;
-import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.ble.LockBLEUtils;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 
@@ -90,6 +91,11 @@ public class Connect2Activity extends BaseConnectActivity {
         setClick(mTvEdit, () -> {
             deviceNameDialog.show(mTvEdit.getText().toString());
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(DeviceInfo lockInfo) {
+        mTvEdit.setText(lockInfo.getName());
     }
 
 

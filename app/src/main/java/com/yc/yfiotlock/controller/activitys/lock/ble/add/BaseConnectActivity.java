@@ -111,6 +111,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                         deviceNameDialog.dismiss();
                         ToastCompat.show(getContext(), "修改成功");
                         lockInfo.setName(name);
+                        EventBus.getDefault().post(lockInfo);
                         EventBus.getDefault().post(new IndexRefreshEvent());
                     } else {
                         msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
@@ -220,7 +221,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
-            if (isDeviceAdd) {
+            if (isDeviceAdd || isFromIndex) {
                 return;
             }
             isDeviceAdd = true;
