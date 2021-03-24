@@ -170,6 +170,7 @@ public class CommonUtil {
                             startLoginWithToken(context, this, tokenInfo.getToken());
                             break;
                         default:
+                            this.onTokenFailed("");
                             break;
                     }
 
@@ -319,6 +320,21 @@ public class CommonUtil {
                 break;
             case "600008":
                 ToastCompat.show(context, "移动网络未开启,请开启移动网络后重试");
+                break;
+            case "600009":
+                ToastCompat.show(context, "无法判断运营商");
+                break;
+            case "600013":
+                ToastCompat.show(context, "60013 运营商维护升级，该功能不可用");
+                break;
+            case "600014":
+                ToastCompat.show(context, "60014 运营商维护升级，该功能不可用");
+                break;
+            case "600015":
+                ToastCompat.show(context, "请求超时");
+                break;
+            case "600025":
+                ToastCompat.show(context, "终端检测参数错误");
                 break;
             //点击返回，⽤户取消免密登录
             case "700000":
