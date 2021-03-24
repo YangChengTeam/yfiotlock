@@ -35,11 +35,11 @@
 
     <style name="SplashTheme" parent="@style/BaseAppTheme">
         <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowBackground">@drawable/splash_bg_xml</item>
         <item name="colorAccent">@color/transparent</item>
         <item name="colorPrimary">@color/transparent</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowBackground">@mipmap/splash_bg</item>
         <item name="colorPrimaryDark">@color/transparent</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
     </style>
 
     <style name="dialogButtonAnim" parent="android:Animation">
