@@ -27,7 +27,6 @@ public class ToastCompat {
                 sField_TN_Handler.setAccessible(true);
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.i("aaaa", "static initializer: " + e);
             }
         }
     }

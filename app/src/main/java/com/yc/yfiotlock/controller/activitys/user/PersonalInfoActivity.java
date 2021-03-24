@@ -212,7 +212,7 @@ public class PersonalInfoActivity extends BaseActivity {
         String publicPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
         File file = new File(publicPath, CROP_ICON_NAME);
         if (file.exists() && file.delete()) {
-            Log.i("aaaa", "onCrop: file.delete" + file.getAbsolutePath());
+            Log.d("aaaa", "onCrop: file.delete" + file.getAbsolutePath());
         }
         cut.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));//保存到uri指定的位置
         try {
@@ -281,7 +281,7 @@ public class PersonalInfoActivity extends BaseActivity {
                             ResultInfo<PicInfo> info = JSONObject.parseObject(resultInfo, new TypeReference<ResultInfo<PicInfo>>() {
                             }.getType());
                             if (info.getCode() == 1) {
-                                Log.i("aaaa", "onSuccess: " + info.getData().getPath());
+                                Log.d("aaaa", "onSuccess: " + info.getData().getPath());
                                 changeUserFace(info.getData().getUrl(), info.getData().getPath());
                             } else {
                                 ToastCompat.show(getContext(), info.getMsg());
