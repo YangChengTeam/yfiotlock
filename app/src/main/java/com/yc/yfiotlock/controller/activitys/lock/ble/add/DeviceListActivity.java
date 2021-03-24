@@ -10,8 +10,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.utils.LogUtil;
+import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
@@ -30,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -103,6 +108,10 @@ public class DeviceListActivity extends BaseAddActivity {
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
                 mLoadingDialog.dismiss();
+                HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
+                if (hashMap.get(bleDevice.getMac()) == null) {
+                    hashMap.put(bleDevice.getMac(), bleDevice);
+                }
                 nav2Connect(bleDevice);
                 LockBLEManager.setMtu(bleDevice);
             }
@@ -110,7 +119,6 @@ public class DeviceListActivity extends BaseAddActivity {
             @Override
             public void onConnectFailed() {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(DeviceListActivity.this, "连接失败");
             }
         });
     }

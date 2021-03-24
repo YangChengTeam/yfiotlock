@@ -3,7 +3,6 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.app.Dialog;
 import android.content.Intent;
 import android.hardware.SensorEvent;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,17 +12,19 @@ import androidx.annotation.Nullable;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
-import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -37,12 +38,13 @@ import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
-import com.yc.yfiotlock.utils.SafeUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -131,8 +133,44 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     protected void initViews() {
         mInstance = new WeakReference<>(this);
         setFullScreen();
-
         loadLockOpenCountInfo();
+
+        if (bleDevice == null) {
+            scan();
+        } else {
+            if (LockBLEManager.isConnected(bleDevice)) {
+                initSends();
+                setConnectedInfo();
+            }
+        }
+
+
+        shakeSensor = new ShakeSensor(this);
+        shakeSensor.setShakeListener(new ShakeSensor.OnShakeListener() {
+            @Override
+            public void onShakeComplete(SensorEvent event) {
+                if (LockBLEManager.isConnected(bleDevice)) {
+                    // 开门
+                    bleopen();
+                    vibrate();
+                }
+            }
+        });
+
+        reConnectDialog = new GeneralDialog(this);
+        reConnectDialog.setTitle("温馨提示");
+        reConnectDialog.setMsg("蓝牙连接已断开，请将手机靠近 门锁后重试");
+        reConnectDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+            @Override
+            public void onClick(Dialog dialog) {
+                connect(bleDevice);
+            }
+        });
+    }
+
+    @Override
+    protected void bindClick() {
+        super.bindClick();
         RxView.clicks(backBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             finish();
         });
@@ -166,41 +204,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
         RxView.longClicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             if (LockBLEManager.isConnected(bleDevice)) {
-                open();
-            }
-        });
-
-        if (bleDevice == null) {
-            scan();
-        } else {
-            if (LockBLEManager.isConnected(bleDevice)) {
-                lockBleSend = new LockBLESend(this, bleDevice);
-                lockBleSend.registerNotify();
-                lockBleSend.setNotifyCallback(this);
-                setConnectedInfo();
-            }
-        }
-
-
-        shakeSensor = new ShakeSensor(this);
-        shakeSensor.setShakeListener(new ShakeSensor.OnShakeListener() {
-            @Override
-            public void onShakeComplete(SensorEvent event) {
-                if (LockBLEManager.isConnected(bleDevice)) {
-                    // 开门
-                    open();
-                    vibrate();
-                }
-            }
-        });
-
-        generalDialog = new GeneralDialog(this);
-        generalDialog.setTitle("温馨提示");
-        generalDialog.setMsg("蓝牙连接已断开，请将手机靠近 门锁后重试");
-        generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-            @Override
-            public void onClick(Dialog dialog) {
-                connect(bleDevice);
+                bleopen();
             }
         });
     }
@@ -212,15 +216,41 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        shakeSensor.register();
+    private void initSends() {
+        if (lockBleSend == null) {
+            lockBleSend = new LockBLESend(this, bleDevice);
+            lockBleSend.registerNotify();
+            lockBleSend.setNotifyCallback(this);
+        }
 
+    }
+
+    private void registerNotify() {
         if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
+    }
+
+    private void unregisterNotify() {
+        if (lockBleSend != null) {
+            lockBleSend.setNotifyCallback(null);
+            lockBleSend.unregisterNotify();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!BleManager.getInstance().isBlueEnable()) {
+            ToastCompat.show(LockIndexActivity.this, "请先打开蓝牙");
+            BleManager.getInstance().enableBluetooth();
+            return;
+        }
+
+        shakeSensor.register();
+
+        registerNotify();
         // 重新连接
         if (bleDevice != null && !LockBLEManager.isConnected(bleDevice)) {
             reconnect();
@@ -230,10 +260,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     protected void onStop() {
         super.onStop();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(null);
-            lockBleSend.unregisterNotify();
-        }
+
+        unregisterNotify();
         shakeSensor.unregister();
     }
 
@@ -243,7 +271,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (lockBleSend != null) {
             lockBleSend.clear();
         }
-        LockBLEManager.clear();
+        LockBLEManager.cancelScan();
+        LogUtil.msg("已清理");
     }
 
     private void stopAnimations() {
@@ -258,7 +287,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         AnimatinUtil.scale(tabView2, 0.05f);
     }
 
-    private void open() {
+    private void bleopen() {
         if (isOpening) {
             return;
         }
@@ -269,18 +298,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startAnimations();
 
         if (lockBleSend != null) {
-            lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this));
+            lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this), false);
         }
-
-        VUiKit.postDelayed(8000, () -> {
-            if (isOpening) {
-                isOpening = false;
-                if (LockBLEManager.isConnected(bleDevice)) {
-                    setConnectedInfo();
-                }
-                ToastCompat.show(getContext(), "操作超时");
-            }
-        });
     }
 
 
@@ -288,6 +307,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (!BleManager.getInstance().isBlueEnable()) {
             ToastCompat.show(LockIndexActivity.this, "请先打开蓝牙");
             BleManager.getInstance().enableBluetooth();
+            return;
+        }
+        HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
+        BleDevice bleDevice = hashMap.get(lockInfo.getMacAddress());
+        if (bleDevice != null) {
+            connect(bleDevice);
             return;
         }
         LockBLEManager.initConfig2(lockInfo.getMacAddress());
@@ -305,10 +330,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             @Override
             public void onScanning(BleDevice bleDevice) {
                 // 搜索到后开始连接
+                LogUtil.msg(bleDevice.getMac());
                 if (!bleDevice.getMac().equals(lockInfo.getMacAddress())) {
                     return;
                 }
                 connect(bleDevice);
+                LockBLEManager.cancelScan();
             }
 
             @Override
@@ -363,24 +390,24 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
                 statusIv.setImageResource(R.mipmap.icon_nolink);
                 loadingIv.setImageResource(R.mipmap.one);
-
             }
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
                 LockIndexActivity.this.bleDevice = bleDevice;
-                if (lockBleSend == null) {
-                    lockBleSend = new LockBLESend(LockIndexActivity.this, bleDevice);
-                    lockBleSend.registerNotify();
-                    lockBleSend.setNotifyCallback(LockIndexActivity.this);
-                    VUiKit.postDelayed(1000, () -> {
-                        LockBLESend.bleNotify(bleDevice);
-                    });
+                initSends();
+
+                HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
+                if (hashMap.get(bleDevice.getMac()) == null) {
+                    App.getApp().getConnectedDevices().put(bleDevice.getMac(), bleDevice);
                 }
+
                 // 设置连接成功状态
                 setConnectedInfo();
 
                 LockBLEManager.setMtu(bleDevice);
+
+                EventBus.getDefault().post(bleDevice);
             }
 
             @Override
@@ -395,11 +422,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     }
 
     // 重新逻辑
-    private GeneralDialog generalDialog;
+    private GeneralDialog reConnectDialog;
 
     private void reconnect() {
-        if (generalDialog.isShowing()) {
-            generalDialog.show();
+        if (!reConnectDialog.isShowing()) {
+            reConnectDialog.show();
         }
     }
 
@@ -409,9 +436,31 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startActivity(intent);
     }
 
+    // 进入开门方式管理
+    private void nav2bindwifi() {
+        Intent intent = new Intent(this, ConnectActivity.class);
+        intent.putExtra("bleDevice", bleDevice);
+        intent.putExtra("family", familyInfo);
+        intent.putExtra("isFromIndex", true);
+        startActivity(intent);
+    }
+
     // 进入访客管理
     private void nav2Vm() {
-        VisitorManageActivity.start(this, lockInfo);
+        if (lockInfo.isOnline() || LockBLEManager.isBindWifi(lockInfo.getMacAddress())) {
+            VisitorManageActivity.start(this, lockInfo);
+        } else {
+            GeneralDialog generalDialog = new GeneralDialog(this);
+            generalDialog.setTitle("温馨提示");
+            generalDialog.setMsg("设备还未配网, 确定进入配网流程");
+            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+                @Override
+                public void onClick(Dialog dialog) {
+                    nav2bindwifi();
+                }
+            });
+            generalDialog.show();
+        }
     }
 
     // 进入日志管理
@@ -422,10 +471,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     // 进入设置
     private void nav2setting() {
         Intent intent = new Intent(this, LockSettingActivity.class);
-        intent.putExtra("device", lockInfo);
         startActivity(intent);
     }
-
 
     private int setCountInfo() {
         int type = 1;
@@ -440,6 +487,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     public void onRefresh(OpenLockRefreshEvent object) {
         setCountInfo();
     }
+
 
     // 开门方式数量
     private void loadLockOpenCountInfo() {
@@ -470,10 +518,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     }
 
     @Override
-    public void onNotifyReady() {
-    }
-
-    @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
             stopAnimations();
@@ -491,8 +535,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
-            setConnectedInfo();
             isOpening = false;
+            setConnectedInfo();
         }
     }
 }

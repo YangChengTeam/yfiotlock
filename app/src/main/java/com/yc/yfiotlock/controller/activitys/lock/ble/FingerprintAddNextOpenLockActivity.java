@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewKt;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
@@ -79,7 +80,8 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            ToastCompat.show(getContext(), "添加失败");
+            isOpOver = true;
+            ToastCompat.show(getContext(), "指纹添加失败");
             finish();
         }
     }

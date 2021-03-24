@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.kk.securityhttp.utils.LogUtil;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
@@ -45,10 +46,11 @@ public class LockBLEManager {
     public static int OPEN_LOCK_PASSWORD = 2;
     public static int OPEN_LOCK_CARD = 3;
 
+
     public static void initBle(Application context) {
         BleManager.getInstance()
                 .enableLog(true)
-                .setReConnectCount(1, 1000)
+                .setReConnectCount(2, 1000)
                 .setSplitWriteNum(LockBLEPackage.getMtu())
                 .setConnectOverTime(10000)
                 .setOperateTimeout(5000).init(context);
@@ -62,6 +64,10 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
+    public static void cancelScan() {
+        BleManager.getInstance().cancelScan();
+    }
+
     public static void initConfig2(String mac) {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
@@ -71,7 +77,7 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
-    public static void clear(){
+    public static void clear() {
         BleManager.getInstance().disconnectAllDevice();
     }
 
@@ -84,12 +90,14 @@ public class LockBLEManager {
         BleManager.getInstance().setMtu(bleDevice, LockBLEPackage.getMtu(), new BleMtuChangedCallback() {
             @Override
             public void onSetMTUFailure(BleException exception) {
+                LockBLESend.bleNotify(bleDevice);
             }
 
             @Override
             public void onMtuChanged(int mtu) {
                 // 设置MTU成功，并获得当前设备传输支持的MTU值
                 LockBLEPackage.setMtu(mtu);
+                LockBLESend.bleNotify(bleDevice);
             }
         });
     }
@@ -211,14 +219,11 @@ public class LockBLEManager {
         });
     }
 
-    public static boolean isFoundDevice(@NonNull String mac){
-        boolean isFound = CacheUtil.getCache(mac, DeviceInfo.class) != null;
-        if(isFound) return true;
-
+    public static boolean isFoundDevice(@NonNull String mac) {
         IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
-        if(indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0){
-            for(DeviceInfo deviceInfo : indexInfo.getDeviceInfos()){
-                if(mac.equals(deviceInfo.getMacAddress())){
+        if (indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0) {
+            for (DeviceInfo deviceInfo : indexInfo.getDeviceInfos()) {
+                if (mac.equals(deviceInfo.getMacAddress())) {
                     return true;
                 }
             }
@@ -226,6 +231,12 @@ public class LockBLEManager {
         return false;
     }
 
+    public static void setBindWifi(String mac) {
+        MMKV.defaultMMKV().putBoolean(mac + "_wifi", true);
+    }
 
+    public static boolean isBindWifi(String mac) {
+        return MMKV.defaultMMKV().getBoolean(mac + "_wifi", false);
+    }
 
 }

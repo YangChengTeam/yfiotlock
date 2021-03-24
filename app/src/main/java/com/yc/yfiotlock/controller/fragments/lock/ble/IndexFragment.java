@@ -1,6 +1,8 @@
 package com.yc.yfiotlock.controller.fragments.lock.ble;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -13,6 +15,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -139,11 +142,6 @@ public class IndexFragment extends BaseFragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(IndexRefreshEvent object) {
         loadData();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onAddDevice(DeviceInfo deviceInfo) {
-        indexDeviceAdapter.addData(0, deviceInfo);
     }
 
     private void nav2MyFamily() {

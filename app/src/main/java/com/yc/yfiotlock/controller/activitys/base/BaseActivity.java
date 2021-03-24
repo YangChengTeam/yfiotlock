@@ -11,7 +11,6 @@ import android.view.WindowManager;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.jakewharton.rxbinding4.view.RxView;
@@ -33,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends AppCompatActivity implements ILoadData {
+public abstract class BaseActivity extends BaseSendActivity implements ILoadData {
 
     protected PermissionHelper mPermissionHelper;
 
@@ -64,7 +63,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ILoadDat
     public LoadingDialog mLoadingDialog;
 
     protected void initVars() {
-
     }
 
     /**

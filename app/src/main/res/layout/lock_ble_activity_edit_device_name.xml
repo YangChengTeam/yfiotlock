@@ -8,7 +8,7 @@
     tools:context=".controller.activitys.user.EditNameActivity">
 
     <com.yc.yfiotlock.view.widgets.BackNavBar
-        android:id="@+id/bnb_title"
+        android:id="@+id/view_nav_bar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:layout_constraintTop_toTopOf="parent"
@@ -18,26 +18,25 @@
         android:id="@+id/stv_sure"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
+        android:layout_marginEnd="5dp"
         android:padding="10dp"
-        app:stv_corner="20dp"
-        app:stv_pressBgColor="#33000000"
         android:text="@string/sure"
         android:textColor="#222222"
         android:textSize="15dp"
-        app:layout_constraintBottom_toBottomOf="@id/bnb_title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/bnb_title" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:stv_corner="20dp"
+        app:stv_pressBgColor="#33000000" />
 
     <EditText
         android:id="@+id/et_name"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:singleLine="true"
         android:layout_marginTop="10dp"
         android:background="@color/white"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
+        android:singleLine="true"
         android:textColor="#222222"
         android:textColorHint="#999999"
         android:textSize="14dp"

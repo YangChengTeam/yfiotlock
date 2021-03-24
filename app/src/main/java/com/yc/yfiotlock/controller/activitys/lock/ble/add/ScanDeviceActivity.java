@@ -6,7 +6,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
@@ -16,10 +18,12 @@ import com.yc.yfiotlock.utils.CacheUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 
@@ -38,6 +42,15 @@ public class ScanDeviceActivity extends BaseAddActivity {
     SuperTextView mStvRescan;
 
     private boolean isFoundOne;
+    private boolean isNav2List;
+
+    private static WeakReference<ScanDeviceActivity> mInstance;
+
+    public static void finish2() {
+        if (mInstance != null && mInstance.get() != null) {
+            mInstance.get().finish();
+        }
+    }
 
     @Override
     protected int getLayoutId() {
@@ -52,12 +65,30 @@ public class ScanDeviceActivity extends BaseAddActivity {
     @Override
     protected void initViews() {
         super.initViews();
+        mInstance = new WeakReference<>(this);
         scan();
     }
 
-    private HashMap<String, BleDevice> deviceHashMap = new LinkedHashMap<>();
+    private HashMap<String, BleDevice> deviceHashMap = new HashMap<>();
 
     private void scan() {
+        if (deviceHashMap == null) {
+            deviceHashMap = new HashMap<>();
+        }
+        HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
+        hashMap.forEach((key, bleDevice) -> {
+            if (!LockBLEManager.isFoundDevice(bleDevice.getMac())) {
+                if (!isFoundOne) {
+                    isFoundOne = true;
+                    deviceHashMap.put(bleDevice.getMac(), bleDevice);
+                    nav2List(bleDevice);
+                } else {
+                    deviceHashMap.put(bleDevice.getMac(), bleDevice);
+                    EventBus.getDefault().post(bleDevice);
+                }
+            }
+        });
+
         LockBLEManager.initConfig();
         LockBLEManager.scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override
@@ -102,10 +133,20 @@ public class ScanDeviceActivity extends BaseAddActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (isNav2List) {
+            LockBLEManager.cancelScan();
+            setFailInfo();
+            isNav2List = false;
+        }
+    }
+
+    @Override
     protected void bindClick() {
         setClick(mStvRescan, () -> {
             setStartInfo();
-            VUiKit.postDelayed(6000, this::setFailInfo);
+            scan();
         });
         setClick(mTvScanQa, () -> startActivity(new Intent(this, QaActivity.class)));
     }
@@ -125,6 +166,8 @@ public class ScanDeviceActivity extends BaseAddActivity {
     }
 
     private void nav2List(BleDevice bleDevice) {
+        if(isNav2List) return;
+        isNav2List = true;
         Intent intent = new Intent(this, DeviceListActivity.class);
         intent.putExtra("bleDevice", bleDevice);
         intent.putExtra("family", familyInfo);

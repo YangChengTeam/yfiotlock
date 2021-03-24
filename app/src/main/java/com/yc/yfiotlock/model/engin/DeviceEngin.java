@@ -11,6 +11,7 @@ import com.kk.securityhttp.engin.HttpCoreEngin;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.TimeInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
@@ -28,8 +29,7 @@ public class DeviceEngin extends BaseEngin {
         return null;
     }
 
-    public Observable<ResultInfo<DeviceInfo>> addDeviceInfo(String familyId, String name, String mac, String deviceId) {
-
+    public Observable<ResultInfo<DeviceInfo>> addDeviceInfo(String familyId, String name, String mac, String deviceId, int isOnline) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
@@ -37,7 +37,8 @@ public class DeviceEngin extends BaseEngin {
         map.put("family_id", familyId);
         map.put("name", name);
         map.put("device_id", deviceId);
-        map.put("mac_address",  mac);
+        map.put("mac_address", mac);
+        map.put("is_online", isOnline + "");
         return new HttpCoreEngin<ResultInfo<DeviceInfo>>(getContext()).rxpost(Config.DEVICE_ADD_URL,
                 new TypeReference<ResultInfo<DeviceInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
@@ -76,6 +77,27 @@ public class DeviceEngin extends BaseEngin {
         map.put("volume", volume + "");
         return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_SET_VOLUME_URL,
                 new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    public Observable<ResultInfo<String>> delDeviceVolume(String id) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("locker_id", id);
+        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_DEL_URL,
+                new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    public Observable<ResultInfo<TimeInfo>> getTime() {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        return new HttpCoreEngin<ResultInfo<TimeInfo>>(getContext()).rxpost(Config.DEVICE_TIME_URL,
+                new TypeReference<ResultInfo<TimeInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }

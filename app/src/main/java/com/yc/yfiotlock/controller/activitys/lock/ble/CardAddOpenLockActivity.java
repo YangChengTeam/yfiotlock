@@ -4,6 +4,7 @@ import android.widget.TextView;
 
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
@@ -43,11 +44,10 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         this.scmd = (byte) 0x05;
         byte[] bytes = LockBLEOpCmd.addCard(this, LockBLEManager.GROUP_TYPE, number);
         lockBleSend.send(mcmd, scmd, bytes);
-        mLoadingDialog.show("指令已下发,按提示音操作");
         VUiKit.postDelayed(15 * 1000, () -> {
             if (!isOpOver) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "操作超时");
+                ToastCompat.show(getContext(), "操作失败");
                 finish();
             }
         });
@@ -65,7 +65,17 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     protected void cloudAdd(String keyid) {
+        mLoadingDialog.show("添加卡片中...");
         cloudAdd(nameTv.getText().toString(), LockBLEManager.OPEN_LOCK_CARD, keyid, "");
     }
 
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            ToastCompat.show(getContext(), "卡片已添加");
+            finish();
+            mLoadingDialog.dismiss();
+            isOpOver = true;
+        }
+    }
 }

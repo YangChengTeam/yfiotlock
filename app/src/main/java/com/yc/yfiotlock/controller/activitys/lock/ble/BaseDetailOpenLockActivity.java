@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.coorchice.library.SuperTextView;
@@ -98,7 +99,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     protected abstract void cloudDelSucc();
 
-
     protected void cloudDel() {
         lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
@@ -109,17 +109,46 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
+                fail();
             }
 
             @Override
-            public void onNext(ResultInfo<String> stringResultInfo) {
-                if (stringResultInfo.getCode() == 1) {
-                    finish();
-                    cloudDelSucc();
-                    EventBus.getDefault().post(new OpenLockRefreshEvent());
+            public void onNext(ResultInfo<String> info) {
+                if (info != null && info.getCode() == 1) {
+                    success(info.getData());
+                } else {
+                    fail();
                 }
             }
         });
+    }
+
+    @Override
+    public void success(Object data) {
+        finish();
+        cloudDelSucc();
+        EventBus.getDefault().post(new OpenLockRefreshEvent());
+    }
+
+    @Override
+    public void fail() {
+        if (retryCount-- > 0) {
+            VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
+                cloudDel();
+            });
+        } else {
+            retryCount = 3;
+            GeneralDialog generalDialog = new GeneralDialog(getContext());
+            generalDialog.setTitle("温馨提示");
+            generalDialog.setMsg("同步云端失败, 请重试");
+            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+                @Override
+                public void onClick(Dialog dialog) {
+                    cloudDel();
+                }
+            });
+            generalDialog.show();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -134,7 +163,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     protected void onResume() {
         super.onResume();
-        if(lockBleSend != null){
+        if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
@@ -144,7 +173,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     protected void onStop() {
         super.onStop();
-        if(lockBleSend != null){
+        if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(null);
             lockBleSend.unregisterNotify();
         }
@@ -187,10 +216,5 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             mLoadingDialog.dismiss();
             ToastCompat.show(getContext(), "删除失败");
         }
-    }
-
-    @Override
-    public void onNotifyReady() {
-
     }
 }

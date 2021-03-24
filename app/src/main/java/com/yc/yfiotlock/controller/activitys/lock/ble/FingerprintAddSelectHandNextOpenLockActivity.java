@@ -4,6 +4,7 @@ import android.view.View;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.constant.Config;
@@ -67,4 +68,6 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
             CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
         }
     }
+
+
 }

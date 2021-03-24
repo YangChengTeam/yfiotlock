@@ -4,6 +4,7 @@ import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.alibaba.fastjson.TypeReference;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
@@ -21,6 +22,7 @@ import com.yc.yfiotlock.utils.BleUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;
+import com.yc.yfiotlock.view.widgets.NoWifiView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -37,6 +39,10 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     RecyclerView openLockRecyclerView;
     @BindView(R.id.view_no_data)
     NoDataView nodataView;
+    @BindView(R.id.view_no_wifi)
+    NoWifiView noWifiView;
+    @BindView(R.id.srl_refresh)
+    SwipeRefreshLayout mSrlRefresh;
 
     @BindView(R.id.stv_add)
     protected SuperTextView addBtn;
@@ -68,6 +74,10 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         setNavTitle(title);
         addBtn.setText(addBtn.getText() + title);
         setRv();
+        mSrlRefresh.setColorSchemeColors(0xff3091f8);
+        mSrlRefresh.setOnRefreshListener(() -> {
+            loadData();
+        });
 
         loadData();
     }
@@ -79,40 +89,66 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     }
 
     private void loadData() {
+        nodataView.setVisibility(View.GONE);
+        noWifiView.setVisibility(View.GONE);
+
         String way = BleUtil.getType(title) + "";
         List<OpenLockInfo> lockInfos = CacheUtil.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + way + type, new TypeReference<List<OpenLockInfo>>() {
         }.getType());
         if (lockInfos != null) {
             openLockAdapter.setNewInstance(lockInfos);
+        } else {
+            mSrlRefresh.setRefreshing(true);
         }
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        mLoadingDialog.show("加载中...");
         lockEngine.getOpenLockWayList(lockInfo.getId(), way, type + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {
-                mLoadingDialog.dismiss();
+                mSrlRefresh.setRefreshing(false);
             }
 
             @Override
             public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
+                mSrlRefresh.setRefreshing(false);
+                fail();
             }
 
             @Override
-            public void onNext(ResultInfo<List<OpenLockInfo>> listResultInfo) {
-                if (listResultInfo.getCode() == 1 && listResultInfo.getData() != null) {
-                    List<OpenLockInfo> lockInfos = listResultInfo.getData();
-                    openLockAdapter.setNewInstance(lockInfos);
-                    CacheUtil.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + way + type, lockInfos);
-                    if (lockInfos.size() == 0) {
-                        nodataView.setVisibility(View.VISIBLE);
-                        nodataView.setMessage("暂无" + title + "数据");
+            public void onNext(ResultInfo<List<OpenLockInfo>> info) {
+                if (info.getCode() == 1 && info.getData() != null) {
+                    if (info.getData() == null || info.getData().size() == 0) {
+                        empty();
                     } else {
-                        nodataView.setVisibility(View.GONE);
+                        success(info.getData());
                     }
+                } else {
+                    fail();
                 }
             }
         });
+    }
+
+    @Override
+    public void empty() {
+        nodataView.setVisibility(View.VISIBLE);
+        nodataView.setMessage("暂无" + title + "数据");
+        String way = BleUtil.getType(title) + "";
+        CacheUtil.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + way + type, "");
+    }
+
+    @Override
+    public void fail() {
+        if (openLockAdapter.getData().size() == 0) {
+            noWifiView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void success(Object data) {
+        String way = BleUtil.getType(title) + "";
+        List<OpenLockInfo> lockInfos = (List<OpenLockInfo>) data;
+        openLockAdapter.setNewInstance(lockInfos);
+        CacheUtil.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + way + type, lockInfos);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

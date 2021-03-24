@@ -1,34 +1,23 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
 import android.animation.ValueAnimator;
-import android.content.Intent;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.utils.LogUtil;
+import com.kk.securityhttp.utils.LogUtil;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
-import com.yc.yfiotlock.controller.dialogs.lock.ble.ChangeDeviceNameDialog;
-import com.yc.yfiotlock.libs.fastble.data.BleDevice;
-import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.engin.DeviceEngin;
-import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
 
-import org.greenrobot.eventbus.EventBus;
-
 import butterknife.BindView;
-import rx.Subscriber;
 
 
-public class Connect2Activity extends BaseAddActivity implements LockBLESend.NotifyCallback {
+public class Connect2Activity extends BaseConnectActivity {
 
     @BindView(R.id.cpb_progress)
     CircularProgressBar mCpbProgress;
@@ -41,41 +30,26 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
     @BindView(R.id.ll_connected)
     LinearLayout mLlConnected;
 
-    private BleDevice bleDevice;
-    private DeviceInfo deviceInfo;
-    private LockBLESend lockBleSend;
-    private DeviceEngin deviceEngin;
-
     private ValueAnimator valueAnimator;
-    private ChangeDeviceNameDialog deviceNameDialog;
-
-    private boolean isConnected = false;
-
-    @Override
-    protected void initVars() {
-        super.initVars();
-        bleDevice = getIntent().getParcelableExtra("bleDevice");
-        lockBleSend = new LockBLESend(this, bleDevice);
-        LockBLESend.bleNotify(bleDevice);
-        lockBleSend.setNotifyCallback(this);
-        deviceEngin = new DeviceEngin(this);
-    }
 
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_add_connect2;
     }
 
+    @Override
+    protected void initVars() {
+        super.initVars();
+        isOnline = 1;
+    }
 
     @Override
     protected void initViews() {
         super.initViews();
         backNavBar.setTitle(bleDevice.getName());
         initProcessAnimate();
-        deviceNameDialog = new ChangeDeviceNameDialog(this);
-        deviceNameDialog.setOnSureClick(name -> {
-            cloudModifyDeivceName(name);
-        });
+        mTvEdit.setText(bleDevice.getName());
+        bleBindWifi();
     }
 
     private void initProcessAnimate() {
@@ -85,19 +59,13 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
             float value = (float) animation.getAnimatedValue();
             mCpbProgress.setProgress(value);
             mTvProgress.setText((int) value + "%");
+            if (!isOpOver && value == 100 && !isConnected) {
+                isOpOver = true;
+                valueAnimator.end();
+                nav2fail();
+            }
         });
-        valueAnimator.setDuration(1000 * 60);
-    }
-
-
-    /**
-     * 连接失败的跳转
-     */
-    private void onConnectFail() {
-        Intent intent = new Intent(this, ConnectFailActivity.class);
-        intent.putExtra("name", bleDevice.getName());
-        startActivity(intent);
-        finish();
+        valueAnimator.setDuration(1000 * 65);
     }
 
     /**
@@ -136,141 +104,29 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
         }
     }
 
-    private void cloudAddDevice() {
-        mLoadingDialog.show("同步到云端");
-        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
-            @Override
-            public void onCompleted() {
-                mLoadingDialog.dismiss();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
-            }
-
-            @Override
-            public void onNext(ResultInfo<DeviceInfo> resultInfo) {
-                if (resultInfo != null && resultInfo.getCode() == 1) {
-                    success(resultInfo.getData());
-                } else {
-                    fail();
-                }
-            }
-        });
-    }
-
-    private void cloudModifyDeivceName(String name) {
-        if (deviceInfo != null && !TextUtils.isEmpty(deviceInfo.getDeviceId())) {
-            mLoadingDialog.show("正在修改");
-            deviceEngin.updateDeviceInfo(deviceInfo.getId(), name).subscribe(new Subscriber<ResultInfo<String>>() {
-                @Override
-                public void onCompleted() {
-                    mLoadingDialog.dismiss();
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    mLoadingDialog.dismiss();
-                }
-
-                @Override
-                public void onNext(ResultInfo<String> resultInfo) {
-                    String msg = "服务器错误";
-                    if (resultInfo != null && resultInfo.getCode() == 1) {
-                        mTvEdit.setText(name);
-                        deviceNameDialog.dismiss();
-                        ToastCompat.show(getContext(), "修改成功");
-                    } else {
-                        msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
-                        ToastCompat.show(getContext(), msg);
-                    }
-                }
-            });
-        }
-
-    }
-
-    private String aliDeviceName = "YF-LOCK";
-    private void bleGetAliDeviceName() {
-        if (lockBleSend != null) {
-            byte[] cmdBytes = LockBLESettingCmd.getAlDeviceName(this);
-            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes);
-        }
-    }
-
-    @Override
-    public void success(Object data) {
-        deviceInfo = (DeviceInfo) data;
-        deviceInfo.setMacAddress(bleDevice.getMac());
-        deviceInfo.setName(bleDevice.getName());
-        deviceInfo.setDeviceId(aliDeviceName);
-        EventBus.getDefault().post(deviceInfo);
-    }
-
-    @Override
-    public void fail() {
-        super.fail();
-        EventBus.getDefault().post(deviceInfo);
-    }
-
-    private void nav2Index() {
-        Intent intent = new Intent(this, LockIndexActivity.class);
-        intent.putExtra("family", familyInfo);
-        intent.putExtra("bleDevice", bleDevice);
-        intent.putExtra("device", deviceInfo);
-        startActivity(intent);
-        DeviceListActivity.finish2();
-        ConnectActivity.finish2();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (isConnected) {
-            nav2Index();
-            finish();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public void onNotifyReady() {
-        bleBindWifi();
-    }
-
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
-            aliDeviceName = new String(lockBLEData.getOther());
-            cloudAddDevice();
-        } else {
+        super.onNotifySuccess(lockBLEData);
+        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+            isConnected = true;
             valueAnimator.end();
             showConnectedUi();
-
-            deviceInfo = new DeviceInfo();
-            deviceInfo.setMacAddress(bleDevice.getMac());
-            deviceInfo.setName(bleDevice.getName());
-            deviceInfo.setDeviceId(aliDeviceName);
             bleGetAliDeviceName();
-            isConnected = true;
 
-            CacheUtil.setCache(bleDevice.getMac(), deviceInfo);
+            LockBLEManager.setBindWifi(bleDevice.getMac());
         }
     }
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
-
-        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+        super.onNotifySuccess(lockBLEData);
+        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+            mLoadingDialog.dismiss();
+            isOpOver = true;
             valueAnimator.end();
-            onConnectFail();
+            nav2fail();
         }
     }
+
+
 }

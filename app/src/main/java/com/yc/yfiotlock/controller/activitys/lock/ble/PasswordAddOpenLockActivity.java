@@ -77,7 +77,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
             this.mcmd = (byte) 0x02;
             this.scmd = (byte) 0x02;
             byte[] bytes = LockBLEOpCmd.addPwd(this, LockBLEManager.GROUP_TYPE, number, passEt.getText() + "", new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
-            lockBleSend.send(mcmd, scmd, bytes);
+            lockBleSend.send(mcmd, scmd, bytes, false);
         }
     }
 
@@ -104,9 +104,11 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            finish();
+            mLoadingDialog.dismiss();
+            isOpOver = true;
+            ToastCompat.show(getContext(), "密码已添加");
         }
     }
+
 }

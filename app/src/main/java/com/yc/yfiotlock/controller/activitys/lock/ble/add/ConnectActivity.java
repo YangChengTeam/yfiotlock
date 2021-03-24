@@ -4,25 +4,29 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.helper.PermissionHelper;
-import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.utils.CommonUtil;
 
 import java.lang.ref.WeakReference;
@@ -32,7 +36,7 @@ import java.util.List;
 import butterknife.BindView;
 
 
-public class ConnectActivity extends BaseAddActivity {
+public class ConnectActivity extends BaseConnectActivity {
     @BindView(R.id.ll_title)
     LinearLayout mLlTitle;
     @BindView(R.id.et_ssid)
@@ -43,8 +47,11 @@ public class ConnectActivity extends BaseAddActivity {
     ImageView mIvSecret;
     @BindView(R.id.stv_next)
     SuperTextView mStvNext;
+    @BindView(R.id.stv_skip)
+    SuperTextView mStvSkip;
 
-    private BleDevice bleDevice;
+    private WifiManager mWifiManager;
+    private AlertDialog wifiAlertDialog;
 
     private static WeakReference<ConnectActivity> mInstance;
 
@@ -54,35 +61,56 @@ public class ConnectActivity extends BaseAddActivity {
         }
     }
 
-
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_add_connect;
     }
 
-    WifiManager mWifiManager;
 
     @Override
     protected void initVars() {
         super.initVars();
-        bleDevice = getIntent().getParcelableExtra("bleDevice");
+        isDeviceAdd = isFromIndex;
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(wifiScanReceiver, intentFilter);
     }
 
-
     @Override
     protected void initViews() {
-        mInstance = new WeakReference<>(this);
         super.initViews();
+        mInstance = new WeakReference<>(this);
         backNavBar.setTitle(bleDevice.getName());
         setInfo();
+
+        if (mEtSsid.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+
+        mEtPwd.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    nav2next();
+                }
+                return false;
+            }
+        });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(wifiScanReceiver);
+    }
+
 
     private void setInfo() {
         mEtSsid.setText(CommonUtil.getSsid(this));
+        if (isFromIndex) {
+            mStvSkip.setVisibility(View.GONE);
+        }
     }
 
     private void nav2next() {
@@ -101,8 +129,8 @@ public class ConnectActivity extends BaseAddActivity {
         intent.putExtra("bleDevice", bleDevice);
         intent.putExtra("ssid", ssid);
         intent.putExtra("pwd", pwd);
+        intent.putExtra("isFromIndex", isFromIndex);
         startActivity(intent);
-        finish();
     }
 
     private void scanWifi() {
@@ -129,8 +157,7 @@ public class ConnectActivity extends BaseAddActivity {
         });
     }
 
-
-    BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context c, Intent intent) {
             boolean success = intent.getBooleanExtra(
@@ -138,21 +165,14 @@ public class ConnectActivity extends BaseAddActivity {
             if (success) {
                 scanSuccess();
             } else {
-                // scan failure handling
                 scanFailure();
             }
         }
     };
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(wifiScanReceiver);
-    }
-
     private void scanSuccess() {
         mLoadingDialog.dismiss();
-        if (isDestroyed()) {
+        if (CommonUtil.isActivityDestory(this)) {
             return;
         }
         List<ScanResult> results = mWifiManager.getScanResults();
@@ -178,29 +198,48 @@ public class ConnectActivity extends BaseAddActivity {
         setClick(mIvSecret, () -> CommonUtil.hiddenEditText(mEtPwd, mIvSecret));
         setClick(mStvNext, this::nav2next);
         setClick(R.id.iv_scan_wifi, () -> {
+            if (mLoadingDialog.isShowing()) return;
             mLoadingDialog.show("扫描中...");
             mLoadingDialog.setCanCancel(false);
             scanWifi();
         });
+        setClick(R.id.stv_skip, this::bleGetAliDeviceName);
     }
 
+
     private void showChooseList(CharSequence[] strings) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
+        if (wifiAlertDialog != null && wifiAlertDialog.isShowing()) return;
+        wifiAlertDialog = new AlertDialog.Builder(this)
                 .setTitle("可用网络列表(2.4G)")
                 .setItems(strings, (dialog, which) -> {
                     mEtSsid.setText(strings[which]);
                     dialog.dismiss();
                 }).create();
-        alertDialog.show();
-        alertDialog.setOnDismissListener(dialog -> {
+        wifiAlertDialog.show();
+        wifiAlertDialog.setOnDismissListener(dialog -> {
             mEtPwd.requestFocus();
             getWindow().setSoftInputMode(5);
         });
-        Window window = alertDialog.getWindow();
+        Window window = wifiAlertDialog.getWindow();
         if (window != null) {
             window.setLayout(ScreenUtil.getWidth(getContext()) - 100, ScreenUtil.getHeight(getContext()) / 2);
         }
     }
 
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        super.onNotifySuccess(lockBLEData);
+        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+            mLoadingDialog.dismiss();
+            isOpOver = true;
+            nav2fail();
+        }
+    }
 
+
+    @Override
+    public void success(Object data) {
+        super.success(data);
+        nav2Index();
+    }
 }
