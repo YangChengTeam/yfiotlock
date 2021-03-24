@@ -62,7 +62,7 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
-    public static void cancelScan(){
+    public static void cancelScan() {
         BleManager.getInstance().cancelScan();
     }
 
@@ -88,12 +88,14 @@ public class LockBLEManager {
         BleManager.getInstance().setMtu(bleDevice, LockBLEPackage.getMtu(), new BleMtuChangedCallback() {
             @Override
             public void onSetMTUFailure(BleException exception) {
+                LockBLESend.bleNotify(bleDevice);
             }
 
             @Override
             public void onMtuChanged(int mtu) {
                 // 设置MTU成功，并获得当前设备传输支持的MTU值
                 LockBLEPackage.setMtu(mtu);
+                LockBLESend.bleNotify(bleDevice);
             }
         });
     }

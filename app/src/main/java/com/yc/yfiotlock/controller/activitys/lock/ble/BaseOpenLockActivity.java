@@ -89,6 +89,9 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     }
 
     private void loadData() {
+        nodataView.setVisibility(View.GONE);
+        noWifiView.setVisibility(View.GONE);
+
         String way = BleUtil.getType(title) + "";
         List<OpenLockInfo> lockInfos = CacheUtil.getCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + way + type, new TypeReference<List<OpenLockInfo>>() {
         }.getType());
@@ -129,6 +132,8 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     public void empty() {
         nodataView.setVisibility(View.VISIBLE);
         nodataView.setMessage("暂无" + title + "数据");
+        String way = BleUtil.getType(title) + "";
+        CacheUtil.setCache(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL + way + type, "");
     }
 
     @Override

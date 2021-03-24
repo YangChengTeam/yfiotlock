@@ -219,7 +219,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     }
 
     @Override
-    public void onNotifyReady() {
+    public void onNotifyReady(boolean isReady) {
 
     }
 }

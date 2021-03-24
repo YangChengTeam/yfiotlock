@@ -7,6 +7,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -18,12 +19,16 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
         return R.layout.lock_ble_activity_fingerprint_add_open_lock;
     }
 
-
     @Override
     protected void initViews() {
         super.initViews();
-        VUiKit.postDelayed(1000, () -> {
-            bleAddFingerprint();
+        bleAddFingerprint();
+
+        VUiKit.postDelayed(12 * 1000, () -> {
+            if (!isOpOver) {
+                ToastCompat.show(getContext(), "操作失败");
+                finish();
+            }
         });
     }
 
@@ -41,4 +46,15 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
             finish();
         }
     }
+
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            isOpOver = true;
+            ToastCompat.show(getContext(), "操作失败");
+            finish();
+        }
+    }
+
+
 }

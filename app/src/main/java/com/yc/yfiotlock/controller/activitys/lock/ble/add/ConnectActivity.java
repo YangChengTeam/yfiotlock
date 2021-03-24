@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.coorchice.library.SuperTextView;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.helper.PermissionHelper;
@@ -47,7 +48,7 @@ public class ConnectActivity extends BaseAddActivity {
 
     private BleDevice bleDevice;
     private WifiManager mWifiManager;
-
+    private boolean isNav2Connect2;
 
     private static WeakReference<ConnectActivity> mInstance;
 
@@ -56,7 +57,6 @@ public class ConnectActivity extends BaseAddActivity {
             mInstance.get().finish();
         }
     }
-
 
     @Override
     protected int getLayoutId() {
@@ -68,7 +68,6 @@ public class ConnectActivity extends BaseAddActivity {
     protected void initVars() {
         super.initVars();
         bleDevice = getIntent().getParcelableExtra("bleDevice");
-        LockBLESend.bleNotify(bleDevice);
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
@@ -98,6 +97,7 @@ public class ConnectActivity extends BaseAddActivity {
             ToastCompat.show(this, "密码不能为空或小于8个字符");
             return;
         }
+        isNav2Connect2 = true;
         Intent intent = new Intent(this, Connect2Activity.class);
         intent.putExtra("family", familyInfo);
         intent.putExtra("bleDevice", bleDevice);
@@ -153,7 +153,7 @@ public class ConnectActivity extends BaseAddActivity {
 
     private void scanSuccess() {
         mLoadingDialog.dismiss();
-        if (isDestroyed()) {
+        if (CommonUtil.isActivityDestory(this)) {
             return;
         }
         List<ScanResult> results = mWifiManager.getScanResults();

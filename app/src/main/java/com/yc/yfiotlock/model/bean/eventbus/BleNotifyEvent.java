@@ -5,6 +5,7 @@ public class BleNotifyEvent {
     private String desp;
     public static int onNotifySuccess = 0;
     public static int onNotifyFailure = 1;
+    public static int onNotifyChangeFailure = 2;
 
     public BleNotifyEvent(int status) {
         this.status = status;

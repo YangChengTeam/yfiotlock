@@ -86,8 +86,6 @@ public class OpenLockManagerActivity extends BaseBackActivity {
                 startActivity(intent);
             }
         });
-
-
     }
 
     protected void loadData() {
@@ -128,6 +126,13 @@ public class OpenLockManagerActivity extends BaseBackActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
         loadData();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConnected(BleDevice bleDevice) {
+        if(bleDevice != null){
+            this.bleDevice = bleDevice;
+        }
     }
 
     protected class OpenLockTypeInfo {

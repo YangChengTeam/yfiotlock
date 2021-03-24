@@ -147,7 +147,6 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
 
     private void bleBindWifi() {
         if (lockBleSend != null) {
-            mLoadingDialog.show("配网中...");
             String ssid = getIntent().getStringExtra("ssid");
             String pwd = getIntent().getStringExtra("pwd");
             valueAnimator.start();
@@ -160,6 +159,7 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
 
     private void cloudAddDevice() {
         bleSynctime();
+        mLoadingDialog.show("添加设备中...");
         deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
@@ -214,12 +214,11 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
         }
     }
 
-    private String aliDeviceName = "YF-LOCK";
-
+    private String aliDeviceName = "000000000000";
     private void bleGetAliDeviceName() {
         if (lockBleSend != null) {
             byte[] cmdBytes = LockBLESettingCmd.getAlDeviceName(this);
-            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes);
+            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes, false);
         }
     }
 
@@ -230,7 +229,7 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
                 public void call(ResultInfo<TimeInfo> info) {
                     if (info != null && info.getCode() == 1 && info.getData() != null) {
                         byte[] cmdBytes = LockBLESettingCmd.syncTime(getContext(), info.getData().getTime());
-                        lockBleSend.send((byte) 0x01, (byte) 0x05, cmdBytes);
+                        lockBleSend.send((byte) 0x01, (byte) 0x05, cmdBytes, false);
                     }
                 }
             });
@@ -274,13 +273,14 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
         intent.putExtra("bleDevice", bleDevice);
         intent.putExtra("device", deviceInfo);
         startActivity(intent);
-        DeviceListActivity.finish2();
         ConnectActivity.finish2();
+        DeviceListActivity.finish2();
+        ScanDeviceActivity.finish2();
     }
 
 
     @Override
-    public void onNotifyReady() {
+    public void onNotifyReady(boolean isRe) {
 
     }
 

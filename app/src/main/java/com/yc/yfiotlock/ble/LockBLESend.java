@@ -4,8 +4,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
 
+import com.kk.utils.LogUtil;
 import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.libs.fastble.BleManager;
@@ -36,6 +36,8 @@ public class LockBLESend {
 
     private boolean waupStatus = false;
     private boolean isSend = false;
+    private boolean isOpOver = false;
+    private int retryCount = 3;
 
     public LockBLESend(Context context, BleDevice bleDevice) {
         this.context = context;
@@ -52,7 +54,7 @@ public class LockBLESend {
     }
 
     // 伪发送数据
-    public void send(byte mcmd, byte scmd, byte[] cmdBytes) {
+    public void send(byte mcmd, byte scmd, byte[] cmdBytes, boolean iswakeup) {
         this.mcmd = mcmd;
         this.scmd = scmd;
         this.cmdBytes = cmdBytes;
@@ -72,10 +74,35 @@ public class LockBLESend {
         if (!isSend) {
             Log.d(TAG, "正在发送");
             isSend = true;
-            wakeup();
+            if (iswakeup) {
+                wakeup();
+            } else {
+                realSend();
+            }
         } else {
             Log.d(TAG, "发送未完毕");
         }
+    }
+
+    public void realSend() {
+        Log.d(TAG, "直接发送真正指令" + retryCount);
+        op(cmdBytes);
+        VUiKit.postDelayed(200, () -> {
+            if (!isOpOver && retryCount-- > 0) {
+                realSend();
+            } else {
+                if (isOpOver && retryCount <= 0) {
+                    notifyErrorResponse("no response");
+                }
+                isOpOver = false;
+                retryCount = 3;
+            }
+        });
+    }
+
+    // 伪发送数据
+    public void send(byte mcmd, byte scmd, byte[] cmdBytes) {
+        send(mcmd, scmd, cmdBytes, true);
     }
 
     public void connect() {
@@ -105,7 +132,7 @@ public class LockBLESend {
     }
 
     public interface NotifyCallback {
-        void onNotifyReady();
+        void onNotifyReady(boolean isReady);
 
         void onNotifySuccess(LockBLEData lockBLEData);
 
@@ -127,8 +154,7 @@ public class LockBLESend {
 
     // 清除操作
     public void clear() {
-        BleManager.getInstance().disconnect(bleDevice);
-        BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_CHARACTERISTIC_UUID);
+        BleManager.getInstance().disconnectAllDevice();
     }
 
     public void registerNotify() {
@@ -166,6 +192,8 @@ public class LockBLESend {
     }
 
     // 监听
+    private static int notifyRetryCount = 3;
+
     public static void bleNotify(BleDevice bleDevice) {
         BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_SERVICE_UUID);
         BleManager.getInstance().notify(
@@ -175,12 +203,21 @@ public class LockBLESend {
                 new BleNotifyCallback() {
                     @Override
                     public void onNotifySuccess() {
+                        Log.d(TAG, "回调通知成功");
                         EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifySuccess));
                     }
 
                     @Override
                     public void onNotifyFailure(BleException exception) {
-                        bleNotify(bleDevice);
+                        Log.d(TAG, "回调通失败:" + exception.getDescription());
+                        if (notifyRetryCount-- > 0) {
+                            VUiKit.postDelayed(notifyRetryCount * (1000 - notifyRetryCount * 200), () -> {
+                                bleNotify(bleDevice);
+                            });
+                        } else {
+                            notifyRetryCount = 3;
+                            EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyFailure));
+                        }
                     }
 
                     @Override
@@ -189,11 +226,11 @@ public class LockBLESend {
                         // 解析响应
                         LockBLEData lockBLEData = LockBLEPackage.getData(data);
                         if (lockBLEData != null) {
-                            Log.d(TAG, "解析成功:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
+                            Log.d(TAG, "解析成功:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());
                             EventBus.getDefault().post(lockBLEData);
                         } else {
                             Log.d(TAG, "解析失败");
-                            EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyFailure, "lockBLEData format error"));
+                            EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyChangeFailure, "lockBLEData format error"));
                         }
                     }
                 });
@@ -203,9 +240,13 @@ public class LockBLESend {
     public void onNotify(BleNotifyEvent bleNotifyEvent) {
         if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
             if (notifyCallback != null) {
-                notifyCallback.onNotifyReady();
+                notifyCallback.onNotifyReady(true);
             }
         } else if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifyFailure) {
+            if (notifyCallback != null) {
+                notifyCallback.onNotifyReady(false);
+            }
+        } else if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifyChangeFailure) {
             notifyErrorResponse(bleNotifyEvent.getDesp());
         }
     }
@@ -218,11 +259,10 @@ public class LockBLESend {
     // 处理响应
     private void processNotify(LockBLEData lockBLEData) {
         if (mcmd == 0x00 || scmd == 0x00) {
-            //Log.d(TAG, "非正常响应:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
+            Log.d(TAG, "非正常响应:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " mscd:" + mcmd + " scmd:" + scmd);
             reset();
             return;
         }
-        Log.d(TAG, "命令:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
         if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x0B) {
             // 唤醒成功后发送真正操作
             Log.d(TAG, "唤醒状态:" + lockBLEData.getStatus());
@@ -238,7 +278,8 @@ public class LockBLESend {
                 notifyCallback.onNotifySuccess(lockBLEData);
             }
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            Log.d(TAG, "命令匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
+            isOpOver = true;
+            Log.d(TAG, "命令匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());
             // 操作响应
             reset();
             if (lockBLEData.getStatus() == (byte) 0x00) {
@@ -259,13 +300,13 @@ public class LockBLESend {
                 }
                 Log.d(TAG, "命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
             } else {
-                Log.d(TAG, "未唤醒命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + mcmd + " scmd:" + lockBLEData.getScmd() + "-" + mcmd);
+                Log.d(TAG, "未唤醒命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + mcmd + " scmd:" + lockBLEData.getScmd() + "-" + scmd);
             }
         }
     }
 
     // 重置所有变量
-    public void reset() {
+    private void reset() {
         Log.d(TAG, "重置命令完毕");
         isSend = false;
         waupStatus = false;
@@ -276,6 +317,7 @@ public class LockBLESend {
 
     // 唤醒失败
     private void wakeupFailureResponse() {
+        Log.d(TAG, "唤醒失败");
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);
@@ -285,6 +327,7 @@ public class LockBLESend {
 
     // 写入失败
     private void writeFailureResponse() {
+        Log.d(TAG, "写入失败");
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);
@@ -294,6 +337,7 @@ public class LockBLESend {
 
     // 响应超时
     private void notifyErrorResponse(String error) {
+        Log.d(TAG, "响应超时");
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);

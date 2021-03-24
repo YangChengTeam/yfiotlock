@@ -72,7 +72,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void bleSetVolume(int volume) {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.changeVolume(this, volume);
-            lockBleSend.send((byte) 0x01, (byte) 0x08, bytes);
+            lockBleSend.send((byte) 0x01, (byte) 0x08, bytes, false);
         }
     }
 
@@ -202,7 +202,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     }
 
     @Override
-    public void onNotifyReady() {
+    public void onNotifyReady(boolean isReady) {
 
     }
 

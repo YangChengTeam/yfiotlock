@@ -14,6 +14,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -40,10 +41,12 @@ import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -86,7 +89,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     private FamilyInfo familyInfo;
     private DeviceInfo lockInfo;
     private LockBLESend lockBleSend;
-    private LockBLESend lockBLESyncTimeSend;
 
     private boolean isOpening;
 
@@ -172,8 +174,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 connect(bleDevice);
             }
         });
-
-        synctime();
     }
 
     @Override
@@ -231,11 +231,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             lockBleSend.setNotifyCallback(this);
         }
 
-        if (lockBLESyncTimeSend == null) {
-            lockBLESyncTimeSend = new LockBLESend(this, bleDevice);
-            lockBLESyncTimeSend.registerNotify();
-            lockBLESyncTimeSend.setNotifyCallback(this);
-        }
     }
 
     private void registerNotify() {
@@ -243,22 +238,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
-
-        if (lockBLESyncTimeSend != null) {
-            lockBLESyncTimeSend.setNotifyCallback(this);
-            lockBLESyncTimeSend.registerNotify();
-        }
     }
 
     private void unregisterNotify() {
         if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(null);
             lockBleSend.unregisterNotify();
-        }
-
-        if (lockBLESyncTimeSend != null) {
-            lockBLESyncTimeSend.setNotifyCallback(null);
-            lockBLESyncTimeSend.unregisterNotify();
         }
     }
 
@@ -289,6 +274,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             lockBleSend.clear();
         }
         LockBLEManager.cancelScan();
+        LogUtil.msg("已清理");
     }
 
     private void stopAnimations() {
@@ -318,19 +304,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startAnimations();
 
         if (lockBleSend != null) {
-            lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this));
+            lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this), false);
         }
 
-        VUiKit.postDelayed(8000, () -> {
-            if (isOpening) {
-                isOpening = false;
-                if (LockBLEManager.isConnected(bleDevice)) {
-                    setConnectedInfo();
-                }
-                lockBleSend.reset();
-                ToastCompat.show(getContext(), "操作超时");
-            }
-        });
+
     }
 
 
@@ -338,6 +315,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (!BleManager.getInstance().isBlueEnable()) {
             ToastCompat.show(LockIndexActivity.this, "请先打开蓝牙");
             BleManager.getInstance().enableBluetooth();
+            return;
+        }
+        HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
+        BleDevice bleDevice = hashMap.get(lockInfo.getMacAddress());
+        if (bleDevice != null) {
+            connect(bleDevice);
             return;
         }
         LockBLEManager.initConfig2(lockInfo.getMacAddress());
@@ -355,10 +338,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             @Override
             public void onScanning(BleDevice bleDevice) {
                 // 搜索到后开始连接
+                LogUtil.msg(bleDevice.getMac());
                 if (!bleDevice.getMac().equals(lockInfo.getMacAddress())) {
                     return;
                 }
                 connect(bleDevice);
+                LockBLEManager.cancelScan();
             }
 
             @Override
@@ -408,26 +393,30 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             @Override
             public void onDisconnect(BleDevice bleDevice) {
                 // 设置连接失败状态
+                isNotityReady = false;
                 stopAnimations();
                 statusTitleTv.setText("门锁未连接");
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
                 statusIv.setImageResource(R.mipmap.icon_nolink);
                 loadingIv.setImageResource(R.mipmap.one);
-
             }
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
                 LockIndexActivity.this.bleDevice = bleDevice;
                 initSends();
-                VUiKit.postDelayed(1000, () -> {
-                    LockBLESend.bleNotify(bleDevice);
-                });
+
+                HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
+                if (hashMap.get(bleDevice.getMac()) == null) {
+                    App.getApp().getConnectedDevices().put(bleDevice.getMac(), bleDevice);
+                }
 
                 // 设置连接成功状态
                 setConnectedInfo();
 
                 LockBLEManager.setMtu(bleDevice);
+
+                EventBus.getDefault().post(bleDevice);
             }
 
             @Override
@@ -445,7 +434,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     private GeneralDialog generalDialog;
 
     private void reconnect() {
-        if (generalDialog.isShowing()) {
+        if (!generalDialog.isShowing()) {
             generalDialog.show();
         }
     }
@@ -486,19 +475,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         setCountInfo();
     }
 
-    private void bleSynctime() {
-        if (lockBLESyncTimeSend != null) {
-            deviceEngin.getTime().subscribe(new Action1<ResultInfo<TimeInfo>>() {
-                @Override
-                public void call(ResultInfo<TimeInfo> info) {
-                    if (info != null && info.getCode() == 1 && info.getData() != null) {
-                        byte[] cmdBytes = LockBLESettingCmd.syncTime(getContext(), info.getData().getTime());
-                        lockBLESyncTimeSend.send((byte) 0x01, (byte) 0x05, cmdBytes);
-                    }
-                }
-            });
-        }
-    }
 
     // 开门方式数量
     private void loadLockOpenCountInfo() {
@@ -528,18 +504,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
     }
 
-    private void synctime() {
-        VUiKit.postDelayed(10*1000, () -> {
-            if (isNotityReady) {
-                bleSynctime();
-            }
-            synctime();
-        });
-    }
+
 
     @Override
-    public void onNotifyReady() {
-        isNotityReady = true;
+    public void onNotifyReady(boolean isReady) {
+        isNotityReady = isReady;
     }
 
     @Override
@@ -554,16 +523,14 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                     setConnectedInfo();
                 }
             });
-        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x05) {
-            LogUtil.msg("同步时间成功");
         }
     }
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
-            setConnectedInfo();
             isOpening = false;
+            setConnectedInfo();
         }
     }
 }

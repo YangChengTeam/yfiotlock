@@ -133,7 +133,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
 
     @Override
-    public void onNotifyReady() {
+    public void onNotifyReady(boolean isReady) {
     }
 
 
@@ -156,12 +156,6 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            ToastCompat.show(getContext(), "添加失败");
 
-            mLoadingDialog.dismiss();
-            isOpOver = true;
-        }
     }
-
 }
