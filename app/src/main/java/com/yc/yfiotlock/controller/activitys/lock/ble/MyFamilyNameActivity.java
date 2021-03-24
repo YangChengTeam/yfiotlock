@@ -52,8 +52,10 @@ public class MyFamilyNameActivity extends BaseActivity {
         Serializable serializable = getIntent().getSerializableExtra("family_info");
         if (serializable instanceof FamilyInfo) {
             this.familyInfo = (FamilyInfo) serializable;
-            editText.setText(familyInfo.getName());
-            editText.setSelection(familyInfo.getName().length());
+            if (!TextUtils.isEmpty(familyInfo.getName())) {
+                editText.setText(familyInfo.getName());
+                editText.setSelection(familyInfo.getName().length());
+            }
         }
 
         RxView.clicks(tvSure).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
