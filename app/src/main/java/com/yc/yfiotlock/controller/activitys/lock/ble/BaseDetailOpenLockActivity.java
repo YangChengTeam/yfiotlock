@@ -217,9 +217,4 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             ToastCompat.show(getContext(), "删除失败");
         }
     }
-
-    @Override
-    public void onNotifyReady(boolean isReady) {
-
-    }
 }

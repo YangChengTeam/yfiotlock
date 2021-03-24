@@ -32,6 +32,4 @@ public class ConnectFailActivity extends BaseBackActivity {
         backNavBar.setTitle(name);
         setClick(mStvReset, this::finish);
     }
-
-
 }

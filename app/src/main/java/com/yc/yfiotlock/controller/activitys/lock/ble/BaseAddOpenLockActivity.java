@@ -133,11 +133,6 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
 
     @Override
-    public void onNotifyReady(boolean isReady) {
-    }
-
-
-    @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             isOpOver = true;

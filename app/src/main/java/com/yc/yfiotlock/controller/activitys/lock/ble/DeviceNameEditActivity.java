@@ -10,6 +10,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
@@ -25,7 +26,7 @@ import rx.Subscriber;
 /**
  * @author Dullyoung
  */
-public class DeviceNameEditActivity extends BaseActivity {
+public class DeviceNameEditActivity extends BaseBackActivity {
 
 
     @BindView(R.id.bnb_title)
@@ -50,7 +51,6 @@ public class DeviceNameEditActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> finish());
         mEtName.setText(deviceInfo.getName());
         mEtName.setSelection(mEtName.getText().length());
         CommonUtil.setEditTextLimit(mEtName, 20, true);

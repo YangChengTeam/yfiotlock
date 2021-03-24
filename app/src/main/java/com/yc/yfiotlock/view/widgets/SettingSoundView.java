@@ -58,7 +58,7 @@ public class SettingSoundView extends BaseView {
     @Override
     protected void initViews(Context context) {
         super.initViews(context);
-        volume = MMKV.defaultMMKV().getInt("volume", 2);
+        volume = MMKV.defaultMMKV().getInt("volume", 3);
         onSelect(volume);
     }
 

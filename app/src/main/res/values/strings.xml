@@ -57,6 +57,7 @@
     <string name="check_version_update">检查版本更新</string>
     <string name="logout">退出登录</string>
     <string name="sure">确定</string>
+    <string name="skip">跳过</string>
     <string name="edit_name_hint">请输入昵称…</string>
     <string name="add_open_type">添加</string>
     <string name="pwd_name">密码名称</string>

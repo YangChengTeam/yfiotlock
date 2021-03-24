@@ -203,10 +203,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         }
     }
 
-    @Override
-    public void onNotifyReady(boolean isReady) {
 
-    }
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {

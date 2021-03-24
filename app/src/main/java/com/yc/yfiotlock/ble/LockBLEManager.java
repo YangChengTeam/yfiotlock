@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.kk.securityhttp.utils.LogUtil;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
@@ -44,6 +45,7 @@ public class LockBLEManager {
     public static int OPEN_LOCK_FINGERPRINT = 1;
     public static int OPEN_LOCK_PASSWORD = 2;
     public static int OPEN_LOCK_CARD = 3;
+
 
     public static void initBle(Application context) {
         BleManager.getInstance()
@@ -229,5 +231,12 @@ public class LockBLEManager {
         return false;
     }
 
+    public static void setBindWifi(String mac) {
+        MMKV.defaultMMKV().putBoolean(mac + "_wifi", true);
+    }
+
+    public static boolean isBindWifi(String mac) {
+        return MMKV.defaultMMKV().getBoolean(mac + "_wifi", false);
+    }
 
 }

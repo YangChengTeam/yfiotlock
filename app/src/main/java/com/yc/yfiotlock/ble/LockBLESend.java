@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
 
-import com.kk.utils.LogUtil;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
@@ -53,6 +52,7 @@ public class LockBLESend {
         this.scmd = scmd;
     }
 
+
     // 发送数据
     public void send(byte mcmd, byte scmd, byte[] cmdBytes, boolean iswakeup) {
         this.mcmd = mcmd;
@@ -70,6 +70,11 @@ public class LockBLESend {
             });
             generalDialog.show();
             return;
+        } else {
+            if (!LockBLESend.isNotityReady()) {
+                LockBLESend.bleNotify(bleDevice);
+                return;
+            }
         }
         if (!isSend) {
             Log.d(TAG, "正在发送");
@@ -91,7 +96,7 @@ public class LockBLESend {
             if (!isOpOver && retryCount-- > 0) {
                 realSend();
             } else {
-                if (isOpOver && retryCount <= 0) {
+                if (!isOpOver && retryCount <= 0) {
                     notifyErrorResponse("no response");
                 }
                 isOpOver = false;
@@ -120,20 +125,17 @@ public class LockBLESend {
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
                 loadingDialog.dismiss();
-                send();
+                LockBLEManager.setMtu(bleDevice);
             }
 
             @Override
             public void onConnectFailed() {
                 loadingDialog.dismiss();
-                send();
             }
         });
     }
 
     public interface NotifyCallback {
-        void onNotifyReady(boolean isReady);
-
         void onNotifySuccess(LockBLEData lockBLEData);
 
         void onNotifyFailure(LockBLEData lockBLEData);
@@ -145,12 +147,6 @@ public class LockBLESend {
         this.notifyCallback = notifyCallback;
     }
 
-    private void send() {
-        if (mcmd == 0x00 || scmd == 0x00 || cmdBytes == null) {
-            return;
-        }
-        send(mcmd, scmd, cmdBytes);
-    }
 
     // 清除操作
     public void clear() {
@@ -193,6 +189,11 @@ public class LockBLESend {
 
     // 监听
     private static int notifyRetryCount = 3;
+    private static boolean isNotityReady = false;
+
+    public static boolean isNotityReady() {
+        return isNotityReady;
+    }
 
     public static void bleNotify(BleDevice bleDevice) {
         BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_SERVICE_UUID);
@@ -204,12 +205,14 @@ public class LockBLESend {
                     @Override
                     public void onNotifySuccess() {
                         Log.d(TAG, "回调通知成功");
+                        isNotityReady = true;
                         EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifySuccess));
                     }
 
                     @Override
                     public void onNotifyFailure(BleException exception) {
                         Log.d(TAG, "回调通失败:" + exception.getDescription());
+                        isNotityReady = false;
                         if (notifyRetryCount-- > 0) {
                             VUiKit.postDelayed(notifyRetryCount * (1000 - notifyRetryCount * 200), () -> {
                                 bleNotify(bleDevice);
@@ -238,15 +241,7 @@ public class LockBLESend {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNotify(BleNotifyEvent bleNotifyEvent) {
-        if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
-            if (notifyCallback != null) {
-                notifyCallback.onNotifyReady(true);
-            }
-        } else if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifyFailure) {
-            if (notifyCallback != null) {
-                notifyCallback.onNotifyReady(false);
-            }
-        } else if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifyChangeFailure) {
+        if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifyChangeFailure) {
             notifyErrorResponse(bleNotifyEvent.getDesp());
         }
     }

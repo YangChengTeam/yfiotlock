@@ -29,8 +29,7 @@ public class DeviceEngin extends BaseEngin {
         return null;
     }
 
-    public Observable<ResultInfo<DeviceInfo>> addDeviceInfo(String familyId, String name, String mac, String deviceId) {
-
+    public Observable<ResultInfo<DeviceInfo>> addDeviceInfo(String familyId, String name, String mac, String deviceId, int isOnline) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
@@ -39,6 +38,7 @@ public class DeviceEngin extends BaseEngin {
         map.put("name", name);
         map.put("device_id", deviceId);
         map.put("mac_address", mac);
+        map.put("is_online", isOnline + "");
         return new HttpCoreEngin<ResultInfo<DeviceInfo>>(getContext()).rxpost(Config.DEVICE_ADD_URL,
                 new TypeReference<ResultInfo<DeviceInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
