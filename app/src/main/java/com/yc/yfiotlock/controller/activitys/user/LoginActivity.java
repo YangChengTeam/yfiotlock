@@ -156,7 +156,7 @@ public class LoginActivity extends BaseActivity {
         mLoginEngin.smsCodeLogin(phone, code).subscribe(new Observer<ResultInfo<UserInfo>>() {
             @Override
             public void onCompleted() {
-
+                mLoadingDialog.dismiss();
             }
 
             @Override
