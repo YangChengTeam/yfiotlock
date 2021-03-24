@@ -53,7 +53,7 @@ public class LockBLESend {
         this.scmd = scmd;
     }
 
-    // 伪发送数据
+    // 发送数据
     public void send(byte mcmd, byte scmd, byte[] cmdBytes, boolean iswakeup) {
         this.mcmd = mcmd;
         this.scmd = scmd;
@@ -87,7 +87,7 @@ public class LockBLESend {
     public void realSend() {
         Log.d(TAG, "直接发送真正指令" + retryCount);
         op(cmdBytes);
-        VUiKit.postDelayed(200, () -> {
+        VUiKit.postDelayed(1000, () -> {
             if (!isOpOver && retryCount-- > 0) {
                 realSend();
             } else {

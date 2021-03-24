@@ -119,7 +119,6 @@ public class DeviceListActivity extends BaseAddActivity {
             @Override
             public void onConnectFailed() {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(DeviceListActivity.this, "连接失败");
             }
         });
     }

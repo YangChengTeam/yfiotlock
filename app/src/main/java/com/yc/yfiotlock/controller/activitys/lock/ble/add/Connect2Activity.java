@@ -25,12 +25,9 @@ import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
-import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.Arrays;
 
 import butterknife.BindView;
 import rx.Subscriber;
@@ -229,7 +226,7 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
                 public void call(ResultInfo<TimeInfo> info) {
                     if (info != null && info.getCode() == 1 && info.getData() != null) {
                         byte[] cmdBytes = LockBLESettingCmd.syncTime(getContext(), info.getData().getTime());
-                        lockBleSend.send((byte) 0x01, (byte) 0x05, cmdBytes, false);
+                        lockBleSend.send((byte) 0x01, (byte) 0x05, cmdBytes, true);
                     }
                 }
             });
@@ -247,7 +244,6 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
 
     @Override
     public void fail() {
-        super.fail();
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
                 cloudAddDevice();
@@ -280,13 +276,18 @@ public class Connect2Activity extends BaseAddActivity implements LockBLESend.Not
 
 
     @Override
-    public void onNotifyReady(boolean isRe) {
+    public void onNotifyReady(boolean isReady) {
 
     }
 
+    private boolean isAdd;
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
+            if(isAdd){
+                return;
+            }
+            isAdd = true;
             aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
             cloudAddDevice();

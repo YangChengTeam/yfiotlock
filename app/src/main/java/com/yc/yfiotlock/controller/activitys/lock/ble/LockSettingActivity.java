@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLESend;
@@ -109,6 +110,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
                     ToastCompat.show(getContext(), "删除成功");
+                    App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
                     EventBus.getDefault().post(new IndexRefreshEvent());
                     finish();
                     LockIndexActivity.getInstance().finish();

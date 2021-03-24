@@ -291,7 +291,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     private void bleopen() {
         if (!isNotityReady) {
-            ToastCompat.show(getContext(), "蓝牙未准备就绪");
+            LockBLESend.bleNotify(bleDevice);
             return;
         }
         if (isOpening) {

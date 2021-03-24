@@ -48,7 +48,7 @@ public class LockBLEManager {
     public static void initBle(Application context) {
         BleManager.getInstance()
                 .enableLog(true)
-                .setReConnectCount(1, 1000)
+                .setReConnectCount(2, 1000)
                 .setSplitWriteNum(LockBLEPackage.getMtu())
                 .setConnectOverTime(10000)
                 .setOperateTimeout(5000).init(context);
