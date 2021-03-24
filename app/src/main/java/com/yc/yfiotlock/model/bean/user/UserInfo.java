@@ -3,6 +3,7 @@ package com.yc.yfiotlock.model.bean.user;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.yc.yfiotlock.constant.Config;
 
 public class UserInfo {
 
@@ -10,7 +11,7 @@ public class UserInfo {
     private String name;
     @JSONField(name = "nickname")
     private String nickName;
-    private String face;
+    private String face = "";
     private String sign;
     private String scene;
     private String model;
@@ -74,6 +75,9 @@ public class UserInfo {
     }
 
     public String getFace() {
+        if (!face.startsWith(Config.getBaseUrl())) {
+            face = Config.getBaseUrl().concat(face);
+        }
         return face;
     }
 

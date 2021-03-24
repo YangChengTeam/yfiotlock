@@ -23,7 +23,7 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".App"
@@ -35,7 +35,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".controller.activitys.lock.ble.add.ConnectFailActivity" />
-        <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" >
+        <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity">
 
         </activity>
         <activity android:name=".controller.activitys.lock.ble.add.Connect2Activity">
@@ -64,8 +64,8 @@
         <activity android:name=".controller.activitys.user.PersonalInfoActivity" />
         <activity
             android:name=".controller.activitys.base.SplashActivity"
-            android:theme="@style/SplashTheme"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
