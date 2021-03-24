@@ -111,7 +111,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                         deviceNameDialog.dismiss();
                         ToastCompat.show(getContext(), "修改成功");
                         lockInfo.setName(name);
-                        EventBus.getDefault().post(lockInfo);
+                        EventBus.getDefault().post(new IndexRefreshEvent());
                     } else {
                         msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
                         ToastCompat.show(getContext(), msg);
@@ -126,7 +126,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {
             byte[] cmdBytes = LockBLESettingCmd.getAlDeviceName(this);
-            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes, false);
+            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes, true);
         }
     }
 

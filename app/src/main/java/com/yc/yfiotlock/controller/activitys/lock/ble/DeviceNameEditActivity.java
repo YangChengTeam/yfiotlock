@@ -29,8 +29,6 @@ import rx.Subscriber;
 public class DeviceNameEditActivity extends BaseBackActivity {
 
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.et_name)
     EditText mEtName;
 

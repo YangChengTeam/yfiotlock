@@ -92,7 +92,7 @@ public class LockBLESend {
     public void realSend() {
         Log.d(TAG, "直接发送真正指令" + retryCount);
         op(cmdBytes);
-        VUiKit.postDelayed(1000, () -> {
+        VUiKit.postDelayed(1000 * 2, () -> {
             if (!isOpOver && retryCount-- > 0) {
                 realSend();
             } else {
@@ -176,7 +176,7 @@ public class LockBLESend {
         op(bytes);
         VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
             if (waupStatus && isSend) return;
-            if (wakeUpCount++ >= 10) {
+            if (wakeUpCount++ >= 3) {
                 //ToastCompat.show(context, "唤醒门锁失败,无法发送指令");
                 Log.d(TAG, "唤醒门锁失败,无法发送指令");
                 wakeUpCount = 0;

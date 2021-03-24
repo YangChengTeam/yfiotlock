@@ -204,7 +204,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     }
 
 
-
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x08) {
