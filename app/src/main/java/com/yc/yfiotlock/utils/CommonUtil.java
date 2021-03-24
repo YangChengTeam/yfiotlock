@@ -185,8 +185,13 @@ public class CommonUtil {
                 Log.i("onekeylogin", "onTokenFailed: " + s);
                 loginEvent.setStateString(LoginEvent.State.FAILED);
                 EventBus.getDefault().post(loginEvent);
-                PhoneTokenInfo tokenInfo = JSONObject.parseObject(s, PhoneTokenInfo.class);
-                showFailTip(context, tokenInfo.getCode());
+                PhoneTokenInfo tokenInfo = null;
+                try {
+                    tokenInfo = JSONObject.parseObject(s, PhoneTokenInfo.class);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                showFailTip(context, tokenInfo == null ? "000001" : tokenInfo.getCode());
                 PhoneNumberAuthHelper.getInstance(context, this).hideLoginLoading();
             }
         });
