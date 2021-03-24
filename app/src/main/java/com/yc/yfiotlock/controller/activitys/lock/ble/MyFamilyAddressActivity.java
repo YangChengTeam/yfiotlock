@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -50,8 +51,10 @@ public class MyFamilyAddressActivity extends BaseActivity {
         Serializable serializable = getIntent().getSerializableExtra("family_info");
         if (serializable instanceof FamilyInfo) {
             this.familyInfo = (FamilyInfo) serializable;
-            editText.setText(familyInfo.getDetailAddress());
-            editText.setSelection(familyInfo.getDetailAddress().length());
+            if (!TextUtils.isEmpty(familyInfo.getDetailAddress())) {
+                editText.setText(familyInfo.getDetailAddress());
+                editText.setSelection(familyInfo.getDetailAddress().length());
+            }
         }
 
         RxView.clicks(tvSure).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
