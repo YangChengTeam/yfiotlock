@@ -135,11 +135,15 @@ public class MyFamilyAddActivity extends BaseActivity {
 
                 @Override
                 public void onNext(ResultInfo<String> stringResultInfo) {
-                    ToastUtil.toast2(MyFamilyAddActivity.this, stringResultInfo.getMsg());
-
-                    familyInfo.setUpdateList(true);
-                    EventBus.getDefault().post(familyInfo);
-                    finish();
+                    if(stringResultInfo.getCode()==1) {
+                        familyInfo.setUpdateList(true);
+                        EventBus.getDefault().post(familyInfo);
+                        ToastUtil.toast2(MyFamilyAddActivity.this, stringResultInfo.getMsg());
+                        mLoadingDialog.dismiss();
+                        finish();
+                    }else {
+                        ToastUtil.toast2(MyFamilyAddActivity.this, "更新出错");
+                    }
                 }
             });
         }
