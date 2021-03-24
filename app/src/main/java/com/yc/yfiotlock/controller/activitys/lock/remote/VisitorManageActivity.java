@@ -12,6 +12,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
 import com.yc.yfiotlock.view.adapters.ItemAdapter;
@@ -19,7 +20,6 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class VisitorManageActivity extends BaseActivity {
     RecyclerView recyclerView;
 
     private ItemAdapter itemAdapter;
-    private DeviceInfo deviceInfo;
+    private DeviceInfo lockInfo;
 
     public static void start(Context context, DeviceInfo deviceInfo) {
         Intent intent = new Intent(context, VisitorManageActivity.class);
@@ -49,10 +49,7 @@ public class VisitorManageActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        Serializable device = getIntent().getSerializableExtra("device");
-        if (device instanceof DeviceInfo) {
-            this.deviceInfo = (DeviceInfo) device;
-        }
+        lockInfo = LockIndexActivity.getInstance().getLockInfo();
     }
 
     @Override
@@ -75,10 +72,10 @@ public class VisitorManageActivity extends BaseActivity {
                 ItemInfo itemInfo = itemAdapter.getData().get(position);
                 switch (itemInfo.getId()) {
                     case 1:
-                        OpenLockActivty.start(VisitorManageActivity.this, deviceInfo);
+                        OpenLockActivty.start(VisitorManageActivity.this, lockInfo);
                         break;
                     case 2:
-                        TempPasswordOpenLockActivity.start(VisitorManageActivity.this, deviceInfo);
+                        TempPasswordOpenLockActivity.start(VisitorManageActivity.this, lockInfo);
                         break;
                 }
             }

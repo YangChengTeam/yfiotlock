@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.model.engin;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
@@ -56,16 +57,24 @@ public class DeviceEngin extends BaseEngin {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    public Observable<ResultInfo<String>> updateDeviceInfo(String id, String name) {
+    public Observable<ResultInfo<String>> updateDeviceInfo(String id, String name, String aliDevname) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", id);
+        if(!TextUtils.isEmpty(aliDevname)){
+            map.put("device_id", aliDevname);
+
+        }
         map.put("name", name);
         return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_MODIFY_URL,
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    public Observable<ResultInfo<String>> updateDeviceInfo(String id, String name) {
+        return updateDeviceInfo(id, name, "");
     }
 
     public Observable<ResultInfo<String>> setDeviceVolume(String id, int volume) {

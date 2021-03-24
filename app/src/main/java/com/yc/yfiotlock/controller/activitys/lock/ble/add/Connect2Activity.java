@@ -9,6 +9,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
 
@@ -121,6 +122,11 @@ public class Connect2Activity extends BaseConnectActivity {
 
             LockBLEManager.setBindWifi(bleDevice.getMac());
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        ToastCompat.show(this, "正在配网");
     }
 
     @Override

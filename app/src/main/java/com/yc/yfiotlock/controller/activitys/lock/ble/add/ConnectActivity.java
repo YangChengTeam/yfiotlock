@@ -127,6 +127,7 @@ public class ConnectActivity extends BaseConnectActivity {
         Intent intent = new Intent(this, Connect2Activity.class);
         intent.putExtra("family", familyInfo);
         intent.putExtra("bleDevice", bleDevice);
+        intent.putExtra("device", lockInfo);
         intent.putExtra("ssid", ssid);
         intent.putExtra("pwd", pwd);
         intent.putExtra("isFromIndex", isFromIndex);

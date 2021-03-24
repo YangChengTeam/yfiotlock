@@ -7,6 +7,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
@@ -21,11 +22,9 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class DeviceInfoActivity extends BaseActivity {
+public class DeviceInfoActivity extends BaseBackActivity {
 
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.rv_device_info)
     RecyclerView mRvDeviceInfo;
 
@@ -45,7 +44,7 @@ public class DeviceInfoActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> finish());
+        super.initViews();
         setRvDeviceInfo();
     }
 

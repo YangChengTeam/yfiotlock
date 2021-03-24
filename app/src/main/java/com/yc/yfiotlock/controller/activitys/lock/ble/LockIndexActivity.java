@@ -440,6 +440,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     private void nav2bindwifi() {
         Intent intent = new Intent(this, ConnectActivity.class);
         intent.putExtra("bleDevice", bleDevice);
+        intent.putExtra("device", lockInfo);
         intent.putExtra("family", familyInfo);
         intent.putExtra("isFromIndex", true);
         startActivity(intent);
@@ -450,12 +451,17 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (lockInfo.isOnline() || LockBLEManager.isBindWifi(lockInfo.getMacAddress())) {
             VisitorManageActivity.start(this, lockInfo);
         } else {
+
             GeneralDialog generalDialog = new GeneralDialog(this);
             generalDialog.setTitle("温馨提示");
             generalDialog.setMsg("设备还未配网, 确定进入配网流程");
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
+                    if (!LockBLEManager.isConnected(bleDevice)) {
+                        ToastCompat.show(getContext(), "蓝牙未连接");
+                        return;
+                    }
                     nav2bindwifi();
                 }
             });

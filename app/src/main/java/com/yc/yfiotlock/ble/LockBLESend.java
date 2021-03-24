@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.libs.fastble.BleManager;
@@ -13,6 +14,7 @@ import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -51,7 +53,6 @@ public class LockBLESend {
     public void setScmd(byte scmd) {
         this.scmd = scmd;
     }
-
 
     // 发送数据
     public void send(byte mcmd, byte scmd, byte[] cmdBytes, boolean iswakeup) {
@@ -111,10 +112,11 @@ public class LockBLESend {
     }
 
     public void connect() {
+        loadingDialog.show("正在连接");
         LockBLEManager.connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
             @Override
             public void onConnectStarted() {
-                loadingDialog.show("正在连接");
+
             }
 
             @Override
@@ -124,7 +126,17 @@ public class LockBLESend {
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
-                loadingDialog.dismiss();
+                loadingDialog.setIcon(R.mipmap.icon_finish);
+                loadingDialog.show("连接成功");
+                VUiKit.postDelayed(1500, new Runnable() {
+                    @Override
+                    public void run() {
+                        if (CommonUtil.isActivityDestory(context)) {
+                            return;
+                        }
+                        loadingDialog.dismiss();
+                    }
+                });
                 LockBLEManager.setMtu(bleDevice);
             }
 
