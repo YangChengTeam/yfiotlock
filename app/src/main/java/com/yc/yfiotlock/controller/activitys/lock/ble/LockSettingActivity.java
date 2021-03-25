@@ -23,6 +23,7 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
+import com.yc.yfiotlock.utils.SafeUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.SettingSoundView;
 
@@ -117,6 +118,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     ToastCompat.show(getContext(), "删除成功");
                     App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
                     EventBus.getDefault().post(new IndexRefreshEvent());
+                    SafeUtils.setSafePwdType(lockInfo, 0);
                     blereset();
                 } else {
                     ToastCompat.show(getContext(), "删除失败");
