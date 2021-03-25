@@ -84,27 +84,15 @@ public class Connect2Activity extends BaseConnectActivity {
             float value = (float) animation.getAnimatedValue();
             mCpbProgress.setProgress(value);
             mTvProgress.setText((int) value + "%");
-            if (!lockBleSend.isOpOver() && value == 100 && !isConnected) {
-                lockBleSend.setOpOver(true);
-                lockBleSend.notifyErrorResponse("bind wifi timeout");
-                valueAnimator.end();
-                nav2fail();
-            }
         });
         valueAnimator.setDuration(1000 * 65);
     }
 
-    /**
-     * 连接中UI
-     */
     private void showConnectingUi() {
         mLlConnected.setVisibility(View.GONE);
         mLlConnecting.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * 连接成功UI
-     */
     private void showConnectedUi() {
         mLlConnected.setVisibility(View.VISIBLE);
         mLlConnecting.setVisibility(View.GONE);
@@ -170,11 +158,13 @@ public class Connect2Activity extends BaseConnectActivity {
         super.onNotifySuccess(lockBLEData);
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
             isConnected = true;
+            valueAnimator.cancel();
             valueAnimator.end();
             showConnectedUi();
             bleGetAliDeviceName();
             LockBLEManager.setBindWifi(bleDevice.getMac());
         } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+            lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();
         }
@@ -183,10 +173,14 @@ public class Connect2Activity extends BaseConnectActivity {
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+            lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();
             valueAnimator.end();
             nav2fail();
         } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+            lockBleSend.setOpOver(true);
+            valueAnimator.end();
+            valueAnimator.cancel();
             mLoadingDialog.dismiss();
             finish();
         }

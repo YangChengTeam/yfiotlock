@@ -6,7 +6,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.controller.fragments.BaseFragment;
+import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogListInfo;

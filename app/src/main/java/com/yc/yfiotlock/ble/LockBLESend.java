@@ -93,6 +93,7 @@ public class LockBLESend {
         if (!isSend) {
             Log.d(TAG, "正在发送");
             isSend = true;
+            isOpOver = false;
             if (iswakeup) {
                 wakeup();
             } else {
@@ -119,7 +120,6 @@ public class LockBLESend {
                 if (!isOpOver && retryCount <= 0) {
                     notifyErrorResponse("no response");
                 }
-                isOpOver = false;
                 retryCount = 3;
             }
         });

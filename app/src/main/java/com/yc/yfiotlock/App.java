@@ -9,7 +9,9 @@ import com.baidu.mapapi.SDKInitializer;
 import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
+import com.kk.utils.VUiKit;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.mmkv.MMKV;
 import com.umeng.analytics.MobclickAgent;
@@ -18,12 +20,17 @@ import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.GlideEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import rx.functions.Action1;
 
 
 public class App extends Application {
@@ -39,6 +46,13 @@ public class App extends Application {
         return connectedDevices;
     }
 
+    private DeviceEngin deviceEngin;
+    private List<String> macList = new ArrayList<>();
+
+    public List<String> getMacList() {
+        return macList;
+    }
+
     public static boolean isLogin() {
         return UserInfoCache.getUserInfo() != null;
     }
@@ -48,12 +62,32 @@ public class App extends Application {
         super.onCreate();
         Reflection.unseal(this);
         app = this;
+        deviceEngin = new DeviceEngin(this);
         LockBLEManager.initBle(this);
         initSdk();
         initHttp();
         initCommonConfig();
         initBauduMap();
+        cloudgetMacList();
+    }
 
+    private int retryCount = 0;
+
+    private void cloudgetMacList() {
+        deviceEngin.getMacList().subscribe(new Action1<ResultInfo<List<String>>>() {
+            @Override
+            public void call(ResultInfo<List<String>> info) {
+                if (info != null && info.getCode() == 1) {
+                    macList = info.getData();
+                } else {
+                    if (retryCount-- > 0) {
+                        VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
+                            cloudgetMacList();
+                        });
+                    }
+                }
+            }
+        });
     }
 
     private void initBauduMap() {

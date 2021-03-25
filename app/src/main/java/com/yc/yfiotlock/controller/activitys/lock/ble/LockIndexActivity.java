@@ -145,7 +145,20 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         }
 
 
+        reConnectDialog = new GeneralDialog(this);
+        reConnectDialog.setTitle("温馨提示");
+        reConnectDialog.setMsg("蓝牙连接已断开，请将手机靠近 门锁后重试");
+        reConnectDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+            @Override
+            public void onClick(Dialog dialog) {
+                connect(bleDevice);
+            }
+        });
+    }
+
+    private void initShakeSensor() {
         shakeSensor = new ShakeSensor(this);
+        shakeSensor.register();
         shakeSensor.setShakeListener(new ShakeSensor.OnShakeListener() {
             @Override
             public void onShakeComplete(SensorEvent event) {
@@ -156,16 +169,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 }
             }
         });
+    }
 
-        reConnectDialog = new GeneralDialog(this);
-        reConnectDialog.setTitle("温馨提示");
-        reConnectDialog.setMsg("蓝牙连接已断开，请将手机靠近 门锁后重试");
-        reConnectDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-            @Override
-            public void onClick(Dialog dialog) {
-                connect(bleDevice);
-            }
-        });
+    private void destoryShakeSensor() {
+        shakeSensor.unregister();
+        shakeSensor = null;
     }
 
     @Override
@@ -248,8 +256,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             return;
         }
 
-        shakeSensor.register();
-
+        initShakeSensor();
         registerNotify();
         // 重新连接
         if (bleDevice != null && !LockBLEManager.isConnected(bleDevice)) {
@@ -262,7 +269,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         super.onStop();
 
         unregisterNotify();
-        shakeSensor.unregister();
+        destoryShakeSensor();
     }
 
     @Override

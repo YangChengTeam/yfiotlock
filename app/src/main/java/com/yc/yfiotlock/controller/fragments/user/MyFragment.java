@@ -14,7 +14,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.AboutUsActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.controller.activitys.user.SuggestActivity;
-import com.yc.yfiotlock.controller.fragments.BaseFragment;
+import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.model.bean.user.PersonalInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.utils.CommonUtil;

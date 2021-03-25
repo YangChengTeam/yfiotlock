@@ -117,6 +117,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 if (info != null && info.getCode() == 1) {
                     ToastCompat.show(getContext(), "删除成功");
                     App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
+                    App.getApp().getMacList().remove(lockInfo.getMacAddress());
                     EventBus.getDefault().post(new IndexRefreshEvent());
                     SafeUtils.setSafePwdType(lockInfo, 0);
                     blereset();
@@ -205,8 +206,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
-
-
     }
 
     @Override

@@ -181,6 +181,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                 }
             }
         } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+            lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();
         }
@@ -189,6 +190,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+            lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();
         }

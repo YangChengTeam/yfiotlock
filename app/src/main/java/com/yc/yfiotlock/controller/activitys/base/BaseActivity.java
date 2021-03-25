@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.activitys.base;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -43,7 +44,7 @@ public abstract class BaseActivity extends BaseSendActivity implements ILoadData
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(getLayoutId());
         setTranslucentStatus();

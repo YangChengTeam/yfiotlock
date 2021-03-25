@@ -21,14 +21,10 @@ public class ShakeSensor implements SensorEventListener {
     protected final String TAG = this.getClass().getName();
 
 
-    private int mSpeedShreshold = 4000;
+    private int mSpeedShreshold = DEFAULT_SHAKE_SPEED;
     private static final int UPTATE_INTERVAL_TIME = 100;
-    public static final int DEFAULT_SHAKE_SPEED = 2000;
+    public static final int DEFAULT_SHAKE_SPEED = 15;
     private boolean isStart = false;
-
-    private float mLastX = 0.0f;
-    private float mLastY = 0.0f;
-    private float mLastZ = 0.0f;
 
     private long mLastUpdateTime;
 
@@ -40,10 +36,6 @@ public class ShakeSensor implements SensorEventListener {
     public ShakeSensor(Context context, int speedShreshold) {
         mContext = context;
         mSpeedShreshold = speedShreshold;
-    }
-
-
-    public boolean register() {
         // 获得传感器管理器
         mSensorManager = (SensorManager) mContext
                 .getSystemService(Context.SENSOR_SERVICE);
@@ -52,6 +44,10 @@ public class ShakeSensor implements SensorEventListener {
             mSensor = mSensorManager
                     .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
+    }
+
+
+    public boolean register() {
         // 注册传感器
         if (mSensor != null) {
             isStart = mSensorManager.registerListener(this, mSensor,
@@ -90,23 +86,9 @@ public class ShakeSensor implements SensorEventListener {
         float y = event.values[1];
         float z = event.values[2];
 
-        // 获得x,y,z的变化值
-        float deltaX = x - mLastX;
-        float deltaY = y - mLastY;
-        float deltaZ = z - mLastZ;
-
-        // 将现在的坐标变成last坐标
-        mLastX = x;
-        mLastY = y;
-        mLastZ = z;
-
-        // 获取摇晃速度
-        double speed = (Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / timeInterval) * 10000;
-        // 达到速度阀值，回调给开发者
-        if (speed >= mSpeedShreshold && mShakeListener != null) {
+        if (mShakeListener != null && Math.abs(x) > mSpeedShreshold && Math.abs(y) > mSpeedShreshold && Math.abs(z) > mSpeedShreshold) {
             mShakeListener.onShakeComplete(event);
         }
-
     }
 
 
