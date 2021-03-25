@@ -29,8 +29,7 @@ import rx.Subscriber;
 public class DeviceNameEditActivity extends BaseBackActivity {
 
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
+
     @BindView(R.id.et_name)
     EditText mEtName;
 
@@ -93,8 +92,6 @@ public class DeviceNameEditActivity extends BaseBackActivity {
 
     @Override
     protected void bindClick() {
-        setClick(R.id.stv_sure, () -> {
-            cloudModifyDeivceName();
-        });
+        setClick(R.id.tv_sure, this::cloudModifyDeivceName);
     }
 }

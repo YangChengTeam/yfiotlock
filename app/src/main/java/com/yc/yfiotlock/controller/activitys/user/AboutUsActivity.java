@@ -105,7 +105,7 @@ public class AboutUsActivity extends BaseActivity {
     private boolean loadCache(boolean showDialog) {
         ResultInfo<UpgradeInfo> info = CacheUtil.getCache(mUpdateEngine.getUrl(), new TypeReference<ResultInfo<UpgradeInfo>>() {
         }.getType());
-        if (info != null) {
+        if (info != null && info.getData() != null) {
             onSuccess(info, showDialog);
             return true;
         }
@@ -131,7 +131,7 @@ public class AboutUsActivity extends BaseActivity {
 
             @Override
             public void onNext(ResultInfo<UpgradeInfo> info) {
-                if (info != null && info.getCode() == 1) {
+                if (info != null && info.getCode() == 1 && info.getData() != null) {
                     onSuccess(info, showDialog);
                     CacheUtil.setCache(mUpdateEngine.getUrl(), info);
                 } else {
