@@ -50,6 +50,7 @@ public class DeviceNameEditActivity extends BaseBackActivity {
 
     @Override
     protected void initViews() {
+        super.initViews();
         mEtName.setText(deviceInfo.getName());
         mEtName.setSelection(mEtName.getText().length());
         CommonUtil.setEditTextLimit(mEtName, 20, true);

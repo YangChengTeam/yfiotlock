@@ -1,15 +1,16 @@
 package com.yc.yfiotlock.libs.fingerprintcompat;
 
-public interface IonFingerCallback
-{
+public interface IonFingerCallback {
 
-	void onSucceed();
+    void onSucceed();
 
-	void onFailed();
+    void onFailed();
 
-	void onHelp(String help);
+    void onHelp(String help);
 
-	void onError(String error);
+    void onError(String error);
 
-	void onCancel();
+    void onError(int code, String error);
+
+    void onCancel();
 }

@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.fragments.lock.ble;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.biometrics.BiometricPrompt;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -158,22 +159,25 @@ public class IndexFragment extends BaseFragment {
                 SafePwdCreateActivity.startCheck(getActivity());
                 break;
             case SafeUtils.FINGERPRINT_TYPE:
-                SafeUtils.useFinger(getActivity(), new Callback<String>() {
-                    @Override
-                    public void onSuccess(String resultInfo) {
-                        real2LockIndex(mDeviceInfo);
-                    }
-
-                    @Override
-                    public void onFailure(Response response) {
-
-                    }
-                });
+                checkFinger();
                 break;
             default:
                 break;
         }
+    }
 
+    private void checkFinger() {
+        SafeUtils.useFinger(getActivity(), new Callback<String>() {
+            @Override
+            public void onSuccess(String resultInfo) {
+                real2LockIndex(mDeviceInfo);
+            }
+
+            @Override
+            public void onFailure(Response response) {
+
+            }
+        });
     }
 
     private void real2LockIndex(DeviceInfo deviceInfo) {

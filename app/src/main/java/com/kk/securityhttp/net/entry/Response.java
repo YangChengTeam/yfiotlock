@@ -12,6 +12,10 @@ public class Response {
         this.body = body;
     }
 
+    public Response(int code) {
+        this.code = code;
+    }
+
     public Response() {
     }
 }

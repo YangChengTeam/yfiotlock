@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.hardware.biometrics.BiometricPrompt;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CompoundButton;
@@ -12,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
+import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -150,6 +152,7 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
      * 之前没有设置过密码 打开的时候应该是创建新密码
      */
     private static final int OPEN_WITH_NO_PWD_BEFORE = 112;
+
 
     private void checkFinger() {
         SafeUtils.useFinger(this, new Callback<String>() {
