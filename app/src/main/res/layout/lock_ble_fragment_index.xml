@@ -4,72 +4,85 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/srl_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:src="@mipmap/home_bg" />
+        android:layout_height="match_parent">
 
-    <com.yc.yfiotlock.view.widgets.StatusBar
-        android:id="@+id/view_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/transparent"
-        app:layout_constraintTop_toBottomOf="@id/view_status">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@mipmap/home_bg" />
 
-        <TextView
-            android:id="@+id/tv_my_family"
-            android:layout_width="wrap_content"
-            android:gravity="center"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="5dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:drawablePadding="5dp"
-            android:text="我的家庭"
-            android:textColor="#ffffffff"
-            android:textSize="17dp"
-            app:drawableEndCompat="@mipmap/home_icon_arrow"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <com.yc.yfiotlock.view.widgets.StatusBar
+                android:id="@+id/view_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
-        <ImageView
-            android:id="@+id/iv_device_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="11dp"
-            android:padding="5dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:scaleType="center"
-            android:src="@mipmap/home_icon_add"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/transparent"
+                app:layout_constraintTop_toBottomOf="@id/view_status">
+
+                <TextView
+                    android:id="@+id/tv_my_family"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:background="?android:selectableItemBackgroundBorderless"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="5dp"
+                    android:text="我的家庭"
+                    android:textColor="#ffffffff"
+                    android:textSize="17dp"
+                    app:drawableEndCompat="@mipmap/home_icon_arrow"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageView
+                    android:id="@+id/iv_device_add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="11dp"
+                    android:background="?android:selectableItemBackgroundBorderless"
+                    android:padding="5dp"
+                    android:scaleType="center"
+                    android:src="@mipmap/home_icon_add"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_devices"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="345dp"
-        android:layout_marginBottom="16dp"
-        android:overScrollMode="never"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.recyclerview.widget.RecyclerView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_devices"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="345dp"
+                android:layout_marginBottom="16dp"
+                android:overScrollMode="never"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

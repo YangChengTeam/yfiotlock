@@ -10,10 +10,12 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
+import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
@@ -51,6 +53,8 @@ public class IndexFragment extends BaseFragment {
 
     @BindView(R.id.rv_devices)
     RecyclerView devicesRecyclerView;
+    @BindView(R.id.srl_refresh)
+    SwipeRefreshLayout mSrlRefresh;
 
     private IndexDeviceAdapter indexDeviceAdapter;
     private IndexEngin indexEngin;
@@ -73,14 +77,17 @@ public class IndexFragment extends BaseFragment {
     @Override
     protected void initViews() {
         setRv();
-
+        mSrlRefresh.setColorSchemeColors(0xff3091f8);
+        mSrlRefresh.setProgressViewOffset(false, 0, ScreenUtil.dip2px(getContext(), 50));
+        mSrlRefresh.setOnRefreshListener(() -> {
+            loadData();
+        });
         loadData();
     }
 
     @Override
     protected void bindClick() {
         setClick(R.id.tv_my_family, this::nav2MyFamily);
-
         setClick(deviceAddBtn, this::nav2AddDevice);
     }
 
@@ -101,23 +108,22 @@ public class IndexFragment extends BaseFragment {
     }
 
     private void loadData() {
-        BaseActivity baseActivity = (BaseActivity) getActivity();
         IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
         if (indexInfo != null) {
             familyInfo = indexInfo.getFamilyInfo();
             indexDeviceAdapter.setNewInstance(indexInfo.getDeviceInfos());
         } else {
-            baseActivity.mLoadingDialog.show("加载中...");
+            mSrlRefresh.setRefreshing(true);
         }
         indexEngin.getIndexInfo().subscribe(new Subscriber<ResultInfo<IndexInfo>>() {
             @Override
             public void onCompleted() {
-                baseActivity.mLoadingDialog.dismiss();
+                mSrlRefresh.setRefreshing(false);
             }
 
             @Override
             public void onError(Throwable e) {
-                baseActivity.mLoadingDialog.dismiss();
+                mSrlRefresh.setRefreshing(false);
             }
 
             @Override
