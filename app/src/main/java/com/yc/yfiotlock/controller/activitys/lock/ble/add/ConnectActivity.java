@@ -47,8 +47,8 @@ public class ConnectActivity extends BaseConnectActivity {
     ImageView mIvSecret;
     @BindView(R.id.stv_next)
     SuperTextView mStvNext;
-    @BindView(R.id.stv_skip)
-    SuperTextView mStvSkip;
+    @BindView(R.id.tv_skip)
+    TextView mStvSkip;
 
     private WifiManager mWifiManager;
     private AlertDialog wifiAlertDialog;
@@ -199,17 +199,21 @@ public class ConnectActivity extends BaseConnectActivity {
         setClick(mIvSecret, () -> CommonUtil.hiddenEditText(mEtPwd, mIvSecret));
         setClick(mStvNext, this::nav2next);
         setClick(R.id.iv_scan_wifi, () -> {
-            if (mLoadingDialog.isShowing()) return;
+            if (mLoadingDialog.isShowing()){
+                return;
+            }
             mLoadingDialog.show("扫描中...");
             mLoadingDialog.setCanCancel(false);
             scanWifi();
         });
-        setClick(R.id.stv_skip, this::bleGetAliDeviceName);
+        setClick(R.id.tv_skip, this::bleGetAliDeviceName);
     }
 
 
     private void showChooseList(CharSequence[] strings) {
-        if (wifiAlertDialog != null && wifiAlertDialog.isShowing()) return;
+        if (wifiAlertDialog != null && wifiAlertDialog.isShowing()) {
+            return;
+        }
         wifiAlertDialog = new AlertDialog.Builder(this)
                 .setTitle("可用网络列表(2.4G)")
                 .setItems(strings, (dialog, which) -> {

@@ -306,7 +306,7 @@
 
 -dontwarn com.squareup.picasso.**
 
-
+### bugly
 -dontwarn com.tencent.bugly.**
 -keep public class com.tencent.bugly.**{*;}
 
@@ -332,4 +332,31 @@
 -keep @androidx.annotation.Keep class **{
     @androidx.annotation.Keep <fields>;
     @androidx.annotation.Keep <methods>;
+
+
+   ####     umeng
+
+-keep class com.umeng.** {*;}
+
+-keepclassmembers class * {
+      public <init> (org.json.JSONObject);
+   }
+
+-keepclassmembers enum * {
+       public static **[] values();
+       public static ** valueOf(java.lang.String);
+   }
+
+   ###//SDK 9.2.4及以上版本自带oaid采集模块，不再需要开发者再手动引用oaid库，所以可以不添加这些混淆
+-keep class com.zui.**{*;}
+-keep class com.miui.**{*;}
+-keep class com.heytap.**{*;}
+-keep class a.**{*;}
+-keep class com.vivo.**{*;}
+
+-keep public class com.yc.yfiotlock.R$*{
+public static final int *;
 }
+
+
+
