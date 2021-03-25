@@ -71,7 +71,6 @@ public class LoginActivity extends BaseActivity {
             }
         });
         mTvGetCode.setClickable(false);
-        CommonUtil.startFastLogin(this);
     }
 
 
