@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.libs.fastble.BleManager;
@@ -44,6 +45,18 @@ public class LockBLESend {
         this.context = context;
         this.bleDevice = bleDevice;
         loadingDialog = new LoadingDialog(context);
+    }
+
+    public boolean isOpOver() {
+        return isOpOver;
+    }
+
+    public void setOpOver(boolean opOver) {
+        isOpOver = opOver;
+    }
+
+    public boolean isConnected() {
+        return LockBLEManager.isConnected(bleDevice);
     }
 
     public void setMcmd(byte mcmd) {
@@ -91,6 +104,12 @@ public class LockBLESend {
     }
 
     public void realSend() {
+        if (retryCount <= 0) {
+            if (!isOpOver) {
+                notifyErrorResponse("no response");
+            }
+            return;
+        }
         Log.d(TAG, "直接发送真正指令" + retryCount);
         op(cmdBytes);
         VUiKit.postDelayed(1000 * 2, () -> {
@@ -104,6 +123,11 @@ public class LockBLESend {
                 retryCount = 3;
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBleDeviceChange(BleDevice bleDevice) {
+        this.bleDevice = bleDevice;
     }
 
     // 伪发送数据
@@ -126,6 +150,10 @@ public class LockBLESend {
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
+                LockBLEManager.setMtu(bleDevice);
+                if (CommonUtil.isActivityDestory(context)) {
+                    return;
+                }
                 loadingDialog.setIcon(R.mipmap.icon_finish);
                 loadingDialog.show("连接成功");
                 VUiKit.postDelayed(1500, new Runnable() {
@@ -137,12 +165,15 @@ public class LockBLESend {
                         loadingDialog.dismiss();
                     }
                 });
-                LockBLEManager.setMtu(bleDevice);
             }
 
             @Override
             public void onConnectFailed() {
+                if (CommonUtil.isActivityDestory(context)) {
+                    return;
+                }
                 loadingDialog.dismiss();
+                ToastCompat.show(context, "连接失败");
             }
         });
     }
@@ -267,7 +298,6 @@ public class LockBLESend {
     private void processNotify(LockBLEData lockBLEData) {
         if (mcmd == 0x00 || scmd == 0x00) {
             Log.d(TAG, "非正常响应:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " mscd:" + mcmd + " scmd:" + scmd);
-            reset();
             return;
         }
         if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x0B) {
@@ -342,8 +372,8 @@ public class LockBLESend {
         processNotify(lockBLEData);
     }
 
-    // 响应超时
-    private void notifyErrorResponse(String error) {
+    // 响应错误
+    public void notifyErrorResponse(String error) {
         Log.d(TAG, "响应超时");
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);

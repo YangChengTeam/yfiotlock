@@ -11,6 +11,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
@@ -86,7 +87,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
-                    cloudDelDevice();
+                    if (lockBleSend != null && lockBleSend.isConnected()) {
+                        cloudDelDevice();
+                    } else {
+                        ToastCompat.show(getContext(), "蓝牙未连接");
+                    }
                 }
             });
             generalDialog.show();
@@ -112,13 +117,19 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     ToastCompat.show(getContext(), "删除成功");
                     App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
                     EventBus.getDefault().post(new IndexRefreshEvent());
-                    finish();
-                    LockIndexActivity.getInstance().finish();
+                    blereset();
                 } else {
                     ToastCompat.show(getContext(), "删除失败");
                 }
             }
         });
+    }
+
+    private void blereset() {
+        if (lockBleSend != null) {
+            byte[] bytes = LockBLESettingCmd.reset(this);
+            lockBleSend.send((byte) 0x01, (byte) 0x01, bytes, true);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -192,6 +203,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
+
+
     }
 
     @Override
@@ -200,6 +213,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(null);
             lockBleSend.unregisterNotify();
+        }
+
+        if (lockBleSend != null) {
+            lockBleSend.setNotifyCallback(this);
+            lockBleSend.registerNotify();
         }
     }
 
@@ -210,6 +228,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             headView.setVolume(volume);
             lockInfo.setBattery(volume);
             ToastCompat.show(getContext(), "设置成功");
+        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x01) {
+            finish();
+            LockIndexActivity.getInstance().finish();
         }
     }
 

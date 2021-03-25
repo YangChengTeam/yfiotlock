@@ -4,6 +4,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.app.Dialog;
 
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
@@ -27,12 +28,12 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     protected LockEngine lockEngine;
     protected DeviceInfo lockInfo;
     protected LockBLESend lockBleSend;
+    protected LockBLESend cancelSend;
 
     protected byte mcmd;
     protected byte scmd;
 
     protected String number;
-    protected boolean isOpOver;
 
 
     protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
@@ -44,9 +45,10 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         lockInfo = getLockInfo();
         BleDevice bleDevice = getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
-        lockBleSend.setNotifyCallback(this);
         Random rand = new Random();
         number = (10000000 + rand.nextInt(90000000)) + "";
+
+        cancelSend = new LockBLESend(this, bleDevice);
     }
 
     protected DeviceInfo getLockInfo() {
@@ -122,6 +124,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         super.onResume();
         lockBleSend.setNotifyCallback(this);
         lockBleSend.registerNotify();
+        cancelSend.setNotifyCallback(this);
+        cancelSend.registerNotify();
     }
 
     @Override
@@ -129,13 +133,43 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         super.onStop();
         lockBleSend.setNotifyCallback(null);
         lockBleSend.unregisterNotify();
+        cancelSend.setNotifyCallback(null);
+        cancelSend.unregisterNotify();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!lockBleSend.isOpOver()) {
+            blecancelDialog();
+        }
+    }
+
+
+    private void blecancelDialog() {
+        GeneralDialog generalDialog = new GeneralDialog(getContext());
+        generalDialog.setTitle("温馨提示");
+        generalDialog.setMsg("确认取消操作?");
+        generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+            @Override
+            public void onClick(Dialog dialog) {
+                mLoadingDialog.show("取消操作中...");
+                blecancel();
+            }
+        });
+        generalDialog.show();
+    }
+
+
+    private void blecancel() {
+        if (cancelSend != null) {
+            cancelSend.send((byte) 0x01, (byte) 0x07, LockBLESettingCmd.cancelOp(this), false);
+        }
     }
 
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            isOpOver = true;
             mLoadingDialog.dismiss();
             if (lockBLEData.getOther() != null) {
                 String number = new String(Arrays.copyOfRange(lockBLEData.getOther(), 0, 8));
@@ -146,11 +180,17 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                     ToastCompat.show(getContext(), "流水号匹配不成功");
                 }
             }
+        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+            mLoadingDialog.dismiss();
+            finish();
         }
     }
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-
+        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+            mLoadingDialog.dismiss();
+            finish();
+        }
     }
 }

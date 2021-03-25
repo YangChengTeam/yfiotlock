@@ -232,7 +232,6 @@ public class ConnectActivity extends BaseConnectActivity {
         super.onNotifySuccess(lockBLEData);
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
             mLoadingDialog.dismiss();
-            isOpOver = true;
             nav2fail();
         }
     }

@@ -19,7 +19,8 @@
             android:id="@+id/ll_default_add"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?android:selectableItemBackground">
+            android:background="?android:selectableItemBackground"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_add_name"
@@ -29,7 +30,6 @@
                 android:text="添加智能设备"
                 android:textColor="#ff222222"
                 android:textSize="13dp"
-                android:visibility="gone"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

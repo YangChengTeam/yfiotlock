@@ -28,7 +28,6 @@ import rx.functions.Action1;
 
 public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESend.NotifyCallback {
 
-    protected boolean isOpOver = false;
     protected boolean isDeviceAdd = false;
     protected boolean isConnected = false;
     protected boolean isFromIndex = false;
@@ -207,7 +206,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     protected void onStop() {
         super.onStop();
-        isOpOver = true;
         if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(null);
             lockBleSend.unregisterNotify();

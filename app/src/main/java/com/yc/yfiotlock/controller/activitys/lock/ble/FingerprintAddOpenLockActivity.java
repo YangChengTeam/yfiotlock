@@ -25,7 +25,7 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
         bleAddFingerprint();
 
         VUiKit.postDelayed(12 * 1000, () -> {
-            if (!isOpOver) {
+            if (!lockBleSend.isOpOver()) {
                 ToastCompat.show(getContext(), "操作失败");
                 finish();
             }
@@ -49,8 +49,8 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
+        super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            isOpOver = true;
             ToastCompat.show(getContext(), "操作失败");
             finish();
         }

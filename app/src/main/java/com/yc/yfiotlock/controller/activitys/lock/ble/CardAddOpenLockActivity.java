@@ -45,7 +45,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         byte[] bytes = LockBLEOpCmd.addCard(this, LockBLEManager.GROUP_TYPE, number);
         lockBleSend.send(mcmd, scmd, bytes);
         VUiKit.postDelayed(15 * 1000, () -> {
-            if (!isOpOver) {
+            if (!lockBleSend.isOpOver()) {
                 mLoadingDialog.dismiss();
                 ToastCompat.show(getContext(), "操作失败");
                 finish();
@@ -71,11 +71,11 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
+        super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             ToastCompat.show(getContext(), "卡片已添加");
             finish();
             mLoadingDialog.dismiss();
-            isOpOver = true;
         }
     }
 }

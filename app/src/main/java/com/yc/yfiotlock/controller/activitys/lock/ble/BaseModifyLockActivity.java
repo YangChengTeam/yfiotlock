@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -8,6 +9,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
@@ -79,15 +81,31 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
+                fail();
             }
 
             @Override
-            public void onNext(ResultInfo<String> stringResultInfo) {
-                if (stringResultInfo.getCode() == 1) {
-                    finish();
-                    EventBus.getDefault().post(openLockInfo);
+            public void onNext(ResultInfo<String> info) {
+                if (info != null && info.getCode() == 1) {
+                    success(info.getData());
+                } else {
+                    String msg = "更新出错";
+                    msg = info != null && !TextUtils.isEmpty(info.getMsg()) ? info.getMsg() : msg;
+                    ToastCompat.show(getContext(), msg);
                 }
             }
         });
+    }
+
+    @Override
+    public void success(Object data) {
+        finish();
+        EventBus.getDefault().post(openLockInfo);
+    }
+
+    @Override
+    public void fail() {
+        String msg = "更新出错";
+        ToastCompat.show(getContext(), msg);
     }
 }
