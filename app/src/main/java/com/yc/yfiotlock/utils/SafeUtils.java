@@ -42,7 +42,7 @@ public class SafeUtils {
      * private final static int FINGERPRINT_TYPE = 2;  验证指纹
      *
      * @param deviceInfo 设备信息
-     * @param type       安全密码设置类型
+     * @param type       安全密码设置类型  0无密
      */
     public static void setSafePwdType(DeviceInfo deviceInfo, @IntRange(from = 0, to = 2) int type) {
         MMKV.defaultMMKV().putInt("safeType" + deviceInfo.getMacAddress(), type);
@@ -52,7 +52,7 @@ public class SafeUtils {
      * @param deviceInfo 设备信息
      * @return private final static int PASSWORD_TYPE = 1;     验证密码
      * private final static int FINGERPRINT_TYPE = 2;  验证指纹
-     * -1,无密码
+     * 0,无密码
      */
     public static int getSafePwdType(DeviceInfo deviceInfo) {
         return MMKV.defaultMMKV().getInt("safeType" + deviceInfo.getMacAddress(), 0);
