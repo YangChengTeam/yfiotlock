@@ -79,8 +79,8 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
+        super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            isOpOver = true;
             ToastCompat.show(getContext(), "指纹添加失败");
             finish();
         }

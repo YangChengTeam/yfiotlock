@@ -11,6 +11,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
@@ -22,6 +23,7 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
+import com.yc.yfiotlock.utils.SafeUtils;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.SettingSoundView;
 
@@ -86,7 +88,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
-                    cloudDelDevice();
+                    if (lockBleSend != null && lockBleSend.isConnected()) {
+                        cloudDelDevice();
+                    } else {
+                        ToastCompat.show(getContext(), "蓝牙未连接");
+                    }
                 }
             });
             generalDialog.show();
@@ -112,13 +118,20 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     ToastCompat.show(getContext(), "删除成功");
                     App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
                     EventBus.getDefault().post(new IndexRefreshEvent());
-                    finish();
-                    LockIndexActivity.getInstance().finish();
+                    SafeUtils.setSafePwdType(lockInfo, 0);
+                    blereset();
                 } else {
                     ToastCompat.show(getContext(), "删除失败");
                 }
             }
         });
+    }
+
+    private void blereset() {
+        if (lockBleSend != null) {
+            byte[] bytes = LockBLESettingCmd.reset(this);
+            lockBleSend.send((byte) 0x01, (byte) 0x01, bytes, true);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -192,6 +205,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
+
+
     }
 
     @Override
@@ -201,8 +216,12 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             lockBleSend.setNotifyCallback(null);
             lockBleSend.unregisterNotify();
         }
-    }
 
+        if (lockBleSend != null) {
+            lockBleSend.setNotifyCallback(this);
+            lockBleSend.registerNotify();
+        }
+    }
 
 
     @Override
@@ -211,6 +230,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             headView.setVolume(volume);
             lockInfo.setBattery(volume);
             ToastCompat.show(getContext(), "设置成功");
+        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x01) {
+            finish();
+            LockIndexActivity.getInstance().finish();
         }
     }
 

@@ -347,7 +347,7 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             }
 
             case R.id.btn_cancel_wifi: {
-                byte[] bytes = LockBLESettingCmd.cancelWifi(OperationActivity.this);
+                byte[] bytes = LockBLESettingCmd.cancelOp(OperationActivity.this);
                 op(bytes);
                 break;
             }

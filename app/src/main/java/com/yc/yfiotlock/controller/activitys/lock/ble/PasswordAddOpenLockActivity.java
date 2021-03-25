@@ -104,9 +104,9 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
+        super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             mLoadingDialog.dismiss();
-            isOpOver = true;
             ToastCompat.show(getContext(), "密码已添加");
         }
     }

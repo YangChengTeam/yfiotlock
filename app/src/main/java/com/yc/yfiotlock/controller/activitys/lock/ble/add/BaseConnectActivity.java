@@ -28,7 +28,6 @@ import rx.functions.Action1;
 
 public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESend.NotifyCallback {
 
-    protected boolean isOpOver = false;
     protected boolean isDeviceAdd = false;
     protected boolean isConnected = false;
     protected boolean isFromIndex = false;
@@ -46,22 +45,29 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         super.initVars();
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         isFromIndex = getIntent().getBooleanExtra("isFromIndex", false);
-
+        lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
         deviceEngin = new DeviceEngin(this);
         lockBleSend = new LockBLESend(this, bleDevice);
         lockBleSend.setNotifyCallback(this);
         lockBleSend.registerNotify();
 
-        lockInfo = new DeviceInfo();
-        lockInfo.setMacAddress(bleDevice.getMac());
-        lockInfo.setName(bleDevice.getName());
+        if (lockInfo == null) {
+            lockInfo = new DeviceInfo();
+            lockInfo.setMacAddress(bleDevice.getMac());
+            lockInfo.setName(bleDevice.getName());
+        }
     }
 
     @Override
     protected void initViews() {
         super.initViews();
         deviceNameDialog = new ChangeDeviceNameDialog(this);
-        deviceNameDialog.setOnSureClick(this::cloudModifyDeivceName);
+        deviceNameDialog.setOnSureClick(new ChangeDeviceNameDialog.OnSureClick() {
+            @Override
+            public void onClick(String name) {
+                cloudModifyDeivceName(name, aliDeviceName);
+            }
+        });
     }
 
     protected void cloudAddDevice() {
@@ -90,10 +96,10 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         });
     }
 
-    protected void cloudModifyDeivceName(String name) {
+    protected void cloudModifyDeivceName(String name, String aliDeviceName) {
         if (lockInfo != null && !TextUtils.isEmpty(lockInfo.getId())) {
             mLoadingDialog.show("正在修改");
-            deviceEngin.updateDeviceInfo(lockInfo.getId(), name).subscribe(new Subscriber<ResultInfo<String>>() {
+            deviceEngin.updateDeviceInfo(lockInfo.getId(), name, aliDeviceName).subscribe(new Subscriber<ResultInfo<String>>() {
                 @Override
                 public void onCompleted() {
                     mLoadingDialog.dismiss();
@@ -112,6 +118,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                         ToastCompat.show(getContext(), "修改成功");
                         lockInfo.setName(name);
                         EventBus.getDefault().post(lockInfo);
+                        EventBus.getDefault().post(new IndexRefreshEvent());
                     } else {
                         msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
                         ToastCompat.show(getContext(), msg);
@@ -126,7 +133,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {
             byte[] cmdBytes = LockBLESettingCmd.getAlDeviceName(this);
-            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes, false);
+            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes, true);
         }
     }
 
@@ -157,7 +164,9 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     public void fail() {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                cloudAddDevice();
+                if (!isFromIndex) {
+                    cloudAddDevice();
+                }
             });
         } else {
             retryCount = 3;
@@ -197,7 +206,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     protected void onStop() {
         super.onStop();
-        isOpOver = true;
         if (lockBleSend != null) {
             lockBleSend.setNotifyCallback(null);
             lockBleSend.unregisterNotify();
@@ -220,12 +228,12 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
-            if (isDeviceAdd) {
+            aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
+            LogUtil.msg("设备名称:" + aliDeviceName);
+            if (isDeviceAdd || isFromIndex) {
                 return;
             }
             isDeviceAdd = true;
-            aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
-            LogUtil.msg("设备名称:" + aliDeviceName);
             cloudAddDevice();
         }
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x05) {

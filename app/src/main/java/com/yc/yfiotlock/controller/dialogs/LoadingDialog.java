@@ -41,9 +41,7 @@ public class LoadingDialog extends BaseDialog {
 
     public void show(String message) {
         mMessageTv.setText(message);
-        if (!isShowing()) {
-            show();
-        }
+        show();
     }
 
     @Override

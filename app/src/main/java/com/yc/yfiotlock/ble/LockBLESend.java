@@ -5,6 +5,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.libs.fastble.BleManager;
@@ -13,6 +15,7 @@ import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -44,6 +47,18 @@ public class LockBLESend {
         loadingDialog = new LoadingDialog(context);
     }
 
+    public boolean isOpOver() {
+        return isOpOver;
+    }
+
+    public void setOpOver(boolean opOver) {
+        isOpOver = opOver;
+    }
+
+    public boolean isConnected() {
+        return LockBLEManager.isConnected(bleDevice);
+    }
+
     public void setMcmd(byte mcmd) {
         this.mcmd = mcmd;
     }
@@ -51,7 +66,6 @@ public class LockBLESend {
     public void setScmd(byte scmd) {
         this.scmd = scmd;
     }
-
 
     // 发送数据
     public void send(byte mcmd, byte scmd, byte[] cmdBytes, boolean iswakeup) {
@@ -90,9 +104,15 @@ public class LockBLESend {
     }
 
     public void realSend() {
+        if (retryCount <= 0) {
+            if (!isOpOver) {
+                notifyErrorResponse("no response");
+            }
+            return;
+        }
         Log.d(TAG, "直接发送真正指令" + retryCount);
         op(cmdBytes);
-        VUiKit.postDelayed(1000, () -> {
+        VUiKit.postDelayed(1000 * 2, () -> {
             if (!isOpOver && retryCount-- > 0) {
                 realSend();
             } else {
@@ -105,16 +125,22 @@ public class LockBLESend {
         });
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBleDeviceChange(BleDevice bleDevice) {
+        this.bleDevice = bleDevice;
+    }
+
     // 伪发送数据
     public void send(byte mcmd, byte scmd, byte[] cmdBytes) {
         send(mcmd, scmd, cmdBytes, true);
     }
 
     public void connect() {
+        loadingDialog.show("正在连接");
         LockBLEManager.connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
             @Override
             public void onConnectStarted() {
-                loadingDialog.show("正在连接");
+
             }
 
             @Override
@@ -124,13 +150,30 @@ public class LockBLESend {
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
-                loadingDialog.dismiss();
                 LockBLEManager.setMtu(bleDevice);
+                if (CommonUtil.isActivityDestory(context)) {
+                    return;
+                }
+                loadingDialog.setIcon(R.mipmap.icon_finish);
+                loadingDialog.show("连接成功");
+                VUiKit.postDelayed(1500, new Runnable() {
+                    @Override
+                    public void run() {
+                        if (CommonUtil.isActivityDestory(context)) {
+                            return;
+                        }
+                        loadingDialog.dismiss();
+                    }
+                });
             }
 
             @Override
             public void onConnectFailed() {
+                if (CommonUtil.isActivityDestory(context)) {
+                    return;
+                }
                 loadingDialog.dismiss();
+                ToastCompat.show(context, "连接失败");
             }
         });
     }
@@ -176,7 +219,7 @@ public class LockBLESend {
         op(bytes);
         VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
             if (waupStatus && isSend) return;
-            if (wakeUpCount++ >= 10) {
+            if (wakeUpCount++ >= 3) {
                 //ToastCompat.show(context, "唤醒门锁失败,无法发送指令");
                 Log.d(TAG, "唤醒门锁失败,无法发送指令");
                 wakeUpCount = 0;
@@ -255,7 +298,6 @@ public class LockBLESend {
     private void processNotify(LockBLEData lockBLEData) {
         if (mcmd == 0x00 || scmd == 0x00) {
             Log.d(TAG, "非正常响应:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " mscd:" + mcmd + " scmd:" + scmd);
-            reset();
             return;
         }
         if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x0B) {
@@ -330,8 +372,8 @@ public class LockBLESend {
         processNotify(lockBLEData);
     }
 
-    // 响应超时
-    private void notifyErrorResponse(String error) {
+    // 响应错误
+    public void notifyErrorResponse(String error) {
         Log.d(TAG, "响应超时");
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);

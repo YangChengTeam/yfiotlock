@@ -16,6 +16,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import java.io.Serializable;
@@ -95,7 +96,7 @@ public class OpenLockActivty extends BaseActivity {
                         VUiKit.postDelayed(1500, new Runnable() {
                             @Override
                             public void run() {
-                                if (isDestroyed()) {
+                                if (CommonUtil.isActivityDestory(getContext())) {
                                     return;
                                 }
                                 mLoadingDialog.dismiss();

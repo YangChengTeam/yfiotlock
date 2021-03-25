@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 
 import com.kk.securityhttp.utils.LogUtil;
 import com.tencent.mmkv.MMKV;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
@@ -31,6 +32,8 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
 public class LockBLEManager {
@@ -38,14 +41,17 @@ public class LockBLEManager {
     public static final int OP_INTERVAL_TIME = 200;
     public static final String PIN_CODE = "123456";
     public static byte GROUP_TYPE = 0;
-    public static byte GROUP_TYPE_TEMP_PWD = 2;
+    public static final byte GROUP_TYPE_TEMP_PWD = 2;
     public static final byte GROUP_ADMIN = 0;
     public static final byte GROUP_HIJACK = 3;
-    public static int OP_TIMEOUT = 20000;
-    public static int OPEN_LOCK_FINGERPRINT = 1;
-    public static int OPEN_LOCK_PASSWORD = 2;
-    public static int OPEN_LOCK_CARD = 3;
+    public static final int OP_TIMEOUT = 20000;
+    public static final int OPEN_LOCK_FINGERPRINT = 1;
+    public static final int OPEN_LOCK_PASSWORD = 2;
+    public static final int OPEN_LOCK_CARD = 3;
+    public static final int CONNECT_FAILED_COUNT = 5;
 
+    public static int connectionFailedCount = 0;
+    public static boolean isScaning = false;
 
     public static void initBle(Application context) {
         BleManager.getInstance()
@@ -158,6 +164,7 @@ public class LockBLEManager {
             @Override
             public void onScanStarted(boolean success) {
                 callbck.onScanStarted();
+                isScaning = true;
             }
 
             @Override
@@ -173,6 +180,7 @@ public class LockBLEManager {
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
+                isScaning = false;
                 if (scanResultList.size() == 0) {
                     // 搜索完成未发现设备
                     callbck.onScanFailed();
@@ -194,6 +202,9 @@ public class LockBLEManager {
     }
 
     public static void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
+        if (++connectionFailedCount > CONNECT_FAILED_COUNT && isScaning) {
+            return;
+        }
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
             public void onStartConnect() {
@@ -202,6 +213,35 @@ public class LockBLEManager {
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
+                if (++connectionFailedCount > CONNECT_FAILED_COUNT) {
+                    // 连接失败多次 bleDevice 内部出现问题 重新搜索
+                    startScan(App.getApp(), new LockBLEScanCallbck() {
+                        @Override
+                        public void onScanStarted() {
+
+                        }
+
+                        @Override
+                        public void onScanning(BleDevice sbleDevice) {
+                            if (bleDevice.getMac().equals(sbleDevice.getMac())) {
+                                if (App.getApp().getConnectedDevices().get(sbleDevice.getMac()) != null) {
+                                    App.getApp().getConnectedDevices().remove(sbleDevice.getMac());
+                                }
+                                clear();
+                                connectionFailedCount = 0;
+                                EventBus.getDefault().post(bleDevice);
+                            }
+                        }
+
+                        @Override
+                        public void onScanSuccess(List<BleDevice> scanResultList) {
+                        }
+
+                        @Override
+                        public void onScanFailed() {
+                        }
+                    });
+                }
                 callbck.onConnectFailed();
             }
 

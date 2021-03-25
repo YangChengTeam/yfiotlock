@@ -436,31 +436,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startActivity(intent);
     }
 
-    // 进入开门方式管理
-    private void nav2bindwifi() {
-        Intent intent = new Intent(this, ConnectActivity.class);
-        intent.putExtra("bleDevice", bleDevice);
-        intent.putExtra("family", familyInfo);
-        intent.putExtra("isFromIndex", true);
-        startActivity(intent);
-    }
-
     // 进入访客管理
     private void nav2Vm() {
-        if (lockInfo.isOnline() || LockBLEManager.isBindWifi(lockInfo.getMacAddress())) {
-            VisitorManageActivity.start(this, lockInfo);
-        } else {
-            GeneralDialog generalDialog = new GeneralDialog(this);
-            generalDialog.setTitle("温馨提示");
-            generalDialog.setMsg("设备还未配网, 确定进入配网流程");
-            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                @Override
-                public void onClick(Dialog dialog) {
-                    nav2bindwifi();
-                }
-            });
-            generalDialog.show();
-        }
+        VisitorManageActivity.start(this, lockInfo);
     }
 
     // 进入日志管理
@@ -488,6 +466,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         setCountInfo();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBleDeviceChange(BleDevice bleDevice) {
+        this.bleDevice = bleDevice;
+    }
 
     // 开门方式数量
     private void loadLockOpenCountInfo() {

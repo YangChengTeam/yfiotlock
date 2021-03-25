@@ -70,8 +70,8 @@ public class LockBLESettingCmd {
         return setting(context, (byte) 0x06, key + origkey);
     }
 
-    // 1.7取消配网(0x07)
-    public static byte[] cancelWifi(Context context) {
+    // 1.7取消操作(0x07)
+    public static byte[] cancelOp(Context context) {
         return setting(context, (byte) 0x07, new String(new byte[]{((byte) 0x01)}));
     }
 

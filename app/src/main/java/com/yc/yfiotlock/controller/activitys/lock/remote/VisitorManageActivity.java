@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
@@ -11,7 +12,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
 import com.yc.yfiotlock.view.adapters.ItemAdapter;
@@ -19,7 +26,6 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +39,7 @@ public class VisitorManageActivity extends BaseActivity {
     RecyclerView recyclerView;
 
     private ItemAdapter itemAdapter;
-    private DeviceInfo deviceInfo;
+    private DeviceInfo lockInfo;
 
     public static void start(Context context, DeviceInfo deviceInfo) {
         Intent intent = new Intent(context, VisitorManageActivity.class);
@@ -49,10 +55,7 @@ public class VisitorManageActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        Serializable device = getIntent().getSerializableExtra("device");
-        if (device instanceof DeviceInfo) {
-            this.deviceInfo = (DeviceInfo) device;
-        }
+        lockInfo = LockIndexActivity.getInstance().getLockInfo();
     }
 
     @Override
@@ -74,15 +77,43 @@ public class VisitorManageActivity extends BaseActivity {
             public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
                 ItemInfo itemInfo = itemAdapter.getData().get(position);
                 switch (itemInfo.getId()) {
-                    case 1:
-                        OpenLockActivty.start(VisitorManageActivity.this, deviceInfo);
-                        break;
+                    case 1: {
+                        if (lockInfo.isOnline() || LockBLEManager.isBindWifi(lockInfo.getMacAddress())) {
+                            OpenLockActivty.start(VisitorManageActivity.this, lockInfo);
+                        } else {
+                            GeneralDialog generalDialog = new GeneralDialog(getContext());
+                            generalDialog.setTitle("温馨提示");
+                            generalDialog.setMsg("设备还未配网, 确定进入配网流程");
+                            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+                                @Override
+                                public void onClick(Dialog dialog) {
+                                    if (!LockBLEManager.isConnected(LockIndexActivity.getInstance().getBleDevice())) {
+                                        ToastCompat.show(getContext(), "蓝牙未连接");
+                                        return;
+                                    }
+                                    nav2bindwifi();
+                                }
+                            });
+                            generalDialog.show();
+                        }
+                    }
+                    break;
                     case 2:
-                        TempPasswordOpenLockActivity.start(VisitorManageActivity.this, deviceInfo);
+                        TempPasswordOpenLockActivity.start(VisitorManageActivity.this, lockInfo);
                         break;
                 }
             }
         });
+    }
+
+    // 进入开门方式管理
+    private void nav2bindwifi() {
+        Intent intent = new Intent(this, ConnectActivity.class);
+        intent.putExtra("bleDevice", LockIndexActivity.getInstance().getBleDevice());
+        intent.putExtra("device", lockInfo);
+        intent.putExtra("family", LockIndexActivity.getInstance().getFamilyInfo());
+        intent.putExtra("isFromIndex", true);
+        startActivity(intent);
     }
 
     private void loadData() {
