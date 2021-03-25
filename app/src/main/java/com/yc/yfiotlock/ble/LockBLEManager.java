@@ -160,6 +160,12 @@ public class LockBLEManager {
         // 设置搜索状态
         callbck.onScanStarted();
         // 开始搜索
+        List<BleDevice> bleDevices = BleManager.getInstance().getAllConnectedDevice();
+        if (bleDevices != null) {
+            for (BleDevice bleDevice : bleDevices) {
+                callbck.onScanning(bleDevice);
+            }
+        }
         BleManager.getInstance().scan(new BleScanCallback() {
             @Override
             public void onScanStarted(boolean success) {
@@ -235,6 +241,7 @@ public class LockBLEManager {
 
                         @Override
                         public void onScanSuccess(List<BleDevice> scanResultList) {
+
                         }
 
                         @Override
@@ -262,8 +269,8 @@ public class LockBLEManager {
     public static boolean isFoundDevice(@NonNull String mac) {
         IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
         List<String> macList = App.getApp().getMacList();
-        if(macList != null){
-            for(String tmac : macList){
+        if (macList != null) {
+            for (String tmac : macList) {
                 if (mac.equals(tmac)) {
                     return true;
                 }

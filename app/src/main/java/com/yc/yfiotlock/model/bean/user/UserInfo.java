@@ -87,6 +87,9 @@ public class UserInfo {
 
 
     public int getDeviceNumber() {
+        if (deviceNumber < 0) {
+            deviceNumber = 0;
+        }
         return deviceNumber;
     }
 

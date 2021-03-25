@@ -34,5 +34,7 @@
         android:paddingLeft="10dp"
         android:textSize="14dp"
         android:textColor="#222222"
+        android:maxLines="1"
+        android:imeOptions="actionDone"
         app:layout_constraintTop_toBottomOf="@id/view_nav_bar"></EditText>
 </androidx.constraintlayout.widget.ConstraintLayout>

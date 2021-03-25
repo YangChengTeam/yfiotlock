@@ -1,9 +1,12 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
@@ -61,7 +64,22 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
         });
 
         setInfo();
+
+        nameEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    if (nameEt.length() < 2) {
+                        ToastUtil.toast2(getContext(), "名称长度不能少于2位");
+                        return false;
+                    }
+                    cloudEdit();
+                }
+                return false;
+            }
+        });
     }
+
 
     private void setInfo() {
         nameEt.setText(openLockInfo.getName());

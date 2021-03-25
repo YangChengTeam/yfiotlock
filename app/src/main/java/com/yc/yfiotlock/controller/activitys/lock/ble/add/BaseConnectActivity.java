@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
@@ -21,6 +22,7 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import org.greenrobot.eventbus.EventBus;
@@ -162,7 +164,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         EventBus.getDefault().post(new IndexRefreshEvent());
 
         UserInfo userInfo = UserInfoCache.getUserInfo();
-        if (userInfo == null) {
+        if (userInfo != null) {
             userInfo.setDeviceNumber(userInfo.getDeviceNumber() + 1);
             UserInfoCache.setUserInfo(userInfo);
             EventBus.getDefault().post(userInfo);

@@ -120,10 +120,10 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     ToastCompat.show(getContext(), "删除成功");
                     App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
                     App.getApp().getMacList().remove(lockInfo.getMacAddress());
-                    EventBus.getDefault().post(new IndexRefreshEvent());
                     SafeUtils.setSafePwdType(lockInfo, 0);
+                    EventBus.getDefault().post(new IndexRefreshEvent());
                     UserInfo userInfo = UserInfoCache.getUserInfo();
-                    if (userInfo == null) {
+                    if (userInfo != null) {
                         userInfo.setDeviceNumber(userInfo.getDeviceNumber() - 1);
                         UserInfoCache.setUserInfo(userInfo);
                         EventBus.getDefault().post(userInfo);

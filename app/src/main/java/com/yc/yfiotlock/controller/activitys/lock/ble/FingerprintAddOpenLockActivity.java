@@ -32,6 +32,13 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!lockBleSend.isOpOver()) {
+            blecancelDialog();
+        }
+    }
+
     private void bleAddFingerprint() {
         byte[] bytes = LockBLEOpCmd.addFingerprint(this, LockBLEManager.GROUP_TYPE, number);
         lockBleSend.send(mcmd, scmd, bytes);
