@@ -82,7 +82,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onPageSelected(int position) {
-                onSelected(position);
+                setItem(position);
             }
 
             @Override
@@ -94,6 +94,9 @@ public class MainActivity extends BaseActivity {
 
 
     private void onSelected(@IntRange(from = 0) int index) {
+        if (index == mVpIndex.getCurrentItem()) {
+            return;
+        }
         setItem(index);
         mVpIndex.setCurrentItem(index, false);
     }
@@ -110,9 +113,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setItem(int index) {
-        if (mVpIndex.getCurrentItem() == index) {
-            return;
-        }
+
         resetItem();
         switch (index) {
             case 0:
