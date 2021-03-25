@@ -14,7 +14,8 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.AboutUsActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.controller.activitys.user.SuggestActivity;
-import com.yc.yfiotlock.controller.fragments.BaseFragment;
+import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.user.PersonalInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
@@ -84,7 +85,15 @@ public class MyFragment extends BaseFragment {
                 .circleCrop()
                 .into(mIvFace);
         mTvUserName.setText(userInfo.getNickName());
-        mTvDeviceNumber.setText(userInfo.getDeviceNumber().concat("个智能设备"));
+        mTvDeviceNumber.setText(userInfo.getDeviceNumber() + "个智能设备");
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(UserInfo userInfo) {
+        if (userInfo != null) {
+            mTvDeviceNumber.setText(userInfo.getDeviceNumber() + "个智能设备");
+        }
     }
 
     private void setRvMy() {

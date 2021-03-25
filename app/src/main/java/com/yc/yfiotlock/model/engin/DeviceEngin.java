@@ -16,6 +16,7 @@ import com.yc.yfiotlock.model.bean.lock.TimeInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
@@ -63,7 +64,7 @@ public class DeviceEngin extends BaseEngin {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", id);
-        if(!TextUtils.isEmpty(aliDevname)){
+        if (!TextUtils.isEmpty(aliDevname)) {
             map.put("device_id", aliDevname);
 
         }
@@ -107,6 +108,16 @@ public class DeviceEngin extends BaseEngin {
         }
         return new HttpCoreEngin<ResultInfo<TimeInfo>>(getContext()).rxpost(Config.DEVICE_TIME_URL,
                 new TypeReference<ResultInfo<TimeInfo>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    public Observable<ResultInfo<List<String>>> getMacList() {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        return new HttpCoreEngin<ResultInfo<List<String>>>(getContext()).rxpost(Config.DEVICE_LIST_URL,
+                new TypeReference<ResultInfo<List<String>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }

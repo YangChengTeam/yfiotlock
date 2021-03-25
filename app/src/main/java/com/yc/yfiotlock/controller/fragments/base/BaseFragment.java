@@ -1,4 +1,4 @@
-package com.yc.yfiotlock.controller.fragments;
+package com.yc.yfiotlock.controller.fragments.base;
 
 import android.app.Activity;
 import android.content.Intent;

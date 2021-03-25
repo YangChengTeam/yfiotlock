@@ -27,9 +27,9 @@ public class LockBLESettingCmd {
     // 1.2WIFI配网(0x02)
     public static byte[] wiftDistributionNetwork(Context context, String ssid, String pwd) {
         final byte[] ssidBuffer = new byte[32];
-        System.arraycopy(ssid.getBytes(), 0, ssidBuffer, 0, ssid.length());
+        System.arraycopy(ssid.getBytes(), 0, ssidBuffer, 0, ssid.getBytes().length);
         final byte[] pwdBuffer = new byte[24];
-        System.arraycopy(pwd.getBytes(), 0, pwdBuffer, 0, pwd.length());
+        System.arraycopy(pwd.getBytes(), 0, pwdBuffer, 0, pwd.getBytes().length);
 
         ByteBuffer bodyBuffer = ByteBuffer.allocate(ssidBuffer.length + pwdBuffer.length).order(ByteOrder.LITTLE_ENDIAN);
         byte[] bytes = bodyBuffer.put(ssidBuffer).put(pwdBuffer).array();

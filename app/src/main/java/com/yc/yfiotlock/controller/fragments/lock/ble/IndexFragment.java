@@ -11,22 +11,18 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.LockSettingActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.SafePwdCreateActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.add.ScanDeviceActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyActivity;
-import com.yc.yfiotlock.controller.fragments.BaseFragment;
-import com.yc.yfiotlock.libs.fingerprintcompat.FingerManager;
+import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
@@ -41,7 +37,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import rx.Subscriber;
@@ -59,6 +54,7 @@ public class IndexFragment extends BaseFragment {
 
     private IndexDeviceAdapter indexDeviceAdapter;
     private IndexEngin indexEngin;
+
 
     private FamilyInfo familyInfo;
     private DeviceInfo mDeviceInfo;

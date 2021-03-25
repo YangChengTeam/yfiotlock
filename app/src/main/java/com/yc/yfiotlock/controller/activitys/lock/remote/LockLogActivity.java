@@ -10,7 +10,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
-import com.yc.yfiotlock.controller.fragments.BaseFragment;
+import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.remote.AlarmsFragment;
 import com.yc.yfiotlock.controller.fragments.lock.remote.LogFragment;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;

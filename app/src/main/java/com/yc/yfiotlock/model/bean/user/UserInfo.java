@@ -21,7 +21,7 @@ public class UserInfo {
      * 智能设备的数量
      */
     @JSONField(name = "locker_number")
-    private String deviceNumber;
+    private int deviceNumber;
 
     public String getSign() {
         return sign;
@@ -86,11 +86,11 @@ public class UserInfo {
     }
 
 
-    public String getDeviceNumber() {
-        return deviceNumber == null ? "0" : deviceNumber;
+    public int getDeviceNumber() {
+        return deviceNumber;
     }
 
-    public void setDeviceNumber(String deviceNumber) {
+    public void setDeviceNumber(int deviceNumber) {
         this.deviceNumber = deviceNumber;
     }
 

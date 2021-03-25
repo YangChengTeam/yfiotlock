@@ -20,10 +20,12 @@ import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.SafeUtils;
+import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.SettingSoundView;
 
@@ -117,8 +119,15 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 if (info != null && info.getCode() == 1) {
                     ToastCompat.show(getContext(), "删除成功");
                     App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
+                    App.getApp().getMacList().remove(lockInfo.getMacAddress());
                     EventBus.getDefault().post(new IndexRefreshEvent());
                     SafeUtils.setSafePwdType(lockInfo, 0);
+                    UserInfo userInfo = UserInfoCache.getUserInfo();
+                    if (userInfo == null) {
+                        userInfo.setDeviceNumber(userInfo.getDeviceNumber() - 1);
+                        UserInfoCache.setUserInfo(userInfo);
+                        EventBus.getDefault().post(userInfo);
+                    }
                     blereset();
                 } else {
                     ToastCompat.show(getContext(), "删除失败");
@@ -205,8 +214,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
-
-
     }
 
     @Override

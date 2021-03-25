@@ -93,6 +93,7 @@ public class LockBLESend {
         if (!isSend) {
             Log.d(TAG, "正在发送");
             isSend = true;
+            isOpOver = false;
             if (iswakeup) {
                 wakeup();
             } else {
@@ -119,7 +120,6 @@ public class LockBLESend {
                 if (!isOpOver && retryCount <= 0) {
                     notifyErrorResponse("no response");
                 }
-                isOpOver = false;
                 retryCount = 3;
             }
         });
@@ -309,6 +309,8 @@ public class LockBLESend {
                     Log.d(TAG, "唤醒成功,发送真正指令");
                     op(cmdBytes);
                 }
+            } else if (lockBLEData.getStatus() == (byte) 0x05) {
+                // 密钥不对 设备重新初始化
             }
         } else if (lockBLEData.getMcmd() == (byte) 0x08 && lockBLEData.getScmd() == (byte) 0x01) {
             if (notifyCallback != null) {
