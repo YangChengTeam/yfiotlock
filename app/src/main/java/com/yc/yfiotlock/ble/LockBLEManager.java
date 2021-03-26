@@ -11,15 +11,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.kk.securityhttp.utils.LogUtil;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.App;
-import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
-import com.yc.yfiotlock.demo.comm.ObserverManager;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleGattCallback;
@@ -48,7 +44,7 @@ public class LockBLEManager {
     public static final int OPEN_LOCK_FINGERPRINT = 1;
     public static final int OPEN_LOCK_PASSWORD = 2;
     public static final int OPEN_LOCK_CARD = 3;
-    public static final int CONNECT_FAILED_COUNT = 5;
+    public static final int FAILED_COUNT = 3;
 
     public static int connectionFailedCount = 0;
     public static boolean isScaning = false;
@@ -181,6 +177,7 @@ public class LockBLEManager {
 
             @Override
             public void onScanning(BleDevice bleDevice) {
+                if(bleDevice == null) return;
                 callbck.onScanning(bleDevice);
             }
 
@@ -208,7 +205,7 @@ public class LockBLEManager {
     }
 
     public static void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
-        if (++connectionFailedCount > CONNECT_FAILED_COUNT && isScaning) {
+        if (++connectionFailedCount > FAILED_COUNT && isScaning) {
             return;
         }
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
@@ -219,7 +216,7 @@ public class LockBLEManager {
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                if (++connectionFailedCount > CONNECT_FAILED_COUNT) {
+                if (++connectionFailedCount > FAILED_COUNT) {
                     // 连接失败多次 bleDevice 内部出现问题 重新搜索
                     startScan(App.getApp(), new LockBLEScanCallbck() {
                         @Override
@@ -229,7 +226,7 @@ public class LockBLEManager {
 
                         @Override
                         public void onScanning(BleDevice sbleDevice) {
-                            if (bleDevice.getMac().equals(sbleDevice.getMac())) {
+                            if (bleDevice != null && bleDevice.getMac().equals(sbleDevice.getMac())) {
                                 if (App.getApp().getConnectedDevices().get(sbleDevice.getMac()) != null) {
                                     App.getApp().getConnectedDevices().remove(sbleDevice.getMac());
                                 }

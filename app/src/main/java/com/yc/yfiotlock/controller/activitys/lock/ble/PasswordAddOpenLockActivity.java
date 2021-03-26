@@ -119,6 +119,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
         intent.putExtra("next", true);
         intent.putExtra("password", passEt.getText().toString());
         startActivity(intent);
+        finish();
     }
 
     private void bleAddPwd() {

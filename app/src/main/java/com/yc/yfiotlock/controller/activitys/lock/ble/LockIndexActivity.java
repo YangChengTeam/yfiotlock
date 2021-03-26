@@ -20,6 +20,7 @@ import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
@@ -428,7 +429,15 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         });
     }
 
-    // 重新逻辑
+    // 测试密钥
+    private void test() {
+        if (lockBleSend != null) {
+            byte[] cmdBytes = LockBLESettingCmd.reset(getContext());
+            lockBleSend.send((byte) 0x01, (byte) 0x01, cmdBytes, false);
+        }
+    }
+
+    // 重连逻辑
     private GeneralDialog reConnectDialog;
 
     private void reconnect() {

@@ -36,15 +36,21 @@ public class LockBLESend {
     private byte scmd = 0x00;
     private byte[] cmdBytes;
 
-    private boolean waupStatus = false;
-    private boolean isSend = false;
-    private boolean isOpOver = false;
-    private int retryCount = 3;
+    private boolean waupStatus = false;  // 唤醒状态
+    private boolean isSend = false;      // 是否发送中
+    private boolean isOpOver = false;    // 实际操作是否完成
+    private int retryCount = 3;          // 重试次数
+    private int noResponseCount = 0;     // 超时次数
+    private boolean isReInit = false;    // 是否已被初始化
 
     public LockBLESend(Context context, BleDevice bleDevice) {
         this.context = context;
         this.bleDevice = bleDevice;
         loadingDialog = new LoadingDialog(context);
+    }
+
+    public void setBleDevice(BleDevice bleDevice) {
+        this.bleDevice = bleDevice;
     }
 
     public boolean isOpOver() {
@@ -53,6 +59,10 @@ public class LockBLESend {
 
     public void setOpOver(boolean opOver) {
         isOpOver = opOver;
+    }
+
+    public boolean isReInit() {
+        return isReInit;
     }
 
     public boolean isConnected() {
@@ -94,6 +104,7 @@ public class LockBLESend {
             Log.d(TAG, "正在发送");
             isSend = true;
             isOpOver = false;
+            noResponseCount = 0;
             if (iswakeup) {
                 wakeup();
             } else {
@@ -104,10 +115,18 @@ public class LockBLESend {
         }
     }
 
+
     public void realSend() {
         if (retryCount <= 0) {
             if (!isOpOver) {
+                if (noResponseCount >= LockBLEManager.FAILED_COUNT) {  //超时三次 重新连接
+                    clear();
+                    connect();
+                    noResponseCount = 0;
+                    return;
+                }
                 notifyErrorResponse("no response");
+                noResponseCount++;
             }
             return;
         }
@@ -150,6 +169,7 @@ public class LockBLESend {
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
+                LockBLESend.this.bleDevice = bleDevice;
                 LockBLEManager.setMtu(bleDevice);
                 if (CommonUtil.isActivityDestory(context)) {
                     return;
@@ -311,6 +331,7 @@ public class LockBLESend {
                 }
             } else if (lockBLEData.getStatus() == (byte) 0x05) {
                 // 密钥不对 设备重新初始化
+                isReInit = true;
             }
         } else if (lockBLEData.getMcmd() == (byte) 0x08 && lockBLEData.getScmd() == (byte) 0x01) {
             if (notifyCallback != null) {
