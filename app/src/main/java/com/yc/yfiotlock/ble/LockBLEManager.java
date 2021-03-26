@@ -229,6 +229,9 @@ public class LockBLEManager {
 
                         @Override
                         public void onScanning(BleDevice sbleDevice) {
+                            if (sbleDevice == null || bleDevice == null) {
+                                return;
+                            }
                             if (bleDevice.getMac().equals(sbleDevice.getMac())) {
                                 if (App.getApp().getConnectedDevices().get(sbleDevice.getMac()) != null) {
                                     App.getApp().getConnectedDevices().remove(sbleDevice.getMac());
