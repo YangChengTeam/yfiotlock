@@ -206,7 +206,7 @@ public class LoginActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (mLoginEngin != null) {
-            mLoginEngin.cancel();
+            mLoginEngin.cancelAll();
         }
     }
 }

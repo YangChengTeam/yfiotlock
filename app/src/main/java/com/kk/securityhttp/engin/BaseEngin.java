@@ -53,6 +53,19 @@ public abstract class BaseEngin<T> {
         OKHttpRequest.getImpl().cancel(url);
     }
 
+    /**
+     * 调用这个方法必须重写{@link #getUrls()}
+     */
+    public void cancelAll() {
+        String[] url = getUrls();
+        if (url.length == 0) {
+            throw new IllegalStateException("method getUrls() has not been override or urls.length = 0");
+        }
+        for (String s : url) {
+            cancel(s);
+        }
+    }
+
     //< 同步请求get 1
     private T get(Type type, Map<String, String> params, Map<String, String> headers, boolean isEncryptResponse) {
         T resultInfo = null;
@@ -102,7 +115,7 @@ public abstract class BaseEngin<T> {
         T resultInfo = null;
         try {
             Response response = OKHttpRequest.getImpl().post(getUrl() + "&key=" + key, params, headers, isrsa, iszip, isEncryptResponse);
-           // Log.i("securityhttp", "response body:--------> " + response.body);
+            // Log.i("securityhttp", "response body:--------> " + response.body);
             resultInfo = getResultInfo(response.body, type);
         } catch (Exception e) {
             Log.i("securityhttp", "Exception: " + e.getMessage());
@@ -275,5 +288,9 @@ public abstract class BaseEngin<T> {
     }
 
     public abstract String getUrl();
+
+    public String[] getUrls() {
+        return new String[0];
+    }
 
 }

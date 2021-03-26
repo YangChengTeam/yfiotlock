@@ -25,6 +25,11 @@ public class LoginEngin extends BaseEngin {
         return null;
     }
 
+    @Override
+    public String[] getUrls() {
+        return new String[]{Config.ALI_FAST_LOGIN, Config.LOGIN_SEND_CODE_URL, Config.SMS_CODE_LOGIN_URL};
+    }
+
     public Observable<ResultInfo<UserInfo>> aliFastLogin(String token) {
         Map<String, String> map = new HashMap<>();
         map.put("token", token);

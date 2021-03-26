@@ -28,6 +28,14 @@ public class UserEngine extends BaseEngin {
         return null;
     }
 
+    @Override
+    public String[] getUrls() {
+        return new String[]{
+                Config.USER_NAME_UPD_URL,
+                Config.USER_FACE_UPD_URL
+        };
+    }
+
     public Observable<ResultInfo<String>> changeNickName(String name) {
         Map<String, String> map = new HashMap<>();
         map.put("nickname", name);

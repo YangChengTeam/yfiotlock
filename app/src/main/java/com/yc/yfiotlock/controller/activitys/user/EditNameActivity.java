@@ -103,7 +103,7 @@ public class EditNameActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (mUserEngine != null) {
-            mUserEngine.cancel();
+            mUserEngine.cancelAll();
         }
     }
 }
