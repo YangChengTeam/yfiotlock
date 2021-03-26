@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.baidu.platform.comapi.map.MapObj;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.contains.HttpConfig;
 import com.kk.securityhttp.net.entry.Response;
@@ -13,10 +14,10 @@ import com.kk.securityhttp.net.impls.OKHttpRequest;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
 
-
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -49,6 +50,12 @@ public abstract class BaseEngin<T> {
     public void cancel() {
         OKHttpRequest.getImpl().cancel(getUrl() + "&key=" + key);
     }
+
+    public void cancel(String url) {
+        OKHttpRequest.getImpl().cancel(url);
+    }
+
+
 
     //< 同步请求get 1
     private T get(Type type, Map<String, String> params, Map<String, String> headers, boolean isEncryptResponse) {
@@ -99,7 +106,7 @@ public abstract class BaseEngin<T> {
         T resultInfo = null;
         try {
             Response response = OKHttpRequest.getImpl().post(getUrl() + "&key=" + key, params, headers, isrsa, iszip, isEncryptResponse);
-           // Log.i("securityhttp", "response body:--------> " + response.body);
+            // Log.i("securityhttp", "response body:--------> " + response.body);
             resultInfo = getResultInfo(response.body, type);
         } catch (Exception e) {
             Log.i("securityhttp", "Exception: " + e.getMessage());
@@ -272,5 +279,6 @@ public abstract class BaseEngin<T> {
     }
 
     public abstract String getUrl();
+
 
 }

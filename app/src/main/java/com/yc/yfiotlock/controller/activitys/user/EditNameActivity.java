@@ -98,4 +98,12 @@ public class EditNameActivity extends BaseActivity {
             }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mUserEngine != null) {
+            mUserEngine.cancelAll();
+        }
+    }
 }
