@@ -536,7 +536,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
             isOpening = false;
-            setConnectedInfo();
+            if (LockBLEManager.isConnected(bleDevice)) {
+                setConnectedInfo();
+            }
         }
     }
 }
