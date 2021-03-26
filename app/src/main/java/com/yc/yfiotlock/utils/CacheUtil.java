@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.utils.LogUtil;
 import com.tencent.mmkv.MMKV;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 
 import java.lang.reflect.Type;
 
@@ -13,13 +14,23 @@ import java.lang.reflect.Type;
  */
 public class CacheUtil {
     public static void setCache(String key, Object object) {
+        String uid = "";
+        UserInfo userInfo = UserInfoCache.getUserInfo();
+        if (userInfo != null) {
+            uid = userInfo.getId();
+        }
         int sv = GoagalInfo.get().getPackageInfo().versionCode;
-        MMKV.defaultMMKV().putString(key + sv, JSON.toJSONString(object));
+        MMKV.defaultMMKV().putString(uid + key + sv, JSON.toJSONString(object));
     }
 
     public static <T> T getCache(String key, Type type) {
+        String uid = "";
+        UserInfo userInfo = UserInfoCache.getUserInfo();
+        if (userInfo != null) {
+            uid = userInfo.getId();
+        }
         int sv = GoagalInfo.get().getPackageInfo().versionCode;
-        String jsonStr = MMKV.defaultMMKV().getString(key + sv, "");
+        String jsonStr = MMKV.defaultMMKV().getString(uid + key + sv, "");
         try {
             return getResultInfo(jsonStr, type);
         } catch (Exception e) {

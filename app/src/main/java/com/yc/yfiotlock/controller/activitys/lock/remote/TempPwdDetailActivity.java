@@ -2,7 +2,6 @@ package com.yc.yfiotlock.controller.activitys.lock.remote;
 
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
@@ -19,12 +18,11 @@ import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.BaseDetailOpenLockActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.PasswordModifyOpenLockActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
-import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.adapters.ItemAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -32,7 +30,6 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -51,13 +48,7 @@ public class TempPwdDetailActivity extends BaseActivity {
 
     private ItemAdapter itemAdapter;
     private LockEngine lockEngine;
-    private PassWordInfo passWordInfo;
-
-    public static void start(Context context, PassWordInfo passWordInfo) {
-        Intent intent = new Intent(context, TempPwdDetailActivity.class);
-        intent.putExtra("password_info", passWordInfo);
-        context.startActivity(intent);
-    }
+    private PasswordInfo passWordInfo;
 
     @Override
     protected int getLayoutId() {
@@ -69,7 +60,7 @@ public class TempPwdDetailActivity extends BaseActivity {
         super.initVars();
 
         lockEngine = new LockEngine(this);
-        passWordInfo = (PassWordInfo) getIntent().getSerializableExtra("password_info");
+        passWordInfo = (PasswordInfo) getIntent().getSerializableExtra("password_info");
     }
 
     @Override

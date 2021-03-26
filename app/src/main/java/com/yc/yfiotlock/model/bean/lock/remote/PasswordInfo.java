@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
 
-public class PassWordInfo implements Serializable {
+public class PasswordInfo implements Serializable {
     private int id;
     private String name;
     @JSONField(name = "temporary_pwd_status")

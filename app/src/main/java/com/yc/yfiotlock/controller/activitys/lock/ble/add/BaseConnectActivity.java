@@ -187,6 +187,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
+                    mLoadingDialog.show("添加设备中...");
                     cloudAddDevice();
                 }
             });

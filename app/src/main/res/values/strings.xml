@@ -124,6 +124,7 @@
     <string name="device_connect_fail">设备连接失败</string>
     <string name="please_reset_work_wifi">请重新设置工作WiFi</string>
     <string name="delete_device">删除设备</string>
+    <string name="temp">临时密码</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>

@@ -32,9 +32,14 @@ public class SettingSoundView extends BaseView {
     CardView mCvHigh;
 
     private int volume = 3;
+    private String deviceMac = "";
+
+    public void setDeviceMac(String deviceMac) {
+        this.deviceMac = deviceMac;
+    }
 
     public void setVolume(int volume) {
-        MMKV.defaultMMKV().putInt("volume", volume);
+        MMKV.defaultMMKV().putInt(deviceMac + "volume", volume);
         this.volume = volume;
     }
 
@@ -58,7 +63,7 @@ public class SettingSoundView extends BaseView {
     @Override
     protected void initViews(Context context) {
         super.initViews(context);
-        volume = MMKV.defaultMMKV().getInt("volume", 3);
+        volume = MMKV.defaultMMKV().getInt(deviceMac + "volume", 3);
         onSelect(volume);
     }
 

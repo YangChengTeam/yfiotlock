@@ -454,12 +454,14 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     // 进入访客管理
     private void nav2Vm() {
-        VisitorManageActivity.start(this, lockInfo);
+        Intent intent = new Intent(getContext(), VisitorManageActivity.class);
+        startActivity(intent);
     }
 
     // 进入日志管理
     private void nav2Log() {
-        LockLogActivity.start(this, lockInfo);
+        Intent intent = new Intent(getContext(), LockLogActivity.class);
+        startActivity(intent);
     }
 
     // 进入设置

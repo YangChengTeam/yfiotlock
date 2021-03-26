@@ -2,9 +2,6 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.hardware.biometrics.BiometricPrompt;
-import android.os.Bundle;
-import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -13,18 +10,14 @@ import androidx.annotation.Nullable;
 
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
-import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.utils.CacheUtil;
-import com.yc.yfiotlock.utils.SafeUtils;
+import com.yc.yfiotlock.utils.SafeUtil;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment.CHECK_PWD;
 
@@ -61,16 +54,16 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
     private void setSwitch() {
         mSafePwd.setOnCheckedChangeListener(this);
         mFingerprintUnlock.setOnCheckedChangeListener(this);
-        switch (SafeUtils.getSafePwdType(mDeviceInfo)) {
-            case SafeUtils.NO_PASSWORD:
+        switch (SafeUtil.getSafePwdType(mDeviceInfo)) {
+            case SafeUtil.NO_PASSWORD:
                 mSafePwd.setChecked(false);
                 mFingerprintUnlock.setChecked(false);
                 break;
-            case SafeUtils.PASSWORD_TYPE:
+            case SafeUtil.PASSWORD_TYPE:
                 mSafePwd.setChecked(true);
                 mFingerprintUnlock.setChecked(false);
                 break;
-            case SafeUtils.FINGERPRINT_TYPE:
+            case SafeUtil.FINGERPRINT_TYPE:
                 mSafePwd.setChecked(false);
                 mFingerprintUnlock.setChecked(true);
                 break;
@@ -88,25 +81,25 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
         if (requestCode == REQUEST_PWD_CODE) {
             if (resultCode == RESULT_OK && data != null) {
                 String pwd = data.getStringExtra("pwd");
-                SafeUtils.setSafePwd(mDeviceInfo, pwd);
+                SafeUtil.setSafePwd(mDeviceInfo, pwd);
                 ToastCompat.show(getContext(), "新密码设置成功");
             }
         }
         //检验密码的回调
         if (requestCode == CHECK_PWD) {
             if (resultCode == RESULT_OK && data != null
-                    && SafeUtils.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
+                    && SafeUtil.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
                 mSafePwd.setChecked(true);
-                setSaveType(SafeUtils.PASSWORD_TYPE);
+                setSaveType(SafeUtil.PASSWORD_TYPE);
             } else {
                 ToastCompat.show(getContext(), "密码错误");
             }
         }
         if (OPEN_WITH_NO_PWD_BEFORE == requestCode) {
             if (resultCode == RESULT_OK && data != null) {
-                SafeUtils.setSafePwd(mDeviceInfo, data.getStringExtra("pwd"));
+                SafeUtil.setSafePwd(mDeviceInfo, data.getStringExtra("pwd"));
                 mSafePwd.setChecked(true);
-                setSaveType(SafeUtils.PASSWORD_TYPE);
+                setSaveType(SafeUtil.PASSWORD_TYPE);
             }
         }
     }
@@ -131,7 +124,7 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
             //密码
             case R.id.s_safe_pwd:
                 if (isChecked) {
-                    if (SafeUtils.DEFAULT.equals(SafeUtils.getSafePwd(mDeviceInfo))) {
+                    if (SafeUtil.DEFAULT.equals(SafeUtil.getSafePwd(mDeviceInfo))) {
                         startActivityForResult(new Intent(this, SafePwdCreateActivity.class),
                                 OPEN_WITH_NO_PWD_BEFORE);
                         return;
@@ -144,7 +137,7 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
         }
         //都没有开就是无密方式
         if (!mFingerprintUnlock.isChecked() && !mSafePwd.isChecked()) {
-            SafeUtils.setSafePwdType(mDeviceInfo, SafeUtils.NO_PASSWORD);
+            SafeUtil.setSafePwdType(mDeviceInfo, SafeUtil.NO_PASSWORD);
         }
     }
 
@@ -155,11 +148,11 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
 
 
     private void checkFinger() {
-        SafeUtils.useFinger(this, new Callback<String>() {
+        SafeUtil.useFinger(this, new Callback<String>() {
             @Override
             public void onSuccess(String resultInfo) {
                 mFingerprintUnlock.setChecked(true);
-                setSaveType(SafeUtils.FINGERPRINT_TYPE);
+                setSaveType(SafeUtil.FINGERPRINT_TYPE);
             }
 
             @Override
@@ -172,14 +165,14 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
 
     private void setSaveType(@IntRange(from = 1, to = 2) int type) {
         //切换为密码验证 设置指纹开关为关闭
-        if (type == SafeUtils.PASSWORD_TYPE) {
-            SafeUtils.setSafePwdType(mDeviceInfo, SafeUtils.PASSWORD_TYPE);
+        if (type == SafeUtil.PASSWORD_TYPE) {
+            SafeUtil.setSafePwdType(mDeviceInfo, SafeUtil.PASSWORD_TYPE);
             if (mFingerprintUnlock.isChecked()) {
                 mFingerprintUnlock.setChecked(false);
             }
         } else {
             //切换为指纹验证 设置密码开关为关闭
-            SafeUtils.setSafePwdType(mDeviceInfo, SafeUtils.FINGERPRINT_TYPE);
+            SafeUtil.setSafePwdType(mDeviceInfo, SafeUtil.FINGERPRINT_TYPE);
             if (mSafePwd.isChecked()) {
                 mSafePwd.setChecked(false);
             }

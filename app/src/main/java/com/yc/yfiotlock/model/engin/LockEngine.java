@@ -12,7 +12,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
-import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
@@ -144,7 +144,7 @@ public class LockEngine extends BaseEngin {
     }
 
     // 临时密码列表
-    public Observable<ResultInfo<List<PassWordInfo>>> temporaryPwdList(String lockerId, int page, int pageSize) {
+    public Observable<ResultInfo<List<PasswordInfo>>> temporaryPwdList(String lockerId, int page, int pageSize) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
@@ -152,8 +152,8 @@ public class LockEngine extends BaseEngin {
         map.put("locker_id", lockerId);
         map.put("page", String.valueOf(page));
         map.put("page_size", String.valueOf(pageSize));
-        return new HttpCoreEngin<ResultInfo<List<PassWordInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_TEMPORARY_PWD_LIST_URL,
-                new TypeReference<ResultInfo<List<PassWordInfo>>>() {
+        return new HttpCoreEngin<ResultInfo<List<PasswordInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_TEMPORARY_PWD_LIST_URL,
+                new TypeReference<ResultInfo<List<PasswordInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }

@@ -8,7 +8,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
@@ -16,9 +15,8 @@ import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.demo.OperationActivity;
-import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import java.io.Serializable;
@@ -26,10 +24,8 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 
-public class CreatPwdSuccessActivity extends BaseActivity {
+public class CreatPwdSuccessActivity extends BaseBackActivity {
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.ll_creat_success_number)
     LinearLayout llPwds;
     @BindView(R.id.tv_creat_success_copy)
@@ -39,7 +35,7 @@ public class CreatPwdSuccessActivity extends BaseActivity {
     @BindView(R.id.stv_btn_finish)
     SuperTextView stvFinish;
 
-    public static void start(Context context, PassWordInfo passWordInfo) {
+    public static void start(Context context, PasswordInfo passWordInfo) {
         Intent intent = new Intent(context, CreatPwdSuccessActivity.class);
         intent.putExtra("password_info", passWordInfo);
         context.startActivity(intent);
@@ -52,16 +48,13 @@ public class CreatPwdSuccessActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> onBackPressed());
-
-
         Serializable passwordInfo = getIntent().getSerializableExtra("password_info");
-        if (!(passwordInfo instanceof PassWordInfo)) {
+        if (!(passwordInfo instanceof PasswordInfo)) {
             ToastUtil.toast2(this, "创建密码失败");
             finish();
             return;
         }
-        String pwd = ((PassWordInfo) passwordInfo).getPwd().trim();
+        String pwd = ((PasswordInfo) passwordInfo).getPwd().trim();
         if (TextUtils.isEmpty(pwd) || pwd.length() != 6) {
             ToastUtil.toast2(this, "创建密码失败");
             finish();

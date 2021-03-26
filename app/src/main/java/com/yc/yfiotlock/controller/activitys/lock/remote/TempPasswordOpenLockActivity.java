@@ -1,6 +1,5 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
-import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
@@ -12,16 +11,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.coorchice.library.SuperTextView;
-import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
-import com.yc.yfiotlock.model.bean.lock.remote.WarnInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.adapters.TempPwdAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -33,9 +30,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import rx.Subscriber;
@@ -57,12 +52,6 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
     private int pageSize = 10;
 
 
-    public static void start(Context context, DeviceInfo deviceInfo) {
-        Intent intent = new Intent(context, TempPasswordOpenLockActivity.class);
-        intent.putExtra("device", deviceInfo);
-        context.startActivity(intent);
-    }
-
     @Override
     protected int getLayoutId() {
         return R.layout.activity_temp_password_open_lock;
@@ -71,21 +60,14 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
-
         lockEngine = new LockEngine(this);
     }
 
     @Override
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
-        initRv();
+        setRv();
 
-        RxView.clicks(stvAdd).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            Serializable device = getIntent().getSerializableExtra("device");
-            if (device instanceof DeviceInfo) {
-                CreatPwdActivity.start(TempPasswordOpenLockActivity.this, (DeviceInfo) device);
-            }
-        });
 
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setOnRefreshListener(() -> {
@@ -97,7 +79,15 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
         loadData();
     }
 
-    private void initRv() {
+    @Override
+    protected void bindClick() {
+        super.bindClick();
+        setClick(R.id.stv_add, () -> {
+            nav2add();
+        });
+    }
+
+    private void setRv() {
         tempPwdAdapter = new TempPwdAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(tempPwdAdapter);
@@ -105,7 +95,7 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
         tempPwdAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-                TempPwdDetailActivity.start(TempPasswordOpenLockActivity.this, tempPwdAdapter.getItem(position));
+                nav2detail(tempPwdAdapter.getItem(position));
             }
         });
 
@@ -115,13 +105,20 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
         });
     }
 
+    private void nav2detail(PasswordInfo passwordInfo) {
+        Intent intent = new Intent(getContext(), TempPwdDetailActivity.class);
+        intent.putExtra("password_info", passwordInfo);
+        startActivity(intent);
+    }
+
+    private void nav2add() {
+        Intent intent = new Intent(this, CreatPwdActivity.class);
+        startActivity(intent);
+    }
+
     private void loadData() {
-        Serializable device = getIntent().getSerializableExtra("device");
-        if (!(device instanceof DeviceInfo)) {
-            ToastUtil.toast2(TempPasswordOpenLockActivity.this, "未连接设备");
-            return;
-        }
-        lockEngine.temporaryPwdList(((DeviceInfo) device).getId(), page, pageSize).subscribe(new Subscriber<ResultInfo<List<PassWordInfo>>>() {
+        DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        lockEngine.temporaryPwdList(lockInfo.getId(), page, pageSize).subscribe(new Subscriber<ResultInfo<List<PasswordInfo>>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);
@@ -130,53 +127,60 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
             @Override
             public void onError(Throwable e) {
                 mSrlRefresh.setRefreshing(false);
-                loadDataFail();
+                fail();
             }
 
             @Override
-            public void onNext(ResultInfo<List<PassWordInfo>> listResultInfo) {
+            public void onNext(ResultInfo<List<PasswordInfo>> listResultInfo) {
                 if (listResultInfo != null && listResultInfo.getCode() == 1) {
                     if (listResultInfo.getData() != null && listResultInfo.getData().size() != 0) {
-                        List<PassWordInfo> items = listResultInfo.getData();
-                        if (page == 1) {
-                            tempPwdAdapter.setNewInstance(items);
-                        } else {
-                            tempPwdAdapter.addData(items);
-                        }
-
-                        if (items.size() < pageSize) {
-                            tempPwdAdapter.getLoadMoreModule().loadMoreEnd();
-                        } else {
-                            tempPwdAdapter.getLoadMoreModule().loadMoreComplete();
-                        }
+                        success(listResultInfo.getData());
                     } else {
-                        loadDataEmpty();
+                        empty();
                     }
                 } else {
-                    loadDataFail();
-                }
-            }
-
-            private void loadDataEmpty() {
-                if (page == 1) {
-                    tempPwdAdapter.setNewInstance(null);
-                    tempPwdAdapter.setEmptyView(new NoDataView(getContext()));
-                } else {
-                    page--;
-                    tempPwdAdapter.getLoadMoreModule().loadMoreComplete();
-                }
-            }
-
-            private void loadDataFail() {
-                if (page == 1) {
-                    tempPwdAdapter.setNewInstance(null);
-                    tempPwdAdapter.setEmptyView(new NoWifiView(getContext()));
-                } else {
-                    page--;
-                    tempPwdAdapter.getLoadMoreModule().loadMoreComplete();
+                    fail();
                 }
             }
         });
+    }
+
+    @Override
+    public void success(Object data) {
+        List<PasswordInfo> items = (List<PasswordInfo>) data;
+        if (page == 1) {
+            tempPwdAdapter.setNewInstance(items);
+        } else {
+            tempPwdAdapter.addData(items);
+        }
+
+        if (items.size() < pageSize) {
+            tempPwdAdapter.getLoadMoreModule().loadMoreEnd();
+        } else {
+            tempPwdAdapter.getLoadMoreModule().loadMoreComplete();
+        }
+    }
+
+    @Override
+    public void empty() {
+        if (page == 1) {
+            tempPwdAdapter.setNewInstance(null);
+            tempPwdAdapter.setEmptyView(new NoDataView(getContext()));
+        } else {
+            page--;
+            tempPwdAdapter.getLoadMoreModule().loadMoreComplete();
+        }
+    }
+
+    @Override
+    public void fail() {
+        if (page == 1) {
+            tempPwdAdapter.setNewInstance(null);
+            tempPwdAdapter.setEmptyView(new NoWifiView(getContext()));
+        } else {
+            page--;
+            tempPwdAdapter.getLoadMoreModule().loadMoreComplete();
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

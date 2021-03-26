@@ -1,10 +1,6 @@
 package com.yc.yfiotlock.controller.fragments.lock.ble;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.hardware.biometrics.BiometricPrompt;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -19,7 +15,6 @@ import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.SafePwdCreateActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.add.ScanDeviceActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
@@ -31,7 +26,7 @@ import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.utils.CacheUtil;
-import com.yc.yfiotlock.utils.SafeUtils;
+import com.yc.yfiotlock.utils.SafeUtil;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -153,14 +148,14 @@ public class IndexFragment extends BaseFragment {
     }
 
     private void nav2LockIndex() {
-        switch (SafeUtils.getSafePwdType(mDeviceInfo)) {
-            case SafeUtils.NO_PASSWORD:
+        switch (SafeUtil.getSafePwdType(mDeviceInfo)) {
+            case SafeUtil.NO_PASSWORD:
                 real2LockIndex(mDeviceInfo);
                 break;
-            case SafeUtils.PASSWORD_TYPE:
+            case SafeUtil.PASSWORD_TYPE:
                 SafePwdCreateActivity.startCheck(getActivity());
                 break;
-            case SafeUtils.FINGERPRINT_TYPE:
+            case SafeUtil.FINGERPRINT_TYPE:
                 checkFinger();
                 break;
             default:
@@ -169,7 +164,7 @@ public class IndexFragment extends BaseFragment {
     }
 
     private void checkFinger() {
-        SafeUtils.useFinger(getActivity(), new Callback<String>() {
+        SafeUtil.useFinger(getActivity(), new Callback<String>() {
             @Override
             public void onSuccess(String resultInfo) {
                 real2LockIndex(mDeviceInfo);
@@ -206,7 +201,7 @@ public class IndexFragment extends BaseFragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CHECK_PWD) {
             if (resultCode == RESULT_OK && data != null
-                    && SafeUtils.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
+                    && SafeUtil.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
                 real2LockIndex(mDeviceInfo);
             } else {
                 ToastCompat.show(getContext(), "密码错误");

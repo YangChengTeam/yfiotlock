@@ -61,13 +61,11 @@ public class VisitorManageActivity extends BaseActivity {
     @Override
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
-        initRv();
-
+        setRv();
         loadData();
     }
 
-
-    private void initRv() {
+    private void setRv() {
         itemAdapter = new ItemAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(itemAdapter);
@@ -99,11 +97,16 @@ public class VisitorManageActivity extends BaseActivity {
                     }
                     break;
                     case 2:
-                        TempPasswordOpenLockActivity.start(VisitorManageActivity.this, lockInfo);
+                        nav2temppass();
                         break;
                 }
             }
         });
+    }
+
+    private void nav2temppass() {
+        Intent intent = new Intent(this, TempPasswordOpenLockActivity.class);
+        startActivity(intent);
     }
 
     // 进入开门方式管理

@@ -29,12 +29,6 @@ public class LockLogActivity extends BaseActivity {
 
     private DeviceInfo lockInfo;
 
-    public static void start(Context context, DeviceInfo deviceInfo) {
-        Intent intent = new Intent(context, LockLogActivity.class);
-        intent.putExtra("device", deviceInfo);
-        context.startActivity(intent);
-    }
-
     @Override
     protected int getLayoutId() {
         return R.layout.activity_lock_log;
@@ -45,7 +39,6 @@ public class LockLogActivity extends BaseActivity {
         super.initVars();
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
     }
-
 
     @Override
     protected void initViews() {

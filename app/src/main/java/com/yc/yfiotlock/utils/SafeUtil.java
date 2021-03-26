@@ -3,8 +3,6 @@ package com.yc.yfiotlock.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.biometrics.BiometricPrompt;
-import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.IntRange;
 
@@ -13,8 +11,6 @@ import com.kk.securityhttp.net.entry.Response;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.demo.MainActivity;
-import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fingerprintcompat.AonFingerChangeCallback;
 import com.yc.yfiotlock.libs.fingerprintcompat.FingerManager;
 import com.yc.yfiotlock.libs.fingerprintcompat.SimpleFingerCheckCallback;
@@ -25,7 +21,7 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
  * Created by　Dullyoung on 2021/3/22
  * 设备的安全密码设置界面工具
  **/
-public class SafeUtils {
+public class SafeUtil {
     /**
      * 无密
      */
@@ -111,7 +107,7 @@ public class SafeUtils {
 
                             @Override
                             public void onError(int code, String error) {
-                                SafeUtils.showFailTip(context, code);
+                                SafeUtil.showFailTip(context, code);
 
                                 /**
                                  * 只要不是  7 9 10 就重试

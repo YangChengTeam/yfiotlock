@@ -177,7 +177,7 @@ public class LockBLEManager {
 
             @Override
             public void onScanning(BleDevice bleDevice) {
-                if(bleDevice == null) return;
+                if (bleDevice == null) return;
                 callbck.onScanning(bleDevice);
             }
 
@@ -280,7 +280,6 @@ public class LockBLEManager {
                 }
             }
         }
-
         return false;
     }
 

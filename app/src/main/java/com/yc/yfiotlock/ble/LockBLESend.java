@@ -117,17 +117,11 @@ public class LockBLESend {
 
 
     public void realSend() {
-        if (retryCount <= 0) {
-            if (!isOpOver) {
-                if (noResponseCount >= LockBLEManager.FAILED_COUNT) {  //超时三次 重新连接
-                    clear();
-                    connect();
-                    noResponseCount = 0;
-                    return;
-                }
-                notifyErrorResponse("no response");
-                noResponseCount++;
-            }
+        if (noResponseCount >= LockBLEManager.FAILED_COUNT) {  //超时三次 重新连接
+            clear();
+            connect();
+            retryCount = 3;
+            noResponseCount = 0;
             return;
         }
         Log.d(TAG, "直接发送真正指令" + retryCount);
@@ -137,6 +131,7 @@ public class LockBLESend {
                 realSend();
             } else {
                 if (!isOpOver && retryCount <= 0) {
+                    noResponseCount++;
                     notifyErrorResponse("no response");
                 }
                 retryCount = 3;

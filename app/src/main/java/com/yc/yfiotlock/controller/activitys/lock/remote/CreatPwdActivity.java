@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
 import android.annotation.SuppressLint;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -24,9 +25,14 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
+import com.yc.yfiotlock.helper.TOTP;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
+import com.yc.yfiotlock.model.bean.lock.TimeInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
+import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.LeftNextTextView;
@@ -40,11 +46,10 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import rx.Subscriber;
+import rx.functions.Action1;
 
-public class CreatPwdActivity extends BaseActivity {
+public class CreatPwdActivity extends BaseBackActivity {
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.tv_creat_pwd_next)
     TextView tvNext;
     @BindView(R.id.tv_pwd_type_the_one)
@@ -69,17 +74,14 @@ public class CreatPwdActivity extends BaseActivity {
     EditText nameEt;
 
     private LockEngine lockEngine;
+    private DeviceEngin deviceEngin;
 
-    public static void start(Context context, DeviceInfo deviceInfo) {
-        Intent intent = new Intent(context, CreatPwdActivity.class);
-        intent.putExtra("device", deviceInfo);
-        context.startActivity(intent);
-    }
 
     @Override
     protected void initVars() {
         super.initVars();
         lockEngine = new LockEngine(this);
+        deviceEngin = new DeviceEngin(this);
     }
 
     private boolean isSelTheOne = true;
@@ -93,8 +95,6 @@ public class CreatPwdActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> onBackPressed());
-
         timeViews = new LeftNextTextView[]{ltvStartDate, ltvEndDate, ltvStartTime, ltvEndTime};
 
         RxView.clicks(tvNext).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
@@ -136,8 +136,22 @@ public class CreatPwdActivity extends BaseActivity {
 
         chengUi(true);
 
-        nameEt.requestFocus();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        genPassword();
+    }
+
+    private String key =  "3132333435363738393031323334353637383930"
+            + "313233343536373839303132";
+    private void genPassword() {
+        deviceEngin.getTime().subscribe(new Action1<ResultInfo<TimeInfo>>() {
+            @Override
+            public void call(ResultInfo<TimeInfo> info) {
+                if (info != null && info.getCode() == 1 && info.getData() != null) {
+                    TimeInfo  timeInfo = info.getData();
+                    String password =  TOTP.generateTOTP256(key, Long.toHexString(timeInfo.getTime()).toUpperCase(), "6");
+                    passEt.setText(password);
+                }
+            }
+        });
     }
 
     private void toSubmit() {
@@ -147,22 +161,22 @@ public class CreatPwdActivity extends BaseActivity {
                 ToastUtil.toast2(CreatPwdActivity.this, "请输入密码名称");
                 return;
             }
+
             String trimPwd = passEt.getText().toString().trim();
+
             if (TextUtils.isEmpty(trimPwd)) {
                 ToastUtil.toast2(CreatPwdActivity.this, "请输入密码");
                 return;
             }
+
             if (trimPwd.length() != 6) {
                 ToastUtil.toast2(CreatPwdActivity.this, "密码长度不合规");
                 return;
             }
-            Serializable device = getIntent().getSerializableExtra("device");
-            if (!(device instanceof DeviceInfo)) {
-                ToastUtil.toast2(CreatPwdActivity.this, "未连接设备");
-                return;
-            }
+
+            DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
             mLoadingDialog.show("添加中...");
-            lockEngine.addOpenLockWay(((DeviceInfo) device).getId(), trimName, "",
+            lockEngine.addOpenLockWay(lockInfo.getId(), trimName, "",
                     LockBLEManager.OPEN_LOCK_PASSWORD, String.valueOf(LockBLEManager.GROUP_TYPE_TEMP_PWD),
                     trimPwd).subscribe(new Subscriber<ResultInfo<String>>() {
                 @Override
@@ -179,7 +193,7 @@ public class CreatPwdActivity extends BaseActivity {
                 public void onNext(ResultInfo<String> stringResultInfo) {
                     if (stringResultInfo != null) {
                         if (stringResultInfo.getCode() == 1) {
-                            PassWordInfo passWordInfo = new PassWordInfo();
+                            PasswordInfo passWordInfo = new PasswordInfo();
                             passWordInfo.setName(trimName);
                             passWordInfo.setPwd(trimPwd);
                             CreatPwdSuccessActivity.start(CreatPwdActivity.this, passWordInfo);

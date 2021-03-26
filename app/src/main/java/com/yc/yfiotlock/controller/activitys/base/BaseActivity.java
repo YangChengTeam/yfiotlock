@@ -59,6 +59,7 @@ public abstract class BaseActivity extends BaseSendActivity implements ILoadData
         initVars();
         initViews();
         bindClick();
+
     }
 
     public LoadingDialog mLoadingDialog;

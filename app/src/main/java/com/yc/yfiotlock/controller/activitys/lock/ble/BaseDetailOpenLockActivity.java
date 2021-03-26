@@ -144,6 +144,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
+                    mLoadingDialog.show("删除中...");
                     cloudDel();
                 }
             });

@@ -3,7 +3,7 @@ package com.yc.yfiotlock.view.adapters;
 import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.model.bean.lock.remote.PassWordInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.jetbrains.annotations.NotNull;
@@ -11,14 +11,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class TempPwdAdapter extends BaseExtendAdapter<PassWordInfo> implements LoadMoreModule {
+public class TempPwdAdapter extends BaseExtendAdapter<PasswordInfo> implements LoadMoreModule {
 
     public TempPwdAdapter(@Nullable List data) {
         super(R.layout.item_temp_pwd, data);
     }
 
     @Override
-    protected void convert(@NotNull BaseViewHolder baseViewHolder, PassWordInfo passWordInfo) {
+    protected void convert(@NotNull BaseViewHolder baseViewHolder, PasswordInfo passWordInfo) {
         baseViewHolder.setText(R.id.tv_temp_pwd_name, passWordInfo.getName())
                 .setText(R.id.tv_temp_pwd_validity, "有效期：一次使用");
 
