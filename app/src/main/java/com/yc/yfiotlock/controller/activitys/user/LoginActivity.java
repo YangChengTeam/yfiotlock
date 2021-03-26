@@ -74,7 +74,6 @@ public class LoginActivity extends BaseActivity {
     }
 
 
-
     @Override
     public void onBackPressed() {
         Intent home = new Intent(Intent.ACTION_MAIN);
@@ -203,4 +202,11 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mLoginEngin != null) {
+            mLoginEngin.cancel();
+        }
+    }
 }
