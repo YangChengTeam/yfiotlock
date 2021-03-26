@@ -126,7 +126,7 @@ public class AlarmsFragment extends BaseFragment {
     private void loadDateEmpty() {
         if (page == 1) {
             warnAdapter.setNewInstance(null);
-            warnAdapter.setEmptyView(new NoDataView(getContext()));
+            warnAdapter.setEmptyView(R.layout.view_nodata);
         } else {
             page--;
             warnAdapter.getLoadMoreModule().loadMoreComplete();

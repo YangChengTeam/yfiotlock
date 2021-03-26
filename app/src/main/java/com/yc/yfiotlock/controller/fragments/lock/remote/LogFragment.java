@@ -118,7 +118,7 @@ public class LogFragment extends BaseFragment {
     private void loadDateFail() {
         if (page == 1) {
             logAdapter.setNewInstance(null);
-            logAdapter.setEmptyView(new NoWifiView(getContext()));
+            logAdapter.setEmptyView(new NoWifiView(getActivity()));
         } else {
             page--;
             logAdapter.getLoadMoreModule().loadMoreComplete();
@@ -128,7 +128,7 @@ public class LogFragment extends BaseFragment {
     private void loadDateEmpty() {
         if (page == 1) {
             logAdapter.setNewInstance(null);
-            logAdapter.setEmptyView(new NoDataView(getContext()));
+            logAdapter.setEmptyView(new NoDataView(getActivity()));
         } else {
             page--;
             logAdapter.getLoadMoreModule().loadMoreComplete();
