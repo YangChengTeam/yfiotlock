@@ -139,6 +139,7 @@ public class FAQActivity extends BaseActivity {
         if (mFAQAdapter.getData().size() == 0) {
             mFAQAdapter.setEmptyView(new NoWifiView(getContext()));
         } else {
+            p--;
             mFAQAdapter.getLoadMoreModule().loadMoreFail();
         }
     }

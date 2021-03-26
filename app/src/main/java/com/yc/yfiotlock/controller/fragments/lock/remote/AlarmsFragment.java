@@ -116,7 +116,7 @@ public class AlarmsFragment extends BaseFragment {
     private void loadDateFail() {
         if (page == 1) {
             warnAdapter.setNewInstance(null);
-            warnAdapter.setEmptyView(new NoWifiView(getContext()));
+            warnAdapter.setEmptyView(R.layout.view_nowifi);
         } else {
             page--;
             warnAdapter.getLoadMoreModule().loadMoreComplete();
