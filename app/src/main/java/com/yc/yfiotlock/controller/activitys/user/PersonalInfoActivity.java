@@ -101,27 +101,7 @@ public class PersonalInfoActivity extends BaseActivity {
         mAdapter.setOnItemClickListener((adapter, view, position) -> {
             switch (position) {
                 case 0:
-                    UpdateIconDialog updateIconDialog = new UpdateIconDialog(this);
-                    updateIconDialog.setOnTvClickListener(new UpdateIconDialog.OnTvClickListener() {
-                        @Override
-                        public void camera() {
-                            onUseCamera();
-                        }
-
-                        @Override
-                        public void pics() {
-                            onUsePic();
-                        }
-                    });
-                    File file = new File(mFilePath, mFileName);
-                    if (file.exists() && file.delete()) {
-                        try {
-                            file.createNewFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    updateIconDialog.show();
+                    showChangeFaceDialog();
                     break;
                 case 2:
                     startActivity(new Intent(getContext(), EditNameActivity.class));
@@ -133,6 +113,30 @@ public class PersonalInfoActivity extends BaseActivity {
         mRvInfo.setAdapter(mAdapter);
         mRvInfo.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvInfo);
+    }
+
+    private void showChangeFaceDialog() {
+        UpdateIconDialog updateIconDialog = new UpdateIconDialog(this);
+        updateIconDialog.setOnTvClickListener(new UpdateIconDialog.OnTvClickListener() {
+            @Override
+            public void camera() {
+                onUseCamera();
+            }
+
+            @Override
+            public void pics() {
+                onUsePic();
+            }
+        });
+        File file = new File(mFilePath, mFileName);
+        if (file.exists() && file.delete()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        updateIconDialog.show();
     }
 
     private void onUseCamera() {
@@ -405,7 +409,7 @@ public class PersonalInfoActivity extends BaseActivity {
                 })
                 .setPositiveButton("确定", (dialog, which) -> {
                     mLoadingDialog.show("退出登录中...");
-                    VUiKit.postDelayed(1000,() -> {
+                    VUiKit.postDelayed(1000, () -> {
                         mLoadingDialog.dismiss();
                         UserInfoCache.setUserInfo(null);
                         EventBus.getDefault().post(new UserInfo());
