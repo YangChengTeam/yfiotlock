@@ -17,12 +17,17 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
 import com.yc.yfiotlock.controller.fragments.user.MyFragment;
+import com.yc.yfiotlock.download.DownloadManager;
 import com.yc.yfiotlock.helper.ThreadPoolExecutorImpl;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
 
 import java.io.File;
@@ -61,6 +66,16 @@ public class MainActivity extends BaseActivity {
         setVp();
         onSelected(0);
         ThreadPoolExecutorImpl.getImpl().execute(this::deleteLowerVersionApkFile);
+        checkUpdate();
+    }
+
+    private void checkUpdate() {
+        UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(App.getApp().getUpdateInfo());
+        if (updateInfo != null) {
+            DownloadManager.setContext(new WeakReference<>(this));
+            UpdateDialog updateDialog = new UpdateDialog(this);
+            updateDialog.show(updateInfo);
+        }
     }
 
     private void setVp() {

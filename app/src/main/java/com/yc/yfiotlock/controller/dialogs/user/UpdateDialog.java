@@ -63,8 +63,20 @@ public class UpdateDialog extends BaseDialog {
         mTvContent.setText(updateInfo.getDesc());
         mTvUpdate.setText("立即更新");
         setBtn(DownloadManager.getUpdateInfo());
+        isMust = (updateInfo.getIsMust() == 1);
+        mIvCancel.setVisibility(isMust ? View.GONE : View.VISIBLE);
+        setCanceledOnTouchOutside(isMust);
         show();
     }
+
+    @Override
+    public void onBackPressed() {
+        if (!isMust) {
+            super.onBackPressed();
+        }
+    }
+
+    private boolean isMust = false;
 
     private UpdateInfo mUpdateInfo;
 
