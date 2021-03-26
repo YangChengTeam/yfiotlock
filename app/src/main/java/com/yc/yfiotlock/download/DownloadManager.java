@@ -224,7 +224,7 @@ public class DownloadManager {
                                     EventBus.getDefault().post(updateInfo);
                                     saveDownloadCache(updateInfo);
                                 }
-                            } else {
+                            } else if (cause == EndCause.ERROR) {
                                 ToastCompat.show(getContext(), "更新失败" + realCause);
                             }
                         }

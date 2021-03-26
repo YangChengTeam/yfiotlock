@@ -20,8 +20,11 @@ import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.GlideEngine;
+import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
 
@@ -69,23 +72,34 @@ public class App extends Application {
         initCommonConfig();
         initBauduMap();
         cloudgetMacList();
+        checkUpdate();
     }
 
     private int retryCount = 0;
 
     private void cloudgetMacList() {
-        deviceEngin.getMacList().subscribe(new Action1<ResultInfo<List<String>>>() {
-            @Override
-            public void call(ResultInfo<List<String>> info) {
-                if (info != null && info.getCode() == 1) {
-                    macList = info.getData();
-                } else {
-                    if (retryCount-- > 0) {
-                        VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                            cloudgetMacList();
-                        });
-                    }
+        deviceEngin.getMacList().subscribe(info -> {
+            if (info != null && info.getCode() == 1) {
+                macList = info.getData();
+            } else {
+                if (retryCount-- > 0) {
+                    VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), this::cloudgetMacList);
                 }
+            }
+        });
+    }
+
+    private UpdateInfo mUpdateInfo;
+
+    public UpdateInfo getUpdateInfo() {
+        return mUpdateInfo;
+    }
+
+    private void checkUpdate() {
+        UpdateEngine updateEngine = new UpdateEngine(this);
+        updateEngine.getUpdateInfo().subscribe(resultInfo -> {
+            if (resultInfo.getData() != null) {
+                mUpdateInfo = resultInfo.getData().getUpgrade();
             }
         });
     }
@@ -132,7 +146,6 @@ public class App extends Application {
     private void initSdk() {
         MMKV.initialize(this);
         ImageEngine.install(new GlideEngine(this));
-        Log.i("app-init", "initSdk: " + BuildConfig.DEBUG);
         if (BuildConfig.DEBUG) {
             UMConfigure.init(this, "605afeda6ee47d382b93fdba", "Umeng", UMConfigure.DEVICE_TYPE_PHONE, "");
             CrashReport.initCrashReport(getApplicationContext(), "2efb5c9b77", true);

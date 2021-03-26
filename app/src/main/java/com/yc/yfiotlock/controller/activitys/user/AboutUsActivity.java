@@ -159,6 +159,7 @@ public class AboutUsActivity extends BaseActivity {
                 if (updateDialog == null) {
                     updateDialog = new UpdateDialog(getContext());
                 }
+                DownloadManager.setContext(new WeakReference<>(this));
                 updateDialog.show(updateInfo);
             }
             mStvCheck.setShaderEnable(true);

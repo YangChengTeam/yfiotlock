@@ -125,9 +125,7 @@ public class UpdateInfo {
         return isMust;
     }
 
-    public void setMust(int must) {
-        isMust = must;
+    public void setIsMust(int isMust) {
+        this.isMust = isMust;
     }
-
-
 }
