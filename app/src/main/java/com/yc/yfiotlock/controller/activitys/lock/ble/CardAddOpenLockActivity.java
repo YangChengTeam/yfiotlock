@@ -64,6 +64,13 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (!lockBleSend.isOpOver()) {
+            blecancelDialog();
+        }
+    }
+
+    @Override
     protected void cloudAdd(String keyid) {
         mLoadingDialog.show("添加卡片中...");
         cloudAdd(nameTv.getText().toString(), LockBLEManager.OPEN_LOCK_CARD, keyid, "");

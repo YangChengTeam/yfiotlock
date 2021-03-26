@@ -2,6 +2,9 @@ package com.yc.yfiotlock.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.biometrics.BiometricPrompt;
+import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.IntRange;
 
@@ -42,7 +45,7 @@ public class SafeUtils {
      * private final static int FINGERPRINT_TYPE = 2;  验证指纹
      *
      * @param deviceInfo 设备信息
-     * @param type       安全密码设置类型
+     * @param type       安全密码设置类型  0无密
      */
     public static void setSafePwdType(DeviceInfo deviceInfo, @IntRange(from = 0, to = 2) int type) {
         MMKV.defaultMMKV().putInt("safeType" + deviceInfo.getMacAddress(), type);
@@ -52,7 +55,7 @@ public class SafeUtils {
      * @param deviceInfo 设备信息
      * @return private final static int PASSWORD_TYPE = 1;     验证密码
      * private final static int FINGERPRINT_TYPE = 2;  验证指纹
-     * -1,无密码
+     * 0,无密码
      */
     public static int getSafePwdType(DeviceInfo deviceInfo) {
         return MMKV.defaultMMKV().getInt("safeType" + deviceInfo.getMacAddress(), 0);
@@ -80,6 +83,10 @@ public class SafeUtils {
     }
 
     public static void useFinger(Activity context, Callback<String> stringCallback) {
+        useFinger(context, stringCallback, "");
+    }
+
+    public static void useFinger(Activity context, Callback<String> stringCallback, String laseFailReason) {
         switch (FingerManager.checkSupport(context)) {
             case DEVICE_UNSUPPORTED:
                 stringCallback.onFailure(new Response());
@@ -93,23 +100,45 @@ public class SafeUtils {
                 FingerManager.build().setApplication(App.getApp())
                         .setTitle("指纹验证")
                         .setDes("请按下指纹")
+                        .setSubTitle(laseFailReason)
                         .setNegativeText("取消")
                         .setFingerCheckCallback(new SimpleFingerCheckCallback() {
 
                             @Override
                             public void onSucceed() {
-                                ToastCompat.show(context, "验证成功");
                                 stringCallback.onSuccess("验证成功");
                             }
 
                             @Override
+                            public void onError(int code, String error) {
+                                SafeUtils.showFailTip(context, code);
+
+                                /**
+                                 * 只要不是  7 9 10 就重试
+                                 *
+                                 * 7 {@link android.hardware.biometrics.BiometricPrompt#BIOMETRIC_ERROR_LOCKOUT}
+                                 * 该操作被取消，因为该API由于尝试过多而被锁定。尝试5次失败后会发生这种情况，持续30秒。
+                                 * 9 {@link android.hardware.biometrics.BiometricPrompt#BIOMETRIC_ERROR_LOCKOUT_PERMANENT}
+                                 * 该操作被取消，因为BIOMETRIC_ERROR_LOCKOUT发生了太多次。禁用生物特征认证，直到用户通过强认证（PIN /图案/密码）解锁
+                                 * 5是代码取消验证  不会走onError 而是走onCancel
+                                 * 10是用户取消验证
+                                 */
+                                if (code != BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT
+                                        && code != BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT_PERMANENT
+                                        && code != BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED) {
+                                    useFinger(context, stringCallback);
+                                }
+
+                            }
+
+                            @Override
                             public void onError(String error) {
-                                ToastCompat.show(context, "验证失败");
+
                             }
 
                             @Override
                             public void onCancel() {
-                                ToastCompat.show(context, "您取消了识别");
+
                             }
                         })
                         .setFingerChangeCallback(new AonFingerChangeCallback() {
@@ -125,6 +154,22 @@ public class SafeUtils {
             default:
                 break;
         }
+    }
+
+
+    public static void showFailTip(Context context, int code) {
+        switch (code) {
+            case BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT:
+                ToastCompat.show(context, "失败次数过多，请稍后再试");
+                break;
+            case BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT_PERMANENT:
+                ToastCompat.show(context, "失败次数过多，指纹识别已被禁用，重新解锁手机后启用。");
+                break;
+            default:
+                break;
+
+        }
+
     }
 
 }

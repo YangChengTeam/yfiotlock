@@ -13,113 +13,109 @@ import androidx.annotation.RequiresApi;
  */
 
 @RequiresApi(api = Build.VERSION_CODES.M)
-public class FingerManagerController
-{
+public class FingerManagerController {
 
-	private Application mApplication;
+    private Application mApplication;
 
-	//弹窗标题
-	private String mTitle;
+    //弹窗标题
+    private String mTitle;
 
-	//弹窗描述
-	private String mDes;
+    //弹窗描述
+    private String mDes;
 
-	//取消按钮话术
-	private String mNegativeText;
+    //显示在是指纹识别下面的文字
+    private String mSubTitle;
 
-	//Android P 以下版本的指纹识别弹窗（如需自定义样式就设置）
-	private AFingerDialog mFingerDialogApi23;
+    //取消按钮话术
+    private String mNegativeText;
 
-	//指纹识别回调
-	private IonFingerCallback mFingerCheckCallback;
+    //Android P 以下版本的指纹识别弹窗（如需自定义样式就设置）
+    private AFingerDialog mFingerDialogApi23;
 
-	//指纹库发生变化时的回调
-	private AonFingerChangeCallback mFingerChangeCallback;
+    //指纹识别回调
+    private IonFingerCallback mFingerCheckCallback;
 
-	public AonFingerChangeCallback getFingerChangeCallback()
-	{
-		return mFingerChangeCallback;
-	}
+    //指纹库发生变化时的回调
+    private AonFingerChangeCallback mFingerChangeCallback;
 
-	public FingerManagerController setFingerChangeCallback(AonFingerChangeCallback fingerChangeCallback)
-	{
-		this.mFingerChangeCallback = fingerChangeCallback;
-		return this;
-	}
+    public AonFingerChangeCallback getFingerChangeCallback() {
+        return mFingerChangeCallback;
+    }
 
-	public IonFingerCallback getFingerCheckCallback()
-	{
-		return mFingerCheckCallback;
-	}
+    public FingerManagerController setFingerChangeCallback(AonFingerChangeCallback fingerChangeCallback) {
+        this.mFingerChangeCallback = fingerChangeCallback;
+        return this;
+    }
 
-	public FingerManagerController setFingerCheckCallback(IonFingerCallback fingerCheckCallback)
-	{
-		this.mFingerCheckCallback = fingerCheckCallback;
-		return this;
-	}
+    public IonFingerCallback getFingerCheckCallback() {
+        return mFingerCheckCallback;
+    }
 
-	public FingerManagerController setDes(String des)
-	{
-		this.mDes = des;
-		return this;
-	}
+    public FingerManagerController setFingerCheckCallback(IonFingerCallback fingerCheckCallback) {
+        this.mFingerCheckCallback = fingerCheckCallback;
+        return this;
+    }
 
-	public FingerManagerController setNegativeText(String negativeText)
-	{
-		this.mNegativeText = negativeText;
-		return this;
-	}
+    public FingerManagerController setDes(String des) {
+        this.mDes = des;
+        return this;
+    }
 
-	public FingerManagerController setTitle(String title)
-	{
-		mTitle = title;
-		return this;
-	}
+    public FingerManagerController setSubTitle(String subTitle) {
+        this.mSubTitle = subTitle;
+        return this;
+    }
 
-	public FingerManagerController setApplication(Application application)
-	{
-		mApplication = application;
-		return this;
-	}
+    public FingerManagerController setNegativeText(String negativeText) {
+        this.mNegativeText = negativeText;
+        return this;
+    }
 
-	public FingerManagerController setFingerDialogApi23(@Nullable AFingerDialog fingerDialogApi23)
-	{
-		this.mFingerDialogApi23 = fingerDialogApi23;
-		return this;
-	}
+    public FingerManagerController setTitle(String title) {
+        mTitle = title;
+        return this;
+    }
 
-	public Application getApplication()
-	{
-		return mApplication;
-	}
+    public FingerManagerController setApplication(Application application) {
+        mApplication = application;
+        return this;
+    }
 
-	public String getTitle()
-	{
-		return mTitle;
-	}
+    public FingerManagerController setFingerDialogApi23(@Nullable AFingerDialog fingerDialogApi23) {
+        this.mFingerDialogApi23 = fingerDialogApi23;
+        return this;
+    }
 
-	public String getDes()
-	{
-		return mDes;
-	}
+    public Application getApplication() {
+        return mApplication;
+    }
 
-	public String getNegativeText()
-	{
-		return mNegativeText;
-	}
+    public String getTitle() {
+        return mTitle;
+    }
 
-	public AFingerDialog getFingerDialogApi23()
-	{
-		return mFingerDialogApi23;
-	}
+    public String getDes() {
+        return mDes;
+    }
 
-	public FingerManager create()
-	{
-		if (mFingerCheckCallback == null){
-			throw new RuntimeException("CompatFingerManager : FingerCheckCallback can not be null");
-		}
+    public String getSubTitle() {
+        return mSubTitle;
+    }
 
-		return FingerManager.getInstance(this);
-	}
+    public String getNegativeText() {
+        return mNegativeText;
+    }
+
+    public AFingerDialog getFingerDialogApi23() {
+        return mFingerDialogApi23;
+    }
+
+    public FingerManager create() {
+        if (mFingerCheckCallback == null) {
+            throw new RuntimeException("CompatFingerManager : FingerCheckCallback can not be null");
+        }
+
+        return FingerManager.getInstance(this);
+    }
 
 }

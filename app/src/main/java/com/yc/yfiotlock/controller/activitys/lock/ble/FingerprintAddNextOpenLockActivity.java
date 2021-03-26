@@ -55,6 +55,14 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
     }
 
     @Override
+    public void onBackPressed() {
+        if (!lockBleSend.isOpOver()) {
+            blecancelDialog();
+        }
+    }
+
+
+    @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData != null && lockBLEData.getMcmd() == (byte) 0x08 && lockBLEData.getScmd() == (byte) 0x01 && lockBLEData.getStatus() > (byte) 0x01) {
             resultTv.setText(lockBLEData.getStatus() + "/6 录入成功");

@@ -115,11 +115,11 @@ public class DownloadManager {
     }
 
     private static void saveDownloadCache(UpdateInfo updateInfo) {
-        CacheUtil.setCache(Config.UPDATE_URL + Build.VERSION.SDK_INT, updateInfo);
+        CacheUtil.setCache("downloadUpdateApkCache" + Build.VERSION.SDK_INT, updateInfo);
     }
 
     public static UpdateInfo getUpdateInfo() {
-        return CacheUtil.getCache(Config.UPDATE_URL + Build.VERSION.SDK_INT, UpdateInfo.class);
+        return CacheUtil.getCache("downloadUpdateApkCache" + Build.VERSION.SDK_INT, UpdateInfo.class);
     }
 
     public static void updateApp(UpdateInfo updateInfo) {

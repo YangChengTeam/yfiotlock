@@ -1,11 +1,16 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.content.Intent;
 import android.text.method.PasswordTransformationMethod;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
@@ -30,14 +35,23 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     ImageView statusIv;
 
     @BindView(R.id.stv_commit)
-    View commitBtn;
+    SuperTextView commitBtn;
     @BindView(R.id.et_pass)
     EditText passEt;
 
+    private boolean isNext;
+    private String password;
 
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_password_add_open_lock;
+    }
+
+    @Override
+    protected void initVars() {
+        super.initVars();
+        isNext = getIntent().getBooleanExtra("next", false);
+        password = getIntent().getStringExtra("password");
     }
 
     @Override
@@ -49,11 +63,21 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
         }
 
         RxView.clicks(commitBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (passEt.length() != 6) {
-                ToastUtil.toast2(getContext(), "密码必需是长度为6位数字");
-                return;
+            addPwd();
+        });
+
+        if (isNext) {
+            commitBtn.setText("添加");
+        }
+
+        passEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    addPwd();
+                }
+                return false;
             }
-            bleAddPwd();
         });
 
         statusIv.setSelected(true);
@@ -70,6 +94,31 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
                 passEt.setSelection(passEt.getText().length());
             }
         });
+
+
+    }
+
+    private void addPwd() {
+        if (passEt.length() != 6) {
+            ToastUtil.toast2(getContext(), "密码必需是长度为6位数字");
+            return;
+        }
+        if (isNext) {
+            if (!passEt.getText().toString().equals(password)) {
+                ToastUtil.toast2(getContext(), "两次密码不一致");
+                return;
+            }
+            bleAddPwd();
+        } else {
+            nav2next();
+        }
+    }
+
+    private void nav2next() {
+        Intent intent = new Intent(this, PasswordAddOpenLockActivity.class);
+        intent.putExtra("next", true);
+        intent.putExtra("password", passEt.getText().toString());
+        startActivity(intent);
     }
 
     private void bleAddPwd() {

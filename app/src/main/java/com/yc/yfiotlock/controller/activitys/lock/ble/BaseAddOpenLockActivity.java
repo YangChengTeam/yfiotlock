@@ -137,15 +137,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         cancelSend.unregisterNotify();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!lockBleSend.isOpOver()) {
-            blecancelDialog();
-        }
-    }
-
-
-    private void blecancelDialog() {
+    protected void blecancelDialog() {
         GeneralDialog generalDialog = new GeneralDialog(getContext());
         generalDialog.setTitle("温馨提示");
         generalDialog.setMsg("确认取消操作?");
