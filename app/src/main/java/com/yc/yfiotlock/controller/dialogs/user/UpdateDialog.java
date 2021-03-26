@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.dialogs.user;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
@@ -62,6 +63,7 @@ public class UpdateDialog extends BaseDialog {
         mUpdateInfo = updateInfo;
         mTvContent.setText(updateInfo.getDesc());
         mTvUpdate.setText("立即更新");
+        mStvVersion.setText("v".concat(updateInfo.getVersion()));
         setBtn(DownloadManager.getUpdateInfo());
         isMust = (updateInfo.getIsMust() == 1);
         mIvCancel.setVisibility(isMust ? View.GONE : View.VISIBLE);
