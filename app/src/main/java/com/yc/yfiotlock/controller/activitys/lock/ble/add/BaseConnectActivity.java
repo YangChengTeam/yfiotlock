@@ -121,6 +121,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                         deviceNameDialog.dismiss();
                         ToastCompat.show(getContext(), "修改成功");
                         lockInfo.setName(name);
+                        backNavBar.setTitle(name);
                         EventBus.getDefault().post(lockInfo);
                         EventBus.getDefault().post(new IndexRefreshEvent());
                     } else {

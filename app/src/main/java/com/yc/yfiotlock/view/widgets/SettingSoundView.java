@@ -36,6 +36,8 @@ public class SettingSoundView extends BaseView {
 
     public void setDeviceMac(String deviceMac) {
         this.deviceMac = deviceMac;
+        volume = MMKV.defaultMMKV().getInt(deviceMac + "volume", 3);
+        onSelect(volume);
     }
 
     public void setVolume(int volume) {
@@ -63,8 +65,6 @@ public class SettingSoundView extends BaseView {
     @Override
     protected void initViews(Context context) {
         super.initViews(context);
-        volume = MMKV.defaultMMKV().getInt(deviceMac + "volume", 3);
-        onSelect(volume);
     }
 
     @OnClick({R.id.ll_low, R.id.ll_mid, R.id.ll_high})

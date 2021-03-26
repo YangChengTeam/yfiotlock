@@ -61,7 +61,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
-        lockBleSend.setNotifyCallback(this);
         deviceEngin = new DeviceEngin(this);
     }
 
@@ -189,8 +188,12 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         headView.setOnSelectChangeListener(new SettingSoundView.OnSelectChangeListener() {
             @Override
             public void onChange(int index) {
-                volume = index;
-                bleSetVolume(volume);
+                if (lockBleSend != null && lockBleSend.isConnected()) {
+                    volume = index;
+                    bleSetVolume(volume);
+                } else {
+                    ToastCompat.show(getContext(), "蓝牙未连接");
+                }
             }
         });
         mSettingAdapter.setHeaderView(headView);
@@ -222,11 +225,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             lockBleSend.setNotifyCallback(null);
             lockBleSend.unregisterNotify();
         }
-
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(this);
-            lockBleSend.registerNotify();
-        }
     }
 
 
@@ -241,6 +239,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             LockIndexActivity.getInstance().finish();
         }
     }
+
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
