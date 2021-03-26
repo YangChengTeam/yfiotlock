@@ -13,7 +13,6 @@ import com.kk.securityhttp.net.impls.OKHttpRequest;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
 
-
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -48,6 +47,10 @@ public abstract class BaseEngin<T> {
 
     public void cancel() {
         OKHttpRequest.getImpl().cancel(getUrl() + "&key=" + key);
+    }
+
+    public void cancel(String url) {
+        OKHttpRequest.getImpl().cancel(url);
     }
 
     //< 同步请求get 1
