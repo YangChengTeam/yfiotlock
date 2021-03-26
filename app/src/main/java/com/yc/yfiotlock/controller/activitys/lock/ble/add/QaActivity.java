@@ -9,8 +9,4 @@ public class QaActivity  extends BaseBackActivity {
         return R.layout.lock_ble_add_activity_qa;
     }
 
-    @Override
-    protected void initViews() {
-            setClick(R.id.view_nav_bar, this::finish);
-    }
 }
