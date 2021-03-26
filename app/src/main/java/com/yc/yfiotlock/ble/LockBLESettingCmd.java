@@ -89,4 +89,16 @@ public class LockBLESettingCmd {
     public static byte[] getAlDeviceName(Context context) {
         return setting(context, (byte) 0x0A, new String(new byte[]{((byte) 0x01)}));
     }
+
+    //  1.11开启升级（0x0B）
+    public static byte[] openUpdate(Context context) {
+        return setting(context, (byte) 0x0A, new String(new byte[]{((byte) 0x01)}));
+    }
+
+    //  1.12开启升级（0x0C）
+    public static byte[] update(Context context, byte[] bytes) {
+        return setting(context, (byte) 0x0C, new String(bytes));
+    }
 }
+
+
