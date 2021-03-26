@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.baidu.platform.comapi.map.MapObj;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.contains.HttpConfig;
 import com.kk.securityhttp.net.entry.Response;
@@ -16,6 +17,7 @@ import com.kk.securityhttp.utils.VUiKit;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -53,18 +55,7 @@ public abstract class BaseEngin<T> {
         OKHttpRequest.getImpl().cancel(url);
     }
 
-    /**
-     * 调用这个方法必须重写{@link #getUrls()}
-     */
-    public void cancelAll() {
-        String[] url = getUrls();
-        if (url.length == 0) {
-            throw new IllegalStateException("method getUrls() has not been override or urls.length = 0");
-        }
-        for (String s : url) {
-            cancel(s);
-        }
-    }
+
 
     //< 同步请求get 1
     private T get(Type type, Map<String, String> params, Map<String, String> headers, boolean isEncryptResponse) {
@@ -289,8 +280,5 @@ public abstract class BaseEngin<T> {
 
     public abstract String getUrl();
 
-    public String[] getUrls() {
-        return new String[0];
-    }
 
 }

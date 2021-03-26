@@ -14,20 +14,10 @@ import java.util.Map;
 
 import rx.Observable;
 
-public class LoginEngin extends BaseEngin {
+public class LoginEngin extends HttpCoreEngin {
 
     public LoginEngin(Context context) {
         super(context);
-    }
-
-    @Override
-    public String getUrl() {
-        return null;
-    }
-
-    @Override
-    public String[] getUrls() {
-        return new String[]{Config.ALI_FAST_LOGIN, Config.LOGIN_SEND_CODE_URL, Config.SMS_CODE_LOGIN_URL};
     }
 
     public Observable<ResultInfo<UserInfo>> aliFastLogin(String token) {

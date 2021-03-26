@@ -5,6 +5,7 @@ import android.content.Context;
 import com.kk.securityhttp.net.entry.UpFileInfo;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.MediaType;
@@ -16,17 +17,20 @@ import rx.Observable;
 
 public class HttpCoreEngin<T> extends BaseEngin<T> {
 
-    public static HttpCoreEngin httpCoreEngin = null;
+    public HttpCoreEngin httpCoreEngin = null;
+
 
     public HttpCoreEngin(Context context) {
         super(context);
     }
 
-    public static HttpCoreEngin get(Context context) {
+    public HttpCoreEngin get(Context context) {
         return new HttpCoreEngin(context);
     }
 
     private String url;
+
+    private Map<String, String> urls = new HashMap<>();
 
     public Observable<T> rxget(String url, Type type, boolean isEncryptResponse) {
         return rxget(url, type, null, null, isEncryptResponse);
@@ -40,6 +44,7 @@ public class HttpCoreEngin<T> extends BaseEngin<T> {
     public Observable<T> rxget(String url, Type type, Map<String, String> params, Map<String, String> headers,
                                boolean isEncryptResponse) {
         this.url = url;
+        urls.put(url, url);
         return super.rxget(type, params, headers, isEncryptResponse);
     }
 
@@ -54,6 +59,7 @@ public class HttpCoreEngin<T> extends BaseEngin<T> {
                                 boolean isrsa, boolean iszip, boolean
                                         isEncryptResponse) {
         this.url = url;
+        urls.put(url, url);
         return super.rxpost(type, params, headers, isrsa, iszip, isEncryptResponse);
     }
 
@@ -62,6 +68,7 @@ public class HttpCoreEngin<T> extends BaseEngin<T> {
     public Observable<String> rxpost(String url, final Map<String, String> header, final MediaType type, final String
             body) {
         this.url = url;
+        urls.put(url, url);
         return super.rxpost(header, type, body);
     }
 
@@ -101,5 +108,13 @@ public class HttpCoreEngin<T> extends BaseEngin<T> {
     @Override
     public String getUrl() {
         return url;
+    }
+
+
+    public void cancelAll() {
+        for (String s : urls.keySet()) {
+            cancel(s);
+        }
+        urls.clear();
     }
 }

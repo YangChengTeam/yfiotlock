@@ -18,22 +18,9 @@ import rx.Observable;
 /*
  * Created by　Dullyoung on 2021/3/9
  */
-public class UserEngine extends BaseEngin {
+public class UserEngine extends HttpCoreEngin {
     public UserEngine(Context context) {
         super(context);
-    }
-
-    @Override
-    public String getUrl() {
-        return null;
-    }
-
-    @Override
-    public String[] getUrls() {
-        return new String[]{
-                Config.USER_NAME_UPD_URL,
-                Config.USER_FACE_UPD_URL
-        };
     }
 
     public Observable<ResultInfo<String>> changeNickName(String name) {
