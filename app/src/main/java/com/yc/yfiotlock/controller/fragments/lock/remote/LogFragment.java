@@ -32,7 +32,7 @@ public class LogFragment extends BaseFragment {
 
 
     private int page = 1;
-    private int pageSize = 10;
+    private int pageSize = 20;
     private DeviceInfo deviceInfo;
 
     public LogFragment() {
