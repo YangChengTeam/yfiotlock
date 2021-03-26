@@ -18,6 +18,7 @@ import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.PasswordModifyOpenLockActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
@@ -37,10 +38,8 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import rx.Subscriber;
 
-public class TempPwdDetailActivity extends BaseActivity {
+public class TempPwdDetailActivity extends BaseBackActivity {
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.rv_temp_pwd_detail)
     RecyclerView recyclerView;
     @BindView(R.id.stv_del)
@@ -65,7 +64,6 @@ public class TempPwdDetailActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> onBackPressed());
 
         if (passWordInfo != null) {
             RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
@@ -91,25 +89,12 @@ public class TempPwdDetailActivity extends BaseActivity {
         itemAdapter = new ItemAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(itemAdapter);
-
-        itemAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-                if (passWordInfo != null) {
-                    Intent intent = new Intent(TempPwdDetailActivity.this, PasswordModifyOpenLockActivity.class);
-                    intent.putExtra("password_info", passWordInfo);
-                    startActivity(intent);
-                }
-            }
-        });
     }
 
     private void loadData() {
         List<ItemInfo> list = new ArrayList<>();
         if (passWordInfo != null) {
-            mBnbTitle.setTitle(passWordInfo.getName());
-
-            list.add(new ItemInfo("修改名称", "", passWordInfo.getId()));
+            list.add(new ItemInfo(passWordInfo.getName(), "", passWordInfo.getId()));
             itemAdapter.setNewInstance(list);
         }
     }
