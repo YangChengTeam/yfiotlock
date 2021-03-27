@@ -52,7 +52,6 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     protected LockEngine lockEngine;
 
     private String title;
-
     public void setTitle(String title) {
         this.title = title;
     }

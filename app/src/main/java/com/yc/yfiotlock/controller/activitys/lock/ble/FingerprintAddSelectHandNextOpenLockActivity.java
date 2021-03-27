@@ -21,7 +21,7 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
     View[] fingerBtns;
 
     private String name;
-    private String keyid;
+    private int keyid;
 
     @Override
     protected int getLayoutId() {
@@ -32,7 +32,7 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
     protected void initVars() {
         super.initVars();
         name = getIntent().getStringExtra("name");
-        keyid = getIntent().getStringExtra("keyid");
+        keyid = getIntent().getIntExtra("keyid", 0);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
 
 
     @Override
-    protected void cloudAdd(String keyid) {
+    protected void cloudAdd(int keyid) {
         int fingerprintCount = 0;
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {

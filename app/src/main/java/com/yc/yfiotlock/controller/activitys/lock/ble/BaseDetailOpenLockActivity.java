@@ -20,8 +20,12 @@ import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
+import com.yc.yfiotlock.offline.OLTOfflineManager;
+import com.yc.yfiotlock.utils.BleUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.greenrobot.eventbus.EventBus;
@@ -43,6 +47,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @BindView(R.id.stv_del)
     SuperTextView delTv;
 
+    protected OLTOfflineManager offlineManager;
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
     protected OpenLockInfo openLockInfo;
@@ -66,6 +71,8 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     protected void initVars() {
         super.initVars();
+        offlineManager = OLTOfflineManager.getInstance(this);
+
         lockEngine = new LockEngine(this);
         openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
@@ -100,6 +107,11 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected abstract void cloudDelSucc();
 
     protected void cloudDel() {
+        DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        OpenLockInfo openLockInfo = new OpenLockInfo();
+        openLockInfo.setId(openLockInfo.getId());
+        openLockInfo.setType(type);
+        offlineManager.saveOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_del", openLockInfo);
         lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
@@ -115,6 +127,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             @Override
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
+                    offlineManager.delOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_del", openLockInfo);
                     success(info.getData());
                 } else {
                     fail();

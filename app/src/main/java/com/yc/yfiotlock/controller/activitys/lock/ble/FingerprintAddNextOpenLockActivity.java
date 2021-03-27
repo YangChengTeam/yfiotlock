@@ -37,6 +37,7 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
     @BindView(R.id.iv_tip)
     ImageView fpIv;
 
+
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_fingerprint_add_next_open_lock;
@@ -51,6 +52,7 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
     @Override
     protected void initViews() {
         super.initViews();
+        setTitle("指纹");
         resultTv.setText("1/6 录入成功");
     }
 
@@ -74,7 +76,7 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
                     if (number.equals(this.number)) {
                         int id = lockBLEData.getOther()[8];
                         Intent intent = new Intent(getContext(), FingerprintAddSelectHandOpenLockActivity.class);
-                        intent.putExtra("keyid", id + "");
+                        intent.putExtra("keyid", id);
                         startActivity(intent);
                         finish();
                     } else {

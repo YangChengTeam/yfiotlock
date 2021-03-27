@@ -20,7 +20,7 @@ public class FingerprintAddSelectHandOpenLockActivity extends BaseBackActivity {
     @BindView(R.id.iv_right_hand)
     View rightHandBtn;
 
-    private String keyid;
+    private int keyid;
 
     @Override
     protected int getLayoutId() {
@@ -30,7 +30,7 @@ public class FingerprintAddSelectHandOpenLockActivity extends BaseBackActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        keyid = getIntent().getStringExtra("keyid");
+        keyid = getIntent().getIntExtra("keyid", 0);
     }
 
     @Override

@@ -50,6 +50,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     @Override
     protected void initVars() {
         super.initVars();
+        setTitle("密码");
         isNext = getIntent().getBooleanExtra("next", false);
         password = getIntent().getStringExtra("password");
     }
@@ -141,14 +142,14 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     @Override
-    protected void cloudAdd(String keyid) {
+    protected void cloudAdd(int keyid) {
         int passwordCount = 0;
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             passwordCount = countInfo.getPasswordCount();
         }
         passwordCount += 1;
-        String name = "密码" + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount);
+        String name = title + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount);
         cloudAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
     }
 

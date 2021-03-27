@@ -3,19 +3,22 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.app.Dialog;
 
-import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
-import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
+import com.yc.yfiotlock.offline.OLTOfflineManager;
+import com.yc.yfiotlock.utils.BleUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -25,15 +28,21 @@ import java.util.Random;
 import rx.Subscriber;
 
 public abstract class BaseAddOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
+    protected OLTOfflineManager offlineManager;
+
     protected LockEngine lockEngine;
     protected DeviceInfo lockInfo;
     protected LockBLESend lockBleSend;
     protected LockBLESend cancelSend;
-
     protected byte mcmd;
     protected byte scmd;
 
     protected String number;
+    protected String title;
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
 
     protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
@@ -41,6 +50,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     @Override
     protected void initVars() {
         super.initVars();
+        offlineManager = OLTOfflineManager.getInstance(this);
+
         lockEngine = new LockEngine(this);
         lockInfo = getLockInfo();
         BleDevice bleDevice = getBleDevice();
@@ -69,11 +80,19 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
     protected abstract void cloudAddSucc();
 
-    protected abstract void cloudAdd(String keyid);
+    protected abstract void cloudAdd(int keyid);
 
-    protected void cloudAdd(String name, int type, String keyid, String password) {
+    protected void cloudAdd(String name, int type, int keyid, String password) {
+        OpenLockInfo openLockInfo = new OpenLockInfo();
+        openLockInfo.setKeyid(keyid);
+        openLockInfo.setName(name);
+        openLockInfo.setType(type);
+        openLockInfo.setLockId(lockInfo.getId());
+        openLockInfo.setPassword(password);
+        openLockInfo.setGroupType(LockBLEManager.GROUP_TYPE);
+        offlineManager.saveOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_add", openLockInfo);
         mLoadingDialog.show("添加中...");
-        lockEngine.addOpenLockWay(lockInfo.getId(), name, keyid, type, LockBLEManager.GROUP_TYPE + "", password).subscribe(new Subscriber<ResultInfo<String>>() {
+        lockEngine.addOpenLockWay(lockInfo.getId(), name, keyid + "", type, LockBLEManager.GROUP_TYPE + "", password).subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
@@ -88,6 +107,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
             @Override
             public void onNext(ResultInfo<String> stringResultInfo) {
                 if (stringResultInfo.getCode() == 1) {
+                    offlineManager.delOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_add", openLockInfo);
                     finish();
                     cloudAddSucc();
                     EventBus.getDefault().post(new OpenLockRefreshEvent());
@@ -98,7 +118,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         });
     }
 
-    public void fail(String name, int type, String keyid, String password) {
+    public void fail(String name, int type, int keyid, String password) {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
                 cloudAdd(name, type, keyid, password);
@@ -167,7 +187,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                 String number = new String(Arrays.copyOfRange(lockBLEData.getOther(), 0, 8));
                 if (number.equals(this.number)) {
                     int id = lockBLEData.getOther()[8];
-                    cloudAdd(id + "");
+                    cloudAdd(id );
                 } else {
                     ToastCompat.show(getContext(), "流水号匹配不成功");
                 }

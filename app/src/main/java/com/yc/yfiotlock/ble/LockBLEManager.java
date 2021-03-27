@@ -233,6 +233,7 @@ public class LockBLEManager {
                                 clear();
                                 connectionFailedCount = 0;
                                 EventBus.getDefault().post(bleDevice);
+                                connect(bleDevice, callbck);
                             }
                         }
 
