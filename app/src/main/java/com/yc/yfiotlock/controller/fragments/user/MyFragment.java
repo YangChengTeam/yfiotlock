@@ -12,6 +12,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.AboutUsActivity;
+import com.yc.yfiotlock.controller.activitys.user.DeviceShareActivity;
 import com.yc.yfiotlock.controller.activitys.user.PersonalInfoActivity;
 import com.yc.yfiotlock.controller.activitys.user.SuggestActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
@@ -102,12 +103,16 @@ public class MyFragment extends BaseFragment {
         mRvMy.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvMy);
         itemAdapter.setOnItemClickListener((adapter, view, position) -> {
-            switch (position) {
-                case 0:
+            PersonalInfo personalInfo = (PersonalInfo) adapter.getData().get(position);
+            switch (personalInfo.getName()) {
+                case "投诉及建议":
                     startActivity(new Intent(getContext(), SuggestActivity.class));
                     break;
-                case 1:
+                case "关于我们":
                     startActivity(new Intent(getContext(), AboutUsActivity.class));
+                    break;
+                case "设备共享":
+                    startActivity(new Intent(getContext(), DeviceShareActivity.class));
                     break;
                 default:
                     break;
@@ -115,6 +120,7 @@ public class MyFragment extends BaseFragment {
         });
         List<PersonalInfo> personalInfos = new ArrayList<>();
         personalInfos.add(new PersonalInfo("投诉及建议", R.mipmap.icon_suggest));
+        personalInfos.add(new PersonalInfo("设备共享", R.mipmap.icon_us));
         personalInfos.add(new PersonalInfo("关于我们", R.mipmap.icon_us));
         itemAdapter.setNewInstance(personalInfos);
     }
