@@ -8,14 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitXY"
-        android:src="@mipmap/lock_bg"></ImageView>
+        android:src="@mipmap/lock_bg" />
 
     <com.yc.yfiotlock.view.widgets.StatusBar
         android:id="@+id/view_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></com.yc.yfiotlock.view.widgets.StatusBar>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/view_nav_bar"
@@ -74,21 +74,21 @@
             android:id="@+id/iv_loading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@mipmap/two"></ImageView>
+            android:src="@mipmap/two" />
 
         <View
             android:id="@+id/iv_tap"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_gravity="center"
-            android:background="@drawable/lock_ble_inner_circle_bg"></View>
+            android:background="@drawable/lock_ble_inner_circle_bg" />
 
         <View
             android:id="@+id/iv_tap2"
             android:layout_width="108dp"
             android:layout_height="108dp"
             android:layout_gravity="center"
-            android:background="@drawable/lock_ble_inner2_circle_bg"></View>
+            android:background="@drawable/lock_ble_inner2_circle_bg" />
 
         <ImageView
             android:id="@+id/iv_status"
@@ -96,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="?android:selectableItemBackground"
-            android:src="@mipmap/icon_bluetooth"></ImageView>
+            android:src="@mipmap/icon_bluetooth" />
     </FrameLayout>
 
     <TextView
@@ -138,8 +138,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:background="?android:selectableItemBackground"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground">
 
             <TextView
                 android:id="@+id/tv_op_item_title"
@@ -171,17 +171,16 @@
                 android:src="@mipmap/icon_arrow"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"></ImageView>
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="12dp"
         android:layout_marginRight="30dp"
-        android:orientation="horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cd_open_lock">
@@ -189,16 +188,18 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cd_vm"
             android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_marginRight="6dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="12dp"
             android:layout_weight="1"
             app:cardCornerRadius="7dp"
-            app:cardElevation="1dp">
+            app:cardElevation="1dp"
+            app:layout_constraintEnd_toStartOf="@id/cd_log"
+            app:layout_constraintStart_toStartOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:background="?android:selectableItemBackground"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="?android:selectableItemBackground">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -225,16 +226,17 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cd_log"
             android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_marginLeft="6dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             app:cardCornerRadius="7dp"
-            app:cardElevation="1dp">
+            app:cardElevation="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/cd_vm">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:background="?android:selectableItemBackground"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="?android:selectableItemBackground">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -257,7 +259,7 @@
                     app:layout_constraintTop_toTopOf="parent"></ImageView>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

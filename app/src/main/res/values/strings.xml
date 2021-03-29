@@ -125,6 +125,10 @@
     <string name="please_reset_work_wifi">请重新设置工作WiFi</string>
     <string name="delete_device">删除设备</string>
     <string name="temp">临时密码</string>
+    <string name="device_share">设备共享</string>
+    <string name="agree">同意</string>
+    <string name="no_device_share">没有设备共享</string>
+    <string name="agreed">已同意</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>

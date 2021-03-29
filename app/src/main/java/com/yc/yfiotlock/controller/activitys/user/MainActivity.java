@@ -20,6 +20,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.dialogs.lock.share.ReceiveDeviceDialog;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
@@ -72,9 +73,14 @@ public class MainActivity extends BaseActivity {
     private void checkUpdate() {
         UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(App.getApp().getUpdateInfo());
         if (updateInfo != null) {
-            DownloadManager.setContext(new WeakReference<>(this));
-            UpdateDialog updateDialog = new UpdateDialog(this);
-            updateDialog.show(updateInfo);
+//            DownloadManager.setContext(new WeakReference<>(this));
+//            UpdateDialog updateDialog = new UpdateDialog(this);
+//            updateDialog.show(updateInfo);
+            ReceiveDeviceDialog deviceDialog=new ReceiveDeviceDialog(this);
+            deviceDialog.setOnBtnClick(() -> {
+
+            });
+            deviceDialog.show("15456415");
         }
     }
 

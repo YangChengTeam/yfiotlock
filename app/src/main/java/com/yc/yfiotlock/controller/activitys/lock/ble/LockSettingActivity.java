@@ -199,11 +199,19 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         mSettingAdapter.setHeaderView(headView);
     }
 
+    /**
+     * 是否是管理员
+     */
+    private boolean isAdministrator = true;
+
     private void loadData() {
         List<SettingInfo> settingInfos = new ArrayList<>();
-        settingInfos.add(new SettingInfo("报警管理", ""));
-        settingInfos.add(new SettingInfo("设备信息", ""));
-        settingInfos.add(new SettingInfo("设备名称", lockInfo.getName()));
+        if (isAdministrator) {
+            settingInfos.add(new SettingInfo("报警管理", ""));
+            settingInfos.add(new SettingInfo("设备信息", ""));
+            settingInfos.add(new SettingInfo("设备名称", lockInfo.getName()));
+            settingInfos.add(new SettingInfo("设备共享", ""));
+        }
         settingInfos.add(new SettingInfo("安全设置", ""));
         settingInfos.add(new SettingInfo("帮助与反馈", ""));
         mSettingAdapter.setNewInstance(settingInfos);

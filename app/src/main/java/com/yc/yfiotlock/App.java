@@ -71,7 +71,7 @@ public class App extends Application {
         initHttp();
         initCommonConfig();
         initBauduMap();
-        cloudgetMacList();
+      //  cloudgetMacList();
         checkUpdate();
     }
 

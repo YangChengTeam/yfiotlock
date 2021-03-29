@@ -79,6 +79,8 @@ public class SettingSoundView extends BaseView {
             case R.id.ll_high:
                 onSelect(3);
                 break;
+            default:
+                break;
         }
     }
 
@@ -96,6 +98,8 @@ public class SettingSoundView extends BaseView {
             case 3:
                 mCvHigh.setVisibility(VISIBLE);
                 mTvHigh.setTextColor(0xff3091F8);
+                break;
+            default:
                 break;
         }
         if (mOnSelectChangeListener != null) {

@@ -120,7 +120,7 @@ public class MyFragment extends BaseFragment {
         });
         List<PersonalInfo> personalInfos = new ArrayList<>();
         personalInfos.add(new PersonalInfo("投诉及建议", R.mipmap.icon_suggest));
-        personalInfos.add(new PersonalInfo("设备共享", R.mipmap.icon_us));
+        personalInfos.add(new PersonalInfo("设备共享", R.mipmap.equipment_share));
         personalInfos.add(new PersonalInfo("关于我们", R.mipmap.icon_us));
         itemAdapter.setNewInstance(personalInfos);
     }
