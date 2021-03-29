@@ -27,13 +27,15 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     @Override
     protected void initViews() {
         super.initViews();
+        setTitle("NFC门卡");
+
         int cardCount = 0;
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             cardCount = countInfo.getCardCount();
         }
         cardCount += 1;
-        String name = "NFC门卡" + ((cardCount) > 9 ? cardCount + "" : "0" + cardCount);
+        String name =  title + ((cardCount) > 9 ? cardCount + "" : "0" + cardCount);
         nameTv.setText(name);
 
         bleAddCard();
@@ -71,7 +73,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     @Override
-    protected void cloudAdd(String keyid) {
+    protected void cloudAdd(int keyid) {
         mLoadingDialog.show("添加卡片中...");
         cloudAdd(nameTv.getText().toString(), LockBLEManager.OPEN_LOCK_CARD, keyid, "");
     }
