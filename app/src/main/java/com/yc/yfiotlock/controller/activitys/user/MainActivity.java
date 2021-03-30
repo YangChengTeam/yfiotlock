@@ -67,20 +67,15 @@ public class MainActivity extends BaseActivity {
         setVp();
         onSelected(0);
         ThreadPoolExecutorImpl.getImpl().execute(this::deleteLowerVersionApkFile);
-        checkUpdate();
+        //checkUpdate();
     }
 
     private void checkUpdate() {
         UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(App.getApp().getUpdateInfo());
         if (updateInfo != null) {
-//            DownloadManager.setContext(new WeakReference<>(this));
-//            UpdateDialog updateDialog = new UpdateDialog(this);
-//            updateDialog.show(updateInfo);
-            ReceiveDeviceDialog deviceDialog=new ReceiveDeviceDialog(this);
-            deviceDialog.setOnBtnClick(() -> {
-
-            });
-            deviceDialog.show("15456415");
+            DownloadManager.setContext(new WeakReference<>(this));
+            UpdateDialog updateDialog = new UpdateDialog(this);
+            updateDialog.show(updateInfo);
         }
     }
 

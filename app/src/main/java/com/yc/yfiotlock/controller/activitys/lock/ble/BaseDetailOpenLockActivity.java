@@ -108,7 +108,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     protected void cloudDel() {
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        OpenLockInfo openLockInfo = new OpenLockInfo();
         openLockInfo.setId(openLockInfo.getId());
         openLockInfo.setType(type);
         offlineManager.saveOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_del", openLockInfo);
@@ -127,6 +126,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             @Override
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
+                    mLoadingDialog.dismiss();
                     offlineManager.delOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_del", openLockInfo);
                     success(info.getData());
                 } else {

@@ -107,6 +107,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
             @Override
             public void onNext(ResultInfo<String> stringResultInfo) {
                 if (stringResultInfo.getCode() == 1) {
+                    mLoadingDialog.dismiss();
                     offlineManager.delOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_add", openLockInfo);
                     finish();
                     cloudAddSucc();
@@ -121,6 +122,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     public void fail(String name, int type, int keyid, String password) {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
+                mLoadingDialog.show("同步中...");
                 cloudAdd(name, type, keyid, password);
             });
         } else {
@@ -187,7 +189,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                 String number = new String(Arrays.copyOfRange(lockBLEData.getOther(), 0, 8));
                 if (number.equals(this.number)) {
                     int id = lockBLEData.getOther()[8];
-                    cloudAdd(id );
+                    cloudAdd(id);
                 } else {
                     ToastCompat.show(getContext(), "流水号匹配不成功");
                 }

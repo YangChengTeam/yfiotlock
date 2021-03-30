@@ -47,6 +47,9 @@ public class OLTOfflineManager {
                 }
             }
         }
+        if (openLockInfos == null) {
+            openLockInfos = new ArrayList<>();
+        }
         openLockInfos.add(openLockInfo);
         CacheUtil.setCache(key, openLockInfos);
     }

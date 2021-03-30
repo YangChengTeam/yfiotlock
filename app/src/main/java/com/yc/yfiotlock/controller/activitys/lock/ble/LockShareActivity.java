@@ -17,6 +17,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.lock.ShareLockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
@@ -67,7 +68,7 @@ public class LockShareActivity extends BaseBackActivity {
     @Override
     protected void bindClick() {
         setClick(mStvAdd, () -> {
-           startActivity(new Intent(getContext(),LockShareInputActivity.class));
+            startActivity(new Intent(getContext(), LockShareInputActivity.class));
         });
     }
 
@@ -80,9 +81,13 @@ public class LockShareActivity extends BaseBackActivity {
         CommonUtil.setItemDivider(getContext(), mRvList);
         mAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             if (view.getId() == R.id.stv_del) {
-                Log.i("aaaa", "setRvList: " + position);
-                mAdapter.getData().remove(position);
-                mAdapter.notifyItemRemoved(position);
+                GeneralDialog dialog = new GeneralDialog(getContext());
+                dialog.setTitle("温馨提示")
+                        .setMsg("确定删除" + mAdapter.getData().get(position).desp + "的使用权限?")
+                        .setOnPositiveClickListener(dialog1 -> {
+                            mAdapter.getData().remove(position);
+                            mAdapter.notifyItemRemoved(position);
+                        }).show();
             }
         });
         mAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
