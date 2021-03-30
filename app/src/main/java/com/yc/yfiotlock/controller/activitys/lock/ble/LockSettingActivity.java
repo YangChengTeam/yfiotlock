@@ -177,6 +177,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 case "帮助与反馈":
                     startActivity(new Intent(this, FAQActivity.class));
                     break;
+                    case "设备共享":
+                    startActivity(new Intent(this, LockShareActivity.class));
+                    break;
                 default:
                     break;
             }

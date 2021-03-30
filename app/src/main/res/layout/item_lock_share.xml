@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="?android:selectableItemBackground"
+    android:layout_height="58dp">
+
+    <ImageView
+        android:id="@+id/iv_face"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_desp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="13dp"
+        android:textColor="#222222"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toTopOf="@id/tv_time"
+        app:layout_constraintStart_toEndOf="@id/iv_face"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#999999"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tv_desp"
+        app:layout_constraintTop_toBottomOf="@id/tv_desp" />
+
+    <TextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:textColor="#3395FD"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_time"
+        app:layout_constraintStart_toEndOf="@id/tv_time"
+        app:layout_constraintTop_toTopOf="@id/tv_time" />
+
+    <com.coorchice.library.SuperTextView
+        android:id="@+id/stv_del"
+        android:layout_width="42dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="15dp"
+        android:gravity="center"
+        android:text="@string/delete"
+        android:textColor="#FE3737"
+        android:textSize="13dp"
+        app:stv_pressBgColor="@color/pressedColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:stv_corner="4dp"
+        app:stv_stroke_color="#FE3737"
+        app:stv_stroke_width="0.33dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

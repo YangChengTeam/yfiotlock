@@ -43,10 +43,11 @@ public class SplashActivity extends BaseActivity {
      */
     private boolean navToMain = false;
 
+
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (navToMain) {
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && navToMain) {
             navToMain();
         }
     }
