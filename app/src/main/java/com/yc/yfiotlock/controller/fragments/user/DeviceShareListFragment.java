@@ -7,7 +7,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockShareManageActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ShareDeviceInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
@@ -60,8 +62,8 @@ public class DeviceShareListFragment extends BaseFragment {
         mRvList.setAdapter(mAdapter);
         mRvList.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvList);
-        mAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-
+        mAdapter.setOnItemClickListener((adapter, view, position) -> {
+            LockShareManageActivity.start(getContext(),new DeviceInfo());
         });
         mAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
             p++;

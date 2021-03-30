@@ -55,7 +55,7 @@
         android:text="@string/delete"
         android:textColor="#FE3737"
         android:textSize="13dp"
-        app:stv_pressBgColor="@color/pressedColor"
+        app:stv_pressBgColor="#21FE3737"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

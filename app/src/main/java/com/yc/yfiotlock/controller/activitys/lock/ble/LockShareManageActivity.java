@@ -1,8 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +17,7 @@ import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ShareLockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
@@ -30,9 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
-public class LockShareActivity extends BaseBackActivity {
+public class LockShareManageActivity extends BaseBackActivity {
 
 
     @BindView(R.id.view_line)
@@ -46,9 +45,15 @@ public class LockShareActivity extends BaseBackActivity {
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
 
+    public static void start(Context context, DeviceInfo deviceInfo) {
+        Intent intent = new Intent(context, LockShareManageActivity.class);
+        intent.putExtra("deviceInfo", deviceInfo);
+        context.startActivity(intent);
+    }
+
     @Override
     protected int getLayoutId() {
-        return R.layout.lock_ble_activity_lock_share;
+        return R.layout.lock_ble_activity_lock_share_manage;
     }
 
     private int p = 1;
@@ -56,6 +61,9 @@ public class LockShareActivity extends BaseBackActivity {
     @Override
     protected void initViews() {
         super.initViews();
+        DeviceInfo deviceInfo = (DeviceInfo) getIntent().getSerializableExtra("deviceInfo");
+        String title = deviceInfo == null ? "" : deviceInfo.getName() + "共享管理";
+        backNavBar.setTitle(title);
         mSrlRefresh.setColorSchemeColors(0xff3395fd);
         mSrlRefresh.setOnRefreshListener(() -> {
             p = 1;

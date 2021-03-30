@@ -39,7 +39,7 @@
         <activity android:name=".controller.activitys.lock.ble.LockShareCommitActivity"></activity>
         <activity android:name=".controller.activitys.lock.ble.LockShareInputActivity"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible"/>
-        <activity android:name=".controller.activitys.lock.ble.LockShareActivity" />
+        <activity android:name=".controller.activitys.lock.ble.LockShareManageActivity" />
         <activity android:name=".controller.activitys.user.DeviceShareActivity" />
         <activity android:name=".controller.activitys.lock.ble.add.ConnectFailActivity" />
         <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" />
