@@ -71,7 +71,7 @@ public class App extends Application {
         initHttp();
         initCommonConfig();
         initBauduMap();
-      //  cloudgetMacList();
+        //  cloudgetMacList();
         checkUpdate();
     }
 
@@ -98,7 +98,7 @@ public class App extends Application {
     private void checkUpdate() {
         UpdateEngine updateEngine = new UpdateEngine(this);
         updateEngine.getUpdateInfo().subscribe(resultInfo -> {
-            if (resultInfo.getData() != null) {
+            if (resultInfo != null && resultInfo.getData() != null) {
                 mUpdateInfo = resultInfo.getData().getUpgrade();
             }
         });
