@@ -16,6 +16,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.ILoadData;
+import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.model.bean.eventbus.EventStub;
 import com.yc.yfiotlock.utils.CommonUtil;
 
@@ -32,6 +33,7 @@ public abstract class BaseFragment extends Fragment implements ILoadData {
 
 
     protected View mRootView;
+    protected LoadingDialog mLoadingDialog;
 
     public BaseFragment() {
 
@@ -50,7 +52,7 @@ public abstract class BaseFragment extends Fragment implements ILoadData {
             mRootView = View.inflate(getActivity(), getLayoutId(), null);
             ButterKnife.bind(this, mRootView);
 
-
+            mLoadingDialog = new LoadingDialog(getContext());
             initVars();
             initViews();
             bindClick();
@@ -85,7 +87,7 @@ public abstract class BaseFragment extends Fragment implements ILoadData {
     @Override
     public void onStop() {
         super.onStop();
-
+        mLoadingDialog.dismiss();
     }
 
     @Override
@@ -127,7 +129,7 @@ public abstract class BaseFragment extends Fragment implements ILoadData {
     }
 
     /**
-     * @param view click view
+     * @param view     click view
      * @param runnable when click to do sth.
      */
     protected void setClick(View view, @NonNull Runnable runnable) {

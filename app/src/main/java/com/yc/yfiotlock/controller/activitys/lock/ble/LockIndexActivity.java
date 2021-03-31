@@ -3,12 +3,14 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.app.Dialog;
 import android.content.Intent;
 import android.hardware.SensorEvent;
+import android.os.Bundle;
 import android.os.Vibrator;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
@@ -25,7 +27,6 @@ import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import rx.functions.Action1;
 
 public class LockIndexActivity extends BaseActivity implements LockBLESend.NotifyCallback {
@@ -62,8 +64,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     View openLockBtn;
     @BindView(R.id.cd_log)
     View logBtn;
-    @BindView(R.id.cd_vm)
-    View vmBtn;
 
     @BindView(R.id.iv_loading)
     ImageView loadingIv;
@@ -80,6 +80,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @BindView(R.id.tv_open_count)
     TextView openCountTv;
+    @BindView(R.id.cd_vm)
+    CardView mCdVm;
 
     private ShakeSensor shakeSensor;
     private BleDevice bleDevice;
@@ -128,6 +130,16 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         familyInfo = (FamilyInfo) getIntent().getSerializableExtra("family");
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         lockEngine = new LockEngine(this);
+        if (lockInfo.getIsShare() == 1) {
+            setUserUi();
+        }
+    }
+
+    /**
+     * 设置用户的UI 而非管理员
+     */
+    private void setUserUi() {
+        mCdVm.setVisibility(View.GONE);
     }
 
     @Override
@@ -196,13 +208,17 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             nav2Log();
         });
 
-        RxView.clicks(vmBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+        RxView.clicks(mCdVm).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             nav2Vm();
         });
 
         RxView.clicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (LockBLEManager.isConnected(bleDevice)) return;
-            if (statusTitleTv.getText().equals("连接门锁中...")) return;
+            if (LockBLEManager.isConnected(bleDevice)) {
+                return;
+            }
+            if ("连接门锁中...".equals(statusTitleTv.getText())){
+                return;
+            }
 
             if (bleDevice == null) {
                 scan();

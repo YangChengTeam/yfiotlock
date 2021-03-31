@@ -3,6 +3,7 @@ package com.yc.yfiotlock.model.bean.lock;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 
 import java.io.Serializable;
 
@@ -25,6 +26,19 @@ public class DeviceInfo implements Serializable {
     @JSONField(name = "mac_address")
     private String macAddress;
     private String model = "Locker";
+
+    /**
+     * 是否是共享的锁
+     */
+    @JSONField(name = "is_share")
+    private int isShare;
+
+    /**
+     * 锁是否还有效 0失效 1 有效
+     */
+    private int has;
+
+    private UserInfo user;
 
     public DeviceInfo() {
     }
@@ -127,5 +141,29 @@ public class DeviceInfo implements Serializable {
 
     public void setOnline(boolean online) {
         isOnline = online;
+    }
+
+    public UserInfo getUser() {
+        return user;
+    }
+
+    public void setUser(UserInfo user) {
+        this.user = user;
+    }
+
+    public int getIsShare() {
+        return isShare;
+    }
+
+    public void setIsShare(int isShare) {
+        this.isShare = isShare;
+    }
+
+    public int getHas() {
+        return has;
+    }
+
+    public void setHas(int has) {
+        this.has = has;
     }
 }

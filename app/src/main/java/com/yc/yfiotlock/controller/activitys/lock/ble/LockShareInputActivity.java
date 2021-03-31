@@ -8,12 +8,21 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
+import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
+import com.yc.yfiotlock.model.engin.UserEngine;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observer;
 
 public class LockShareInputActivity extends BaseBackActivity {
 
@@ -70,10 +79,55 @@ public class LockShareInputActivity extends BaseBackActivity {
 
     @Override
     protected void bindClick() {
+        setClick(mTvSure, this::getUserInfo);
+    }
 
-        setClick(mTvSure, () -> {
-            LockShareCommitActivity.start(getContext(), deviceInfo, mEtAccount.getText().toString());
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mUserEngine = new UserEngine(getContext());
+    }
+
+    private UserEngine mUserEngine;
+
+    private void getUserInfo() {
+        mLoadingDialog.show("请求中...");
+        mUserEngine.getUserInfo(mEtAccount.getText().toString()).subscribe(new Observer<ResultInfo<UserInfo>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), "请求失败");
+            }
+
+            @Override
+            public void onNext(ResultInfo<UserInfo> info) {
+                if (info.getCode() == 1) {
+                    mLoadingDialog.dismiss();
+                    LockShareCommitActivity.start(getContext(), deviceInfo, info.getData());
+                } else {
+                    ToastCompat.show(getContext(), info.getMsg());
+                }
+            }
         });
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMsg(String s) {
+        if (s.equals(ShareDeviceEngine.SHARE_DEVICE_SUCCESS)) {
+            finish();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mUserEngine != null) {
+            mUserEngine.cancelAll();
+        }
+    }
 }

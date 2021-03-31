@@ -1,27 +1,29 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.app.Dialog;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
-import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.offline.OLTOfflineManager;
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import rx.Subscriber;
 
 public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
@@ -58,6 +61,8 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected byte scmd;
 
     protected String title;
+    @BindView(R.id.fl_bottom)
+    FrameLayout mFlBottom;
 
     public void setTitle(String title) {
         this.title = title;
@@ -72,7 +77,10 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected void initVars() {
         super.initVars();
         offlineManager = OLTOfflineManager.getInstance(this);
-
+        DeviceInfo deviceInfo = LockIndexActivity.getInstance().getLockInfo();
+        if (deviceInfo != null && deviceInfo.getIsShare() == 1) {
+            mFlBottom.setVisibility(View.GONE);
+        }
         lockEngine = new LockEngine(this);
         openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
@@ -83,6 +91,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected void initViews() {
         super.initViews();
         setNavTitle(title + "详情");
+
         delTv.setText(delTv.getText() + title);
         RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             GeneralDialog generalDialog = new GeneralDialog(BaseDetailOpenLockActivity.this);
@@ -200,6 +209,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
         openLockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         openLockRecyclerView.setAdapter(openLockAdapter);
     }
+
 
     public static class OpenLockAdapter extends BaseExtendAdapter<OpenLockInfo> {
         public OpenLockAdapter(@Nullable List<OpenLockInfo> data) {

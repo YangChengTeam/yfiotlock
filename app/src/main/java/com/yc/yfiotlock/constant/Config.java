@@ -93,6 +93,16 @@ public class Config {
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();
     public static final String LOG_OPEN_URL = getBaseUrl() + "/userapp/v1.locker_open_log/openLogList" + isRsa();
 
+    //分享设备相关
+
+    public static final String GET_USER_INFO_URL = getBaseUrl() + "/userapp/v1.locker_share/getReceiveInfo" + isRsa();
+    public static final String SHARE_DEVICE_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerShareAdd" + isRsa();
+    public static final String SHARE_DEVICE_LIST_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerShareList" + isRsa();
+    public static final String SHARE_ALL_DEVICE_LIST_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerList" + isRsa();
+    public static final String SHARE_DEVICE_DELETE_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerShareDel" + isRsa();
+    public static final String SHARE_DEVICE_RECEIVE_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerShareAgree" + isRsa();
+    public static final String SHARE_DEVICE_HAS_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerShareHas" + isRsa();
+    public static final String SHARE_DEVICE_EXIST_URL = getBaseUrl() + "/userapp/v1.locker/lockerHas" + isRsa();
 
     public static final int CLICK_LIMIT = 500;
 

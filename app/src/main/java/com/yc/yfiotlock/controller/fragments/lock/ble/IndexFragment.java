@@ -25,6 +25,7 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
+import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.SafeUtil;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import rx.Observer;
 import rx.Subscriber;
 
 import static android.app.Activity.RESULT_OK;
@@ -66,6 +68,7 @@ public class IndexFragment extends BaseFragment {
     @Override
     protected void initVars() {
         super.initVars();
+        mEngine = new ShareDeviceEngine(getContext());
         indexEngin = new IndexEngin(getActivity());
     }
 
@@ -74,9 +77,7 @@ public class IndexFragment extends BaseFragment {
         setRv();
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setProgressViewOffset(false, 0, ScreenUtil.dip2px(getContext(), 50));
-        mSrlRefresh.setOnRefreshListener(() -> {
-            loadData();
-        });
+        mSrlRefresh.setOnRefreshListener(this::loadData);
         loadData();
     }
 
@@ -97,7 +98,40 @@ public class IndexFragment extends BaseFragment {
                 nav2AddDevice();
             } else {
                 mDeviceInfo = (DeviceInfo) adapter.getData().get(position);
-                nav2LockIndex();
+                if (mDeviceInfo.getIsShare() == 1) {
+                    checkLockExist();
+                } else {
+                    nav2LockIndex();
+                }
+            }
+        });
+    }
+
+    private ShareDeviceEngine mEngine;
+
+    private void checkLockExist() {
+        mLoadingDialog.show("检验中...");
+        mEngine.checkLockExist(mDeviceInfo.getId()).subscribe(new Observer<ResultInfo<DeviceInfo>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), "检验失败");
+            }
+
+            @Override
+            public void onNext(ResultInfo<DeviceInfo> deviceInfoResultInfo) {
+                mLoadingDialog.dismiss();
+                if (deviceInfoResultInfo.getData().getHas() == 1) {
+                    nav2LockIndex();
+                } else {
+                    ToastCompat.show(getContext(),"设备已失效");
+                    loadData();
+                }
             }
         });
     }

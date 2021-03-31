@@ -3,7 +3,9 @@ package com.yc.yfiotlock.controller.dialogs.lock.share;
 import android.content.Context;
 import android.widget.TextView;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.controller.dialogs.BaseBottomSheetDialog;
 import com.yc.yfiotlock.controller.dialogs.BaseDialog;
 
 import butterknife.BindView;
@@ -12,7 +14,7 @@ import butterknife.BindView;
  * @author Dullyoung
  * Created by　Dullyoung on 2021/3/29
  **/
-public class ReceiveDeviceDialog extends BaseDialog {
+public class ReceiveDeviceDialog extends BaseBottomSheetDialog {
     @BindView(R.id.tv_from)
     TextView mTvFrom;
     @BindView(R.id.tv_cancel)
@@ -31,7 +33,7 @@ public class ReceiveDeviceDialog extends BaseDialog {
 
     @Override
     protected void initViews() {
-    setCanceledOnTouchOutside(false);
+        setCanceledOnTouchOutside(false);
     }
 
 
@@ -39,8 +41,8 @@ public class ReceiveDeviceDialog extends BaseDialog {
      * @param fromUserName 门锁分享来自的用户名
      */
     public void show(String fromUserName) {
-        mTvFrom.setText("来自".concat(fromUserName).concat("的共享"));
         super.show();
+        mTvFrom.setText("来自".concat(fromUserName).concat("的共享"));
     }
 
     @Override

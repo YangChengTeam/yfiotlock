@@ -62,6 +62,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
         deviceEngin = new DeviceEngin(this);
+        isAdministrator = lockInfo.getIsShare() == 0;
     }
 
     @Override
@@ -177,29 +178,31 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 case "帮助与反馈":
                     startActivity(new Intent(this, FAQActivity.class));
                     break;
-                    case "设备共享":
-                    LockShareManageActivity.start(getContext(),lockInfo);
+                case "设备共享":
+                    LockShareManageActivity.start(getContext(), lockInfo);
                     break;
                 default:
                     break;
             }
         });
         CommonUtil.setItemDivider(getContext(), mRvSetting);
-        headView = new SettingSoundView(this);
-        headView.setDeviceMac(lockInfo.getMacAddress());
-        lockInfo.setBattery(headView.getVolume());
-        headView.setOnSelectChangeListener(new SettingSoundView.OnSelectChangeListener() {
-            @Override
-            public void onChange(int index) {
-                if (lockBleSend != null && lockBleSend.isConnected()) {
-                    volume = index;
-                    bleSetVolume(volume);
-                } else {
-                    ToastCompat.show(getContext(), "蓝牙未连接");
+        if (isAdministrator) {
+            headView = new SettingSoundView(this);
+            headView.setDeviceMac(lockInfo.getMacAddress());
+            lockInfo.setBattery(headView.getVolume());
+            headView.setOnSelectChangeListener(new SettingSoundView.OnSelectChangeListener() {
+                @Override
+                public void onChange(int index) {
+                    if (lockBleSend != null && lockBleSend.isConnected()) {
+                        volume = index;
+                        bleSetVolume(volume);
+                    } else {
+                        ToastCompat.show(getContext(), "蓝牙未连接");
+                    }
                 }
-            }
-        });
-        mSettingAdapter.setHeaderView(headView);
+            });
+            mSettingAdapter.setHeaderView(headView);
+        }
     }
 
     /**

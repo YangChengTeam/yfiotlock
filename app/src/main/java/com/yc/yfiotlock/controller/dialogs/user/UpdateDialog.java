@@ -16,6 +16,7 @@ import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -68,6 +69,9 @@ public class UpdateDialog extends BaseDialog {
         isMust = (updateInfo.getIsMust() == 1);
         mIvCancel.setVisibility(isMust ? View.GONE : View.VISIBLE);
         setCanceledOnTouchOutside(isMust);
+        if (!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
         show();
     }
 

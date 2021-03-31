@@ -6,11 +6,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockShareManageActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.ShareDeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.ShareDeviceWrapper;
+import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDeviceView;
@@ -19,10 +21,10 @@ import com.yc.yfiotlock.view.widgets.NoWifiView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import rx.Observer;
 
 /**
  * @author Dullyoung
@@ -63,7 +65,11 @@ public class DeviceShareListFragment extends BaseFragment {
         mRvList.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvList);
         mAdapter.setOnItemClickListener((adapter, view, position) -> {
-            LockShareManageActivity.start(getContext(),new DeviceInfo());
+            ShareDeviceWrapper wrapper=mAdapter.getData().get(position);
+            DeviceInfo deviceInfo= new DeviceInfo();
+            deviceInfo.setId(wrapper.getId());
+            deviceInfo.setName(wrapper.getName());
+            LockShareManageActivity.start(getContext(),deviceInfo);
         });
         mAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
             p++;
@@ -71,29 +77,43 @@ public class DeviceShareListFragment extends BaseFragment {
         });
     }
 
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mEngine = new ShareDeviceEngine(getContext());
+    }
+
+    private ShareDeviceEngine mEngine;
+
     private void loadData() {
-        List<ShareDeviceInfo> shareDeviceInfos = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            ShareDeviceInfo shareDeviceInfo = new ShareDeviceInfo();
-            shareDeviceInfo.desp = "分享至4164565465";
-            shareDeviceInfo.name = "YF_IOTLOCK";
-            shareDeviceInfos.add(shareDeviceInfo);
-        }
-        mAdapter.addData(shareDeviceInfos);
+        mSrlRefresh.setRefreshing(p == 1);
+        mEngine.getAllDevice(p).subscribe(new Observer<ResultInfo<List<ShareDeviceWrapper>>>() {
+            @Override
+            public void onCompleted() {
+                mSrlRefresh.setRefreshing(false);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mSrlRefresh.setRefreshing(false);
+                fail();
+            }
+
+            @Override
+            public void onNext(ResultInfo<List<ShareDeviceWrapper>> info) {
+                if (info.getCode() == 1) {
+                    if (info.getData() == null || info.getData().size() == 0) {
+                        empty();
+                        return;
+                    }
+                    success(info);
+                } else {
+                    fail();
+                }
+            }
+        });
     }
 
-
-    private class DeviceShareAdapter extends BaseExtendAdapter<ShareDeviceInfo> implements LoadMoreModule {
-        public DeviceShareAdapter(@Nullable List<ShareDeviceInfo> data) {
-            super(R.layout.item_device_share, data);
-        }
-
-        @Override
-        protected void convert(@NotNull BaseViewHolder holder, ShareDeviceInfo shareDeviceInfo) {
-            holder.setText(R.id.tv_device_name, shareDeviceInfo.name);
-            holder.setText(R.id.tv_desp, shareDeviceInfo.desp);
-        }
-    }
 
     @Override
     public void empty() {
@@ -106,7 +126,17 @@ public class DeviceShareListFragment extends BaseFragment {
 
     @Override
     public void success(Object data) {
-        super.success(data);
+        List<ShareDeviceWrapper> list = ((ResultInfo<List<ShareDeviceWrapper>>) data).getData();
+        if (p == 1) {
+            mAdapter.setNewInstance(list);
+        } else {
+            mAdapter.addData(list);
+        }
+        if (list.size() < 10) {
+            mAdapter.getLoadMoreModule().loadMoreEnd();
+        } else {
+            mAdapter.getLoadMoreModule().loadMoreComplete();
+        }
     }
 
     @Override
@@ -118,4 +148,25 @@ public class DeviceShareListFragment extends BaseFragment {
             mAdapter.getLoadMoreModule().loadMoreFail();
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mEngine!=null){
+            mEngine.cancelAll();
+        }
+    }
+
+    private class DeviceShareAdapter extends BaseExtendAdapter<ShareDeviceWrapper> implements LoadMoreModule {
+        public DeviceShareAdapter(@Nullable List<ShareDeviceWrapper> data) {
+            super(R.layout.item_device_share, data);
+        }
+
+        @Override
+        protected void convert(@NotNull BaseViewHolder holder, ShareDeviceWrapper shareDeviceInfo) {
+            holder.setText(R.id.tv_device_name, shareDeviceInfo.getName());
+            holder.setText(R.id.tv_desp, "分享至" + shareDeviceInfo.getReceiveUser().getMobile());
+        }
+    }
+
 }

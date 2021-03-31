@@ -7,14 +7,20 @@ import android.text.Html;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
+import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 
 import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observer;
 
 public class LockShareCommitActivity extends BaseBackActivity {
 
@@ -28,9 +34,9 @@ public class LockShareCommitActivity extends BaseBackActivity {
     @BindView(R.id.tv_sure)
     TextView mTvSure;
 
-    public static void start(Context context, DeviceInfo deviceInfo, String account) {
+    public static void start(Context context, DeviceInfo deviceInfo, UserInfo userInfo) {
         Intent intent = new Intent(context, LockShareCommitActivity.class);
-        intent.putExtra("account", account);
+        intent.putExtra("userInfo", userInfo);
         intent.putExtra("DeviceInfo", deviceInfo);
         context.startActivity(intent);
     }
@@ -40,21 +46,74 @@ public class LockShareCommitActivity extends BaseBackActivity {
         return R.layout.lock_ble_activity_lock_share_commit;
     }
 
+    UserInfo mUserInfo;
+    DeviceInfo lockInfo;
+
     @Override
     protected void initViews() {
         super.initViews();
-        DeviceInfo lockInfo = (DeviceInfo) getIntent().getSerializableExtra("DeviceInfo");
+        lockInfo = (DeviceInfo) getIntent().getSerializableExtra("DeviceInfo");
         String text = "<font color='#999999'>允许控制</font><font color='#222222'>【" + lockInfo.getName() + "】</font>";
         mTvResult.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        mTvAccount.setText(getIntent().getStringExtra("account"));
+        mUserInfo = (UserInfo) getIntent().getSerializableExtra("userInfo");
+        if (mUserInfo == null) {
+            finish();
+            ToastCompat.show(getContext(), "用户信息有误");
+            return;
+        }
+        mTvAccount.setText(mUserInfo.getNickName());
+        Glide.with(getContext())
+                .load(mUserInfo.getFace())
+                .error(R.mipmap.head_big)
+                .placeholder(R.mipmap.head_big)
+                .circleCrop()
+                .into(mIvFace);
     }
 
     @Override
     protected void bindClick() {
-        setClick(mTvSure, () -> {
-            finish();
+        setClick(mTvSure, this::shareDevice);
+    }
+
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mEngine = new ShareDeviceEngine(getContext());
+    }
+
+    private ShareDeviceEngine mEngine;
+
+    private void shareDevice() {
+        mLoadingDialog.show("请求中...");
+        mEngine.shareDevice(mUserInfo.getId(), lockInfo.getId()).subscribe(new Observer<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), "分享失败");
+            }
+
+            @Override
+            public void onNext(ResultInfo<String> info) {
+                ToastCompat.show(getContext(), info.getMsg());
+                if (info.getCode() == 1) {
+                    mLoadingDialog.dismiss();
+                    EventBus.getDefault().post(ShareDeviceEngine.SHARE_DEVICE_SUCCESS);
+                    finish();
+                }
+            }
         });
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mEngine != null) {
+            mEngine.cancelAll();
+        }
+    }
 }

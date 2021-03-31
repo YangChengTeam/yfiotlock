@@ -5,7 +5,9 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.yc.yfiotlock.constant.Config;
 
-public class UserInfo {
+import java.io.Serializable;
+
+public class UserInfo implements Serializable {
 
     private String id;
     private String name;

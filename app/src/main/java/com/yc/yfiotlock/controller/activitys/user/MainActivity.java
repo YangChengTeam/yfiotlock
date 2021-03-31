@@ -17,8 +17,10 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
+import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.lock.share.ReceiveDeviceDialog;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
@@ -27,9 +29,14 @@ import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
 import com.yc.yfiotlock.controller.fragments.user.MyFragment;
 import com.yc.yfiotlock.download.DownloadManager;
 import com.yc.yfiotlock.helper.ThreadPoolExecutorImpl;
+import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -37,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import rx.Observer;
 
 public class MainActivity extends BaseActivity {
 
@@ -66,6 +74,7 @@ public class MainActivity extends BaseActivity {
         instance = new WeakReference<>(this);
         setVp();
         onSelected(0);
+        getShareDevice();
         ThreadPoolExecutorImpl.getImpl().execute(this::deleteLowerVersionApkFile);
         //checkUpdate();
     }
@@ -95,6 +104,9 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 setItem(position);
+                if (position == 0) {
+                    getShareDevice();
+                }
             }
 
             @Override
@@ -104,6 +116,64 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mEngine = new ShareDeviceEngine(getContext());
+    }
+
+    private ShareDeviceEngine mEngine;
+
+    private void getShareDevice() {
+        mEngine.hasShare().subscribe(new Observer<ResultInfo<DeviceInfo>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(ResultInfo<DeviceInfo> info) {
+                if (info.getCode() == 1 && info.getData() != null && !"0".equals(info.getData().getId())) {
+                    ReceiveDeviceDialog receiveDeviceDialog = new ReceiveDeviceDialog(getContext());
+                    receiveDeviceDialog.show(info.getData().getUser().getNickName());
+                    receiveDeviceDialog.setOnBtnClick(() -> {
+                        agreeShare(info.getData().getId());
+                    });
+                }
+            }
+        });
+    }
+
+    private void agreeShare(String id) {
+        mLoadingDialog.show("请求中...");
+        mEngine.receiveShare(id).subscribe(new Observer<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), "请求失败");
+            }
+
+            @Override
+            public void onNext(ResultInfo<String> info) {
+                if (info.getCode() == 1) {
+                    mLoadingDialog.dismiss();
+                    EventBus.getDefault().post(new IndexRefreshEvent());
+                } else {
+                    ToastCompat.show(getContext(), info.getMsg());
+                }
+            }
+        });
+    }
 
     private void onSelected(@IntRange(from = 0) int index) {
         if (index == mVpIndex.getCurrentItem()) {
@@ -158,7 +228,9 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void bindClick() {
-        setClick(R.id.ll_index, () -> onSelected(0));
+        setClick(R.id.ll_index, () -> {
+            onSelected(0);
+        });
         setClick(R.id.ll_mine, () -> onSelected(1));
     }
 
