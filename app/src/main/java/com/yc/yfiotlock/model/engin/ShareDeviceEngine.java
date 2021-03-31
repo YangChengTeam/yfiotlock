@@ -101,13 +101,13 @@ public class ShareDeviceEngine extends HttpCoreEngin {
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    public Observable<ResultInfo<DeviceInfo>> hasShare() {
+    public Observable<ResultInfo<List<DeviceInfo>>> hasShare() {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<DeviceInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_HAS_URL, new TypeReference<ResultInfo<DeviceInfo>>() {
+        HttpCoreEngin<ResultInfo<List<DeviceInfo>>> httpCoreEngin = new HttpCoreEngin<>(getContext());
+        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_HAS_URL, new TypeReference<ResultInfo<List<DeviceInfo>>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }

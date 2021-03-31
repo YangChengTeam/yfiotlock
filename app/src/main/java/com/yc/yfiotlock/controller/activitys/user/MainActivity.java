@@ -125,7 +125,7 @@ public class MainActivity extends BaseActivity {
     private ShareDeviceEngine mEngine;
 
     private void getShareDevice() {
-        mEngine.hasShare().subscribe(new Observer<ResultInfo<DeviceInfo>>() {
+        mEngine.hasShare().subscribe(new Observer<ResultInfo<List<DeviceInfo>>>() {
             @Override
             public void onCompleted() {
 
@@ -137,12 +137,24 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            public void onNext(ResultInfo<DeviceInfo> info) {
-                if (info.getCode() == 1 && info.getData() != null && !"0".equals(info.getData().getId())) {
+            public void onNext(ResultInfo<List<DeviceInfo>> info) {
+                if (info.getCode() == 1 && info.getData() != null && info.getData().size() > 0) {
                     ReceiveDeviceDialog receiveDeviceDialog = new ReceiveDeviceDialog(getContext());
-                    receiveDeviceDialog.show(info.getData().getUser().getNickName());
+                    String text = "";
+                    boolean singleDevice = info.getData().size() == 1;
+                    if (singleDevice) {
+                        text = "来自 ".concat(info.getData().get(0).getUser().getMobile()).concat(" 的共享");
+                    } else {
+                        text = "收到多个设备的共享请求";
+                    }
+                    receiveDeviceDialog.show(text, singleDevice ? "确定" : "查看");
+
                     receiveDeviceDialog.setOnBtnClick(() -> {
-                        agreeShare(info.getData().getId());
+                        if (singleDevice) {
+                            agreeShare(info.getData().get(0).getId());
+                        } else {
+                            DeviceShareActivity.seeAllShare(getContext(), 1);
+                        }
                     });
                 }
             }

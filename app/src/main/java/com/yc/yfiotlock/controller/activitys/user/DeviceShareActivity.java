@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -45,6 +46,12 @@ public class DeviceShareActivity extends BaseBackActivity {
     @BindView(R.id.vp_device)
     ViewPager mVpDevice;
 
+    public static void seeAllShare(Context context, int index) {
+        Intent intent = new Intent(context, DeviceShareActivity.class);
+        intent.putExtra("index", index);
+        context.startActivity(intent);
+    }
+
     @Override
     protected int getLayoutId() {
         return R.layout.user_activity_device_share;
@@ -54,6 +61,8 @@ public class DeviceShareActivity extends BaseBackActivity {
     protected void initViews() {
         super.initViews();
         setVpAndMi();
+        int index = getIntent().getIntExtra("index", 0);
+        mVpDevice.setCurrentItem(index);
     }
 
     private void setVpAndMi() {
@@ -76,7 +85,7 @@ public class DeviceShareActivity extends BaseBackActivity {
                 colorTransitionPagerTitleView.setNormalColor(0xff222222);
                 colorTransitionPagerTitleView.setSelectedColor(0xff3395FD);
                 colorTransitionPagerTitleView.setText(strings[index]);
-                colorTransitionPagerTitleView.setBackground(ContextCompat.getDrawable(context,R.drawable.ripple_bg));
+                colorTransitionPagerTitleView.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_bg));
                 colorTransitionPagerTitleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
                 colorTransitionPagerTitleView.setOnClickListener(view -> mVpDevice.setCurrentItem(index));
                 return colorTransitionPagerTitleView;

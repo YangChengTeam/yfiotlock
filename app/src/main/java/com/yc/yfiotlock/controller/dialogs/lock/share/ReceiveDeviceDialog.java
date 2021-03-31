@@ -38,11 +38,12 @@ public class ReceiveDeviceDialog extends BaseBottomSheetDialog {
 
 
     /**
-     * @param fromUserName 门锁分享来自的用户名
+     * @param desp 门锁分享来自的用户名
      */
-    public void show(String fromUserName) {
+    public void show(String desp,String positiveBtnString) {
         super.show();
-        mTvFrom.setText("来自".concat(fromUserName).concat("的共享"));
+        mTvFrom.setText(desp);
+        mTvSure.setText(positiveBtnString);
     }
 
     @Override
