@@ -163,6 +163,8 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         @Override
         protected void convert(@NotNull BaseViewHolder holder, OpenLockInfo openLockTypeInfo) {
             holder.setText(R.id.tv_name, openLockTypeInfo.getName());
+            String text = "我".equals(openLockTypeInfo.getAddUserMobile()) ? "" : "用户";
+            holder.setText(R.id.tv_from, text + openLockTypeInfo.getAddUserMobile() + "添加");
             if (holder.getAdapterPosition() == getData().size() - 1) {
                 holder.setVisible(R.id.view_line, false);
             } else {

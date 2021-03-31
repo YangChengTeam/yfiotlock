@@ -219,6 +219,8 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
         @Override
         protected void convert(@NotNull BaseViewHolder holder, OpenLockInfo openLockInfo) {
             holder.setText(R.id.tv_name, openLockInfo.getName());
+            String text = "我".equals(openLockInfo.getAddUserMobile()) ? "" : "用户";
+            holder.setText(R.id.tv_from, text + openLockInfo.getAddUserMobile() + "添加");
             if (holder.getAdapterPosition() == getData().size() - 1) {
                 holder.setVisible(R.id.view_line, false);
             } else {

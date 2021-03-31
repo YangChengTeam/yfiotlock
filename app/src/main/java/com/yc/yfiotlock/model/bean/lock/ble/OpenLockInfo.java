@@ -3,6 +3,8 @@ package com.yc.yfiotlock.model.bean.lock.ble;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.io.Serializable;
 
 public class OpenLockInfo implements Serializable {
@@ -14,6 +16,8 @@ public class OpenLockInfo implements Serializable {
     private int groupType;
     private String password;
     private String lockId;
+    @JSONField(name = "add_user_mobile")
+    private String addUserMobile;
 
     public OpenLockInfo() {
 
@@ -84,5 +88,13 @@ public class OpenLockInfo implements Serializable {
 
     public void setLockId(String lockId) {
         this.lockId = lockId;
+    }
+
+    public String getAddUserMobile() {
+        return addUserMobile;
+    }
+
+    public void setAddUserMobile(String addUserMobile) {
+        this.addUserMobile = addUserMobile;
     }
 }
