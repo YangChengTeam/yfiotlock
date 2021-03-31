@@ -86,7 +86,9 @@ public class LockShareManageActivity extends BaseBackActivity {
     @Override
     protected void bindClick() {
         setClick(mStvAdd, () -> {
-            startActivity(new Intent(getContext(), LockShareInputActivity.class));
+            Intent intent = new Intent(getContext(), LockShareInputActivity.class);
+            intent.putExtra("deviceInfo", deviceInfo);
+            startActivity(intent);
         });
     }
 

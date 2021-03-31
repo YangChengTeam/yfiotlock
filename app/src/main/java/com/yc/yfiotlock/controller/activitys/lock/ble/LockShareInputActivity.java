@@ -48,7 +48,18 @@ public class LockShareInputActivity extends BaseBackActivity {
     @Override
     protected void initViews() {
         super.initViews();
-        deviceInfo = LockIndexActivity.getInstance().getLockInfo();
+        if (LockIndexActivity.getInstance() == null) {
+            deviceInfo = (DeviceInfo) getIntent().getSerializableExtra("deviceInfo");
+        } else {
+            deviceInfo = LockIndexActivity.getInstance().getLockInfo();
+        }
+
+        if (deviceInfo == null) {
+            ToastCompat.show(getContext(), "设备信息有误");
+            finish();
+            return;
+        }
+        backNavBar.setTitle(deviceInfo.getName().concat("共享管理"));
         mTvDeviceName.setText(deviceInfo.getName());
         mEtAccount.addTextChangedListener(new TextWatcher() {
             @Override

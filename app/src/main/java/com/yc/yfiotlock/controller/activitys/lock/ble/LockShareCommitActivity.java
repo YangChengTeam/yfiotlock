@@ -61,6 +61,7 @@ public class LockShareCommitActivity extends BaseBackActivity {
             ToastCompat.show(getContext(), "用户信息有误");
             return;
         }
+        backNavBar.setTitle(lockInfo.getName().concat("共享管理"));
         mTvAccount.setText(mUserInfo.getNickName());
         Glide.with(getContext())
                 .load(mUserInfo.getFace())
