@@ -65,6 +65,7 @@
                 android:id="@+id/et_account"
                 android:inputType="number"
                 android:maxLength="11"
+                android:imeOptions="actionDone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/et_no_underline"

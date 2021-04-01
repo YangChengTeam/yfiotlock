@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -61,6 +62,12 @@ public class LockShareInputActivity extends BaseBackActivity {
         }
         backNavBar.setTitle(deviceInfo.getName().concat("共享管理"));
         mTvDeviceName.setText(deviceInfo.getName());
+        mEtAccount.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId== EditorInfo.IME_ACTION_DONE){
+                getUserInfo();
+            }
+            return false;
+        });
         mEtAccount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
