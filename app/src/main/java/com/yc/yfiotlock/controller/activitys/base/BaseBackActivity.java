@@ -17,12 +17,7 @@ public abstract class BaseBackActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        backNavBar.setBackListener(new BackNavBar.BackListener() {
-            @Override
-            public void onBack(View view) {
-                back();
-            }
-        });
+        backNavBar.setBackListener(view -> back());
     }
 
     protected void back() {

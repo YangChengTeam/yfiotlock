@@ -48,6 +48,7 @@ public class CreatPwdSuccessActivity extends BaseBackActivity {
 
     @Override
     protected void initViews() {
+        super.initViews();
         Serializable passwordInfo = getIntent().getSerializableExtra("password_info");
         if (!(passwordInfo instanceof PasswordInfo)) {
             ToastUtil.toast2(this, "创建密码失败");

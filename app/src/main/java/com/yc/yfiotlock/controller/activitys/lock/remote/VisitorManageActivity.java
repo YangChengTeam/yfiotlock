@@ -70,36 +70,17 @@ public class VisitorManageActivity extends BaseActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(itemAdapter);
 
-        itemAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-                ItemInfo itemInfo = itemAdapter.getData().get(position);
-                switch (itemInfo.getId()) {
-                    case 1: {
-                        if (lockInfo.isOnline() || LockBLEManager.isBindWifi(lockInfo.getMacAddress())) {
-                            OpenLockActivty.start(VisitorManageActivity.this, lockInfo);
-                        } else {
-                            GeneralDialog generalDialog = new GeneralDialog(getContext());
-                            generalDialog.setTitle("温馨提示");
-                            generalDialog.setMsg("设备还未配网, 确定进入配网流程");
-                            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                                @Override
-                                public void onClick(Dialog dialog) {
-                                    if (!LockBLEManager.isConnected(LockIndexActivity.getInstance().getBleDevice())) {
-                                        ToastCompat.show(getContext(), "蓝牙未连接");
-                                        return;
-                                    }
-                                    nav2bindwifi();
-                                }
-                            });
-                            generalDialog.show();
-                        }
-                    }
+        itemAdapter.setOnItemClickListener((adapter, view, position) -> {
+            ItemInfo itemInfo = itemAdapter.getData().get(position);
+            switch (itemInfo.getId()) {
+                case 1:
+                    OpenLockActivty.start(VisitorManageActivity.this, lockInfo);
                     break;
-                    case 2:
-                        nav2temppass();
-                        break;
-                }
+                case 2:
+                    nav2temppass();
+                    break;
+                default:
+                    break;
             }
         });
     }
@@ -109,15 +90,6 @@ public class VisitorManageActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    // 进入开门方式管理
-    private void nav2bindwifi() {
-        Intent intent = new Intent(this, ConnectActivity.class);
-        intent.putExtra("bleDevice", LockIndexActivity.getInstance().getBleDevice());
-        intent.putExtra("device", lockInfo);
-        intent.putExtra("family", LockIndexActivity.getInstance().getFamilyInfo());
-        intent.putExtra("isFromIndex", true);
-        startActivity(intent);
-    }
 
     private void loadData() {
         List<ItemInfo> list = new ArrayList<>();

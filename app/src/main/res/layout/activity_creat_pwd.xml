@@ -13,18 +13,24 @@
         app:text="创建密码"
         app:textPosition="center" />
 
-    <TextView
-        android:id="@+id/tv_creat_pwd_next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="7dp"
-        android:padding="8dp"
-        android:text="确定"
-        android:textColor="@color/blue_3091F8"
-        app:layout_constraintBottom_toBottomOf="@id/view_nav_bar"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/view_nav_bar" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/transparent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_creat_pwd_next"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/sure"
+            android:textColor="@color/blue_3091F8"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -63,10 +69,10 @@
                     android:layout_weight="1"
                     android:background="@drawable/et_no_underline"
                     android:gravity="start|center_vertical"
-                    android:text="@string/temp"
                     android:maxLength="15"
                     android:maxLines="1"
                     android:singleLine="true"
+                    android:text="@string/temp"
                     android:textColor="#222222"
                     android:textColorHint="#999999"
                     android:textSize="14dp" />

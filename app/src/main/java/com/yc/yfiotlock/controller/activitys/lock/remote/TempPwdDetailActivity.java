@@ -64,7 +64,7 @@ public class TempPwdDetailActivity extends BaseBackActivity {
 
     @Override
     protected void initViews() {
-
+        super.initViews();
         if (passWordInfo != null) {
             RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
                 GeneralDialog generalDialog = new GeneralDialog(TempPwdDetailActivity.this);

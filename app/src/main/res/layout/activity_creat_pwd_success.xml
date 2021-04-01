@@ -168,15 +168,16 @@
             android:layout_marginBottom="20dp"
             android:gravity="center"
             android:text="@string/finish_open_type"
-            android:textColor="#34A2FF"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:stv_corner="18dp"
             app:stv_pressBgColor="@color/pressedColor"
-            app:stv_pressTextColor="@color/pressedColor"
-            app:stv_stroke_color="#34A2FF"
-            app:stv_stroke_width="1dp" />
+            app:stv_shaderEnable="true"
+            app:stv_shaderEndColor="@color/color_end"
+            app:stv_shaderMode="topToBottom"
+            app:stv_shaderStartColor="@color/color_start" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

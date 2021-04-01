@@ -95,6 +95,7 @@ public class CreatPwdActivity extends BaseBackActivity {
 
     @Override
     protected void initViews() {
+        super.initViews();
         timeViews = new LeftNextTextView[]{ltvStartDate, ltvEndDate, ltvStartTime, ltvEndTime};
 
         RxView.clicks(tvNext).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
@@ -142,14 +143,11 @@ public class CreatPwdActivity extends BaseBackActivity {
     private String key =  "3132333435363738393031323334353637383930"
             + "313233343536373839303132";
     private void genPassword() {
-        deviceEngin.getTime().subscribe(new Action1<ResultInfo<TimeInfo>>() {
-            @Override
-            public void call(ResultInfo<TimeInfo> info) {
-                if (info != null && info.getCode() == 1 && info.getData() != null) {
-                    TimeInfo  timeInfo = info.getData();
-                    String password =  TOTP.generateTOTP256(key, Long.toHexString(timeInfo.getTime()).toUpperCase(), "6");
-                    passEt.setText(password);
-                }
+        deviceEngin.getTime().subscribe(info -> {
+            if (info != null && info.getCode() == 1 && info.getData() != null) {
+                TimeInfo  timeInfo = info.getData();
+                String password =  TOTP.generateTOTP256(key, Long.toHexString(timeInfo.getTime()).toUpperCase(), "6");
+                passEt.setText(password);
             }
         });
     }

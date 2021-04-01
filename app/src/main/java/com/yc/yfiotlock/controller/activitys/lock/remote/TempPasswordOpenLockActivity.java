@@ -60,6 +60,7 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
     @Override
     protected void initVars() {
         super.initVars();
+        mBnbTitle.setBackListener(view -> finish());
         lockEngine = new LockEngine(this);
     }
 

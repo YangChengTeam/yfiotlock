@@ -104,6 +104,8 @@ public class Config {
     public static final String SHARE_DEVICE_HAS_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerShareHas" + isRsa();
     public static final String SHARE_DEVICE_EXIST_URL = getBaseUrl() + "/userapp/v1.locker/lockerHas" + isRsa();
 
+    public static final String DEVICE_CHECK_NETWORK_URL = getBaseUrl() + "/userapp/v1.locker/lockerOnlineStatus" + isRsa();
+
     public static final int CLICK_LIMIT = 500;
 
     public static String isRsa() {

@@ -12,6 +12,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.NetworkStateInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
@@ -25,7 +26,7 @@ import rx.Observable;
  * @author Dullyoung
  * Created by　Dullyoung on 2021/3/10
  **/
-public class LockEngine extends BaseEngin {
+public class LockEngine extends HttpCoreEngin {
 
     public LockEngine(Context context) {
         super(context);
@@ -155,5 +156,17 @@ public class LockEngine extends BaseEngin {
         return new HttpCoreEngin<ResultInfo<List<PasswordInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_TEMPORARY_PWD_LIST_URL,
                 new TypeReference<ResultInfo<List<PasswordInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    public Observable<ResultInfo<NetworkStateInfo>> checkNetWork(String lockId) {
+        Map<String, String> map = new HashMap<>();
+        map.put("locker_id", lockId);
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        HttpCoreEngin<ResultInfo<NetworkStateInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
+        return httpCoreEngin.rxpost(Config.DEVICE_CHECK_NETWORK_URL, new TypeReference<ResultInfo<NetworkStateInfo>>() {
+                }.getType(),
+                map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }
