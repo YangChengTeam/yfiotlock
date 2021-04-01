@@ -85,14 +85,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             GeneralDialog generalDialog = new GeneralDialog(getContext());
             generalDialog.setTitle("温馨提示");
             generalDialog.setMsg("是否删除该设备");
-            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                @Override
-                public void onClick(Dialog dialog) {
-                    if (lockBleSend != null && lockBleSend.isConnected()) {
-                        cloudDelDevice();
-                    } else {
-                        ToastCompat.show(getContext(), "蓝牙未连接");
-                    }
+            generalDialog.setOnPositiveClickListener(dialog -> {
+                if (lockBleSend != null && lockBleSend.isConnected()) {
+                    cloudDelDevice();
+                } else {
+                    ToastCompat.show(getContext(), "蓝牙未连接");
                 }
             });
             generalDialog.show();
@@ -189,16 +186,13 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         if (isAdministrator) {
             headView = new SettingSoundView(this);
             headView.setDeviceMac(lockInfo.getMacAddress());
-            lockInfo.setBattery(headView.getVolume());
-            headView.setOnSelectChangeListener(new SettingSoundView.OnSelectChangeListener() {
-                @Override
-                public void onChange(int index) {
-                    if (lockBleSend != null && lockBleSend.isConnected()) {
-                        volume = index;
-                        bleSetVolume(volume);
-                    } else {
-                        ToastCompat.show(getContext(), "蓝牙未连接");
-                    }
+            headView.setVolume(headView.getVolume());
+            headView.setOnSelectChangeListener(index -> {
+                if (lockBleSend != null && lockBleSend.isConnected()) {
+                    volume = index;
+                    bleSetVolume(volume);
+                } else {
+                    ToastCompat.show(getContext(), "蓝牙未连接");
                 }
             });
             mSettingAdapter.setHeaderView(headView);

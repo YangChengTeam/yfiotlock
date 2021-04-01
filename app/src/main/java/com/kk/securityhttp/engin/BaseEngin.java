@@ -1,11 +1,9 @@
 package com.kk.securityhttp.engin;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.baidu.platform.comapi.map.MapObj;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.contains.HttpConfig;
 import com.kk.securityhttp.net.entry.Response;
@@ -17,7 +15,6 @@ import com.kk.securityhttp.utils.VUiKit;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -54,7 +51,6 @@ public abstract class BaseEngin<T> {
     public void cancel(String url) {
         OKHttpRequest.getImpl().cancel(url);
     }
-
 
 
     //< 同步请求get 1
@@ -106,10 +102,10 @@ public abstract class BaseEngin<T> {
         T resultInfo = null;
         try {
             Response response = OKHttpRequest.getImpl().post(getUrl() + "&key=" + key, params, headers, isrsa, iszip, isEncryptResponse);
-            // Log.i("securityhttp", "response body:--------> " + response.body);
+            //for Location error when request error
+            //Log.i("securityHttp", "服务器返回源数据: " + response.body);
             resultInfo = getResultInfo(response.body, type);
         } catch (Exception e) {
-            Log.i("securityhttp", "Exception: " + e.getMessage());
             String body = "{\"code\":500, \"message\":\"" + e.getMessage().replaceAll("\"", "'") + "\"}";
             resultInfo = getResultInfo(body, type);
             LogUtil.msg("异常->" + e, LogUtil.W);
