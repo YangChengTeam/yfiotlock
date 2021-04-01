@@ -38,6 +38,8 @@ public class TempPwdAdapter extends BaseExtendAdapter<PasswordInfo> implements L
                 passWordInfo.setStateDes("已失效");
                 textColor = getContext().getResources().getColor(R.color.gray_999);
                 break;
+            default:
+                break;
         }
         baseViewHolder.setText(R.id.tv_temp_pwd_state, passWordInfo.getStateDes())
                 .setTextColor(R.id.tv_temp_pwd_state, textColor);

@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -416,10 +417,16 @@ public class CommonUtil {
 
     public static String getSsid(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled()) {
+            return "";
+        }
         WifiInfo info = wifiManager.getConnectionInfo();
-        String ssid = info.getSSID();
-        if (!TextUtils.isEmpty(ssid)) {
-            ssid = ssid.replace("\"", "");
+        String ssid ="";
+        if (info.getSupplicantState().equals(SupplicantState.COMPLETED)){
+            ssid=info.getSSID();
+            if (!TextUtils.isEmpty(ssid)) {
+                ssid = ssid.replace("\"", "");
+            }
         }
         return ssid;
     }

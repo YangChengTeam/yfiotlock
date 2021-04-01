@@ -22,6 +22,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.PasswordModifyOpenLockActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
@@ -29,6 +30,8 @@ import com.yc.yfiotlock.view.adapters.ItemAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -70,12 +73,7 @@ public class TempPwdDetailActivity extends BaseBackActivity {
                 GeneralDialog generalDialog = new GeneralDialog(TempPwdDetailActivity.this);
                 generalDialog.setTitle("温馨提示");
                 generalDialog.setMsg("是否删除" + passWordInfo.getName());
-                generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                    @Override
-                    public void onClick(Dialog dialog) {
-                        cloudDel();
-                    }
-                });
+                generalDialog.setOnPositiveClickListener(dialog -> cloudDel());
                 generalDialog.show();
             });
         }
@@ -89,6 +87,13 @@ public class TempPwdDetailActivity extends BaseBackActivity {
         itemAdapter = new ItemAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(itemAdapter);
+        itemAdapter.setOnItemClickListener((adapter, view, position) -> {
+            ItemInfo itemInfo = itemAdapter.getItem(position);
+            OpenLockInfo openLockInfo = new OpenLockInfo();
+            openLockInfo.setId(itemInfo.getId() + "");
+            openLockInfo.setName(itemInfo.getName());
+            PasswordModifyOpenLockActivity.start(getContext(), openLockInfo);
+        });
     }
 
     private void loadData() {
@@ -123,5 +128,13 @@ public class TempPwdDetailActivity extends BaseBackActivity {
                 }
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPwdChanged(OpenLockInfo openLockInfo) {
+        if (openLockInfo.getId().equals(passWordInfo.getId() + "")) {
+            itemAdapter.getData().get(0).setName(openLockInfo.getName());
+            itemAdapter.notifyItemChanged(0);
+        }
     }
 }

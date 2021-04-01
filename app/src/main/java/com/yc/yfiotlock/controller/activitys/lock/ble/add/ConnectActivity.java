@@ -6,9 +6,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -26,6 +29,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.utils.CommonUtil;
 
@@ -66,16 +70,22 @@ public class ConnectActivity extends BaseConnectActivity {
         return R.layout.lock_ble_activity_add_connect;
     }
 
+    private boolean showScanWifiResult = false;
 
     @Override
     protected void initVars() {
         super.initVars();
-        isDeviceAdd = isFromIndex;
+        isDeviceAdd = LockIndexActivity.isIsConnectWifi();
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        registerScanWifiReceiver();
+    }
+
+    private void registerScanWifiReceiver() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(wifiScanReceiver, intentFilter);
     }
+
 
     @Override
     protected void initViews() {
@@ -105,7 +115,7 @@ public class ConnectActivity extends BaseConnectActivity {
 
     private void setInfo() {
         mEtSsid.setText(CommonUtil.getSsid(this));
-        if (isFromIndex) {
+        if (LockIndexActivity.isIsConnectWifi()) {
             mStvSkip.setVisibility(View.GONE);
         }
     }
@@ -127,7 +137,6 @@ public class ConnectActivity extends BaseConnectActivity {
         intent.putExtra("device", lockInfo);
         intent.putExtra("ssid", ssid);
         intent.putExtra("pwd", pwd);
-        intent.putExtra("isFromIndex", isFromIndex);
         startActivity(intent);
     }
 
@@ -142,14 +151,17 @@ public class ConnectActivity extends BaseConnectActivity {
             public void onRequestPermissionSuccess() {
                 if (!mWifiManager.isWifiEnabled() && !mWifiManager.setWifiEnabled(true)) {
                     mLoadingDialog.dismiss();
+                    showScanWifiResult = false;
                     ToastCompat.show(getContext(), "请先打开Wifi开关");
                     return;
                 }
                 mWifiManager.startScan();
+                showScanWifiResult = true;
             }
 
             @Override
             public void onRequestPermissionError() {
+                showScanWifiResult = false;
                 ToastCompat.show(getContext(), "未获取到必须权限，无法扫描附近的WIFI");
             }
         });
@@ -169,6 +181,9 @@ public class ConnectActivity extends BaseConnectActivity {
     };
 
     private void scanSuccess() {
+        if (!showScanWifiResult) {
+            return;
+        }
         mLoadingDialog.dismiss();
         if (CommonUtil.isActivityDestory(this)) {
             return;
@@ -196,7 +211,7 @@ public class ConnectActivity extends BaseConnectActivity {
         setClick(mIvSecret, () -> CommonUtil.hiddenEditText(mEtPwd, mIvSecret));
         setClick(mStvNext, this::nav2next);
         setClick(R.id.iv_scan_wifi, () -> {
-            if (mLoadingDialog.isShowing()){
+            if (mLoadingDialog.isShowing()) {
                 return;
             }
             mLoadingDialog.show("扫描中...");
@@ -208,15 +223,17 @@ public class ConnectActivity extends BaseConnectActivity {
 
 
     private void showChooseList(CharSequence[] strings) {
-        if (wifiAlertDialog != null && wifiAlertDialog.isShowing()) {
+        if (wifiAlertDialog == null) {
+            wifiAlertDialog = new AlertDialog.Builder(this)
+                    .setTitle("可用网络列表(2.4G)")
+                    .setItems(strings, (dialog, which) -> {
+                        mEtSsid.setText(strings[which]);
+                        dialog.dismiss();
+                    }).create();
+        }
+        if (wifiAlertDialog.isShowing()) {
             return;
         }
-        wifiAlertDialog = new AlertDialog.Builder(this)
-                .setTitle("可用网络列表(2.4G)")
-                .setItems(strings, (dialog, which) -> {
-                    mEtSsid.setText(strings[which]);
-                    dialog.dismiss();
-                }).create();
         wifiAlertDialog.show();
         wifiAlertDialog.setOnDismissListener(dialog -> {
             mEtPwd.requestFocus();

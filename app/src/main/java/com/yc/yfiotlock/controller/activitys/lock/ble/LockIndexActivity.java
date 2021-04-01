@@ -502,7 +502,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "请求失败");
+                ToastCompat.show(getContext(), "请求失败,请稍后再试");
             }
 
             @Override
@@ -518,7 +518,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                         ToastCompat.show(getContext(), networkStateInfo.getMsg());
                     }
                 } else {
-                    ToastCompat.show(getContext(), "请求失败");
+                    ToastCompat.show(getContext(), "请求失败,请稍后再试");
                 }
             }
         });

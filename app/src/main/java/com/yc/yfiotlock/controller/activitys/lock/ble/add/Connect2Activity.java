@@ -147,12 +147,9 @@ public class Connect2Activity extends BaseConnectActivity {
         GeneralDialog generalDialog = new GeneralDialog(getContext());
         generalDialog.setTitle("温馨提示");
         generalDialog.setMsg("确认取消操作?");
-        generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-            @Override
-            public void onClick(Dialog dialog) {
-                mLoadingDialog.show("取消操作中...");
-                blecancel();
-            }
+        generalDialog.setOnPositiveClickListener(dialog -> {
+            mLoadingDialog.show("取消操作中...");
+            blecancel();
         });
         generalDialog.show();
     }
@@ -173,7 +170,9 @@ public class Connect2Activity extends BaseConnectActivity {
             showConnectedUi();
             LockBLEManager.setBindWifi(bleDevice.getMac());
             ConnectActivity.finish2();
-            bleGetAliDeviceName();
+            if (!LockIndexActivity.isIsConnectWifi()) {
+                bleGetAliDeviceName();
+            }
         } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
             lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();

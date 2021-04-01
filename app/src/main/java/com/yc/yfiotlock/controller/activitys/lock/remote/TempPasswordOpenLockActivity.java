@@ -18,6 +18,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.adapters.TempPwdAdapter;
@@ -93,12 +94,7 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(tempPwdAdapter);
 
-        tempPwdAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-                nav2detail(tempPwdAdapter.getItem(position));
-            }
-        });
+        tempPwdAdapter.setOnItemClickListener((adapter, view, position) -> nav2detail(tempPwdAdapter.getItem(position)));
 
         tempPwdAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
             page++;
@@ -186,6 +182,12 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
+        page = 1;
+        loadData();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPwdChanged(OpenLockInfo openLockInfo) {
         page = 1;
         loadData();
     }

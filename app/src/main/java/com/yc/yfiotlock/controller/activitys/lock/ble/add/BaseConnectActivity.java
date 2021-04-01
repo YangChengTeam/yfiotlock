@@ -34,7 +34,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     protected boolean isDeviceAdd = false;
     protected boolean isConnected = false;
-    protected boolean isFromIndex = false;
+
 
     protected int isOnline = 0;
 
@@ -48,7 +48,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected void initVars() {
         super.initVars();
         bleDevice = getIntent().getParcelableExtra("bleDevice");
-        isFromIndex = getIntent().getBooleanExtra("isFromIndex", false);
         lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
         deviceEngin = new DeviceEngin(this);
         lockBleSend = new LockBLESend(this, bleDevice);
@@ -172,7 +171,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     public void fail() {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                if (!isFromIndex) {
+                if (!LockIndexActivity.isIsConnectWifi()) {
                     cloudAddDevice();
                 }
             });
@@ -181,12 +180,9 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             GeneralDialog generalDialog = new GeneralDialog(getContext());
             generalDialog.setTitle("温馨提示");
             generalDialog.setMsg("同步云端失败, 请重试");
-            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                @Override
-                public void onClick(Dialog dialog) {
-                    mLoadingDialog.show("添加设备中...");
-                    cloudAddDevice();
-                }
+            generalDialog.setOnPositiveClickListener(dialog -> {
+                mLoadingDialog.show("添加设备中...");
+                cloudAddDevice();
             });
             generalDialog.show();
         }
@@ -223,7 +219,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     @Override
     public void onBackPressed() {
-        if (isFromIndex) {
+        if (LockIndexActivity.isIsConnectWifi()) {
             finish();
             ConnectActivity.finish2();
         } else if (isDeviceAdd) {
@@ -239,7 +235,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
             aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
-            if (isDeviceAdd || isFromIndex) {
+            if (isDeviceAdd || LockIndexActivity.isIsConnectWifi()) {
                 return;
             }
             isDeviceAdd = true;
