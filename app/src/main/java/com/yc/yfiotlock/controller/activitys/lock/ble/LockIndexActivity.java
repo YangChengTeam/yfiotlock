@@ -129,7 +129,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
      */
     private static boolean isConnectWifi = false;
 
-    public static boolean isIsConnectWifi() {
+    public static boolean isConnectWifi() {
         return getInstance() != null && isConnectWifi;
     }
 

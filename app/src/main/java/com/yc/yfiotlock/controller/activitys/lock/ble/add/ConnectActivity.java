@@ -6,13 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,11 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
-import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
@@ -75,7 +69,7 @@ public class ConnectActivity extends BaseConnectActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        isDeviceAdd = LockIndexActivity.isIsConnectWifi();
+        isDeviceAdd = LockIndexActivity.isConnectWifi();
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         registerScanWifiReceiver();
     }
@@ -94,12 +88,15 @@ public class ConnectActivity extends BaseConnectActivity {
         backNavBar.setTitle(bleDevice.getName());
         setInfo();
 
-        if (mEtSsid.requestFocus()) {
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if ("".equals(mEtSsid.getText().toString())) {
+            mEtSsid.requestFocus();
+        } else {
+            mEtPwd.requestFocus();
         }
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
         mEtPwd.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
                 nav2next();
             }
             return false;
@@ -115,7 +112,7 @@ public class ConnectActivity extends BaseConnectActivity {
 
     private void setInfo() {
         mEtSsid.setText(CommonUtil.getSsid(this));
-        if (LockIndexActivity.isIsConnectWifi()) {
+        if (LockIndexActivity.isConnectWifi()) {
             mStvSkip.setVisibility(View.GONE);
         }
     }

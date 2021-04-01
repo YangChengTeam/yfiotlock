@@ -1,8 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
 import android.animation.ValueAnimator;
-import android.app.Dialog;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,7 +19,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 
 public class Connect2Activity extends BaseConnectActivity {
@@ -98,7 +95,7 @@ public class Connect2Activity extends BaseConnectActivity {
     }
 
     private void showConnectedUi() {
-        if (LockIndexActivity.isIsConnectWifi()) {
+        if (LockIndexActivity.isConnectWifi()) {
             mLlConnectWifi.setVisibility(View.VISIBLE);
             mLlConnected.setVisibility(View.GONE);
         } else {
@@ -170,9 +167,7 @@ public class Connect2Activity extends BaseConnectActivity {
             showConnectedUi();
             LockBLEManager.setBindWifi(bleDevice.getMac());
             ConnectActivity.finish2();
-            if (!LockIndexActivity.isIsConnectWifi()) {
-                bleGetAliDeviceName();
-            }
+            bleGetAliDeviceName();
         } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
             lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();

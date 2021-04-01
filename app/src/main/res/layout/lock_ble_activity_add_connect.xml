@@ -104,7 +104,7 @@
         android:layout_marginEnd="15dp"
         android:background="@drawable/et_bg"
         android:hint="@string/please_input_wifi_pwd"
-        android:imeOptions="actionNext"
+        android:imeOptions="actionDone"
         android:inputType="textPassword"
         android:maxLength="20"
         android:singleLine="true"

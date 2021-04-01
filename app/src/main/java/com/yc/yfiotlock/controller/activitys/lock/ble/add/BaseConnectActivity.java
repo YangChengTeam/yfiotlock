@@ -1,13 +1,11 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.text.TextUtils;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
@@ -22,7 +20,6 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
-import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import org.greenrobot.eventbus.EventBus;
@@ -171,7 +168,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     public void fail() {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                if (!LockIndexActivity.isIsConnectWifi()) {
+                if (!LockIndexActivity.isConnectWifi()) {
                     cloudAddDevice();
                 }
             });
@@ -219,7 +216,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     @Override
     public void onBackPressed() {
-        if (LockIndexActivity.isIsConnectWifi()) {
+        if (LockIndexActivity.isConnectWifi()) {
             finish();
             ConnectActivity.finish2();
         } else if (isDeviceAdd) {
@@ -235,7 +232,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
             aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
-            if (isDeviceAdd || LockIndexActivity.isIsConnectWifi()) {
+            if (isDeviceAdd || LockIndexActivity.isConnectWifi()) {
                 return;
             }
             isDeviceAdd = true;
