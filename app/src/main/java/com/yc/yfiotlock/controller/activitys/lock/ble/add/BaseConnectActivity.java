@@ -66,12 +66,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected void initViews() {
         super.initViews();
         deviceNameDialog = new ChangeDeviceNameDialog(this);
-        deviceNameDialog.setOnSureClick(new ChangeDeviceNameDialog.OnSureClick() {
-            @Override
-            public void onClick(String name) {
-                cloudModifyDeivceName(name, aliDeviceName);
-            }
-        });
+        deviceNameDialog.setOnSureClick(name -> cloudModifyDeivceName(name, aliDeviceName));
     }
 
     protected void cloudAddDevice() {

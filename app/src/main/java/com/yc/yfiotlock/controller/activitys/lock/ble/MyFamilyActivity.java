@@ -100,6 +100,8 @@ public class MyFamilyActivity extends BaseActivity {
                     case R.id.tv_family_delete:
                         delete(position);
                         break;
+                    default:
+                        break;
                 }
             }
 

@@ -27,6 +27,7 @@ import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -116,6 +117,15 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             return mInstance.get();
         }
         return null;
+    }
+
+    /**
+     * 跳转到配网界面 是否仅配置网络 而不是添加设备
+     */
+    private static boolean isConnectWifi = false;
+
+    public static boolean isIsConnectWifi() {
+        return getInstance() != null && isConnectWifi;
     }
 
     @Override
@@ -216,7 +226,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             if (LockBLEManager.isConnected(bleDevice)) {
                 return;
             }
-            if ("连接门锁中...".equals(statusTitleTv.getText())){
+            if ("连接门锁中...".equals(statusTitleTv.getText())) {
                 return;
             }
 
@@ -470,8 +480,27 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     // 进入访客管理
     private void nav2Vm() {
-        Intent intent = new Intent(getContext(), VisitorManageActivity.class);
-        startActivity(intent);
+        if (lockInfo.isOnline()) {
+            Intent intent = new Intent(getContext(), VisitorManageActivity.class);
+            startActivity(intent);
+        } else {
+            GeneralDialog generalDialog = new GeneralDialog(getContext());
+            generalDialog.setTitle("温馨提示")
+                    .setMsg("设备处于离线状态，请先配置网络")
+                    .setPositiveText("去配置")
+                    .setOnPositiveClickListener(dialog -> {
+                        if (bleDevice == null) {
+                            ToastCompat.show(getContext(), "请先链接设备");
+                            return;
+                        }
+                        Intent intent = new Intent(getContext(), ConnectActivity.class);
+                        intent.putExtra("device", lockInfo);
+                        intent.putExtra("bleDevice", bleDevice);
+                        startActivity(intent);
+                        isConnectWifi = true;
+                    }).show();
+        }
+
     }
 
     // 进入日志管理

@@ -134,6 +134,7 @@
     <string name="share_to_yfiot_account">共享给扬飞智家账号</string>
     <string name="share_lock_tip">快来共享设备，和家人一起享受智能生活吧！</string>
     <string name="please_input_yf_smart_home_account">请输入扬飞智家的账号</string>
+    <string name="wifi_config_success">WIFI配置成功</string>
 
     <string-array name="lock_log_array">
         <item>日志</item>

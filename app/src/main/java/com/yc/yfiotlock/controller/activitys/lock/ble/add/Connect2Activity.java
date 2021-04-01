@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
 import android.animation.ValueAnimator;
 import android.app.Dialog;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -11,7 +12,7 @@ import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
@@ -20,6 +21,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class Connect2Activity extends BaseConnectActivity {
@@ -34,6 +36,8 @@ public class Connect2Activity extends BaseConnectActivity {
     TextView mTvEdit;
     @BindView(R.id.ll_connected)
     LinearLayout mLlConnected;
+    @BindView(R.id.ll_connect_wifi)
+    LinearLayout mLlConnectWifi;
 
     private ValueAnimator valueAnimator;
     private LockBLESend cancelSend;
@@ -94,7 +98,13 @@ public class Connect2Activity extends BaseConnectActivity {
     }
 
     private void showConnectedUi() {
-        mLlConnected.setVisibility(View.VISIBLE);
+        if (LockIndexActivity.isIsConnectWifi()) {
+            mLlConnectWifi.setVisibility(View.VISIBLE);
+            mLlConnected.setVisibility(View.GONE);
+        } else {
+            mLlConnected.setVisibility(View.VISIBLE);
+            mLlConnectWifi.setVisibility(View.GONE);
+        }
         mLlConnecting.setVisibility(View.GONE);
     }
 
@@ -161,8 +171,9 @@ public class Connect2Activity extends BaseConnectActivity {
             valueAnimator.cancel();
             valueAnimator.end();
             showConnectedUi();
-            bleGetAliDeviceName();
             LockBLEManager.setBindWifi(bleDevice.getMac());
+            ConnectActivity.finish2();
+            bleGetAliDeviceName();
         } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
             lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();

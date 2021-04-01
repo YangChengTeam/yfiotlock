@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
@@ -101,6 +102,7 @@ public class DeviceShareActivity extends BaseBackActivity {
                 indicator.setStartInterpolator(new AccelerateInterpolator());
                 indicator.setEndInterpolator(new DecelerateInterpolator(2.0f));
                 indicator.setColors(0xff3395FD);
+                indicator.setYOffset(ScreenUtil.dip2px(getContext(),2));
                 return indicator;
             }
         };
