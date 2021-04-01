@@ -92,6 +92,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             @Override
             public void onNext(ResultInfo<DeviceInfo> resultInfo) {
                 if (resultInfo != null && resultInfo.getCode() == 1) {
+                    mLoadingDialog.dismiss();
                     success(resultInfo.getData());
                 } else {
                     fail();

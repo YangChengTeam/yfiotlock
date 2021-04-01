@@ -70,7 +70,7 @@ public class DeviceShareActivity extends BaseBackActivity {
         fragments.add(new DeviceShareListFragment());
         fragments.add(new DeviceReceiveListFragment());
         String[] strings = new String[]{"共享", "接受"};
-        ViewPagerAdapter adapter = new ViewPagerAdapter(fragments, strings, getSupportFragmentManager(), 1);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(fragments, getSupportFragmentManager(), 1);
         mVpDevice.setAdapter(adapter);
 
         CommonNavigatorAdapter navigatorAdapter = new CommonNavigatorAdapter() {

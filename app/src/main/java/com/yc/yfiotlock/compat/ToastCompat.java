@@ -32,7 +32,9 @@ public class ToastCompat {
     }
 
     private static void hook(Toast toast) {
-        if (Build.VERSION.SDK_INT > 24) return;
+        if (Build.VERSION.SDK_INT > 24) {
+            return;
+        }
         try {
             Object tn = sField_TN.get(toast);
             Handler preHandler = (Handler) sField_TN_Handler.get(tn);
@@ -71,9 +73,13 @@ public class ToastCompat {
     }
 
     public static void showCenter(Context context, CharSequence cs) {
-        if (CommonUtil.isActivityDestory(context)) return;
+        if (CommonUtil.isActivityDestory(context)){
+            return;
+        }
         Toast toast = Toast.makeText(context, cs, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
+        if (Build.VERSION.SDK_INT<30){
+            toast.setGravity(Gravity.CENTER, 0, 0);
+        }
         hook(toast);
         toast.show();
     }

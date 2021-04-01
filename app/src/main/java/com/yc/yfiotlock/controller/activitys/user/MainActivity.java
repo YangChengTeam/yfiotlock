@@ -92,7 +92,7 @@ public class MainActivity extends BaseActivity {
         List<BaseFragment> fragments = new ArrayList<>();
         fragments.add(new IndexFragment());
         fragments.add(new MyFragment());
-        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(fragments, new String[0], getSupportFragmentManager(), 1);
+        ViewPagerAdapter pagerAdapter = new ViewPagerAdapter(fragments, getSupportFragmentManager(), 1);
         mVpIndex.setAdapter(pagerAdapter);
         mVpIndex.setOffscreenPageLimit(1);
         mVpIndex.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

@@ -20,12 +20,10 @@ import java.util.List;
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     private List<BaseFragment> fragments;
-    private String[] titles;
 
-    public ViewPagerAdapter(List<BaseFragment> fragments, String[] titles, @NonNull @NotNull FragmentManager fm, int behavior) {
+    public ViewPagerAdapter(List<BaseFragment> fragments, @NonNull @NotNull FragmentManager fm, int behavior) {
         super(fm, behavior);
         this.fragments = fragments;
-        this.titles = titles;
     }
 
     @NonNull
@@ -40,10 +38,5 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         return fragments.size();
     }
 
-    @Nullable
-    @org.jetbrains.annotations.Nullable
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return titles[position];
-    }
+
 }
