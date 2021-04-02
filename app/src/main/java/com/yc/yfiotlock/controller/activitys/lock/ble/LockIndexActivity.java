@@ -32,6 +32,7 @@ import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.sensor.ShakeSensor;
+import com.yc.yfiotlock.model.bean.eventbus.IndexReScanEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
@@ -508,6 +509,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
         setCountInfo();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReScan(IndexReScanEvent object) {
+        scan();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

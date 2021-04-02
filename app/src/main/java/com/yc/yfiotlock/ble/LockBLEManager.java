@@ -260,9 +260,9 @@ public class LockBLEManager {
 
             @Override
             public void onDisConnected(boolean isActiveDisConnected, BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                BleManager.getInstance().disconnect(bleDevice);
                 // 设置连接失败状态
                 callbck.onDisconnect(bleDevice);
-                BleManager.getInstance().disconnect(bleDevice);
             }
         });
     }
