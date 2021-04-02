@@ -247,16 +247,19 @@ public class LockShareManageActivity extends BaseBackActivity {
             holder.setText(R.id.tv_time, time.concat("共享"));
 
             // '状态 0:等待接受 1:接受 2:共享人删除',
+            //receive_status 0:未删除 1:删除',
 
-            if (shareLockInfo.getShareStatus() == 1) {
-                holder.setText(R.id.tv_state, "已接受");
-                holder.setTextColor(R.id.tv_state, 0xff09B857);
-            } else if (shareLockInfo.getShareStatus() == 0) {
-                holder.setText(R.id.tv_state, "等待接受");
-                holder.setTextColor(R.id.tv_state, 0xff3395FD);
-            } else {
+            if (shareLockInfo.getReceiveStatus() == 1) {
                 holder.setText(R.id.tv_state, "共享人删除");
                 holder.setTextColor(R.id.tv_state, 0xff666666);
+            } else {
+                if (shareLockInfo.getShareStatus() == 1) {
+                    holder.setText(R.id.tv_state, "已接受");
+                    holder.setTextColor(R.id.tv_state, 0xff09B857);
+                } else {
+                    holder.setText(R.id.tv_state, "等待接受");
+                    holder.setTextColor(R.id.tv_state, 0xff3395FD);
+                }
             }
 
             setClick(holder.getView(R.id.stv_del), () -> {
