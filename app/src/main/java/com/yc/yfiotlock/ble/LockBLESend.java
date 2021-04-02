@@ -15,6 +15,7 @@ import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
+import com.yc.yfiotlock.model.bean.eventbus.IndexReScanEvent;
 import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -283,6 +284,8 @@ public class LockBLESend {
 
                     @Override
                     public void onCharacteristicChanged(byte[] data) {
+                        errorCount = 0;
+
                         Log.d(TAG, "响应数据:" + LockBLEUtils.toHexString(data));
                         // 解析响应
                         LockBLEData lockBLEData = LockBLEPackage.getData(data);
@@ -370,6 +373,16 @@ public class LockBLESend {
         cmdBytes = null;
     }
 
+    //  bleDevice 出现未知问题
+    private void rescan() {
+        if (errorCount > 3) {
+            Log.d(TAG, "超过最大错误次数:" + errorCount + " 重新搜索连接");
+            BleManager.getInstance().destroy();
+            EventBus.getDefault().post(new IndexReScanEvent());
+        }
+    }
+
+    public static int errorCount = 0;
 
     // 写入失败
     private void writeFailureResponse() {
@@ -379,6 +392,8 @@ public class LockBLESend {
         lockBLEData.setScmd(scmd);
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_WRITE_ERROR);
         processNotify(lockBLEData);
+        errorCount++;
+        rescan();
     }
 
     // 响应错误
@@ -390,6 +405,8 @@ public class LockBLESend {
         lockBLEData.setOther(error.getBytes());
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_NOTIFY_TIMEOUT_ERROR);
         processNotify(lockBLEData);
+        errorCount++;
+        rescan();
     }
 
     // 唤醒失败
@@ -400,6 +417,8 @@ public class LockBLESend {
         lockBLEData.setScmd(scmd);
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_WAKEUP_ERROR);
         processNotify(lockBLEData);
+        errorCount++;
+        rescan();
     }
 
     // 写入操作
@@ -413,6 +432,7 @@ public class LockBLESend {
                     @Override
                     public void onWriteSuccess(final int current, final int total, final byte[] justWrite) {
                         Log.d(TAG, "写入数据:" + LockBLEUtils.toHexString(justWrite));
+                        errorCount = 0;
                     }
 
                     @Override
