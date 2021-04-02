@@ -231,6 +231,7 @@ public class LockShareManageActivity extends BaseBackActivity {
     private class LockShareAdapter extends BaseExtendAdapter<ShareDeviceWrapper> implements LoadMoreModule {
         public LockShareAdapter(@Nullable List<ShareDeviceWrapper> data) {
             super(R.layout.item_lock_share, data);
+            addChildClickViewIds(R.id.stv_del);
         }
 
         @Override
@@ -262,12 +263,6 @@ public class LockShareManageActivity extends BaseBackActivity {
                 }
             }
 
-            setClick(holder.getView(R.id.stv_del), () -> {
-                if (getOnItemChildClickListener() != null) {
-                    getOnItemChildClickListener().onItemChildClick(this,
-                            holder.getView(R.id.stv_del), holder.getLayoutPosition());
-                }
-            });
 
         }
 

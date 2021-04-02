@@ -31,6 +31,7 @@ import com.yc.yfiotlock.download.DownloadManager;
 import com.yc.yfiotlock.helper.ThreadPoolExecutorImpl;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.ShareDeviceWrapper;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
@@ -125,7 +126,7 @@ public class MainActivity extends BaseActivity {
     private ShareDeviceEngine mEngine;
 
     private void getShareDevice() {
-        mEngine.hasShare().subscribe(new Observer<ResultInfo<List<DeviceInfo>>>() {
+        mEngine.hasShare().subscribe(new Observer<ResultInfo<List<ShareDeviceWrapper>>>() {
             @Override
             public void onCompleted() {
 
@@ -137,13 +138,13 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            public void onNext(ResultInfo<List<DeviceInfo>> info) {
+            public void onNext(ResultInfo<List<ShareDeviceWrapper>> info) {
                 if (info.getCode() == 1 && info.getData() != null && info.getData().size() > 0) {
                     ReceiveDeviceDialog receiveDeviceDialog = new ReceiveDeviceDialog(getContext());
                     String text = "";
                     boolean singleDevice = info.getData().size() == 1;
                     if (singleDevice) {
-                        text = "来自 ".concat(info.getData().get(0).getUser().getMobile()).concat(" 的共享");
+                        text = "来自 ".concat(info.getData().get(0).getShareUser().getMobile()).concat(" 的共享");
                     } else {
                         text = "收到多个设备的共享请求";
                     }
