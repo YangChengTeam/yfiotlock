@@ -353,13 +353,13 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
             }
 
             case R.id.btn_cancel_ble: {
-                byte[] bytes = LockBLESettingCmd.cancelBle(OperationActivity.this);
+                byte[] bytes = LockBLESettingCmd.unbindBle(OperationActivity.this);
                 op(bytes);
                 break;
             }
 
             case R.id.btn_get_al_device: {
-                byte[] bytes = LockBLESettingCmd.getAlDeviceName(OperationActivity.this);
+                byte[] bytes = LockBLESettingCmd.getAliDeviceName(OperationActivity.this);
                 op(bytes);
                 break;
             }

@@ -125,8 +125,8 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     private void bleAddPwd() {
         if (lockBleSend != null) {
-            this.mcmd = (byte) 0x02;
-            this.scmd = (byte) 0x02;
+            this.mcmd = LockBLEOpCmd.MCMD;
+            this.scmd = LockBLEOpCmd.SCMD_ADD_PWD;
             byte[] bytes = LockBLEOpCmd.addPwd(this, LockBLEManager.GROUP_TYPE, number, passEt.getText() + "", new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
             lockBleSend.send(mcmd, scmd, bytes, false);
         }

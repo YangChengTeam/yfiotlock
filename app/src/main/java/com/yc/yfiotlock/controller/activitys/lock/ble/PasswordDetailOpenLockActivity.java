@@ -31,8 +31,8 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
 
     @Override
     protected void bleDel() {
-        this.mcmd = (byte)0x02;
-        this.scmd = (byte)0x04;
+        this.mcmd = LockBLEOpCmd.MCMD;
+        this.scmd = LockBLEOpCmd.SCMD_DEL_PWD;
         byte[] bytes = LockBLEOpCmd.delPwd(this, (byte) LockBLEManager.GROUP_TYPE, (byte) openLockInfo.getKeyid());
         lockBleSend.send(mcmd, scmd, bytes, false);
     }

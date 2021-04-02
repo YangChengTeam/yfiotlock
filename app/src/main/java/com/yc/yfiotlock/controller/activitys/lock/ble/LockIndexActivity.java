@@ -116,6 +116,14 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         return null;
     }
 
+
+    public static void safeFinish() {
+        if (getInstance() != null) {
+            getInstance().finish();
+        }
+    }
+
+
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_index;
@@ -324,7 +332,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startAnimations();
 
         if (lockBleSend != null) {
-            lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this), false);
+            lockBleSend.send(LockBLEOpCmd.MCMD, LockBLEOpCmd.SCMD_OPEN, LockBLEOpCmd.open(this), false);
         }
     }
 
@@ -451,7 +459,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     private void test() {
         if (lockBleSend != null) {
             byte[] cmdBytes = LockBLESettingCmd.reset(getContext());
-            lockBleSend.send((byte) 0x01, (byte) 0x01, cmdBytes, false);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, cmdBytes, false);
         }
     }
 
@@ -537,7 +545,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
+        if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_OPEN) {
             stopAnimations();
             statusTitleTv.setText("门锁已打开");
             // 恢复状态  我们目前版本使用机械反锁，所以门开关的状态事件目前版本是没有的。
@@ -552,7 +560,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
+        if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_OPEN) {
             isOpening = false;
             if (LockBLEManager.isConnected(bleDevice)) {
                 setConnectedInfo();

@@ -33,7 +33,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected boolean isConnected = false;  // 是否 配网成功
     protected boolean isActiveDistributionNetwork = false;  // 是否 连接完成后 主动配网
 
-    protected int isOnline = 0;
 
     protected BleDevice bleDevice;
     protected DeviceInfo lockInfo;
@@ -68,7 +67,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected void cloudAddDevice() {
         bleSynctime();
         mLoadingDialog.show("添加设备中...");
-        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, isOnline).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
+        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, isConnected ? 1 : 0).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
@@ -129,8 +128,8 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {
-            byte[] cmdBytes = LockBLESettingCmd.getAlDeviceName(this);
-            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes, true);
+            byte[] cmdBytes = LockBLESettingCmd.getAliDeviceName(this);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes, true);
         }
     }
 
@@ -141,7 +140,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                 public void call(ResultInfo<TimeInfo> info) {
                     if (info != null && info.getCode() == 1 && info.getData() != null) {
                         byte[] cmdBytes = LockBLESettingCmd.syncTime(getContext(), info.getData().getTime());
-                        lockBleSend.send((byte) 0x01, (byte) 0x05, cmdBytes, true);
+                        lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SYNC_TIME, cmdBytes, true);
                     }
                 }
             });
@@ -227,16 +226,16 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
             aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
-            if (isDeviceAdd ||  isActiveDistributionNetwork) {
+            if (isDeviceAdd || isActiveDistributionNetwork) {
                 return;
             }
             isDeviceAdd = true;
             cloudAddDevice();
         }
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x05) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
             LogUtil.msg("同步时间成功");
         }
     }

@@ -22,6 +22,7 @@ import com.coorchice.library.SuperTextView;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.utils.CommonUtil;
@@ -242,7 +243,7 @@ public class ConnectActivity extends BaseConnectActivity {
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         super.onNotifySuccess(lockBLEData);
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK) {
             mLoadingDialog.dismiss();
             nav2fail();
         }

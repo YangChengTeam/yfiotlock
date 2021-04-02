@@ -5,6 +5,7 @@ import android.content.Intent;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
@@ -46,7 +47,7 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData != null && lockBLEData.getMcmd() == (byte) 0x08 && lockBLEData.getScmd() == (byte) 0x01 && lockBLEData.getStatus() == (byte) 0x01) {
+        if (lockBLEData != null && lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_INPUT_PRINTFINGER && lockBLEData.getStatus() == (byte) 0x01) {
             Intent intent = new Intent(getContext(), FingerprintAddNextOpenLockActivity.class);
             intent.putExtra("number", number);
             startActivity(intent);

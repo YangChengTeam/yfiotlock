@@ -75,8 +75,12 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void bleSetVolume(int volume) {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.changeVolume(this, volume);
-            lockBleSend.send((byte) 0x01, (byte) 0x08, bytes, false);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHANGE_VOLUME, bytes, false);
         }
+    }
+
+    private boolean isBleDeviceConnected() {
+        return lockBleSend != null && lockBleSend.isConnected();
     }
 
     @Override
@@ -86,7 +90,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setTitle("温馨提示");
             generalDialog.setMsg("是否删除该设备");
             generalDialog.setOnPositiveClickListener(dialog -> {
-                if (lockBleSend != null && lockBleSend.isConnected()) {
+                //是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
+                if (isBleDeviceConnected() || !isAdministrator) {
                     cloudDelDevice();
                 } else {
                     ToastCompat.show(getContext(), "蓝牙未连接");
@@ -123,7 +128,13 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                         UserInfoCache.setUserInfo(userInfo);
                         EventBus.getDefault().post(userInfo);
                     }
-                    blereset();
+                    if (isAdministrator) {
+                        blereset();
+                    } else {
+                        EventBus.getDefault().post(new IndexRefreshEvent());
+                        LockIndexActivity.safeFinish();
+                        finish();
+                    }
                 } else {
                     ToastCompat.show(getContext(), "删除失败");
                 }
@@ -134,7 +145,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void blereset() {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.reset(this);
-            lockBleSend.send((byte) 0x01, (byte) 0x01, bytes, true);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes, true);
         }
     }
 
@@ -238,11 +249,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x08) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHANGE_VOLUME) {
             headView.setVolume(volume);
             lockInfo.setVolume(volume);
             ToastCompat.show(getContext(), "设置成功");
-        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x01) {
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_RESET) {
             finish();
             LockIndexActivity.getInstance().finish();
         }
@@ -251,7 +262,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x08) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHANGE_VOLUME) {
             ToastCompat.show(getContext(), "设置失败");
             headView.resetVolume();
         }

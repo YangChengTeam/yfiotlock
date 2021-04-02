@@ -315,20 +315,20 @@ public class LockBLESend {
             Log.d(TAG, "非正常响应:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " mscd:" + mcmd + " scmd:" + scmd);
             return;
         }
-        if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x0B) {
+        if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_WAKE_UP) {
             // 唤醒成功后发送真正操作
             Log.d(TAG, "唤醒状态:" + lockBLEData.getStatus());
-            if (lockBLEData.getStatus() == (byte) 0x00) {
+            if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
                 if (!waupStatus) {
                     waupStatus = true;
                     Log.d(TAG, "唤醒成功,发送真正指令");
                     op(cmdBytes);
                 }
-            } else if (lockBLEData.getStatus() == (byte) 0x05) {
+            } else if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_KEY_ERROR) {
                 // 密钥不对 设备重新初始化
                 isReInit = true;
             }
-        } else if (lockBLEData.getMcmd() == (byte) 0x08 && lockBLEData.getScmd() == (byte) 0x01) {
+        } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_INPUT_PRINTFINGER) {
             if (notifyCallback != null) {
                 notifyCallback.onNotifySuccess(lockBLEData);
             }
@@ -337,7 +337,7 @@ public class LockBLESend {
             Log.d(TAG, "命令匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());
             // 操作响应
             reset();
-            if (lockBLEData.getStatus() == (byte) 0x00) {
+            if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
                 if (notifyCallback != null) {
                     notifyCallback.onNotifySuccess(lockBLEData);
                 }
@@ -370,15 +370,6 @@ public class LockBLESend {
         cmdBytes = null;
     }
 
-    // 唤醒失败
-    private void wakeupFailureResponse() {
-        Log.d(TAG, "唤醒失败");
-        LockBLEData lockBLEData = new LockBLEData();
-        lockBLEData.setMcmd(mcmd);
-        lockBLEData.setScmd(scmd);
-        lockBLEData.setStatus((byte) 0x12);
-        processNotify(lockBLEData);
-    }
 
     // 写入失败
     private void writeFailureResponse() {
@@ -386,7 +377,7 @@ public class LockBLESend {
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);
-        lockBLEData.setStatus((byte) 0x10);
+        lockBLEData.setStatus(LockBLEBaseCmd.STATUS_WRITE_ERROR);
         processNotify(lockBLEData);
     }
 
@@ -397,7 +388,17 @@ public class LockBLESend {
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);
         lockBLEData.setOther(error.getBytes());
-        lockBLEData.setStatus((byte) 0x11);
+        lockBLEData.setStatus(LockBLEBaseCmd.STATUS_NOTIFY_TIMEOUT_ERROR);
+        processNotify(lockBLEData);
+    }
+
+    // 唤醒失败
+    private void wakeupFailureResponse() {
+        Log.d(TAG, "唤醒失败");
+        LockBLEData lockBLEData = new LockBLEData();
+        lockBLEData.setMcmd(mcmd);
+        lockBLEData.setScmd(scmd);
+        lockBLEData.setStatus(LockBLEBaseCmd.STATUS_WAKEUP_ERROR);
         processNotify(lockBLEData);
     }
 
