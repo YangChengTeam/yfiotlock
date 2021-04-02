@@ -223,7 +223,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 return;
             }
 
-            if ("连接门锁中...".equals(statusTitleTv.getText())) {
+            if ("连接门锁中...".equals(statusTitleTv.getText().toString())) {
                 return;
             }
 
