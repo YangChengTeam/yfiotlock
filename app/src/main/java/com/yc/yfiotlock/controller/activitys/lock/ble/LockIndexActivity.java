@@ -124,6 +124,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         return null;
     }
 
+    public static void safeFinish() {
+        if (getInstance() != null) {
+            getInstance().finish();
+        }
+    }
+
     /**
      * 跳转到配网界面 是否仅配置网络 而不是添加设备
      */

@@ -79,6 +79,10 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         }
     }
 
+    private boolean isBleDeviceConnected() {
+        return lockBleSend != null && lockBleSend.isConnected();
+    }
+
     @Override
     protected void bindClick() {
         setClick(R.id.stv_del, () -> {
@@ -86,7 +90,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setTitle("温馨提示");
             generalDialog.setMsg("是否删除该设备");
             generalDialog.setOnPositiveClickListener(dialog -> {
-                if (lockBleSend != null && lockBleSend.isConnected()) {
+                //是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
+                if (isBleDeviceConnected() || !isAdministrator) {
                     cloudDelDevice();
                 } else {
                     ToastCompat.show(getContext(), "蓝牙未连接");
@@ -125,6 +130,10 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     }
                     if (isAdministrator) {
                         blereset();
+                    } else {
+                        EventBus.getDefault().post(new IndexRefreshEvent());
+                        LockIndexActivity.safeFinish();
+                        finish();
                     }
                 } else {
                     ToastCompat.show(getContext(), "删除失败");
