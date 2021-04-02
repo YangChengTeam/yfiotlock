@@ -1,8 +1,6 @@
 package com.yc.yfiotlock.download;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -16,6 +14,7 @@ import android.text.TextUtils;
 
 import androidx.core.content.FileProvider;
 
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 
@@ -28,8 +27,9 @@ public class DownloadUtils {
     }
 
     public static PackageInfo getPackageInfo(Context context, String packageName) {
-        if (CommonUtil.isActivityDestory(context) || TextUtils.isEmpty(packageName))
+        if (CommonUtil.isActivityDestory(context) || TextUtils.isEmpty(packageName)) {
             return null;
+        }
 
         synchronized (DownloadUtils.class) {
             PackageInfo packageInfo = null;
@@ -65,7 +65,9 @@ public class DownloadUtils {
     }
 
     public static void installApp(Context context, File file) {
-        if (CommonUtil.isActivityDestory(context)) return;
+        if (CommonUtil.isActivityDestory(context)) {
+            return;
+        }
 
         Uri apkUri = getUriFromFile(context, file);
         Intent installIntent = new Intent(Intent.ACTION_VIEW);
@@ -93,7 +95,9 @@ public class DownloadUtils {
 
 
     public static PackageInfo getPackageInfoByFile(Context context, File file) {
-        if (CommonUtil.isActivityDestory(context)) return null;
+        if (CommonUtil.isActivityDestory(context)) {
+            return null;
+        }
 
         PackageInfo packageInfo = null;
         try {
@@ -162,53 +166,20 @@ public class DownloadUtils {
 
 
     public static void onDownload(Context context, Runnable runnable) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("流量保护提醒");
-        builder.setMessage("立即下载会消耗您的数据流量，是否继续?");
-        builder.setPositiveButton("立即下载", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (runnable != null) {
-                    runnable.run();
-                }
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton("稍后", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.GRAY);
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
+        GeneralDialog generalDialog = new GeneralDialog(context);
+        generalDialog.setTitle("流量保护提醒")
+                .setMsg("立即下载会消耗您的数据流量，是否继续?")
+                .setPositiveText("立即下载")
+                .setOnPositiveClickListener(dialog -> {
+                    if (runnable != null) {
+                        runnable.run();
+                    }
+                })
+                .setNegativeText("稍后")
+                .setPositiveTextColor(Color.RED)
+                .setNegativeTextColor(Color.GRAY)
+                .show();
     }
 
-    public static void onDel(Context context, Runnable runnable) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("");
-        builder.setMessage("是否确认删除?");
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (runnable != null) {
-                    runnable.run();
-                }
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.GRAY);
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
-    }
 
 }

@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.download;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,12 +10,10 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.ArrayMap;
 import android.util.Log;
-import android.view.KeyEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
 import com.liulishuo.okdownload.DownloadTask;
@@ -29,12 +26,11 @@ import com.liulishuo.okdownload.core.dispatcher.DownloadDispatcher;
 import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
 import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
 import com.tencent.mmkv.MMKV;
-
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
@@ -151,17 +147,17 @@ public class DownloadManager {
                     mDownloadListener = new DownloadListener4WithSpeed() {
                         @Override
                         public void taskStart(@NonNull DownloadTask task) {
-                            Log.i("DownloadManager", "taskStart: ");
+
                         }
 
                         @Override
                         public void connectStart(@NonNull DownloadTask task, int blockIndex, @NonNull Map<String, List<String>> requestHeaderFields) {
-                            Log.i(TAG, "connectStart: ");
+
                         }
 
                         @Override
                         public void connectEnd(@NonNull DownloadTask task, int blockIndex, int responseCode, @NonNull Map<String, List<String>> responseHeaderFields) {
-                            Log.i(TAG, "connectEnd: ");
+
                         }
 
                         @Override
@@ -172,7 +168,6 @@ public class DownloadManager {
                                 updateInfo.setTotalSize(info.getTotalLength());
                                 updateInfo.setOffsetSize(info.getTotalOffset());
                                 updateInfo.setDownloading(true);
-                                Log.i(TAG, "infoReady: " + updateInfo.getProgress());
                                 EventBus.getDefault().post(updateInfo);
                             }
                         }
@@ -184,7 +179,6 @@ public class DownloadManager {
 
                         @Override
                         public void progress(@NonNull DownloadTask task, long currentOffset, @NonNull SpeedCalculator taskSpeed) {
-                            Log.i(TAG, "progress: " + currentOffset);
                             if (task.getTag() instanceof UpdateInfo) {
                                 UpdateInfo updateInfo = (UpdateInfo) task.getTag();
                                 updateInfo.setSpeed(taskSpeed.speed());
@@ -197,12 +191,12 @@ public class DownloadManager {
 
                         @Override
                         public void blockEnd(@NonNull DownloadTask task, int blockIndex, BlockInfo info, @NonNull SpeedCalculator blockSpeed) {
-                            Log.i(TAG, "blockEnd: ");
+
                         }
 
                         @Override
                         public void taskEnd(@NonNull DownloadTask task, @NonNull EndCause cause, @Nullable Exception realCause, @NonNull SpeedCalculator taskSpeed) {
-                            Log.i(TAG, "taskEnd: " + cause);
+
                             UpdateInfo updateInfo = (UpdateInfo) task.getTag();
                             if (cause == EndCause.COMPLETED) {
                                 saveDownloadCache(updateInfo);
@@ -237,10 +231,12 @@ public class DownloadManager {
                 @Override
                 public void onRequestPermissionError() {
                     if (requestPermissionCount >= 3) {
-                        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                        new GeneralDialog(getContext())
                                 .setTitle("提示")
-                                .setMessage("请授予存储权限，否则无法下载更新文件。若无权限申请弹窗，请手动到设置-应用-找到乐乐游戏-选择权限-打开存储权限")
-                                .setPositiveButton("我知道了", (dialog, which) -> {
+                                .setMsg("请授予存储权限，否则无法下载更新文件。若无权限申请弹窗，请手动到设置-应用-找到"
+                                        + getContext().getString(R.string.app_name) + "-选择权限-打开存储权限")
+                                .setPositiveText("去授权")
+                                .setOnPositiveClickListener(dialog -> {
                                     try {
                                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                                         Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
@@ -248,19 +244,14 @@ public class DownloadManager {
                                         getContext().startActivity(intent);
                                         ToastCompat.show(getContext(), "请授予存储权限");
                                     } catch (Exception e) {
+                                        ToastCompat.show(getContext(),"自动跳转失败，请手动操作");
                                         e.printStackTrace();
                                     }
-                                    dialog.dismiss();
-                                }).create();
-                        alertDialog.show();
-                        alertDialog.setCanceledOnTouchOutside(false);
-                        alertDialog.setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK);
-                        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(0xffff9b27);
+                                }).show();
                         return;
                     }
                     ToastCompat.show(getContext(), "请授予存储权限");
                     updateApp(updateInfo);
-
                 }
 
             });

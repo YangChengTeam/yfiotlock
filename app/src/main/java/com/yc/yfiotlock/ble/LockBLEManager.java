@@ -1,6 +1,5 @@
 package com.yc.yfiotlock.ble;
 
-import android.app.AlertDialog;
 import android.app.Application;
 import android.bluetooth.BluetoothGatt;
 import android.content.Context;
@@ -16,6 +15,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleGattCallback;
@@ -125,16 +125,17 @@ public class LockBLEManager {
             public void onRequestPermissionSuccess() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                         && !LockBLEUtils.checkGPSIsOpen(activity)) {
-                    new AlertDialog.Builder(activity)
+
+                    new GeneralDialog(activity)
                             .setTitle("提示")
-                            .setMessage("为了更精确的扫描到Bluetooth LE设备, 请打开GPS定位")
-                            .setPositiveButton("确定", (dialog, which) -> {
+                            .setMsg("为了更精确的扫描到Bluetooth LE设备, 请打开GPS定位")
+                            .setPositiveText("确定")
+                            .setOnPositiveClickListener(dialog -> {
                                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                                 activity.startActivityForResult(intent, REQUEST_GPS);
                             })
-                            .setNegativeButton("取消", null)
-                            .create()
-                            .show();
+                            .setNegativeText("取消").show();
+
                     return;
                 }
                 startScan(activity, callbck);
