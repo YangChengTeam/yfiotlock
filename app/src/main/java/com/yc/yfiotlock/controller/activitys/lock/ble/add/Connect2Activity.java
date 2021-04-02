@@ -95,7 +95,7 @@ public class Connect2Activity extends BaseConnectActivity {
     }
 
     private void showConnectedUi() {
-        if (LockIndexActivity.isConnectWifi()) {
+        if (isActiveDistributionNetwork) {
             mLlConnectWifi.setVisibility(View.VISIBLE);
             mLlConnected.setVisibility(View.GONE);
         } else {

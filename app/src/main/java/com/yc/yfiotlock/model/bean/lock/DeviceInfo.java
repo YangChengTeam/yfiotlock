@@ -19,6 +19,7 @@ public class DeviceInfo implements Serializable {
     @JSONField(name = "add_time")
     private int regtime;
     private int battery;
+    private int volume;
     @JSONField(name = "device_id")
     private String deviceId;
     @JSONField(name = "is_online")
@@ -38,7 +39,7 @@ public class DeviceInfo implements Serializable {
      */
     private int has;
 
-    private UserInfo user;
+    private transient UserInfo user;
 
     public DeviceInfo() {
     }
@@ -109,6 +110,14 @@ public class DeviceInfo implements Serializable {
 
     public void setBattery(int battery) {
         this.battery = battery;
+    }
+
+    public int getVolume() {
+        return volume;
+    }
+
+    public void setVolume(int volume) {
+        this.volume = volume;
     }
 
     public String getDeviceId() {

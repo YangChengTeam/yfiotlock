@@ -122,7 +122,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     public void fail(String name, int type, int keyid, String password) {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                mLoadingDialog.show("同步中...");
+                mLoadingDialog.show("添加中...");
                 cloudAdd(name, type, keyid, password);
             });
         } else {

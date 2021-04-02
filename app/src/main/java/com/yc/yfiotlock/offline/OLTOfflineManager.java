@@ -73,7 +73,7 @@ public class OLTOfflineManager {
         void exce(List<OpenLockInfo> lockInfos);
     }
 
-    public void autoExceOfflineData(String type, List<OpenLockInfo> lockInfos, ExceCallbac callbac) {
+    public void autoExceOfflineData(String type, List<OpenLockInfo> lockInfos, ExceCallbac callback) {
         List<OpenLockInfo> lastLockInfos = null;
         if (lockInfos == null || lockInfos.size() == 0) {
             lastLockInfos = CacheUtil.getCache(type, new TypeReference<List<OpenLockInfo>>() {
@@ -95,8 +95,8 @@ public class OLTOfflineManager {
                 }
             }
         }
-        if (lastLockInfos != null && lastLockInfos.size() > 0 && callbac != null) {
-            callbac.exce(lastLockInfos);
+        if (lastLockInfos != null && lastLockInfos.size() > 0 && callback != null) {
+            callback.exce(lastLockInfos);
         }
     }
 

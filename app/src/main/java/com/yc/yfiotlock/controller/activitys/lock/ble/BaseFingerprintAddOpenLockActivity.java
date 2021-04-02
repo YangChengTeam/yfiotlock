@@ -18,6 +18,12 @@ public abstract class BaseFingerprintAddOpenLockActivity extends BaseAddOpenLock
         lockBleSend.setScmd(scmd);
     }
 
+    @Override
+    protected void initViews() {
+        super.initViews();
+        title = "指纹";
+    }
+
     // fuck code
     @Override
     protected void cloudAddSucc() { }

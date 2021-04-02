@@ -240,7 +240,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x08) {
             headView.setVolume(volume);
-            lockInfo.setBattery(volume);
+            lockInfo.setVolume(volume);
             ToastCompat.show(getContext(), "设置成功");
         } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x01) {
             finish();

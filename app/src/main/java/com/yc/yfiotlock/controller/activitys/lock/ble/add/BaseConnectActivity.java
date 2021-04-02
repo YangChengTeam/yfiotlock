@@ -29,9 +29,9 @@ import rx.functions.Action1;
 
 public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESend.NotifyCallback {
 
-    protected boolean isDeviceAdd = false;
-    protected boolean isConnected = false;
-
+    protected boolean isDeviceAdd = false;  // 是否 设备同步云端添加成功
+    protected boolean isConnected = false;  // 是否 配网成功
+    protected boolean isActiveDistributionNetwork = false;  // 是否 连接完成后 主动配网
 
     protected int isOnline = 0;
 
@@ -168,9 +168,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     public void fail() {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                if (!LockIndexActivity.isConnectWifi()) {
-                    cloudAddDevice();
-                }
+                cloudAddDevice();
             });
         } else {
             retryCount = 3;
@@ -216,7 +214,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     @Override
     public void onBackPressed() {
-        if (LockIndexActivity.isConnectWifi()) {
+        if (isActiveDistributionNetwork) {
             finish();
             ConnectActivity.finish2();
         } else if (isDeviceAdd) {
@@ -232,7 +230,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
             aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
-            if (isDeviceAdd || LockIndexActivity.isConnectWifi()) {
+            if (isDeviceAdd ||  isActiveDistributionNetwork) {
                 return;
             }
             isDeviceAdd = true;

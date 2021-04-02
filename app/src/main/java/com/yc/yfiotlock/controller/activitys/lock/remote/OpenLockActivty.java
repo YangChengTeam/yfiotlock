@@ -13,8 +13,14 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.VUiKit;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.remote.NetworkStateInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -22,6 +28,7 @@ import com.yc.yfiotlock.view.widgets.BackNavBar;
 import java.io.Serializable;
 
 import butterknife.BindView;
+import rx.Observer;
 import rx.Subscriber;
 
 public class OpenLockActivty extends BaseActivity {
@@ -39,6 +46,8 @@ public class OpenLockActivty extends BaseActivity {
 
 
     private LockEngine lockEngine;
+    private BleDevice bleDevice;
+    private DeviceInfo lockInfo;
 
     public static void start(Context context, DeviceInfo deviceInfo) {
         Intent intent = new Intent(context, OpenLockActivty.class);
@@ -55,6 +64,8 @@ public class OpenLockActivty extends BaseActivity {
     protected void initVars() {
         super.initVars();
         lockEngine = new LockEngine(this);
+        bleDevice = LockIndexActivity.getInstance().getBleDevice();
+        lockInfo = LockIndexActivity.getInstance().getLockInfo();
     }
 
 
@@ -117,5 +128,56 @@ public class OpenLockActivty extends BaseActivity {
                 }
             }
         });
+    }
+
+
+    private void checkDeviceNetworkState() {
+        mLoadingDialog.show("检查设备联网状态");
+        lockEngine.checkNetWork(lockInfo.getId()).subscribe(new Observer<ResultInfo<NetworkStateInfo>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), "请求失败,请稍后再试");
+            }
+
+            @Override
+            public void onNext(ResultInfo<NetworkStateInfo> info) {
+                NetworkStateInfo networkStateInfo = info.getData();
+                if (networkStateInfo != null) {
+                    if (networkStateInfo.getMsg().equals(NetworkStateInfo.ONLINE)) {
+                        Intent intent = new Intent(getContext(), VisitorManageActivity.class);
+                        startActivity(intent);
+                    } else if (networkStateInfo.getMsg().equals(NetworkStateInfo.OFFLINE)) {
+                        showOfflineTip();
+                    } else {
+                        ToastCompat.show(getContext(), networkStateInfo.getMsg());
+                    }
+                } else {
+                    ToastCompat.show(getContext(), "请求失败,请稍后再试");
+                }
+            }
+        });
+    }
+
+    private void showOfflineTip() {
+        GeneralDialog generalDialog = new GeneralDialog(getContext());
+        generalDialog.setTitle("温馨提示")
+                .setMsg("设备处于离线状态，请先配置网络")
+                .setPositiveText("去配置")
+                .setOnPositiveClickListener(dialog -> {
+                    if (bleDevice == null) {
+                        ToastCompat.show(getContext(), "请先链接设备");
+                        return;
+                    }
+                    Intent intent = new Intent(getContext(), ConnectActivity.class);
+                    intent.putExtra("device", lockInfo);
+                    intent.putExtra("bleDevice", bleDevice);
+                    startActivity(intent);
+                }).show();
     }
 }

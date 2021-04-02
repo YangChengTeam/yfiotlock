@@ -37,6 +37,8 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
 
     @Override
     protected void initViews() {
+       
+
         super.initViews();
         for (int i = 0; i < fingerBtns.length; i++) {
             final View fingerBtn = fingerBtns[i];
