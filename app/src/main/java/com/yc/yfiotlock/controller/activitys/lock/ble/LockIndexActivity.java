@@ -3,9 +3,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.app.Dialog;
 import android.content.Intent;
 import android.hardware.SensorEvent;
-import android.os.Bundle;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
-import com.alibaba.fastjson.JSONObject;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
@@ -29,7 +26,6 @@ import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -40,9 +36,7 @@ import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
-import com.yc.yfiotlock.model.bean.lock.remote.NetworkStateInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
 
@@ -56,8 +50,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import rx.Observer;
 import rx.functions.Action1;
 
 public class LockIndexActivity extends BaseActivity implements LockBLESend.NotifyCallback {
@@ -124,20 +116,13 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         return null;
     }
 
+
     public static void safeFinish() {
         if (getInstance() != null) {
             getInstance().finish();
         }
     }
 
-    /**
-     * 跳转到配网界面 是否仅配置网络 而不是添加设备
-     */
-    private static boolean isConnectWifi = false;
-
-    public static boolean isConnectWifi() {
-        return getInstance() != null && isConnectWifi;
-    }
 
     @Override
     protected int getLayoutId() {
@@ -237,6 +222,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             if (LockBLEManager.isConnected(bleDevice)) {
                 return;
             }
+
             if ("连接门锁中...".equals(statusTitleTv.getText())) {
                 return;
             }
@@ -346,7 +332,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startAnimations();
 
         if (lockBleSend != null) {
-            lockBleSend.send((byte) 0x02, (byte) 0x01, LockBLEOpCmd.open(this), false);
+            lockBleSend.send(LockBLEOpCmd.MCMD, LockBLEOpCmd.SCMD_OPEN, LockBLEOpCmd.open(this), false);
         }
     }
 
@@ -473,7 +459,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     private void test() {
         if (lockBleSend != null) {
             byte[] cmdBytes = LockBLESettingCmd.reset(getContext());
-            lockBleSend.send((byte) 0x01, (byte) 0x01, cmdBytes, false);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, cmdBytes, false);
         }
     }
 
@@ -494,58 +480,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     // 进入访客管理
     private void nav2Vm() {
-        checkDeviceNetworkState();
-    }
-
-    private void checkDeviceNetworkState() {
-        mLoadingDialog.show("检查设备联网状态");
-        lockEngine.checkNetWork(lockInfo.getId()).subscribe(new Observer<ResultInfo<NetworkStateInfo>>() {
-            @Override
-            public void onCompleted() {
-                mLoadingDialog.dismiss();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "请求失败,请稍后再试");
-            }
-
-            @Override
-            public void onNext(ResultInfo<NetworkStateInfo> info) {
-                NetworkStateInfo networkStateInfo = info.getData();
-                if (networkStateInfo != null) {
-                    if (networkStateInfo.getMsg().equals(NetworkStateInfo.ONLINE)) {
-                        Intent intent = new Intent(getContext(), VisitorManageActivity.class);
-                        startActivity(intent);
-                    } else if (networkStateInfo.getMsg().equals(NetworkStateInfo.OFFLINE)) {
-                        showOfflineTip();
-                    } else {
-                        ToastCompat.show(getContext(), networkStateInfo.getMsg());
-                    }
-                } else {
-                    ToastCompat.show(getContext(), "请求失败,请稍后再试");
-                }
-            }
-        });
-    }
-
-    private void showOfflineTip() {
-        GeneralDialog generalDialog = new GeneralDialog(getContext());
-        generalDialog.setTitle("温馨提示")
-                .setMsg("设备处于离线状态，请先配置网络")
-                .setPositiveText("去配置")
-                .setOnPositiveClickListener(dialog -> {
-                    if (bleDevice == null) {
-                        ToastCompat.show(getContext(), "请先链接设备");
-                        return;
-                    }
-                    Intent intent = new Intent(getContext(), ConnectActivity.class);
-                    intent.putExtra("device", lockInfo);
-                    intent.putExtra("bleDevice", bleDevice);
-                    startActivity(intent);
-                    isConnectWifi = true;
-                }).show();
+        Intent intent = new Intent(getContext(), VisitorManageActivity.class);
+        startActivity(intent);
     }
 
     // 进入日志管理
@@ -609,7 +545,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
+        if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_OPEN) {
             stopAnimations();
             statusTitleTv.setText("门锁已打开");
             // 恢复状态  我们目前版本使用机械反锁，所以门开关的状态事件目前版本是没有的。
@@ -624,7 +560,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x02 && lockBLEData.getScmd() == (byte) 0x01) {
+        if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_OPEN) {
             isOpening = false;
             if (LockBLEManager.isConnected(bleDevice)) {
                 setConnectedInfo();

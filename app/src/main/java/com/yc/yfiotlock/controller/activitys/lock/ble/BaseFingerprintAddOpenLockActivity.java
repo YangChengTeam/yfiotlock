@@ -12,10 +12,16 @@ public abstract class BaseFingerprintAddOpenLockActivity extends BaseAddOpenLock
     @Override
     protected void initVars() {
         super.initVars();
-        this.mcmd = (byte) 0x02;
-        this.scmd = (byte) 0x08;
+        this.mcmd = LockBLEOpCmd.MCMD;
+        this.scmd = LockBLEOpCmd.SCMD_ADD_PRINTFINGER;
         lockBleSend.setMcmd(mcmd);
         lockBleSend.setScmd(scmd);
+    }
+
+    @Override
+    protected void initViews() {
+        super.initViews();
+        title = "指纹";
     }
 
     // fuck code

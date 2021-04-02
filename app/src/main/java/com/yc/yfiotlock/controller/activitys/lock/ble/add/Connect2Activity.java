@@ -47,7 +47,6 @@ public class Connect2Activity extends BaseConnectActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        isOnline = 1;
         cancelSend = new LockBLESend(this, bleDevice);
     }
 
@@ -95,7 +94,7 @@ public class Connect2Activity extends BaseConnectActivity {
     }
 
     private void showConnectedUi() {
-        if (LockIndexActivity.isConnectWifi()) {
+        if (isActiveDistributionNetwork) {
             mLlConnectWifi.setVisibility(View.VISIBLE);
             mLlConnected.setVisibility(View.GONE);
         } else {
@@ -126,7 +125,7 @@ public class Connect2Activity extends BaseConnectActivity {
             valueAnimator.start();
             showConnectingUi();
             byte[] cmdBytes = LockBLESettingCmd.wiftDistributionNetwork(this, ssid, pwd);
-            lockBleSend.send((byte) 0x01, (byte) 0x02, cmdBytes);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK, cmdBytes);
         }
     }
 
@@ -153,14 +152,14 @@ public class Connect2Activity extends BaseConnectActivity {
 
     private void blecancel() {
         if (cancelSend != null) {
-            cancelSend.send((byte) 0x01, (byte) 0x07, LockBLESettingCmd.cancelOp(this), false);
+            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(this), false);
         }
     }
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         super.onNotifySuccess(lockBLEData);
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK) {
             isConnected = true;
             valueAnimator.cancel();
             valueAnimator.end();
@@ -168,7 +167,7 @@ public class Connect2Activity extends BaseConnectActivity {
             LockBLEManager.setBindWifi(bleDevice.getMac());
             ConnectActivity.finish2();
             bleGetAliDeviceName();
-        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();
@@ -177,12 +176,12 @@ public class Connect2Activity extends BaseConnectActivity {
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK) {
             lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();
             valueAnimator.end();
             nav2fail();
-        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSend.setOpOver(true);
             valueAnimator.end();
             valueAnimator.cancel();

@@ -122,7 +122,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     public void fail(String name, int type, int keyid, String password) {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                mLoadingDialog.show("同步中...");
+                mLoadingDialog.show("添加中...");
                 cloudAdd(name, type, keyid, password);
             });
         } else {
@@ -176,7 +176,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
     private void blecancel() {
         if (cancelSend != null) {
-            cancelSend.send((byte) 0x01, (byte) 0x07, LockBLESettingCmd.cancelOp(this), false);
+            cancelSend.send(LockBLESettingCmd.MCMD , LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(this), false);
         }
     }
 
@@ -194,7 +194,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                     ToastCompat.show(getContext(), "流水号匹配不成功");
                 }
             }
-        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();
@@ -203,7 +203,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x07) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();

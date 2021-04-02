@@ -29,11 +29,10 @@ import rx.functions.Action1;
 
 public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESend.NotifyCallback {
 
-    protected boolean isDeviceAdd = false;
-    protected boolean isConnected = false;
+    protected boolean isDeviceAdd = false;  // 是否 设备同步云端添加成功
+    protected boolean isConnected = false;  // 是否 配网成功
+    protected boolean isActiveDistributionNetwork = false;  // 是否 连接完成后 主动配网
 
-
-    protected int isOnline = 0;
 
     protected BleDevice bleDevice;
     protected DeviceInfo lockInfo;
@@ -68,7 +67,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected void cloudAddDevice() {
         bleSynctime();
         mLoadingDialog.show("添加设备中...");
-        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, isOnline).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
+        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, isConnected ? 1 : 0).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
@@ -129,8 +128,8 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {
-            byte[] cmdBytes = LockBLESettingCmd.getAlDeviceName(this);
-            lockBleSend.send((byte) 0x01, (byte) 0x0A, cmdBytes, true);
+            byte[] cmdBytes = LockBLESettingCmd.getAliDeviceName(this);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes, true);
         }
     }
 
@@ -141,7 +140,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                 public void call(ResultInfo<TimeInfo> info) {
                     if (info != null && info.getCode() == 1 && info.getData() != null) {
                         byte[] cmdBytes = LockBLESettingCmd.syncTime(getContext(), info.getData().getTime());
-                        lockBleSend.send((byte) 0x01, (byte) 0x05, cmdBytes, true);
+                        lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SYNC_TIME, cmdBytes, true);
                     }
                 }
             });
@@ -168,9 +167,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     public void fail() {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                if (!LockIndexActivity.isConnectWifi()) {
-                    cloudAddDevice();
-                }
+                cloudAddDevice();
             });
         } else {
             retryCount = 3;
@@ -216,7 +213,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     @Override
     public void onBackPressed() {
-        if (LockIndexActivity.isConnectWifi()) {
+        if (isActiveDistributionNetwork) {
             finish();
             ConnectActivity.finish2();
         } else if (isDeviceAdd) {
@@ -229,16 +226,16 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x0A) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
             aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
-            if (isDeviceAdd || LockIndexActivity.isConnectWifi()) {
+            if (isDeviceAdd || isActiveDistributionNetwork) {
                 return;
             }
             isDeviceAdd = true;
             cloudAddDevice();
         }
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x05) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
             LogUtil.msg("同步时间成功");
         }
     }

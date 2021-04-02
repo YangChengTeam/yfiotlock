@@ -75,7 +75,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void bleSetVolume(int volume) {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.changeVolume(this, volume);
-            lockBleSend.send((byte) 0x01, (byte) 0x08, bytes, false);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHANGE_VOLUME, bytes, false);
         }
     }
 
@@ -145,7 +145,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void blereset() {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.reset(this);
-            lockBleSend.send((byte) 0x01, (byte) 0x01, bytes, true);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes, true);
         }
     }
 
@@ -249,11 +249,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x08) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHANGE_VOLUME) {
             headView.setVolume(volume);
-            lockInfo.setBattery(volume);
+            lockInfo.setVolume(volume);
             ToastCompat.show(getContext(), "设置成功");
-        } else if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x01) {
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_RESET) {
             finish();
             LockIndexActivity.getInstance().finish();
         }
@@ -262,7 +262,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x08) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHANGE_VOLUME) {
             ToastCompat.show(getContext(), "设置失败");
             headView.resetVolume();
         }

@@ -63,7 +63,7 @@ public class DeviceInfoActivity extends BaseBackActivity {
         itemInfos.add(new ItemInfo("固件版本", deviceInfo.getFirmwareVersion()));
         itemInfos.add(new ItemInfo("协议版本", deviceInfo.getProtocolVersion()));
         itemInfos.add(new ItemInfo("注册时间", CommonUtil.formatTime(deviceInfo.getRegtime())));
-        itemInfos.add(new ItemInfo("剩余电量", getBatteryString(deviceInfo.getBattery())));
+        itemInfos.add(new ItemInfo("剩余电量", getBatteryString(deviceInfo.getVolume())));
         itemInfos.add(new ItemInfo("设备id", deviceInfo.getMacAddress().replaceAll(":", "")));
         mAdapter.setNewInstance(itemInfos);
     }

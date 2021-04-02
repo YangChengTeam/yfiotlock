@@ -22,8 +22,8 @@ import com.coorchice.library.SuperTextView;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.utils.CommonUtil;
 
@@ -52,7 +52,6 @@ public class ConnectActivity extends BaseConnectActivity {
     private AlertDialog wifiAlertDialog;
 
     private static WeakReference<ConnectActivity> mInstance;
-
     public static void finish2() {
         if (mInstance != null && mInstance.get() != null) {
             mInstance.get().finish();
@@ -69,7 +68,6 @@ public class ConnectActivity extends BaseConnectActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        isDeviceAdd = LockIndexActivity.isConnectWifi();
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         registerScanWifiReceiver();
     }
@@ -112,7 +110,7 @@ public class ConnectActivity extends BaseConnectActivity {
 
     private void setInfo() {
         mEtSsid.setText(CommonUtil.getSsid(this));
-        if (LockIndexActivity.isConnectWifi()) {
+        if (isActiveDistributionNetwork) {
             mStvSkip.setVisibility(View.GONE);
         }
     }
@@ -245,7 +243,7 @@ public class ConnectActivity extends BaseConnectActivity {
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         super.onNotifySuccess(lockBLEData);
-        if (lockBLEData.getMcmd() == (byte) 0x01 && lockBLEData.getScmd() == (byte) 0x02) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK) {
             mLoadingDialog.dismiss();
             nav2fail();
         }
