@@ -40,6 +40,8 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected DeviceEngin deviceEngin;
     protected ChangeDeviceNameDialog deviceNameDialog;
 
+    protected String aliDeviceName = "000000000000";
+
     @Override
     protected void initVars() {
         super.initVars();
@@ -124,7 +126,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         }
     }
 
-    protected String aliDeviceName = "000000000000";
 
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {
@@ -188,6 +189,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         intent.putExtra("bleDevice", bleDevice);
         intent.putExtra("device", lockInfo);
         startActivity(intent);
+        finish();
         ConnectActivity.finish2();
         DeviceListActivity.finish2();
         ScanDeviceActivity.finish2();
@@ -218,7 +220,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             ConnectActivity.finish2();
         } else if (isDeviceAdd) {
             nav2Index();
-            finish();
         } else {
             super.onBackPressed();
         }

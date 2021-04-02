@@ -98,7 +98,7 @@ public class IndexFragment extends BaseFragment {
                 nav2AddDevice();
             } else {
                 mDeviceInfo = (DeviceInfo) adapter.getData().get(position);
-                if (mDeviceInfo.getIsShare() == 1) {
+                if (mDeviceInfo.isShare() == 1) {
                     checkLockExist();
                 } else {
                     nav2LockIndex();
@@ -126,7 +126,7 @@ public class IndexFragment extends BaseFragment {
             @Override
             public void onNext(ResultInfo<DeviceInfo> deviceInfoResultInfo) {
                 mLoadingDialog.dismiss();
-                if (deviceInfoResultInfo.getData().getHas() == 1) {
+                if (deviceInfoResultInfo.getData().isValid() == 1) {
                     nav2LockIndex();
                 } else {
                     ToastCompat.show(getContext(),"设备已失效");

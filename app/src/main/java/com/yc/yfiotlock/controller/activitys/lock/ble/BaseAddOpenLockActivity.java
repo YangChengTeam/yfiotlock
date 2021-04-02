@@ -45,7 +45,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     }
 
 
-    protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
+    protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
 
     @Override
     protected void initVars() {

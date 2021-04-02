@@ -40,6 +40,9 @@ public class LockBLEManager {
     public static final byte GROUP_TYPE_TEMP_PWD = 2;
     public static final byte GROUP_ADMIN = 0;
     public static final byte GROUP_HIJACK = 3;
+    public static final byte ALARM_TYPE = 2;
+    public static final byte NORMAL_TYPE = 1;
+
     public static final int OP_TIMEOUT = 20000;
     public static final int OPEN_LOCK_FINGERPRINT = 1;
     public static final int OPEN_LOCK_PASSWORD = 2;

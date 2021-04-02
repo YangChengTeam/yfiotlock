@@ -28,16 +28,13 @@ public class DeviceInfo implements Serializable {
     private String macAddress;
     private String model = "Locker";
 
-    /**
-     * 是否是共享的锁
-     */
+    // 是否是共享的锁
     @JSONField(name = "is_share")
     private int isShare;
 
-    /**
-     * 锁是否还有效 0失效 1 有效
-     */
-    private int has;
+    // 锁是否还有效 0失效 1 有效
+    @JSONField(name = "has")
+    private int isValid;
 
     private transient UserInfo user;
 
@@ -102,9 +99,6 @@ public class DeviceInfo implements Serializable {
     }
 
     public int getBattery() {
-        if (battery == 0) {
-            battery = 3;
-        }
         return battery;
     }
 
@@ -113,6 +107,9 @@ public class DeviceInfo implements Serializable {
     }
 
     public int getVolume() {
+        if (volume == 0) {
+            volume = 3;
+        }
         return volume;
     }
 
@@ -160,19 +157,19 @@ public class DeviceInfo implements Serializable {
         this.user = user;
     }
 
-    public int getIsShare() {
+    public int isShare() {
         return isShare;
     }
 
-    public void setIsShare(int isShare) {
+    public void setShare(int isShare) {
         this.isShare = isShare;
     }
 
-    public int getHas() {
-        return has;
+    public int isValid() {
+        return isValid;
     }
 
-    public void setHas(int has) {
-        this.has = has;
+    public void setValid(int isValid) {
+        this.isValid = isValid;
     }
 }

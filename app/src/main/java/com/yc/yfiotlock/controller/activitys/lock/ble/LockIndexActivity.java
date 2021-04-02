@@ -136,7 +136,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         familyInfo = (FamilyInfo) getIntent().getSerializableExtra("family");
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         lockEngine = new LockEngine(this);
-        if (lockInfo.getIsShare() == 1) {
+        if (lockInfo.isShare() == 1) {
             setUserUi();
         }
     }
