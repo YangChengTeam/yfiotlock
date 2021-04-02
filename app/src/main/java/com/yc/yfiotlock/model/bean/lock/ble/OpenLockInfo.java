@@ -1,8 +1,5 @@
 package com.yc.yfiotlock.model.bean.lock.ble;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;

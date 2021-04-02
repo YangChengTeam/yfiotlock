@@ -137,4 +137,6 @@ dependencies {
     implementation 'com.tencent.bugly:nativecrashreport:3.9.1' //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
 
     implementation 'com.github.hackware1993:MagicIndicator:1.7.0'
+    implementation "androidx.work:work-runtime:2.5.0"
+
 }

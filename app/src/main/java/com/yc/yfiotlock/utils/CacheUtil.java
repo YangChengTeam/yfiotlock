@@ -1,9 +1,11 @@
 package com.yc.yfiotlock.utils;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.GoagalInfo;
-import com.kk.utils.LogUtil;
+import com.kk.securityhttp.utils.LogUtil;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 
@@ -54,13 +56,13 @@ public class CacheUtil {
         try {
             if (type != null) {
                 resultInfo = JSON.parseObject(body, type);
-
             } else {
                 resultInfo = JSON.parseObject(body, new TypeReference<T>() {
                 }); //范型已被擦除 --！
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            LogUtil.msg("缓存解析不成功");
         }
         return resultInfo;
     }
