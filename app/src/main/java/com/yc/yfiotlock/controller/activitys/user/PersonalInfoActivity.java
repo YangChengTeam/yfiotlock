@@ -1,11 +1,9 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -31,6 +29,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateIconDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.user.PersonalInfo;
@@ -401,13 +400,10 @@ public class PersonalInfoActivity extends BaseActivity {
     }
 
     private void showLogoutDialog() {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
-                .setTitle("提示")
-                .setMessage("是否确定退出？")
-                .setNegativeButton("取消", (dialog, which) -> {
-                    dialog.dismiss();
-                })
-                .setPositiveButton("确定", (dialog, which) -> {
+        GeneralDialog dialog = new GeneralDialog(getContext());
+        dialog.setTitle("提示")
+                .setMsg("是否确定退出？")
+                .setOnPositiveClickListener(dialog1 -> {
                     mLoadingDialog.show("退出登录中...");
                     VUiKit.postDelayed(1000, () -> {
                         mLoadingDialog.dismiss();
@@ -415,11 +411,8 @@ public class PersonalInfoActivity extends BaseActivity {
                         EventBus.getDefault().post(new UserInfo());
                         finish();
                     });
-                })
-                .create();
-        alertDialog.show();
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED);
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.colorAccent));
+                });
+        dialog.show();
     }
 
 
