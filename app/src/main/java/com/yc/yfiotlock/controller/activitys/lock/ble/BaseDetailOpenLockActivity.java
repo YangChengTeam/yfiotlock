@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.app.Dialog;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -41,7 +40,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import rx.Subscriber;
 
 public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
@@ -55,7 +53,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected LockEngine lockEngine;
     protected OpenLockInfo openLockInfo;
     protected LockBLESend lockBleSend;
-    protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
+    protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
 
     protected byte mcmd;
     protected byte scmd;
@@ -78,7 +76,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
         super.initVars();
         offlineManager = OLTOfflineManager.getInstance(this);
         DeviceInfo deviceInfo = LockIndexActivity.getInstance().getLockInfo();
-        if (deviceInfo != null && deviceInfo.getIsShare() == 1) {
+        if (deviceInfo != null && deviceInfo.isShare() == 1) {
             mFlBottom.setVisibility(View.GONE);
         }
         lockEngine = new LockEngine(this);

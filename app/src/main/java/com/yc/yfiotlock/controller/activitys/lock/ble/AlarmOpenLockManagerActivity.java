@@ -53,7 +53,7 @@ public class AlarmOpenLockManagerActivity extends OpenLockManagerActivity {
     // 开门方式数量
     @Override
     protected void loadData() {
-        int type = 2;
+        int type = LockBLEManager.ALARM_TYPE;
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             notifyAdapter(countInfo);

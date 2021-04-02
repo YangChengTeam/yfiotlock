@@ -1,6 +1,5 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import android.app.Dialog;
 import android.content.Intent;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -62,7 +61,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
         deviceEngin = new DeviceEngin(this);
-        isAdministrator = lockInfo.getIsShare() == 0;
+        isAdministrator = lockInfo.isShare() == 0;
     }
 
     @Override

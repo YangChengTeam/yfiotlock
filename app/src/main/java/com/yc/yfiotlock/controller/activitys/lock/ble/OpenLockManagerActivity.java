@@ -92,7 +92,8 @@ public class OpenLockManagerActivity extends BaseBackActivity {
         int fingerprintCount = 0;
         int passwordCount = 0;
         int cardCount = 0;
-        int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
+        
+        int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             fingerprintCount = countInfo.getFingerprintCount();
