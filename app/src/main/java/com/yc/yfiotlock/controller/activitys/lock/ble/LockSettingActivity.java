@@ -123,7 +123,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                         UserInfoCache.setUserInfo(userInfo);
                         EventBus.getDefault().post(userInfo);
                     }
-                    blereset();
+                    if (isAdministrator) {
+                        blereset();
+                    }
                 } else {
                     ToastCompat.show(getContext(), "删除失败");
                 }
