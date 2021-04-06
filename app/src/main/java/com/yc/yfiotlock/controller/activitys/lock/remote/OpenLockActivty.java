@@ -72,11 +72,7 @@ public class OpenLockActivty extends BaseActivity {
     @Override
     protected void initViews() {
         mBnbTitle.setBackListener(view -> onBackPressed());
-
-        Serializable device = getIntent().getSerializableExtra("device");
-        if (device instanceof DeviceInfo) {
-            open(((DeviceInfo) device).getId());
-        }
+        open(lockInfo.getId() + "");
     }
 
     private void open(String id) {
@@ -133,7 +129,7 @@ public class OpenLockActivty extends BaseActivity {
 
     private void checkDeviceNetworkState() {
         mLoadingDialog.show("检查设备联网状态");
-        lockEngine.checkNetWork(lockInfo.getId()).subscribe(new Observer<ResultInfo<NetworkStateInfo>>() {
+        lockEngine.checkNetWork(lockInfo.getId() + "").subscribe(new Observer<ResultInfo<NetworkStateInfo>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();

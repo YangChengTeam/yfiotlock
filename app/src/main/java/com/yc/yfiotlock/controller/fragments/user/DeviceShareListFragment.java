@@ -65,11 +65,11 @@ public class DeviceShareListFragment extends BaseFragment {
         mRvList.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvList);
         mAdapter.setOnItemClickListener((adapter, view, position) -> {
-            ShareDeviceWrapper wrapper=mAdapter.getData().get(position);
-            DeviceInfo deviceInfo= new DeviceInfo();
+            ShareDeviceWrapper wrapper = mAdapter.getData().get(position);
+            DeviceInfo deviceInfo = new DeviceInfo();
             deviceInfo.setId(wrapper.getId());
             deviceInfo.setName(wrapper.getName());
-            LockShareManageActivity.start(getContext(),deviceInfo);
+            LockShareManageActivity.start(getContext(), deviceInfo);
         });
         mAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
             p++;
@@ -152,7 +152,7 @@ public class DeviceShareListFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mEngine!=null){
+        if (mEngine != null) {
             mEngine.cancelAll();
         }
     }

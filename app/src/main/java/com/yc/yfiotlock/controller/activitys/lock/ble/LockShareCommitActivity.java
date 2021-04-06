@@ -86,7 +86,7 @@ public class LockShareCommitActivity extends BaseBackActivity {
 
     private void shareDevice() {
         mLoadingDialog.show("请求中...");
-        mEngine.shareDevice(mUserInfo.getId(), lockInfo.getId()).subscribe(new Observer<ResultInfo<String>>() {
+        mEngine.shareDevice(mUserInfo.getId(), lockInfo.getId() + "").subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();

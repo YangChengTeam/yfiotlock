@@ -219,8 +219,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <service android:name=".offline.OfflineManagerService"></service>
-        <receiver android:name=".offline.OfflineManagerReceiver"></receiver>
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"

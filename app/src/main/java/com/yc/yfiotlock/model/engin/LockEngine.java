@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 
 import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.securityhttp.engin.BaseEngin;
 import com.kk.securityhttp.engin.HttpCoreEngin;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
@@ -87,15 +86,15 @@ public class LockEngine extends HttpCoreEngin {
      * @param lockerId -
      * @return list of single openLockWay's info
      */
-    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String way, String type) {
+    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String type, String groupType) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", lockerId);
-        map.put("pwd_type", way);
-        map.put("type", type);
+        map.put("pwd_type", type);
+        map.put("type", groupType);
         return new HttpCoreEngin<ResultInfo<List<OpenLockInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
                 new TypeReference<ResultInfo<List<OpenLockInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);

@@ -45,8 +45,6 @@ import rx.Subscriber;
 import static android.app.Activity.RESULT_OK;
 
 public class IndexFragment extends BaseFragment {
-
-
     @BindView(R.id.iv_device_add)
     View deviceAddBtn;
 
@@ -113,7 +111,7 @@ public class IndexFragment extends BaseFragment {
 
     private void checkLockExist() {
         mLoadingDialog.show("检验中...");
-        mEngine.checkLockExist(mDeviceInfo.getId()).subscribe(new Observer<ResultInfo<DeviceInfo>>() {
+        mEngine.checkLockExist(mDeviceInfo.getId()+"").subscribe(new Observer<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();

@@ -94,9 +94,9 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     protected void cloudModifyDeivceName(String name, String aliDeviceName) {
-        if (lockInfo != null && !TextUtils.isEmpty(lockInfo.getId())) {
+        if (lockInfo.getId() != 0) {
             mLoadingDialog.show("正在修改");
-            deviceEngin.updateDeviceInfo(lockInfo.getId(), name, aliDeviceName).subscribe(new Subscriber<ResultInfo<String>>() {
+            deviceEngin.updateDeviceInfo(lockInfo.getId() + "", name, aliDeviceName).subscribe(new Subscriber<ResultInfo<String>>() {
                 @Override
                 public void onCompleted() {
                     mLoadingDialog.dismiss();

@@ -8,7 +8,7 @@ import com.yc.yfiotlock.model.bean.user.UserInfo;
  * Created by　Dullyoung on 2021/3/31
  **/
 public class ShareDeviceWrapper {
-    private String id;
+    private int id;
     private String name;
     @JSONField(name = "share_uid")
     private String shareUid;
@@ -30,11 +30,11 @@ public class ShareDeviceWrapper {
     private DeviceInfo locker;
 
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -79,7 +79,7 @@ public class AlarmsFragment extends BaseFragment {
         if (deviceInfo == null) {
             return;
         }
-        logEngine.getWarnLog(deviceInfo.getId(), page, pageSize).subscribe(new Observer<ResultInfo<WarnListInfo>>() {
+        logEngine.getWarnLog(deviceInfo.getId() + "", page, pageSize).subscribe(new Observer<ResultInfo<WarnListInfo>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);

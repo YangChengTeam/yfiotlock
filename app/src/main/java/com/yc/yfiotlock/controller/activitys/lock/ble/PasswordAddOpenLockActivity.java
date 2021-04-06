@@ -133,7 +133,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     @Override
-    protected void cloudAddSucc() {
+    protected void localAddSucc() {
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setPasswordCount(countInfo.getPasswordCount() + 1);
@@ -142,7 +142,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     @Override
-    protected void cloudAdd(int keyid) {
+    protected void localAdd(int keyid) {
         int passwordCount = 0;
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
@@ -150,8 +150,9 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
         }
         passwordCount += 1;
         String name = title + ((passwordCount) > 9 ? passwordCount + "" : "0" + passwordCount);
-        cloudAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
+        localAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, keyid, passEt.getText() + "");
     }
+
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {

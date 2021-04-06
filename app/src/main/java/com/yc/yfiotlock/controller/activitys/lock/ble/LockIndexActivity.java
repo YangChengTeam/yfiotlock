@@ -15,6 +15,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -524,7 +525,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     // 开门方式数量
     private void loadLockOpenCountInfo() {
         int type = setCountInfo();
-        lockEngine.getOpenLockInfoCount(lockInfo.getId(), type + "").subscribe(new Action1<ResultInfo<OpenLockCountInfo>>() {
+        lockEngine.getOpenLockInfoCount(lockInfo.getId() + "", type + "").subscribe(new Action1<ResultInfo<OpenLockCountInfo>>() {
             @Override
             public void call(ResultInfo<OpenLockCountInfo> openLockCountInfoResultInfo) {
                 if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {

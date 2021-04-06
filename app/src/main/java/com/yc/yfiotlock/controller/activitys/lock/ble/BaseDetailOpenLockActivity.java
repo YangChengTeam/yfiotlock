@@ -26,7 +26,6 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.offline.OLTOfflineManager;
-import com.yc.yfiotlock.utils.BleUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.greenrobot.eventbus.EventBus;
@@ -115,8 +114,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     protected void cloudDel() {
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        String key = LockBLEManager.GROUP_TYPE + lockInfo.getId() + "_del";
-        offlineManager.saveOfflineData(key, openLockInfo);
         lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
@@ -131,7 +128,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
                     mLoadingDialog.dismiss();
-                    offlineManager.delOfflineData(key, openLockInfo);
                     success(info.getData());
                 } else {
                     fail();
@@ -172,9 +168,9 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockInfo openLockInfo) {
-        List<OpenLockInfo> openLockTypeInfos = new ArrayList<>();
-        openLockTypeInfos.add(openLockInfo);
-        openLockAdapter.setNewInstance(openLockTypeInfos);
+        List<OpenLockInfo> openLockInfos = new ArrayList<>();
+        openLockInfos.add(openLockInfo);
+        openLockAdapter.setNewInstance(openLockInfos);
         EventBus.getDefault().post(new OpenLockRefreshEvent());
     }
 
@@ -199,9 +195,9 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     }
 
     private void setRv() {
-        List<OpenLockInfo> openLockTypeInfos = new ArrayList<>();
-        openLockTypeInfos.add(openLockInfo);
-        openLockAdapter = new OpenLockAdapter(openLockTypeInfos);
+        List<OpenLockInfo> openLockInfos = new ArrayList<>();
+        openLockInfos.add(openLockInfo);
+        openLockAdapter = new OpenLockAdapter(openLockInfos);
         openLockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         openLockRecyclerView.setAdapter(openLockAdapter);
     }

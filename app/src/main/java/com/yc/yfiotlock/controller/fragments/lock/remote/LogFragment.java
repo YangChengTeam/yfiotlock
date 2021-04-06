@@ -80,7 +80,7 @@ public class LogFragment extends BaseFragment {
         if (deviceInfo == null) {
             return;
         }
-        logEngine.getOpenLog(deviceInfo.getId(), page, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
+        logEngine.getOpenLog(deviceInfo.getId()+"", page, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);

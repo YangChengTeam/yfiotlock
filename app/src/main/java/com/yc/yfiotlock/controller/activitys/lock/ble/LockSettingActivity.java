@@ -102,7 +102,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     private void cloudDelDevice() {
         mLoadingDialog.show("删除中...");
-        deviceEngin.delDeviceVolume(lockInfo.getId()).subscribe(new Subscriber<ResultInfo<String>>() {
+        deviceEngin.delDeviceVolume(lockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();

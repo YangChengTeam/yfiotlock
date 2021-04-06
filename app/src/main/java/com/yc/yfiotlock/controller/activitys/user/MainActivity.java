@@ -152,7 +152,7 @@ public class MainActivity extends BaseActivity {
 
                     receiveDeviceDialog.setOnBtnClick(() -> {
                         if (singleDevice) {
-                            agreeShare(info.getData().get(0).getId());
+                            agreeShare(info.getData().get(0).getId()+"");
                         } else {
                             DeviceShareActivity.seeAllShare(getContext(), 1);
                         }

@@ -40,38 +40,7 @@ public class OLTOfflineManager {
         return instance;
     }
 
-    public void saveOfflineData(String key, OpenLockInfo openLockInfo) {
-        List<OpenLockInfo> openLockInfos = CacheUtil.getCache(key, new TypeReference<List<OpenLockInfo>>() {
-        }.getType());
-        if (openLockInfos != null) {
-            for (OpenLockInfo topenLockInfo : openLockInfos) {
-                if ((!TextUtils.isEmpty(topenLockInfo.getId()) && topenLockInfo.getId().equals(openLockInfo.getId())) || openLockInfo.getKeyid() == topenLockInfo.getKeyid()) {
-                    return;
-                }
-            }
-        }
-        if (openLockInfos == null) {
-            openLockInfos = new ArrayList<>();
-        }
-        Log.d(TAG, "离线数据保存:" + key + "-" + openLockInfo.getKeyid() + "-" + openLockInfo.getId());
-        openLockInfos.add(openLockInfo);
-        CacheUtil.setCache(key, openLockInfos);
-    }
 
-    public void delOfflineData(String key, OpenLockInfo openLockInfo) {
-        List<OpenLockInfo> openLockInfos = CacheUtil.getCache(key, new TypeReference<List<OpenLockInfo>>() {
-        }.getType());
-        if (openLockInfos != null) {
-            for (OpenLockInfo topenLockInfo : openLockInfos) {
-                if (openLockInfo.getKeyid() == topenLockInfo.getKeyid()) {
-                    Log.d(TAG, "离线数据删除:" + key + "-" + openLockInfo.getKeyid() + "-" + openLockInfo.getId());
-                    openLockInfos.remove(topenLockInfo);
-                    break;
-                }
-            }
-        }
-        CacheUtil.setCache(key, openLockInfos);
-    }
 
     interface ExceCallbac {
         void exce(List<OpenLockInfo> lockInfos);
@@ -111,7 +80,7 @@ public class OLTOfflineManager {
             for (OpenLockInfo cacheOpenLockInfo : cacheOpenLockInfos) {
                 boolean isExist = false;
                 for (OpenLockInfo openLockInfo : openLockInfos) {
-                    if (openLockInfo.getId().equals(cacheOpenLockInfo.getId())) {
+                    if (openLockInfo.getId() == cacheOpenLockInfo.getId()) {
                         isExist = true;
                         break;
                     }
@@ -145,12 +114,11 @@ public class OLTOfflineManager {
             if (openLockInfos != null && openLockInfos.size() > n) {
                 OpenLockInfo openLockInfo = openLockInfos.get(n);
                 if (openLockInfo == null) return;
-                lockEngine.addOpenLockWay(openLockInfo.getLockId(), openLockInfo.getName(), openLockInfo.getKeyid() + "", openLockInfo.getType(), openLockInfo.getGroupType() + "", openLockInfo.getPassword()).subscribe(new Action1<ResultInfo<String>>() {
+                lockEngine.addOpenLockWay(openLockInfo.getLockId() + "", openLockInfo.getName(), openLockInfo.getKeyid() + "", openLockInfo.getType(), openLockInfo.getGroupType() + "", openLockInfo.getPassword()).subscribe(new Action1<ResultInfo<String>>() {
                     @Override
                     public void call(ResultInfo<String> info) {
                         if (info != null && info.getCode() == 1) {
                             Log.d(TAG, "添加离线同步数据:" + key + openLockInfo.getKeyid() + "-" + openLockInfo.getId());
-                            delOfflineData(key, openLockInfo);
                             loopAdd(key, openLockInfos, n + 1);
                         }
                     }
@@ -163,12 +131,11 @@ public class OLTOfflineManager {
         if (openLockInfos != null && openLockInfos.size() > n) {
             OpenLockInfo openLockInfo = openLockInfos.get(n);
             if (openLockInfo == null) return;
-            lockEngine.delOpenLockWay(openLockInfo.getId()).subscribe(new Action1<ResultInfo<String>>() {
+            lockEngine.delOpenLockWay(openLockInfo.getId()+"").subscribe(new Action1<ResultInfo<String>>() {
                 @Override
                 public void call(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {
                         Log.d(TAG, "删除离线同步数据:" + key + openLockInfo.getKeyid() + "-" + openLockInfo.getId());
-                        delOfflineData(key, openLockInfo);
                         loopDel(key, openLockInfos, n + 1);
                     }
                 }
@@ -191,7 +158,7 @@ public class OLTOfflineManager {
             return;
         }
 
-        lockEngine.getOpenLockWayList(deviceInfo.getId(), "0", type + "").subscribe(new Action1<ResultInfo<List<OpenLockInfo>>>() {
+        lockEngine.getOpenLockWayList(deviceInfo.getId() + "", "0", type + "").subscribe(new Action1<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void call(ResultInfo<List<OpenLockInfo>> info) {
                 synchronized (OLTOfflineManager.class){

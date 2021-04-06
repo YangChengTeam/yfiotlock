@@ -90,7 +90,7 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
         mLoadingDialog.show("修改中...");
         String name = nameEt.getText().toString();
         openLockInfo.setName(name);
-        lockEngine.modifyOpenLockName(openLockInfo.getId(), name).subscribe(new Subscriber<ResultInfo<String>>() {
+        lockEngine.modifyOpenLockName(openLockInfo.getId() + "", name).subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();

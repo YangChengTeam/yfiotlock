@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 public class OfflineManager {
     public static void enqueue(Context context) {
         // 1. WorkManager 最小间隔15分钟 生命周期更长
-
-        /*
         Constraints.Builder builder = new Constraints.Builder();
         builder.setRequiredNetworkType(NetworkType.CONNECTED);
         WorkRequest workRequest =
@@ -29,9 +27,5 @@ public class OfflineManager {
         WorkManager
                 .getInstance(context)
                 .enqueue(requests);
-        */
-
-        // 2. AlarmManager 定时任务  补充方案
-        context.startService(new Intent(context, OfflineManagerService.class));
     }
 }

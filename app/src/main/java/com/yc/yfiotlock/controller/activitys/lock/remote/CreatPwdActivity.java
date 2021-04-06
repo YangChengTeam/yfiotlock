@@ -174,7 +174,7 @@ public class CreatPwdActivity extends BaseBackActivity {
 
             DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
             mLoadingDialog.show("添加中...");
-            lockEngine.addOpenLockWay(lockInfo.getId(), trimName, "",
+            lockEngine.addOpenLockWay(lockInfo.getId()+"", trimName, "",
                     LockBLEManager.OPEN_LOCK_PASSWORD, String.valueOf(LockBLEManager.GROUP_TYPE_TEMP_PWD),
                     trimPwd).subscribe(new Subscriber<ResultInfo<String>>() {
                 @Override

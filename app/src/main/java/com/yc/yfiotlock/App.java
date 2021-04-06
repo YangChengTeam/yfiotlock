@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.room.Room;
+
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
@@ -18,6 +20,7 @@ import com.umeng.analytics.MobclickAgent;
 import com.umeng.commonsdk.UMConfigure;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.dao.AppDatabase;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
@@ -37,24 +40,31 @@ import rx.functions.Action1;
 
 
 public class App extends Application {
+    // 应用单例
     private static App app;
-
     public static App getApp() {
         return app;
     }
 
+    // 已连接设备
     private HashMap<String, BleDevice> connectedDevices = new HashMap<>();
-
     public HashMap<String, BleDevice> getConnectedDevices() {
         return connectedDevices;
     }
 
     private DeviceEngin deviceEngin;
+    // 所有云端设备
     private List<String> macList = new ArrayList<>();
-
     public List<String> getMacList() {
         return macList;
     }
+
+    // 锁数据库
+    private AppDatabase db;
+    public AppDatabase getDb() {
+        return db;
+    }
+
 
     public static boolean isLogin() {
         return UserInfoCache.getUserInfo() != null;
@@ -63,7 +73,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Reflection.unseal(this);
         app = this;
         deviceEngin = new DeviceEngin(this);
         LockBLEManager.initBle(this);
@@ -73,6 +82,9 @@ public class App extends Application {
         initBauduMap();
         //  cloudgetMacList();
         checkUpdate();
+
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "lock").build();
     }
 
     private int retryCount = 0;

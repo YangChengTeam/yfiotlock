@@ -1,23 +1,15 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
 
-import android.app.Dialog;
-import android.content.Intent;
-import android.view.View;
-
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.PasswordModifyOpenLockActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -27,12 +19,10 @@ import com.yc.yfiotlock.model.bean.lock.remote.ItemInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.view.adapters.ItemAdapter;
-import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +80,7 @@ public class TempPwdDetailActivity extends BaseBackActivity {
         itemAdapter.setOnItemClickListener((adapter, view, position) -> {
             ItemInfo itemInfo = itemAdapter.getItem(position);
             OpenLockInfo openLockInfo = new OpenLockInfo();
-            openLockInfo.setId(itemInfo.getId() + "");
+            openLockInfo.setId(itemInfo.getId());
             openLockInfo.setName(itemInfo.getName());
             PasswordModifyOpenLockActivity.start(getContext(), openLockInfo);
         });
@@ -132,7 +122,7 @@ public class TempPwdDetailActivity extends BaseBackActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPwdChanged(OpenLockInfo openLockInfo) {
-        if (openLockInfo.getId().equals(passWordInfo.getId() + "")) {
+        if (openLockInfo.getId() == passWordInfo.getId()) {
             itemAdapter.getData().get(0).setName(openLockInfo.getName());
             itemAdapter.notifyItemChanged(0);
         }

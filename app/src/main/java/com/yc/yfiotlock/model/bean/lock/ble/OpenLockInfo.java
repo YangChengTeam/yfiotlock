@@ -1,33 +1,52 @@
 package com.yc.yfiotlock.model.bean.lock.ble;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
 
+
+@Entity(tableName = "open_lock_info")
 public class OpenLockInfo implements Serializable {
-    private String id;
+    @PrimaryKey(autoGenerate = true)
+    @NonNull
+    private int id;
+    @ColumnInfo(name = "name")
     private String name;
+    @Ignore
     private String model;
+    @ColumnInfo(name = "key_id")
     private int keyid;
-    private int type;
-    private int groupType;
+    @ColumnInfo(name = "type")
+    private int type;  // 类型
+    @ColumnInfo(name = "group_type")
+    private int groupType; // 设备权根
+    @ColumnInfo(name = "password")
     private String password;
-    private String lockId;
+    @ColumnInfo(name = "lock_id")
+    private int lockId;
+
+    @ColumnInfo(name = "add_user_mobile")
     @JSONField(name = "add_user_mobile")
     private String addUserMobile;
+
+    @ColumnInfo(name = "is_sync")
+    private boolean isSync;
 
     public OpenLockInfo() {
 
     }
 
-    public String getId() {
-        if (id == null) {
-            id = "";
-        }
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -79,11 +98,11 @@ public class OpenLockInfo implements Serializable {
         this.password = password;
     }
 
-    public String getLockId() {
+    public int getLockId() {
         return lockId;
     }
 
-    public void setLockId(String lockId) {
+    public void setLockId(int lockId) {
         this.lockId = lockId;
     }
 
@@ -93,5 +112,13 @@ public class OpenLockInfo implements Serializable {
 
     public void setAddUserMobile(String addUserMobile) {
         this.addUserMobile = addUserMobile;
+    }
+
+    public boolean isSync() {
+        return isSync;
+    }
+
+    public void setSync(boolean sync) {
+        isSync = sync;
     }
 }

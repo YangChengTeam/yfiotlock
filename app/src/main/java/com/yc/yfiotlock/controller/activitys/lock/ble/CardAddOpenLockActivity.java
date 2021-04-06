@@ -57,7 +57,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
 
 
     @Override
-    protected void cloudAddSucc() {
+    protected void localAddSucc() {
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setCardCount(countInfo.getCardCount() + 1);
@@ -75,9 +75,9 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     @Override
-    protected void cloudAdd(int keyid) {
+    protected void localAdd(int keyid) {
         mLoadingDialog.show("添加卡片中...");
-        cloudAdd(nameTv.getText().toString(), LockBLEManager.OPEN_LOCK_CARD, keyid, "");
+        localAdd(nameTv.getText().toString(), LockBLEManager.OPEN_LOCK_CARD, keyid, "");
     }
 
     @Override

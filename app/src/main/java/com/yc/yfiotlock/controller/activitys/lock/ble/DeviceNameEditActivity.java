@@ -29,7 +29,6 @@ import rx.Subscriber;
 public class DeviceNameEditActivity extends BaseBackActivity {
 
 
-
     @BindView(R.id.et_name)
     EditText mEtName;
 
@@ -59,10 +58,10 @@ public class DeviceNameEditActivity extends BaseBackActivity {
     }
 
     private void cloudModifyDeivceName() {
-        if (deviceInfo != null && !TextUtils.isEmpty(deviceInfo.getId())) {
+        if (deviceInfo.getId() != 0) {
             String name = mEtName.getText().toString();
             mLoadingDialog.show("正在修改");
-            deviceEngin.updateDeviceInfo(deviceInfo.getId(), name).subscribe(new Subscriber<ResultInfo<String>>() {
+            deviceEngin.updateDeviceInfo(deviceInfo.getId() + "", name).subscribe(new Subscriber<ResultInfo<String>>() {
                 @Override
                 public void onCompleted() {
                     mLoadingDialog.dismiss();

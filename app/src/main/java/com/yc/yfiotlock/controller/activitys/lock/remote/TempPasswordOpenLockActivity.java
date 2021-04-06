@@ -1,18 +1,13 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
 import android.content.Intent;
-import android.view.View;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
@@ -28,9 +23,7 @@ import com.yc.yfiotlock.view.widgets.NoWifiView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.List;
 
 import butterknife.BindView;
@@ -115,7 +108,7 @@ public class TempPasswordOpenLockActivity extends BaseActivity {
 
     private void loadData() {
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        lockEngine.temporaryPwdList(lockInfo.getId(), page, pageSize).subscribe(new Subscriber<ResultInfo<List<PasswordInfo>>>() {
+        lockEngine.temporaryPwdList(lockInfo.getId() + "", page, pageSize).subscribe(new Subscriber<ResultInfo<List<PasswordInfo>>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);

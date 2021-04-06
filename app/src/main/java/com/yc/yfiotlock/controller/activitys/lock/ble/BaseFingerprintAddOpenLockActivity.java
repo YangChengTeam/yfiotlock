@@ -26,10 +26,10 @@ public abstract class BaseFingerprintAddOpenLockActivity extends BaseAddOpenLock
 
     // fuck code
     @Override
-    protected void cloudAddSucc() { }
+    protected void localAddSucc() { }
     // fuck code
     @Override
-    protected void cloudAdd(int keyid) { }
+    protected void localAdd(int keyid) { }
 
 
 }

@@ -8,9 +8,7 @@ import com.yc.yfiotlock.model.bean.user.UserInfo;
 import java.io.Serializable;
 
 public class DeviceInfo implements Serializable {
-    private String id;
-    @JSONField(name = "locker_id")
-    private String lockerId;
+    private int id;
     private String name;
     @JSONField(name = "firmware_version")
     private String firmwareVersion;
@@ -41,25 +39,14 @@ public class DeviceInfo implements Serializable {
     public DeviceInfo() {
     }
 
-    public String getId() {
-        if (TextUtils.isEmpty(id)) {
-            id = lockerId;
-        }
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
-
-    public String getLockerId() {
-        return lockerId;
-    }
-
-    public void setLockerId(String lockerId) {
-        this.lockerId = lockerId;
-    }
-
+    
     public String getName() {
         return name;
     }

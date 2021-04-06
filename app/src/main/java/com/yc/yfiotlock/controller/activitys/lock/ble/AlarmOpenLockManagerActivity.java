@@ -58,7 +58,7 @@ public class AlarmOpenLockManagerActivity extends OpenLockManagerActivity {
         if (countInfo != null) {
             notifyAdapter(countInfo);
         }
-        lockEngine.getOpenLockInfoCount(lockInfo.getId(), type + "").subscribe(new Subscriber<ResultInfo<OpenLockCountInfo>>() {
+        lockEngine.getOpenLockInfoCount(lockInfo.getId() + "", type + "").subscribe(new Subscriber<ResultInfo<OpenLockCountInfo>>() {
             @Override
             public void onCompleted() {
 

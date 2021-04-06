@@ -4,9 +4,7 @@ import android.view.View;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
@@ -37,21 +35,21 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
 
     @Override
     protected void initViews() {
-       
+
 
         super.initViews();
         for (int i = 0; i < fingerBtns.length; i++) {
             final View fingerBtn = fingerBtns[i];
             RxView.clicks(fingerBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
                 name += fingerBtn.getTag() + "";
-                cloudAdd(keyid);
+                localAdd(keyid);
             });
         }
     }
 
 
     @Override
-    protected void cloudAdd(int keyid) {
+    protected void localAdd(int keyid) {
         int fingerprintCount = 0;
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
@@ -59,11 +57,11 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
         }
         fingerprintCount += 1;
         name += fingerprintCount;
-        cloudAdd(name, LockBLEManager.OPEN_LOCK_FINGERPRINT, keyid, "");
+        localAdd(name, LockBLEManager.OPEN_LOCK_FINGERPRINT, keyid, "");
     }
 
     @Override
-    protected void cloudAddSucc() {
+    protected void localAddSucc() {
         OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setFingerprintCount(countInfo.getFingerprintCount() + 1);

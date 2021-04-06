@@ -118,7 +118,7 @@ public class LockShareManageActivity extends BaseBackActivity {
 
     private void deleteUsePermission(int position) {
         mLoadingDialog.show("请求中...");
-        mEngine.deleteShare(1, mAdapter.getData().get(position).getId()).subscribe(new Observer<ResultInfo<String>>() {
+        mEngine.deleteShare(1, mAdapter.getData().get(position).getId() + "").subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
@@ -151,7 +151,7 @@ public class LockShareManageActivity extends BaseBackActivity {
 
     private void loadData() {
         mSrlRefresh.setRefreshing(p == 1);
-        mEngine.getShareList(p, deviceInfo.getId()).subscribe(new Observer<ResultInfo<List<ShareDeviceWrapper>>>() {
+        mEngine.getShareList(p, deviceInfo.getId() + "").subscribe(new Observer<ResultInfo<List<ShareDeviceWrapper>>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);

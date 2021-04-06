@@ -116,7 +116,7 @@ public class DeviceReceiveListFragment extends BaseFragment {
     private void agreeShare(int position) {
         ShareDeviceWrapper receiveDeviceInfo = mAdapter.getData().get(position);
         mLoadingDialog.show("请求中...");
-        mEngine.receiveShare(receiveDeviceInfo.getId()).subscribe(new Observer<ResultInfo<String>>() {
+        mEngine.receiveShare(receiveDeviceInfo.getId()+"").subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
