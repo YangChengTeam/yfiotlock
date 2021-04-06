@@ -1,34 +1,16 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Intent;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.core.view.ViewKt;
-
-import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.listener.OnItemClickListener;
-import com.jakewharton.rxbinding4.view.RxView;
-import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEBaseCmd;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
-import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLEOpCmd;
-import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.libs.fastble.data.BleDevice;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 
@@ -60,7 +42,7 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
     @Override
     public void onBackPressed() {
         if (!lockBleSend.isOpOver()) {
-            blecancelDialog();
+            bleCancelDialog();
         } else {
             super.onBackPressed();
         }

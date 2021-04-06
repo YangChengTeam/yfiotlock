@@ -23,6 +23,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.CloudDeleteEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
@@ -119,43 +120,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     protected abstract void localDelSucc();
 
-    protected void cloudDel() {
-        cloudDel(false);
-    }
-
-    protected void cloudDel(boolean isRetry) {
-        lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
-            @Override
-            public void onCompleted() {
-                if (!isRetry) {
-                    mLoadingDialog.dismiss();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                if (!isRetry) {
-                    mLoadingDialog.dismiss();
-                }
-                fail();
-            }
-
-            @Override
-            public void onNext(ResultInfo<String> info) {
-                if (info != null && info.getCode() == 1) {
-                    mLoadingDialog.dismiss();
-                    success(info.getData());
-                } else {
-                    if (!isRetry) {
-                        fail();
-                    } else {
-                        fail2();
-                    }
-                }
-            }
-        });
-    }
-
     protected void localDel() {
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
         openLockDao.deleteOpenLockInfo(lockInfo.getId(), openLockInfo.getKeyid()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
@@ -166,14 +130,13 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
             @Override
             public void onComplete() {
-                mLoadingDialog.show("删除中...");
+                retryCount = 3;
+                localDelSucc();
                 if (CommonUtil.isNetworkAvailable(getContext())) {
-                    cloudDel();
-                } else {
-                    localDelSucc();
-                    EventBus.getDefault().post(new OpenLockRefreshEvent());
-                    finish();
+                    EventBus.getDefault().post(new CloudDeleteEvent(openLockInfo));
                 }
+                EventBus.getDefault().post(new OpenLockRefreshEvent());
+                finish();
             }
 
             @Override
@@ -182,46 +145,9 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
                     localDel();
                 } else {
                     retryCount = 3;
-                    cloudDel(true);
                 }
             }
         });
-    }
-
-    @Override
-    public void success(Object data) {
-        localDelSucc();
-        EventBus.getDefault().post(new OpenLockRefreshEvent());
-        finish();
-    }
-
-    @Override
-    public void fail() {
-        localDelSucc();
-        EventBus.getDefault().post(new OpenLockRefreshEvent());
-        finish();
-    }
-
-    public void fail2() {
-        if (retryCount-- > 0) {
-            VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                cloudDel(true);
-            });
-        } else {
-            retryCount = 3;
-            mLoadingDialog.dismiss();
-            GeneralDialog generalDialog = new GeneralDialog(getContext());
-            generalDialog.setTitle("温馨提示");
-            generalDialog.setMsg("同步云端失败, 请重试");
-            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                @Override
-                public void onClick(Dialog dialog) {
-                    mLoadingDialog.show("删除中...");
-                    cloudDel(true);
-                }
-            });
-            generalDialog.show();
-        }
     }
 
 

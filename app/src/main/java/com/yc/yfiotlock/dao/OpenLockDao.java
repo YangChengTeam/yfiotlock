@@ -18,6 +18,9 @@ import io.reactivex.Flowable;
 @Dao
 public interface OpenLockDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    Completable insertOpenLockInfos(List<OpenLockInfo> openLockInfo);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertOpenLockInfo(OpenLockInfo openLockInfo);
 
     @Query("update open_lock_info set is_delete=1 where lock_id=:lockId and key_id=:keyid")
@@ -26,7 +29,7 @@ public interface OpenLockDao {
     @Query("update open_lock_info set is_add=:isAdd where lock_id=:lockId and key_id=:keyid")
     Completable updateOpenLockInfo(int lockId, int keyid, boolean isAdd);
 
-    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and type=:type and group_type =:groupType and is_delete=0 order by id desc")
+    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and type=:type and is_delete=0 and group_type =:groupType order by id desc")
     Flowable<List<OpenLockInfo>> loadOpenLockInfos(int lockId, int type, int groupType);
 
 
@@ -35,5 +38,7 @@ public interface OpenLockDao {
 
     @Query("SELECT * FROM open_lock_info where lock_id=:lockId and is_delete=1 and group_type=:groupType")
     Flowable<List<OpenLockInfo>> loadNeedDelOpenLockInfos(int lockId, int groupType);
+
+
 
 }

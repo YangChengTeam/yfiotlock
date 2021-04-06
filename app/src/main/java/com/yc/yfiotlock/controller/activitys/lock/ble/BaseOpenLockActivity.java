@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,6 +10,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -20,6 +22,7 @@ import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.BleUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
@@ -108,10 +111,11 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             @Override
             public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
                 openLockAdapter.setNewInstance(openLockInfos);
-                cloudLoadData();
+                if(CommonUtil.isNetworkAvailable(getContext()) && openLockInfos.size() == 0){
+                    cloudLoadData();
+                }
             }
         });
-
     }
 
     private void cloudLoadData() {
@@ -131,7 +135,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
             @Override
             public void onNext(ResultInfo<List<OpenLockInfo>> info) {
-                if (info.getCode() == 1 && info.getData() != null) {
+                if (info != null &&info.getCode() == 1) {
                     if (info.getData() == null || info.getData().size() == 0) {
                         empty();
                     } else {
@@ -161,24 +165,9 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
     @Override
     public void success(Object data) {
-        List<OpenLockInfo> lastSyncLockInfos = new ArrayList<>();
         List<OpenLockInfo> lockInfos = (List<OpenLockInfo>) data;
-        if (lockInfos.size() > 0) {
-            lastSyncLockInfos.addAll(lockInfos);
-            for (OpenLockInfo lopenLockInfo : openLockAdapter.getData()) {
-                boolean isExist = false;
-                for (OpenLockInfo copenLockInfo : lockInfos) {
-                    if (copenLockInfo.getKeyid() == lopenLockInfo.getKeyid()) {
-                        isExist = true;
-                        break;
-                    }
-                }
-                if (!isExist) {
-                    lastSyncLockInfos.add(lopenLockInfo);
-                }
-            }
-            openLockAdapter.setNewInstance(lastSyncLockInfos);
-        }
+        openLockAdapter.setNewInstance(lockInfos);
+        openLockDao.insertOpenLockInfos(lockInfos).subscribeOn(Schedulers.io()).subscribe();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

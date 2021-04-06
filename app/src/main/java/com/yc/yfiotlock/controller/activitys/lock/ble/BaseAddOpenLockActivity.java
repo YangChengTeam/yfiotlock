@@ -3,8 +3,6 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.app.Dialog;
 
-import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -15,6 +13,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.CloudAddEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
@@ -29,9 +28,7 @@ import java.util.Random;
 import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
-import rx.Subscriber;
 
 public abstract class BaseAddOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
 
@@ -60,6 +57,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
         lockEngine = new LockEngine(this);
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
         Random rand = new Random();
@@ -90,100 +88,26 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
             @Override
             public void onComplete() {
+                retryCount = 3;
                 localAddSucc();
                 if (CommonUtil.isNetworkAvailable(getContext())) {
-                    cloudAdd(name, type, keyid, password);
-                } else {
-                    fail();
+                    openLockInfo.setAdd(true);
+                    EventBus.getDefault().post(new CloudAddEvent(openLockInfo));
                 }
+                EventBus.getDefault().post(new OpenLockRefreshEvent());
+                finish();
             }
+
 
             @Override
             public void onError(Throwable e) {
-                if (retryCount-- > 3) {
+                if (retryCount-- > 0) {
                     localAdd(name, type, keyid, password);
                 } else {
                     retryCount = 3;
-                    cloudAdd(name, type, keyid, password, true);
                 }
             }
         });
-    }
-
-    protected void cloudAdd(String name, int type, int keyid, String password) {
-        cloudAdd(name, type, keyid, password, false);
-    }
-
-    protected void cloudAdd(String name, int type, int keyid, String password, boolean isRetry) {
-        mLoadingDialog.show("添加中...");
-        lockEngine.addOpenLockWay(lockInfo.getId() + "", name, keyid + "", type, LockBLEManager.GROUP_TYPE + "", password).subscribe(new Subscriber<ResultInfo<String>>() {
-            @Override
-            public void onCompleted() {
-                if (!isRetry) {
-                    mLoadingDialog.dismiss();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                if (!isRetry) {
-                    mLoadingDialog.dismiss();
-                }
-                fail();
-            }
-
-            @Override
-            public void onNext(ResultInfo<String> info) {
-                if (info != null && info.getCode() == 1) {
-                    mLoadingDialog.dismiss();
-                    openLockDao.updateOpenLockInfo(lockInfo.getId(), keyid, true).subscribeOn(Schedulers.io()).subscribe();
-                    success(info.getData());
-                } else {
-                    if (!isRetry) {
-                        fail();
-                    } else {
-                        fail(name, type, keyid, password);
-                    }
-                }
-            }
-        });
-    }
-
-    public void fail(String name, int type, int keyid, String password) {
-        if (retryCount-- > 0) {
-            VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                cloudAdd(name, type, keyid, password, true);
-            });
-        } else {
-            retryCount = 3;
-            mLoadingDialog.dismiss();
-            GeneralDialog generalDialog = new GeneralDialog(getContext());
-            generalDialog.setTitle("温馨提示");
-            generalDialog.setMsg("同步云端失败, 请重试");
-            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                @Override
-                public void onClick(Dialog dialog) {
-                    mLoadingDialog.show("添加中...");
-                    cloudAdd(name, type, keyid, password, true);
-                }
-            });
-            generalDialog.show();
-        }
-    }
-
-
-    @Override
-    public void success(Object data) {
-        super.success(data);
-        EventBus.getDefault().post(new OpenLockRefreshEvent());
-        finish();
-    }
-
-    @Override
-    public void fail() {
-        super.fail();
-        EventBus.getDefault().post(new OpenLockRefreshEvent());
-        finish();
     }
 
     @Override
@@ -204,7 +128,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         cancelSend.unregisterNotify();
     }
 
-    protected void blecancelDialog() {
+    protected void bleCancelDialog() {
         GeneralDialog generalDialog = new GeneralDialog(getContext());
         generalDialog.setTitle("温馨提示");
         generalDialog.setMsg("确认取消操作?");
@@ -212,14 +136,14 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
             @Override
             public void onClick(Dialog dialog) {
                 mLoadingDialog.show("取消操作中...");
-                blecancel();
+                bleCancel();
             }
         });
         generalDialog.show();
     }
 
 
-    private void blecancel() {
+    private void bleCancel() {
         if (cancelSend != null) {
             cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(this), false);
         }

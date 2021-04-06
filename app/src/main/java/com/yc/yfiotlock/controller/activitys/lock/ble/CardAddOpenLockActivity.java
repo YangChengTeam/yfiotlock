@@ -68,7 +68,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     @Override
     public void onBackPressed() {
         if (!lockBleSend.isOpOver()) {
-            blecancelDialog();
+            bleCancelDialog();
         } else {
             super.onBackPressed();
         }

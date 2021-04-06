@@ -15,7 +15,6 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
-import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -31,6 +30,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.helper.CloudHelper;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.sensor.ShakeSensor;
@@ -91,6 +91,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     private DeviceInfo lockInfo;
     private LockBLESend lockBleSend;
 
+    private CloudHelper cloudHelper;
+
     private boolean isOpening;
 
     public DeviceInfo getLockInfo() {
@@ -139,6 +141,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         familyInfo = (FamilyInfo) getIntent().getSerializableExtra("family");
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         lockEngine = new LockEngine(this);
+        cloudHelper = new CloudHelper(this);
         if (lockInfo.isShare() == 1) {
             setUserUi();
         }
@@ -277,6 +280,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     protected void onResume() {
         super.onResume();
+
+        cloudHelper.registerNotify();
         if (!BleManager.getInstance().isBlueEnable()) {
             ToastCompat.show(LockIndexActivity.this, "请先打开蓝牙");
             BleManager.getInstance().enableBluetooth();
@@ -294,7 +299,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     protected void onStop() {
         super.onStop();
-
+        cloudHelper.unregisterNotify();
         unregisterNotify();
         destoryShakeSensor();
     }

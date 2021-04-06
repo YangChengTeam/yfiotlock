@@ -9,10 +9,6 @@ import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockActivity {
     @Override
@@ -36,7 +32,7 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
     @Override
     public void onBackPressed() {
         if (!lockBleSend.isOpOver()) {
-            blecancelDialog();
+            bleCancelDialog();
         } else {
             super.onBackPressed();
         }

@@ -22,6 +22,7 @@ import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.helper.TOTP;
+import com.yc.yfiotlock.model.bean.eventbus.CloudAddEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
@@ -140,7 +141,9 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
             @Override
             public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
                 tempPwdAdapter.setNewInstance(openLockInfos);
-                cloudLoadData();
+                if(CommonUtil.isNetworkAvailable(getContext()) && openLockInfos.size() == 0){
+                    cloudLoadData();
+                }
             }
         });
     }
@@ -162,7 +165,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
 
             @Override
             public void onNext(ResultInfo<List<OpenLockInfo>> info) {
-                if (info.getCode() == 1 && info.getData() != null) {
+                if (info != null && info.getCode() == 1) {
                     if (info.getData() == null || info.getData().size() == 0) {
                         empty();
                     } else {
@@ -192,26 +195,9 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
 
     @Override
     public void success(Object data) {
-        List<OpenLockInfo> lastSyncLockInfos = new ArrayList<>();
         List<OpenLockInfo> lockInfos = (List<OpenLockInfo>) data;
-        if (lockInfos.size() > 0) {
-            lastSyncLockInfos.addAll(lockInfos);
-            for (OpenLockInfo lopenLockInfo : tempPwdAdapter.getData()) {
-                boolean isExist = false;
-                for (OpenLockInfo copenLockInfo : lockInfos) {
-                    if (copenLockInfo.getKeyid() == lopenLockInfo.getKeyid()) {
-                        isExist = true;
-                        break;
-                    }
-                }
-                if (!isExist) {
-                    lastSyncLockInfos.add(lopenLockInfo);
-                }
-            }
-            tempPwdAdapter.setNewInstance(lastSyncLockInfos);
-        }
+        tempPwdAdapter.setNewInstance(lockInfos);
     }
-
 
     protected void localAdd(String keyid, long time) {
         String name = "临时密码";
@@ -231,14 +217,15 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         openLockDao.insertOpenLockInfo(openLockInfo).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
-
+                retryCount = 3;
             }
 
             @Override
             public void onComplete() {
                 localAddSucc();
                 if (CommonUtil.isNetworkAvailable(getContext())) {
-                    cloudAdd(name, type, keyid, password);
+                    openLockInfo.setAdd(true);
+                    EventBus.getDefault().post(new CloudAddEvent(openLockInfo));
                 }
             }
 
@@ -248,73 +235,12 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
                     localAdd(name, type, keyid, password, time);
                 } else {
                     retryCount = 3;
-                    cloudAdd(name, type, keyid, password, true);
                 }
             }
         });
-    }
-
-    protected void cloudAdd(String name, int type, int keyid, String password) {
-        cloudAdd(name, type, keyid, password, false);
-    }
-
-    protected void cloudAdd(String name, int type, int keyid, String password, boolean isRetry) {
-        mLoadingDialog.show("添加中...");
-        lockEngine.addOpenLockWay(lockInfo.getId() + "", name, keyid + "", type, LockBLEManager.GROUP_TYPE + "", password).subscribe(new Subscriber<ResultInfo<String>>() {
-            @Override
-            public void onCompleted() {
-                if (!isRetry) {
-                    mLoadingDialog.dismiss();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                if (!isRetry) {
-                    mLoadingDialog.dismiss();
-                }
-                localAddSucc();
-            }
-
-            @Override
-            public void onNext(ResultInfo<String> info) {
-                if (info != null && info.getCode() == 1) {
-                    mLoadingDialog.dismiss();
-                    openLockDao.updateOpenLockInfo(lockInfo.getId(), keyid, true).subscribeOn(Schedulers.io()).subscribe();
-                } else {
-                    if (isRetry) {
-                        fail(name, type, keyid, password);
-                    }
-                }
-            }
-        });
-    }
-
-    public void fail(String name, int type, int keyid, String password) {
-        if (retryCount-- > 0) {
-            VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                cloudAdd(name, type, keyid, password, true);
-            });
-        } else {
-            retryCount = 3;
-            mLoadingDialog.dismiss();
-            GeneralDialog generalDialog = new GeneralDialog(getContext());
-            generalDialog.setTitle("温馨提示");
-            generalDialog.setMsg("同步云端失败, 请重试");
-            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                @Override
-                public void onClick(Dialog dialog) {
-                    mLoadingDialog.show("添加中...");
-                    cloudAdd(name, type, keyid, password, true);
-                }
-            });
-            generalDialog.show();
-        }
     }
 
     private void localAddSucc() {
         synctimeLoadData();
     }
-
-
 }
