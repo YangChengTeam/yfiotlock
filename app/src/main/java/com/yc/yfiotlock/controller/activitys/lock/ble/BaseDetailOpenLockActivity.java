@@ -115,18 +115,15 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     protected void cloudDel() {
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        openLockInfo.setId(openLockInfo.getId());
-        openLockInfo.setType(type);
-        offlineManager.saveOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_del", openLockInfo);
+        String key = LockBLEManager.GROUP_TYPE + lockInfo.getId() + "_del";
+        offlineManager.saveOfflineData(key, openLockInfo);
         lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
-                mLoadingDialog.dismiss();
             }
 
             @Override
             public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
                 fail();
             }
 
@@ -134,7 +131,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
                     mLoadingDialog.dismiss();
-                    offlineManager.delOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_del", openLockInfo);
+                    offlineManager.delOfflineData(key, openLockInfo);
                     success(info.getData());
                 } else {
                     fail();
@@ -158,6 +155,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             });
         } else {
             retryCount = 3;
+            mLoadingDialog.dismiss();
             GeneralDialog generalDialog = new GeneralDialog(getContext());
             generalDialog.setTitle("温馨提示");
             generalDialog.setMsg("同步云端失败, 请重试");

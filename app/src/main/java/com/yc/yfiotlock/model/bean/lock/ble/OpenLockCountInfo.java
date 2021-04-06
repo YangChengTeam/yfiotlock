@@ -12,6 +12,9 @@ public class OpenLockCountInfo {
     private int cardCount;
 
     public int getFingerprintCount() {
+        if(fingerprintCount < 0){
+            fingerprintCount = 0;
+        }
         return fingerprintCount;
     }
 
@@ -20,6 +23,9 @@ public class OpenLockCountInfo {
     }
 
     public int getPasswordCount() {
+        if(passwordCount < 0){
+            passwordCount = 0;
+        }
         return passwordCount;
     }
 
@@ -28,6 +34,9 @@ public class OpenLockCountInfo {
     }
 
     public int getCardCount() {
+        if(cardCount < 0){
+            cardCount = 0;
+        }
         return cardCount;
     }
 

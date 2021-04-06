@@ -26,6 +26,8 @@ import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
+import com.yc.yfiotlock.offline.OLTOfflineManager;
+import com.yc.yfiotlock.offline.OfflineManager;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.SafeUtil;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
@@ -166,6 +168,8 @@ public class IndexFragment extends BaseFragment {
                     deviceInfoList.add(new DeviceInfo());
                     indexDeviceAdapter.setNewInstance(deviceInfoList);
                     CacheUtil.setCache(Config.INDEX_DETAIL_URL, resultInfo.getData());
+                    OfflineManager.enqueue(getContext());
+
                 }
             }
         });

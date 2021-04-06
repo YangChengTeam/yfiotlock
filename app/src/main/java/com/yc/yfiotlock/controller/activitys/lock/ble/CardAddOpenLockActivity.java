@@ -42,8 +42,8 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     private void bleAddCard() {
-        this.mcmd = (byte) 0x02;
-        this.scmd = (byte) 0x05;
+        this.mcmd = LockBLEOpCmd.MCMD;
+        this.scmd = LockBLEOpCmd.SCMD_ADD_CARD;
         byte[] bytes = LockBLEOpCmd.addCard(this, LockBLEManager.GROUP_TYPE, number);
         lockBleSend.send(mcmd, scmd, bytes);
         VUiKit.postDelayed(15 * 1000, () -> {
@@ -69,6 +69,8 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     public void onBackPressed() {
         if (!lockBleSend.isOpOver()) {
             blecancelDialog();
+        } else {
+            super.onBackPressed();
         }
     }
 

@@ -53,31 +53,15 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         offlineManager = OLTOfflineManager.getInstance(this);
 
         lockEngine = new LockEngine(this);
-        lockInfo = getLockInfo();
-        BleDevice bleDevice = getBleDevice();
+        lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
         Random rand = new Random();
         number = (10000000 + rand.nextInt(90000000)) + "";
 
         cancelSend = new LockBLESend(this, bleDevice);
     }
-
-    protected DeviceInfo getLockInfo() {
-        LockIndexActivity lockIndexActivity = LockIndexActivity.getInstance();
-        if (lockIndexActivity != null) {
-            return lockIndexActivity.getLockInfo();
-        }
-        return null;
-    }
-
-    protected BleDevice getBleDevice() {
-        LockIndexActivity lockIndexActivity = LockIndexActivity.getInstance();
-        if (lockIndexActivity != null) {
-            return lockIndexActivity.getBleDevice();
-        }
-        return null;
-    }
-
+    
     protected abstract void cloudAddSucc();
 
     protected abstract void cloudAdd(int keyid);
@@ -90,17 +74,16 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         openLockInfo.setLockId(lockInfo.getId());
         openLockInfo.setPassword(password);
         openLockInfo.setGroupType(LockBLEManager.GROUP_TYPE);
-        offlineManager.saveOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_add", openLockInfo);
+        String key = LockBLEManager.GROUP_TYPE + lockInfo.getId() + "_add";
+        offlineManager.saveOfflineData(key, openLockInfo);
         mLoadingDialog.show("添加中...");
         lockEngine.addOpenLockWay(lockInfo.getId(), name, keyid + "", type, LockBLEManager.GROUP_TYPE + "", password).subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
-                mLoadingDialog.dismiss();
             }
 
             @Override
             public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
                 fail(name, type, keyid, password);
             }
 
@@ -108,7 +91,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
             public void onNext(ResultInfo<String> stringResultInfo) {
                 if (stringResultInfo.getCode() == 1) {
                     mLoadingDialog.dismiss();
-                    offlineManager.delOfflineData(BleUtil.getType(title) + lockInfo.getId() + "_add", openLockInfo);
+                    offlineManager.delOfflineData(key, openLockInfo);
                     finish();
                     cloudAddSucc();
                     EventBus.getDefault().post(new OpenLockRefreshEvent());
@@ -122,17 +105,18 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     public void fail(String name, int type, int keyid, String password) {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                mLoadingDialog.show("添加中...");
                 cloudAdd(name, type, keyid, password);
             });
         } else {
             retryCount = 3;
+            mLoadingDialog.dismiss();
             GeneralDialog generalDialog = new GeneralDialog(getContext());
             generalDialog.setTitle("温馨提示");
             generalDialog.setMsg("同步云端失败, 请重试");
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
+                    mLoadingDialog.show("添加中...");
                     cloudAdd(name, type, keyid, password);
                 }
             });
