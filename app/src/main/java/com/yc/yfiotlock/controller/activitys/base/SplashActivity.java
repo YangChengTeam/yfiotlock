@@ -1,13 +1,17 @@
 package com.yc.yfiotlock.controller.activitys.base;
 
+import android.Manifest;
 import android.content.Intent;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.download.DownloadManager;
+import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 
@@ -28,10 +32,22 @@ public class SplashActivity extends BaseActivity {
         DownloadManager.init(new WeakReference<>(this));
         setFullScreen();
         setFullScreenWithCutOutScreen();
-        VUiKit.postDelayed(1000, () -> {
-            navToMain = true;
-            if (this.hasWindowFocus()) {
+
+        mPermissionHelper.setMustPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE});
+        mPermissionHelper.checkAndRequestPermission(this, new PermissionHelper.OnRequestPermissionsCallback() {
+            @Override
+            public void onRequestPermissionSuccess() {
                 navToMain();
+            }
+
+            @Override
+            public void onRequestPermissionError() {
+                VUiKit.postDelayed(1000, () -> {
+                    navToMain = true;
+                    if (SplashActivity.this.hasWindowFocus()) {
+                        navToMain();
+                    }
+                });
             }
         });
     }
@@ -75,5 +91,11 @@ public class SplashActivity extends BaseActivity {
         home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         home.addCategory(Intent.CATEGORY_HOME);
         startActivity(home);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPermissionHelper.onRequestPermissionsResult(this, resultCode);
     }
 }

@@ -93,7 +93,7 @@ public class VisitorManageActivity extends BaseActivity {
 
     private void loadData() {
         List<ItemInfo> list = new ArrayList<>();
-        list.add(new ItemInfo("远程开锁", "", 1));
+        //list.add(new ItemInfo("远程开锁", "", 1));
         list.add(new ItemInfo("临时密码", "", 2));
         itemAdapter.setNewInstance(list);
     }

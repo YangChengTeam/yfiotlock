@@ -94,8 +94,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                 if (CommonUtil.isNetworkAvailable(getContext())) {
                     cloudAdd(name, type, keyid, password);
                 } else {
-                    EventBus.getDefault().post(new OpenLockRefreshEvent());
-                    finish();
+                    fail();
                 }
             }
 
@@ -105,35 +104,73 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                     localAdd(name, type, keyid, password);
                 } else {
                     retryCount = 3;
-                    cloudAdd(name, type, keyid, password);
+                    cloudAdd(name, type, keyid, password, true);
                 }
             }
         });
     }
 
     protected void cloudAdd(String name, int type, int keyid, String password) {
+        cloudAdd(name, type, keyid, password, false);
+    }
+
+    protected void cloudAdd(String name, int type, int keyid, String password, boolean isRetry) {
         mLoadingDialog.show("添加中...");
         lockEngine.addOpenLockWay(lockInfo.getId() + "", name, keyid + "", type, LockBLEManager.GROUP_TYPE + "", password).subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
-                mLoadingDialog.dismiss();
+                if (!isRetry) {
+                    mLoadingDialog.dismiss();
+                }
             }
 
             @Override
             public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
+                if (!isRetry) {
+                    mLoadingDialog.dismiss();
+                }
                 fail();
             }
 
             @Override
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
+                    mLoadingDialog.dismiss();
                     openLockDao.updateOpenLockInfo(lockInfo.getId(), keyid, true).subscribeOn(Schedulers.io()).subscribe();
+                    success(info.getData());
+                } else {
+                    if (!isRetry) {
+                        fail();
+                    } else {
+                        fail(name, type, keyid, password);
+                    }
                 }
-                fail();
             }
         });
     }
+
+    public void fail(String name, int type, int keyid, String password) {
+        if (retryCount-- > 0) {
+            VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
+                cloudAdd(name, type, keyid, password, true);
+            });
+        } else {
+            retryCount = 3;
+            mLoadingDialog.dismiss();
+            GeneralDialog generalDialog = new GeneralDialog(getContext());
+            generalDialog.setTitle("温馨提示");
+            generalDialog.setMsg("同步云端失败, 请重试");
+            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
+                @Override
+                public void onClick(Dialog dialog) {
+                    mLoadingDialog.show("添加中...");
+                    cloudAdd(name, type, keyid, password, true);
+                }
+            });
+            generalDialog.show();
+        }
+    }
+
 
     @Override
     public void success(Object data) {

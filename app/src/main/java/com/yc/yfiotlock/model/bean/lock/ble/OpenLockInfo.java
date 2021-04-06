@@ -35,8 +35,13 @@ public class OpenLockInfo implements Serializable {
     @JSONField(name = "add_user_mobile")
     private String addUserMobile;
 
-    @ColumnInfo(name = "is_sync")
-    private boolean isSync;
+    @ColumnInfo(name = "is_add")
+    private boolean isAdd;
+    @ColumnInfo(name = "is_delete")
+    private boolean isDelete;
+
+    @ColumnInfo(name = "add_time")
+    private long addtime;
 
     public OpenLockInfo() {
 
@@ -114,11 +119,27 @@ public class OpenLockInfo implements Serializable {
         this.addUserMobile = addUserMobile;
     }
 
-    public boolean isSync() {
-        return isSync;
+    public boolean isAdd() {
+        return isAdd;
     }
 
-    public void setSync(boolean sync) {
-        isSync = sync;
+    public void setAdd(boolean add) {
+        isAdd = add;
+    }
+
+    public boolean isDelete() {
+        return isDelete;
+    }
+
+    public void setDelete(boolean delete) {
+        isDelete = delete;
+    }
+
+    public long getAddtime() {
+        return addtime;
+    }
+
+    public void setAddtime(long addtime) {
+        this.addtime = addtime;
     }
 }

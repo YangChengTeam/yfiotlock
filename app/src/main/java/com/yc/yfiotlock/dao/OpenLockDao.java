@@ -20,12 +20,20 @@ public interface OpenLockDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertOpenLockInfo(OpenLockInfo openLockInfo);
 
-    @Delete
-    Completable deleteOpenLockInfo(OpenLockInfo openLockInfo);
+    @Query("update open_lock_info set is_delete=1 where lock_id=:lockId and key_id=:keyid")
+    Completable deleteOpenLockInfo(int lockId, int keyid);
 
-    @Query("update open_lock_info set is_sync=:isSync where lock_id=:lockId and key_id=:keyid")
-    Completable updateOpenLockInfo(int lockId, int keyid, boolean isSync);
+    @Query("update open_lock_info set is_add=:isAdd where lock_id=:lockId and key_id=:keyid")
+    Completable updateOpenLockInfo(int lockId, int keyid, boolean isAdd);
 
-    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and type=:type and group_type =:groupType")
+    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and type=:type and group_type =:groupType and is_delete=0 order by id desc")
     Flowable<List<OpenLockInfo>> loadOpenLockInfos(int lockId, int type, int groupType);
+
+
+    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and is_add=0 and group_type=:groupType")
+    Flowable<List<OpenLockInfo>> loadNeedAddOpenLockInfos(int lockId, int groupType);
+
+    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and is_delete=1 and group_type=:groupType")
+    Flowable<List<OpenLockInfo>> loadNeedDelOpenLockInfos(int lockId, int groupType);
+
 }

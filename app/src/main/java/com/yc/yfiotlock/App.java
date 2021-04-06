@@ -73,6 +73,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Reflection.unseal(this);
         app = this;
         deviceEngin = new DeviceEngin(this);
         LockBLEManager.initBle(this);

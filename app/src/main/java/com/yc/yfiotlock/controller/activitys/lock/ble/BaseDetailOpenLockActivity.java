@@ -12,6 +12,7 @@ import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -20,12 +21,13 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.offline.OLTOfflineManager;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
 import org.greenrobot.eventbus.EventBus;
@@ -39,6 +41,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rx.Subscriber;
 
 public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
@@ -47,7 +54,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @BindView(R.id.stv_del)
     SuperTextView delTv;
 
-    protected OLTOfflineManager offlineManager;
+    protected OpenLockDao openLockDao;
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
     protected OpenLockInfo openLockInfo;
@@ -73,7 +80,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     protected void initVars() {
         super.initVars();
-        offlineManager = OLTOfflineManager.getInstance(this);
+        openLockDao = App.getApp().getDb().openLockDao();
         DeviceInfo deviceInfo = LockIndexActivity.getInstance().getLockInfo();
         if (deviceInfo != null && deviceInfo.isShare() == 1) {
             mFlBottom.setVisibility(View.GONE);
@@ -110,17 +117,26 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     protected abstract void bleDel();
 
-    protected abstract void cloudDelSucc();
+    protected abstract void localDelSucc();
 
     protected void cloudDel() {
-        DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        cloudDel(false);
+    }
+
+    protected void cloudDel(boolean isRetry) {
         lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
+                if (!isRetry) {
+                    mLoadingDialog.dismiss();
+                }
             }
 
             @Override
             public void onError(Throwable e) {
+                if (!isRetry) {
+                    mLoadingDialog.dismiss();
+                }
                 fail();
             }
 
@@ -130,7 +146,43 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
                     mLoadingDialog.dismiss();
                     success(info.getData());
                 } else {
-                    fail();
+                    if (!isRetry) {
+                        fail();
+                    } else {
+                        fail2();
+                    }
+                }
+            }
+        });
+    }
+
+    protected void localDel() {
+        DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        openLockDao.deleteOpenLockInfo(lockInfo.getId(), openLockInfo.getKeyid()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                mLoadingDialog.show("删除中...");
+                if (CommonUtil.isNetworkAvailable(getContext())) {
+                    cloudDel();
+                } else {
+                    localDelSucc();
+                    EventBus.getDefault().post(new OpenLockRefreshEvent());
+                    finish();
+                }
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                if (retryCount-- > 3) {
+                    localDel();
+                } else {
+                    retryCount = 3;
+                    cloudDel(true);
                 }
             }
         });
@@ -138,16 +190,22 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     @Override
     public void success(Object data) {
-        finish();
-        cloudDelSucc();
+        localDelSucc();
         EventBus.getDefault().post(new OpenLockRefreshEvent());
+        finish();
     }
 
     @Override
     public void fail() {
+        localDelSucc();
+        EventBus.getDefault().post(new OpenLockRefreshEvent());
+        finish();
+    }
+
+    public void fail2() {
         if (retryCount-- > 0) {
             VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                cloudDel();
+                cloudDel(true);
             });
         } else {
             retryCount = 3;
@@ -159,12 +217,13 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
                 @Override
                 public void onClick(Dialog dialog) {
                     mLoadingDialog.show("删除中...");
-                    cloudDel();
+                    cloudDel(true);
                 }
             });
             generalDialog.show();
         }
     }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockInfo openLockInfo) {
@@ -182,7 +241,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
-
     }
 
     @Override
@@ -224,7 +282,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            cloudDel();
+            localDel();
         }
     }
 

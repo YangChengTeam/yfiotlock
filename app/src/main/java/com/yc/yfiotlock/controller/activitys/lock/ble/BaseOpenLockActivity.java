@@ -183,7 +183,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
-        cloudLoadData();
+        localLoadData();
     }
 
     public static class OpenLockAdapter extends BaseExtendAdapter<OpenLockInfo> {

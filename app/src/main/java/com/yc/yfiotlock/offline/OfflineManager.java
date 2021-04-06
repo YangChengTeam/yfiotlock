@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
@@ -18,14 +19,11 @@ public class OfflineManager {
         // 1. WorkManager 最小间隔15分钟 生命周期更长
         Constraints.Builder builder = new Constraints.Builder();
         builder.setRequiredNetworkType(NetworkType.CONNECTED);
-        WorkRequest workRequest =
+        PeriodicWorkRequest workRequest =
                 new PeriodicWorkRequest.Builder(OLTWorker.class, 15, TimeUnit.MINUTES).setConstraints(builder.build())
-                        .setInitialDelay(15, TimeUnit.MINUTES)
                         .build();
-        List<WorkRequest> requests = new ArrayList<>();
-        requests.add(workRequest);
         WorkManager
                 .getInstance(context)
-                .enqueue(requests);
+                .enqueueUniquePeriodicWork("lockinfosync", ExistingPeriodicWorkPolicy.REPLACE, workRequest);
     }
 }

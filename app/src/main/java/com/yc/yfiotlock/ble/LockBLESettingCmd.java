@@ -72,8 +72,8 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
         int year = Calendar.getInstance().get(Calendar.YEAR);
         year = getYearSuff(year, 1000);
         int month = Calendar.getInstance().get(Calendar.MONTH);
-        int date = Calendar.getInstance().get(Calendar.DATE);
-        int hour = Calendar.getInstance().get(Calendar.HOUR);
+        int date = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         int minute = Calendar.getInstance().get(Calendar.MINUTE);
         int second = Calendar.getInstance().get(Calendar.SECOND);
         return setting(context, SCMD_SYNC_TIME, new String(new byte[]{(byte) year, (byte) month, (byte) date, (byte) hour, (byte) minute, (byte) second}));

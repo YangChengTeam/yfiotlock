@@ -6,8 +6,11 @@ import android.util.Log;
 
 import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.securityhttp.utils.LogUtil;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
@@ -17,6 +20,9 @@ import com.yc.yfiotlock.utils.CacheUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import rx.functions.Action1;
 
 
@@ -27,6 +33,7 @@ public class OLTOfflineManager {
     private static OLTOfflineManager instance = null;
 
     protected LockEngine lockEngine;
+    protected OpenLockDao openLockDao;
 
     public static OLTOfflineManager getInstance(Context context) {
         if (instance == null) {
@@ -34,109 +41,41 @@ public class OLTOfflineManager {
                 if (instance == null) {
                     instance = new OLTOfflineManager();
                     instance.lockEngine = new LockEngine(context);
+                    instance.openLockDao = App.getApp().getDb().openLockDao();
                 }
             }
         }
         return instance;
     }
 
-
-
-    interface ExceCallbac {
-        void exce(List<OpenLockInfo> lockInfos);
-    }
-
-    public void autoAddOfflineData(String key, List<OpenLockInfo> openLockInfos, List<OpenLockInfo> cacheOpenLockInfos, ExceCallbac callback) {
-        List<OpenLockInfo> lastOpenLockInfos = null;
-        if (openLockInfos == null || openLockInfos.size() == 0) {
-            lastOpenLockInfos = cacheOpenLockInfos;
-        } else {
-            lastOpenLockInfos = new ArrayList<>();
-            for (OpenLockInfo cacheOpenLockInfo : cacheOpenLockInfos) {
-                boolean isExist = false;
-                for (OpenLockInfo openLockInfo : openLockInfos) {
-                    if (openLockInfo.getKeyid() == cacheOpenLockInfo.getKeyid()) {
-                        isExist = true;
-                        break;
-                    }
-                }
-                if (!isExist) {
-                    lastOpenLockInfos.add(cacheOpenLockInfo);
-                }
-            }
-        }
-        if (lastOpenLockInfos != null && lastOpenLockInfos.size() > 0 && callback != null) {
-            Log.d(TAG, "离线同步数据:" + lastOpenLockInfos.size());
-            callback.exce(lastOpenLockInfos);
-        }
-    }
-
-    public void autoDelOfflineData(String key, List<OpenLockInfo> openLockInfos, List<OpenLockInfo> cacheOpenLockInfos, ExceCallbac callback) {
-        List<OpenLockInfo> lastOpenLockInfos = null;
-        if (openLockInfos == null || openLockInfos.size() == 0) {
-            lastOpenLockInfos = cacheOpenLockInfos;
-        } else {
-            lastOpenLockInfos = new ArrayList<>();
-            for (OpenLockInfo cacheOpenLockInfo : cacheOpenLockInfos) {
-                boolean isExist = false;
-                for (OpenLockInfo openLockInfo : openLockInfos) {
-                    if (openLockInfo.getId() == cacheOpenLockInfo.getId()) {
-                        isExist = true;
-                        break;
-                    }
-                }
-                if (isExist) {
-                    lastOpenLockInfos.add(cacheOpenLockInfo);
-                }
-            }
-        }
-        if (lastOpenLockInfos != null && lastOpenLockInfos.size() > 0 && callback != null) {
-            Log.d(TAG, "离线同步数据:" + lastOpenLockInfos.size());
-            callback.exce(lastOpenLockInfos);
-        }
-    }
-
-    public void autoAddOfflineData(String key, List<OpenLockInfo> openLockInfos, List<OpenLockInfo> cacheLockInfos) {
-        autoAddOfflineData(key, openLockInfos, cacheLockInfos, (lastLockInfos) -> {
-            loopAdd(key, lastLockInfos, 0);
-        });
-    }
-
-    public void autoDelOfflineData(String key, List<OpenLockInfo> openLockInfos, List<OpenLockInfo> cacheOpenLockInfos) {
-        autoDelOfflineData(key, openLockInfos, cacheOpenLockInfos, (lastOpenLockInfos) -> {
-            loopDel(key, lastOpenLockInfos, 0);
-        });
-    }
-
-
-    private void loopAdd(String key, List<OpenLockInfo> openLockInfos, int n) {
-        synchronized (OLTOfflineManager.class){
-            if (openLockInfos != null && openLockInfos.size() > n) {
-                OpenLockInfo openLockInfo = openLockInfos.get(n);
-                if (openLockInfo == null) return;
-                lockEngine.addOpenLockWay(openLockInfo.getLockId() + "", openLockInfo.getName(), openLockInfo.getKeyid() + "", openLockInfo.getType(), openLockInfo.getGroupType() + "", openLockInfo.getPassword()).subscribe(new Action1<ResultInfo<String>>() {
-                    @Override
-                    public void call(ResultInfo<String> info) {
-                        if (info != null && info.getCode() == 1) {
-                            Log.d(TAG, "添加离线同步数据:" + key + openLockInfo.getKeyid() + "-" + openLockInfo.getId());
-                            loopAdd(key, openLockInfos, n + 1);
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    private void loopDel(String key, List<OpenLockInfo> openLockInfos, int n) {
+    private void loopAdd(List<OpenLockInfo> openLockInfos, int n) {
         if (openLockInfos != null && openLockInfos.size() > n) {
             OpenLockInfo openLockInfo = openLockInfos.get(n);
             if (openLockInfo == null) return;
-            lockEngine.delOpenLockWay(openLockInfo.getId()+"").subscribe(new Action1<ResultInfo<String>>() {
+            lockEngine.addOpenLockWay(openLockInfo.getLockId() + "", openLockInfo.getName(), openLockInfo.getKeyid() + "", openLockInfo.getType(), openLockInfo.getGroupType() + "", openLockInfo.getPassword()).subscribe(new Action1<ResultInfo<String>>() {
+                @Override
+                public void call(ResultInfo<String> info) {
+                    if (info != null && (info.getCode() == 1 || info.getCode() == -101)) {
+                        LogUtil.msg("同步添加: keyid:" + openLockInfo.getKeyid() + " lockid:" + openLockInfo.getLockId());
+                        openLockDao.updateOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid(), true).subscribeOn(Schedulers.io()).subscribe();
+                        loopAdd(openLockInfos, n + 1);
+                    }
+                }
+            });
+        }
+    }
+
+    private void loopDel(List<OpenLockInfo> openLockInfos, int n) {
+        if (openLockInfos != null && openLockInfos.size() > n) {
+            OpenLockInfo openLockInfo = openLockInfos.get(n);
+            if (openLockInfo == null) return;
+            lockEngine.delOpenLockWay(openLockInfo.getId() + "").subscribe(new Action1<ResultInfo<String>>() {
                 @Override
                 public void call(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {
-                        Log.d(TAG, "删除离线同步数据:" + key + openLockInfo.getKeyid() + "-" + openLockInfo.getId());
-                        loopDel(key, openLockInfos, n + 1);
+                        LogUtil.msg("同步删除: keyid:" + openLockInfo.getKeyid() + " lockid:" + openLockInfo.getLockId());
+                        openLockDao.deleteOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid());
+                        loopDel(openLockInfos, n + 1);
                     }
                 }
             });
@@ -144,38 +83,17 @@ public class OLTOfflineManager {
     }
 
     private void autoExceOfflineDatas(DeviceInfo deviceInfo, int type) {
-        String addkey = type + deviceInfo.getId() + "_add";
-        String delkey = type + deviceInfo.getId() + "_del";
-
-        List<OpenLockInfo> addCacheOpenLockInfos = CacheUtil.getCache(addkey, new TypeReference<List<OpenLockInfo>>() {
-        }.getType());
-
-        List<OpenLockInfo> delCacheOpenLockInfos = CacheUtil.getCache(delkey, new TypeReference<List<OpenLockInfo>>() {
-        }.getType());
-
-        if ((addCacheOpenLockInfos == null || addCacheOpenLockInfos.size() == 0) && (delCacheOpenLockInfos == null || delCacheOpenLockInfos.size() == 0)) {
-            Log.d(TAG, "没有离线数据");
-            return;
-        }
-
-        lockEngine.getOpenLockWayList(deviceInfo.getId() + "", "0", type + "").subscribe(new Action1<ResultInfo<List<OpenLockInfo>>>() {
+        openLockDao.loadNeedAddOpenLockInfos(deviceInfo.getId(), type).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<OpenLockInfo>>() {
             @Override
-            public void call(ResultInfo<List<OpenLockInfo>> info) {
-                synchronized (OLTOfflineManager.class){
-                    if (info != null) {
-                        List<OpenLockInfo> addCacheOpenLockInfos = CacheUtil.getCache(addkey, new TypeReference<List<OpenLockInfo>>() {
-                        }.getType());
-                        if ((addCacheOpenLockInfos != null && addCacheOpenLockInfos.size() > 0)) {
-                            autoAddOfflineData(addkey, info.getData(), addCacheOpenLockInfos);
-                        }
+            public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
+                loopAdd(openLockInfos, 0);
+            }
+        });
 
-                        List<OpenLockInfo> delCacheOpenLockInfos = CacheUtil.getCache(delkey, new TypeReference<List<OpenLockInfo>>() {
-                        }.getType());
-                        if ((delCacheOpenLockInfos != null && delCacheOpenLockInfos.size() > 0)) {
-                            autoDelOfflineData(delkey, info.getData(), delCacheOpenLockInfos);
-                        }
-                    }
-                }
+        openLockDao.loadNeedDelOpenLockInfos(deviceInfo.getId(), type).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<OpenLockInfo>>() {
+            @Override
+            public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
+                loopDel(openLockInfos, 0);
             }
         });
     }
@@ -189,7 +107,7 @@ public class OLTOfflineManager {
         }
         if (deviceInfos != null && deviceInfos.size() > 0) {
             for (DeviceInfo deviceInfo : deviceInfos) {
-                if(!TextUtils.isEmpty(deviceInfo.getMacAddress())){
+                if (!TextUtils.isEmpty(deviceInfo.getMacAddress())) {
                     autoExceOfflineDatas(deviceInfo, LockBLEManager.GROUP_ADMIN);
                     autoExceOfflineDatas(deviceInfo, LockBLEManager.GROUP_HIJACK);
                 }
