@@ -23,6 +23,7 @@ import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtils;
+import com.yc.yfiotlock.ble.LockBleLogCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -562,6 +563,30 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 }
             });
         }
+        //事件上报类(0x08)
+        if (lockBLEData.getMcmd() == LockBleLogCmd.MCMD) {
+            switch (lockBLEData.getScmd()) {
+                case LockBleLogCmd.SCMD_FINGERPRINT_INPUT_COUNT:
+                    break;
+                case LockBleLogCmd.SCMD_DOORBELL:
+                    break;
+                case LockBleLogCmd.SCMD_OPEN_DOOR_INFO:
+                    break;
+                case LockBleLogCmd.SCMD_LOW_BATTERY:
+                    break;
+                case LockBleLogCmd.SCMD_LOCAL_INIT:
+                    break;
+                case LockBleLogCmd.SCMD_LOCK_CLOSED:
+                    break;
+                case LockBleLogCmd.SCMD_LOCK_UNCLOSED:
+                    break;
+                case LockBleLogCmd.SCMD_DOOR_UNCLOSED:
+                    break;
+                case LockBleLogCmd.SCMD_AVOID_PRY_ALARM:
+                    break;
+            }
+        }
+
     }
 
     @Override
