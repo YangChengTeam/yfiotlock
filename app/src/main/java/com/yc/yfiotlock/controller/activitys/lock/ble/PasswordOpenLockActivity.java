@@ -9,14 +9,21 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
+import com.yc.yfiotlock.utils.BleUtil;
+import com.yc.yfiotlock.utils.CacheUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.TimeUnit;
 
 public class PasswordOpenLockActivity extends BaseOpenLockActivity {
     @Override
     protected void initViews() {
-        setTitle("密码");
+        title = "密码";
         super.initViews();
 
         RxView.clicks(addBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
@@ -32,5 +39,21 @@ public class PasswordOpenLockActivity extends BaseOpenLockActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void success(Object data) {
+        super.success(data);
+        setCountInfo();
+    }
+
+    private void setCountInfo() {
+        String key = "locker_count_" + lockInfo.getId() + groupType;
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
+        if (countInfo != null) {
+            countInfo.setPasswordCount(openLockAdapter.getData().size());
+            CacheUtil.setCache(key, countInfo);
+        }
+        EventBus.getDefault().post(new OpenLockCountRefreshEvent());
     }
 }

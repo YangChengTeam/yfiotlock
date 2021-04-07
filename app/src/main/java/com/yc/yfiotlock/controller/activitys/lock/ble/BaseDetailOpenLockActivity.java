@@ -61,6 +61,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected OpenLockInfo openLockInfo;
     protected LockBLESend lockBleSend;
     protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
+    protected String key = "";
 
     protected byte mcmd;
     protected byte scmd;
@@ -82,14 +83,16 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected void initVars() {
         super.initVars();
         openLockDao = App.getApp().getDb().openLockDao();
-        DeviceInfo deviceInfo = LockIndexActivity.getInstance().getLockInfo();
-        if (deviceInfo != null && deviceInfo.isShare() == 1) {
+        DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        if (lockInfo.isShare() == 1) {
             mFlBottom.setVisibility(View.GONE);
         }
         lockEngine = new LockEngine(this);
         openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
+
+        key = "locker_count_" + lockInfo.getId() + type;
     }
 
     @Override
@@ -105,7 +108,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
                 @Override
                 public void onClick(Dialog dialog) {
-                    mLoadingDialog.show("删除中...");
                     bleDel();
                 }
             });

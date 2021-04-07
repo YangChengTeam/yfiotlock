@@ -42,6 +42,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
     protected String number;
     protected String title;
+    String key = "";
 
     public void setTitle(String title) {
         this.title = title;
@@ -57,13 +58,15 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
         lockEngine = new LockEngine(this);
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        
+
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
         Random rand = new Random();
         number = (10000000 + rand.nextInt(90000000)) + "";
 
         cancelSend = new LockBLESend(this, bleDevice);
+
+        key = "locker_count_" + lockInfo.getId() + type;
     }
 
 

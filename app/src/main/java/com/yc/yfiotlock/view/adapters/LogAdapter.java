@@ -19,14 +19,20 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
 
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, LogInfo logInfo) {
+
         baseViewHolder
                 .setText(R.id.tv_log_des, logInfo.getName())
-                .setText(R.id.tv_log_date, DateUtil.timestamp2Date(logInfo.getAddTime()))
-                .setImageResource(R.id.iv_log_icon, logInfo.getIcon());
+                .setText(R.id.tv_log_date, logInfo.getTime());
+
+        if (logInfo.getLogType() == 1) {
+            baseViewHolder.setImageResource(R.id.iv_log_icon, R.mipmap.alarm);
+        } else {
+            baseViewHolder.setImageResource(R.id.iv_log_icon, R.mipmap.alarm);
+        }
 
         String name = "";
-        int pwdType = logInfo.getPwdType();
-        switch (pwdType) {
+        int type = logInfo.getType();
+        switch (type) {
             case 1:
                 name += "指纹";
                 break;
@@ -37,16 +43,7 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
                 name += "门禁";
                 break;
         }
-        name += "开锁";
-        int isSucc = logInfo.getIsSucc();
-        switch (isSucc) {
-            case 0:
-                name += "失败";
-                break;
-            case 1:
-                name += "成功";
-                break;
-        }
+
         baseViewHolder.setText(R.id.tv_log_name, name);
 
         baseViewHolder.setGone(R.id.view_item_log_line, baseViewHolder.getLayoutPosition() == 0);

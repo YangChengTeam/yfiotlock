@@ -23,7 +23,6 @@ import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtils;
-import com.yc.yfiotlock.ble.LockBleLogCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
@@ -35,6 +34,7 @@ import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.sensor.ShakeSensor;
 import com.yc.yfiotlock.model.bean.eventbus.IndexReScanEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
@@ -299,7 +299,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     protected void onStop() {
         super.onStop();
-        cloudHelper.unregisterNotify();
         unregisterNotify();
         destoryShakeSensor();
     }
@@ -312,6 +311,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         }
         if (lockEngine != null) {
             lockEngine.cancelAll();
+        }
+        if (cloudHelper != null) {
+            cloudHelper.unregisterNotify();
         }
         LockBLEManager.cancelScan();
         LogUtil.msg("已清理");
@@ -504,17 +506,35 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startActivity(intent);
     }
 
-    private int setCountInfo() {
-        int type = 1;
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+    private void setCountInfo() {
+        int groupType = 1;
+        String key = "locker_count_" + lockInfo.getId() + groupType;
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {
             openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
+        } else {
+            countInfo = new OpenLockCountInfo();
+            CacheUtil.setCache(key, countInfo);
+            lockEngine.getOpenLockInfoCount(lockInfo.getId() + "", groupType + "").subscribe(new Action1<ResultInfo<OpenLockCountInfo>>() {
+                @Override
+                public void call(ResultInfo<OpenLockCountInfo> openLockCountInfoResultInfo) {
+                    if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
+                        OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
+                        openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
+                        CacheUtil.setCache(key, countInfo);
+                    }
+                }
+            });
         }
-        return type;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
+        setCountInfo();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefresh(OpenLockCountRefreshEvent object) {
         setCountInfo();
     }
 
@@ -530,17 +550,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     // 开门方式数量
     private void loadLockOpenCountInfo() {
-        int type = setCountInfo();
-        lockEngine.getOpenLockInfoCount(lockInfo.getId() + "", type + "").subscribe(new Action1<ResultInfo<OpenLockCountInfo>>() {
-            @Override
-            public void call(ResultInfo<OpenLockCountInfo> openLockCountInfoResultInfo) {
-                if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
-                    OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
-                    openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
-                    CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
-                }
-            }
-        });
+        setCountInfo();
     }
 
     @Override
@@ -569,30 +579,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 }
             });
         }
-        //事件上报类(0x08)
-        if (lockBLEData.getMcmd() == LockBleLogCmd.MCMD) {
-            switch (lockBLEData.getScmd()) {
-                case LockBleLogCmd.SCMD_FINGERPRINT_INPUT_COUNT:
-                    break;
-                case LockBleLogCmd.SCMD_DOORBELL:
-                    break;
-                case LockBleLogCmd.SCMD_OPEN_DOOR_INFO:
-                    break;
-                case LockBleLogCmd.SCMD_LOW_BATTERY:
-                    break;
-                case LockBleLogCmd.SCMD_LOCAL_INIT:
-                    break;
-                case LockBleLogCmd.SCMD_LOCK_CLOSED:
-                    break;
-                case LockBleLogCmd.SCMD_LOCK_UNCLOSED:
-                    break;
-                case LockBleLogCmd.SCMD_DOOR_UNCLOSED:
-                    break;
-                case LockBleLogCmd.SCMD_AVOID_PRY_ALARM:
-                    break;
-            }
-        }
-
     }
 
     @Override

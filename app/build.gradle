@@ -54,9 +54,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         signingConfig signingConfigs.ycR
-        ndk {
-            abiFilters "armeabi-v7a"
-        }
+
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -77,11 +75,7 @@ android {
     lintOptions {
         checkReleaseBuilds false
     }
-    externalNativeBuild {
-        cmake {
-            path file('CMakeLists.txt')
-        }
-    }
+
 
 
 }

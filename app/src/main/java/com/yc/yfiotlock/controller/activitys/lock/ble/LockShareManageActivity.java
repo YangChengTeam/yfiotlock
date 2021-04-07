@@ -42,7 +42,6 @@ import rx.Observer;
 
 public class LockShareManageActivity extends BaseBackActivity {
 
-
     @BindView(R.id.view_line)
     View mViewLine;
     @BindView(R.id.stv_add)
@@ -53,6 +52,13 @@ public class LockShareManageActivity extends BaseBackActivity {
     RecyclerView mRvList;
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
+
+    private ShareDeviceEngine mEngine;
+    private int page = 1;
+
+    private LockShareAdapter mAdapter;
+    private DeviceInfo deviceInfo;
+
 
     public static void start(Context context, DeviceInfo deviceInfo) {
         Intent intent = new Intent(context, LockShareManageActivity.class);
@@ -65,18 +71,22 @@ public class LockShareManageActivity extends BaseBackActivity {
         return R.layout.lock_ble_activity_lock_share_manage;
     }
 
-    private int p = 1;
-    DeviceInfo deviceInfo;
+
+    @Override
+    protected void initVars() {
+        super.initVars();
+        mEngine = new ShareDeviceEngine(getContext());
+        deviceInfo = (DeviceInfo) getIntent().getSerializableExtra("deviceInfo");
+    }
 
     @Override
     protected void initViews() {
         super.initViews();
-        deviceInfo = (DeviceInfo) getIntent().getSerializableExtra("deviceInfo");
         String title = deviceInfo == null ? "" : deviceInfo.getName() + "共享管理";
         backNavBar.setTitle(title);
         mSrlRefresh.setColorSchemeColors(0xff3395fd);
         mSrlRefresh.setOnRefreshListener(() -> {
-            p = 1;
+            page = 1;
             loadData();
         });
         setRvList();
@@ -92,7 +102,6 @@ public class LockShareManageActivity extends BaseBackActivity {
         });
     }
 
-    LockShareAdapter mAdapter;
 
     private void setRvList() {
         mAdapter = new LockShareAdapter(null);
@@ -110,7 +119,7 @@ public class LockShareManageActivity extends BaseBackActivity {
             }
         });
         mAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
-            p++;
+            page++;
             loadData();
         });
         mAdapter.setEmptyView(new NoDeviceView(getContext()));
@@ -141,17 +150,9 @@ public class LockShareManageActivity extends BaseBackActivity {
         });
     }
 
-    ShareDeviceEngine mEngine;
-
-    @Override
-    protected void initVars() {
-        super.initVars();
-        mEngine = new ShareDeviceEngine(getContext());
-    }
-
     private void loadData() {
-        mSrlRefresh.setRefreshing(p == 1);
-        mEngine.getShareList(p, deviceInfo.getId() + "").subscribe(new Observer<ResultInfo<List<ShareDeviceWrapper>>>() {
+        mSrlRefresh.setRefreshing(page == 1);
+        mEngine.getShareList(page, deviceInfo.getId() + "").subscribe(new Observer<ResultInfo<List<ShareDeviceWrapper>>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);
@@ -192,7 +193,7 @@ public class LockShareManageActivity extends BaseBackActivity {
         if (mAdapter.getData().size() == 0) {
             mAdapter.setEmptyView(new NoWifiView(getContext()));
         } else {
-            p--;
+            page--;
             mAdapter.getLoadMoreModule().loadMoreFail();
         }
     }
@@ -200,7 +201,7 @@ public class LockShareManageActivity extends BaseBackActivity {
     @Override
     public void success(Object data) {
         List<ShareDeviceWrapper> list = ((ResultInfo<List<ShareDeviceWrapper>>) data).getData();
-        if (p == 1) {
+        if (page == 1) {
             mAdapter.setNewInstance(list);
         } else {
             mAdapter.addData(list);
@@ -223,7 +224,7 @@ public class LockShareManageActivity extends BaseBackActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMsg(String s) {
         if (s.equals(ShareDeviceEngine.SHARE_DEVICE_SUCCESS)) {
-            p = 1;
+            page = 1;
             loadData();
         }
     }
@@ -263,10 +264,6 @@ public class LockShareManageActivity extends BaseBackActivity {
                 }
             }
 
-
         }
-
     }
-
-
 }

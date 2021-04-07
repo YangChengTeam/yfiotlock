@@ -31,26 +31,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"></androidx.recyclerview.widget.RecyclerView>
+
         </LinearLayout>
+
+        <com.yc.yfiotlock.view.widgets.NoDataView
+            android:id="@+id/view_no_data"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+        ></com.yc.yfiotlock.view.widgets.NoDataView>
+
+
+        <com.yc.yfiotlock.view.widgets.NoWifiView
+            android:id="@+id/view_no_wifi"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            ></com.yc.yfiotlock.view.widgets.NoWifiView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <com.yc.yfiotlock.view.widgets.NoDataView
-        android:id="@+id/view_no_data"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/fl_add"
-        app:layout_constraintTop_toBottomOf="@+id/view_nav_bar"></com.yc.yfiotlock.view.widgets.NoDataView>
 
-
-    <com.yc.yfiotlock.view.widgets.NoWifiView
-        android:id="@+id/view_no_wifi"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/fl_add"
-        app:layout_constraintTop_toBottomOf="@+id/view_nav_bar"></com.yc.yfiotlock.view.widgets.NoWifiView>
 
     <FrameLayout
         android:id="@+id/fl_add"

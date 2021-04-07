@@ -1,59 +1,44 @@
 package com.yc.yfiotlock.model.bean.lock.remote;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.yc.yfiotlock.R;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
+@Entity(tableName = "log_info", primaryKeys = {"id", "event_id"})
 public class LogInfo {
+    @NonNull
     private int id;
-    @JSONField(name = "pwd_type")
-    private int pwdType;
-    @JSONField(name = "group_type")
-    private int groupType;
-    @JSONField(name = "is_local")
-    private int isLocal;
-    @JSONField(name = "is_succ")
-    private int isSucc;
-    @JSONField(name = "action_time")
-    private long actionTime;
-    private int icon;
-    @JSONField(name = "action_name")
-    private String actionName;
-    @JSONField(name = "add_time")
-    private long addTime;
-    private String desp;
+
+    @ColumnInfo(name = "event_id")
+    private int eventId;
+
+    @ColumnInfo(name = "log_type")
+    private int logType;  // 日志 报警
+
+    @ColumnInfo(name = "type")
+    private int type;  // 类型
+
+    @ColumnInfo(name = "group_type")
+    private int groupType; // 设备权根
+
+    @ColumnInfo(name = "time")
+    private String time;
+
+    @ColumnInfo(name = "addtime")
+    private long addtime;
+
+    @ColumnInfo(name = "lock_id")
+    private int lockId;
+
+    @ColumnInfo(name = "key_id")
+    private int keyid;
+
+    @ColumnInfo(name = "name")
     private String name;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(long addTime) {
-        this.addTime = addTime;
-    }
-
-    public String getActionName() {
-        return actionName;
-    }
-
-    public void setActionName(String actionName) {
-        this.actionName = actionName;
-    }
-
-    public String getDesp() {
-        return desp;
-    }
-
-    public void setDesp(String desp) {
-        this.desp = desp;
-    }
+    @ColumnInfo(name = "is_add")
+    private boolean isAdd;
 
     public int getId() {
         return id;
@@ -63,12 +48,28 @@ public class LogInfo {
         this.id = id;
     }
 
-    public int getPwdType() {
-        return pwdType;
+    public int getEventId() {
+        return eventId;
     }
 
-    public void setPwdType(int pwdType) {
-        this.pwdType = pwdType;
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
+
+    public int getLogType() {
+        return logType;
+    }
+
+    public void setLogType(int logType) {
+        this.logType = logType;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getGroupType() {
@@ -79,35 +80,53 @@ public class LogInfo {
         this.groupType = groupType;
     }
 
-    public int getIsLocal() {
-        return isLocal;
+    public String getTime() {
+        return time;
     }
 
-    public void setIsLocal(int isLocal) {
-        this.isLocal = isLocal;
+    public void setTime(String time) {
+        this.time = time;
     }
 
-    public int getIsSucc() {
-        return isSucc;
+    public long getAddtime() {
+        return addtime;
     }
 
-    public void setIsSucc(int isSucc) {
-        this.isSucc = isSucc;
+    public void setAddtime(long addtime) {
+        this.addtime = addtime;
     }
 
-    public long getActionTime() {
-        return actionTime;
+    public String getName() {
+        return name;
     }
 
-    public void setActionTime(long actionTime) {
-        this.actionTime = actionTime;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public int getIcon() {
-        return R.mipmap.icon_log;
+    public int getLockId() {
+        return lockId;
     }
 
-    public void setIcon(int icon) {
-        this.icon = icon;
+    public void setLockId(int lockId) {
+        this.lockId = lockId;
     }
+
+    public int getKeyid() {
+        return keyid;
+    }
+
+    public void setKeyid(int keyid) {
+        this.keyid = keyid;
+    }
+
+    public boolean isAdd() {
+        return isAdd;
+    }
+
+    public void setAdd(boolean add) {
+        isAdd = add;
+    }
+
+
 }

@@ -18,6 +18,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.BleUtil;
@@ -34,10 +35,14 @@ import org.jetbrains.annotations.Nullable;
 import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
+import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rx.Subscriber;
@@ -55,18 +60,16 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     @BindView(R.id.stv_add)
     protected SuperTextView addBtn;
 
-    protected int groupType = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
+    protected int groupType = 1;
     protected int type = 1;
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
     protected OpenLockDao openLockDao;
     protected DeviceInfo lockInfo;
+    protected List<OpenLockInfo> allOpenLockInfos;
+    protected boolean isAdmin = true;
+    protected String title;
 
-    private String title;
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     @Override
     protected int getLayoutId() {
@@ -79,6 +82,8 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         lockEngine = new LockEngine(this);
         openLockDao = App.getApp().getDb().openLockDao();
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        isAdmin = lockInfo.isShare() == 0;
+        groupType = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
     }
 
     @Override
@@ -93,10 +98,10 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setOnRefreshListener(() -> {
-            localLoadData();
+            loadData();
         });
 
-        localLoadData();
+        loadData();
     }
 
     private void setRv() {
@@ -105,22 +110,40 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         openLockRecyclerView.setAdapter(openLockAdapter);
     }
 
+    private void loadData() {
+        if (!isAdmin) {
+            cloudLoadData();
+        } else {
+            localLoadData();
+        }
+    }
+
     private void localLoadData() {
+        nodataView.setVisibility(View.GONE);
+        noWifiView.setVisibility(View.GONE);
         mSrlRefresh.setRefreshing(true);
         openLockDao.loadOpenLockInfos(lockInfo.getId(), type, LockBLEManager.GROUP_TYPE).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<OpenLockInfo>>() {
             @Override
             public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
-                openLockAdapter.setNewInstance(openLockInfos);
-                if(CommonUtil.isNetworkAvailable(getContext()) && openLockInfos.size() == 0){
+                allOpenLockInfos = openLockInfos;
+                List<OpenLockInfo> lastOpenLocks = new ArrayList<>();
+                for (OpenLockInfo openLockInfo : openLockInfos) {
+                    if (!openLockInfo.isDelete()) {
+                        lastOpenLocks.add(openLockInfo);
+                    }
+                }
+                openLockAdapter.setNewInstance(lastOpenLocks);
+                if (CommonUtil.isNetworkAvailable(getContext())) {
                     cloudLoadData();
+                } else {
+                    mSrlRefresh.setRefreshing(false);
+                    empty();
                 }
             }
         });
     }
 
     private void cloudLoadData() {
-        nodataView.setVisibility(View.GONE);
-        noWifiView.setVisibility(View.GONE);
         lockEngine.getOpenLockWayList(lockInfo.getId() + "", type + "", groupType + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {
@@ -135,7 +158,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
             @Override
             public void onNext(ResultInfo<List<OpenLockInfo>> info) {
-                if (info != null &&info.getCode() == 1) {
+                if (info != null && info.getCode() == 1) {
                     if (info.getData() == null || info.getData().size() == 0) {
                         empty();
                     } else {
@@ -163,12 +186,57 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         }
     }
 
+    private void processData(List<OpenLockInfo> copenlockInfos) {
+        for (OpenLockInfo openLockInfo : copenlockInfos) {
+            openLockInfo.setAdd(true);
+            openLockInfo.setType(type);
+            openLockInfo.setGroupType(LockBLEManager.GROUP_TYPE);
+            openLockInfo.setLockId(lockInfo.getId());
+        }
+    }
+
     @Override
     public void success(Object data) {
-        List<OpenLockInfo> lockInfos = (List<OpenLockInfo>) data;
-        openLockAdapter.setNewInstance(lockInfos);
-        openLockDao.insertOpenLockInfos(lockInfos).subscribeOn(Schedulers.io()).subscribe();
+        List<OpenLockInfo> copenlockInfos = (List<OpenLockInfo>) data;
+        if (!isAdmin) {
+            openLockAdapter.setNewInstance(copenlockInfos);
+            return;
+        }
+        List<OpenLockInfo> lastOpenLockInfos = new ArrayList<>();
+        for (OpenLockInfo copenLockInfo : copenlockInfos) {
+            boolean isExist = false;
+            for (OpenLockInfo lopenLockInfo : allOpenLockInfos) {
+                if (lopenLockInfo.getKeyid() == copenLockInfo.getKeyid()) {
+                    isExist = true;
+                    break;
+                }
+            }
+            if (!isExist) {
+                lastOpenLockInfos.add(copenLockInfo);
+            }
+        }
+        if (lastOpenLockInfos.size() > 0) {
+            processData(lastOpenLockInfos);
+            List<OpenLockInfo> insertOpenLockInfos = new ArrayList<>();
+            for (OpenLockInfo openLockInfo : lastOpenLockInfos) {
+                if (openLockInfo.getAddUserMobile().equals("我")) {
+                    insertOpenLockInfos.add(openLockInfo);
+                }
+            }
+            processData(insertOpenLockInfos);
+            openLockDao.insertOpenLockInfos(lastOpenLockInfos).subscribeOn(Schedulers.io()).subscribe();
+            lastOpenLockInfos.addAll(openLockAdapter.getData());
+            lastOpenLockInfos.sort(new Comparator<OpenLockInfo>() {
+                @Override
+                public int compare(OpenLockInfo o1, OpenLockInfo o2) {
+                    return o2.getKeyid() - o1.getKeyid();
+                }
+            });
+            openLockAdapter.setNewInstance(lastOpenLockInfos);
+        }
+        empty();
     }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {

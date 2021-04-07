@@ -89,9 +89,17 @@ public class Config {
     public static final String OPEN_LOCK_LONG_OPEN_URL = getBaseUrl() + "/userapp/v1.Locker/longRangeOPen" + isRsa();
     public static final String OPEN_LOCK_TEMPORARY_PWD_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/temporaryPwdList" + isRsa();
 
+    public static final String OPEN_LOCK_DEL_PSW_URL2 = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDel2" + isRsa();
+    public static final String OPEN_LOCK_MODIFY_PSW_URL2 = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpd2" + isRsa();
+
+
     //远程
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();
     public static final String LOG_OPEN_URL = getBaseUrl() + "/userapp/v1.locker_open_log/openLogList" + isRsa();
+
+    public static final String LOG_LOCAL_WARN_URL = getBaseUrl() + "/userapp/v1.locker_local_log/warnLogList" + isRsa();
+    public static final String LOG_LOCAL_OPEN_URL = getBaseUrl() + "/userapp/v1.locker_local_log/openLogList" + isRsa();
+    public static final String LOG_LOCAL_ADD_URL = getBaseUrl() + "/userapp/v1.locker_local_log/logAdd" + isRsa();
 
     //分享设备相关
 

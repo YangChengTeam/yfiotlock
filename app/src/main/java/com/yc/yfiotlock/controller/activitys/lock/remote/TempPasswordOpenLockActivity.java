@@ -69,7 +69,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
     private OpenLockDao openLockDao;
     private LockEngine lockEngine;
     private DeviceEngin deviceEngin;
-    DeviceInfo lockInfo;
+    private DeviceInfo lockInfo;
     protected int type = 2;
 
     private String key = "3132333435363738393031323334353637383930"
@@ -137,20 +137,24 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
     }
 
     private void localLoadData() {
+        nodataView.setVisibility(View.GONE);
+        noWifiView.setVisibility(View.GONE);
+        mSrlRefresh.setRefreshing(true);
         openLockDao.loadOpenLockInfos(lockInfo.getId(), type, LockBLEManager.GROUP_TYPE).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<OpenLockInfo>>() {
             @Override
             public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
                 tempPwdAdapter.setNewInstance(openLockInfos);
-                if(CommonUtil.isNetworkAvailable(getContext()) && openLockInfos.size() == 0){
+                if (CommonUtil.isNetworkAvailable(getContext()) && openLockInfos.size() == 0) {
                     cloudLoadData();
+                } else {
+                    mSrlRefresh.setRefreshing(false);
+                    empty();
                 }
             }
         });
     }
 
     private void cloudLoadData() {
-        nodataView.setVisibility(View.GONE);
-        noWifiView.setVisibility(View.GONE);
         lockEngine.getOpenLockWayList(lockInfo.getId() + "", type + "", LockBLEManager.GROUP_TYPE + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {

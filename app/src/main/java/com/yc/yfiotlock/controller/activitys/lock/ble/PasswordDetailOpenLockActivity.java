@@ -39,10 +39,10 @@ public class PasswordDetailOpenLockActivity extends BaseDetailOpenLockActivity {
 
     @Override
     protected void localDelSucc() {
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setPasswordCount(countInfo.getPasswordCount() - 1);
-            CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+            CacheUtil.setCache(key, countInfo);
         }
     }
 

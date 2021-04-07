@@ -49,6 +49,7 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
@@ -59,6 +60,7 @@ import com.yc.yfiotlock.view.widgets.MyItemDivider;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import rx.Observer;
@@ -461,6 +463,4 @@ public class CommonUtil {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
-
-
 }

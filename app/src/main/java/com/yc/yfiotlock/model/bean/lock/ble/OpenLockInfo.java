@@ -39,6 +39,8 @@ public class OpenLockInfo implements Serializable {
     private boolean isAdd;
     @ColumnInfo(name = "is_delete")
     private boolean isDelete;
+    @ColumnInfo(name = "is_update")
+    private boolean isUpdate;
 
     @ColumnInfo(name = "add_time")
     private long addtime;
@@ -133,6 +135,14 @@ public class OpenLockInfo implements Serializable {
 
     public void setDelete(boolean delete) {
         isDelete = delete;
+    }
+
+    public boolean isUpdate() {
+        return isUpdate;
+    }
+
+    public void setUpdate(boolean update) {
+        isUpdate = update;
     }
 
     public long getAddtime() {

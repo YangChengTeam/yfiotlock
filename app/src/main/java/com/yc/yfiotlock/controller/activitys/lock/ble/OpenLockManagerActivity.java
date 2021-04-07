@@ -18,6 +18,7 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
@@ -40,7 +41,6 @@ public class OpenLockManagerActivity extends BaseBackActivity {
     RecyclerView openLockRecyclerView;
 
     protected DeviceInfo lockInfo;
-    protected BleDevice bleDevice;
     protected OpenLockAdapter openLockAdapter;
 
     @Override
@@ -51,7 +51,6 @@ public class OpenLockManagerActivity extends BaseBackActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
         LockBLEManager.GROUP_TYPE = LockBLEManager.GROUP_ADMIN;
     }
@@ -70,7 +69,7 @@ public class OpenLockManagerActivity extends BaseBackActivity {
         openLockAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
-                if (!LockBLEManager.isConnected(bleDevice)) {
+                if (!LockBLEManager.isConnected(LockIndexActivity.getInstance().getBleDevice())) {
                     ToastCompat.show(getContext(), "蓝牙未连接");
                     return;
                 }
@@ -93,8 +92,9 @@ public class OpenLockManagerActivity extends BaseBackActivity {
         int passwordCount = 0;
         int cardCount = 0;
         
-        int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        int groupType = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
+        String key = "locker_count_" + lockInfo.getId() + groupType;
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {
             fingerprintCount = countInfo.getFingerprintCount();
             passwordCount = countInfo.getPasswordCount();
@@ -130,10 +130,8 @@ public class OpenLockManagerActivity extends BaseBackActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onConnected(BleDevice bleDevice) {
-        if (bleDevice != null) {
-            this.bleDevice = bleDevice;
-        }
+    public void onRefresh(OpenLockCountRefreshEvent object) {
+        loadData();
     }
 
     protected class OpenLockTypeInfo {

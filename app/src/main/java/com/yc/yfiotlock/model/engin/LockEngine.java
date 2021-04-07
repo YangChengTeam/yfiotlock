@@ -131,6 +131,34 @@ public class LockEngine extends HttpCoreEngin {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
+    // 删除开门方式2
+    public Observable<ResultInfo<String>> delOpenLockWay2(String lockid, String keyid) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("locker_id", lockid);
+        map.put("keyid", keyid);
+        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_DEL_PSW_URL2,
+                new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    // 修改名称2
+    public Observable<ResultInfo<String>> modifyOpenLockName2(String lockid, String keyid, String name) {
+
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("name", name);
+        map.put("locker_id", lockid);
+        map.put("keyid", keyid);
+        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_MODIFY_PSW_URL2,
+                new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
     // 远程开锁
     public Observable<ResultInfo<String>> longOpenLock(String lockerId) {
         Map<String, String> map = new HashMap<>();

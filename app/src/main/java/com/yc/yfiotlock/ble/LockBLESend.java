@@ -331,7 +331,7 @@ public class LockBLESend {
                 // 密钥不对 设备重新初始化
                 isReInit = true;
             }
-        } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_INPUT_PRINTFINGER) {
+        } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT) {
             if (notifyCallback != null) {
                 notifyCallback.onNotifySuccess(lockBLEData);
             }

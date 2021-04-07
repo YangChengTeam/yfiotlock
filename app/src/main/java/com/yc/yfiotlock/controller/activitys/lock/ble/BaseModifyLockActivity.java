@@ -11,18 +11,29 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.dao.OpenLockDao;
+import com.yc.yfiotlock.model.bean.eventbus.CloudAddEvent;
+import com.yc.yfiotlock.model.bean.eventbus.CloudUpdateEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import rx.Subscriber;
 
 public abstract class BaseModifyLockActivity extends BaseBackActivity {
@@ -32,8 +43,8 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
     @BindView(R.id.stv_commit)
     View commitBtn;
 
+    protected OpenLockDao openLockDao;
     protected OpenLockInfo openLockInfo;
-    private LockEngine lockEngine;
 
     @Override
     protected int getLayoutId() {
@@ -43,7 +54,7 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        lockEngine = new LockEngine(this);
+        openLockDao = App.getApp().getDb().openLockDao();
         openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
     }
 
@@ -60,7 +71,7 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
                 ToastUtil.toast2(getContext(), "名称长度不能少于2位");
                 return;
             }
-            cloudEdit();
+            localEdit();
         });
 
         setInfo();
@@ -73,7 +84,7 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
                         ToastUtil.toast2(getContext(), "名称长度不能少于2位");
                         return false;
                     }
-                    cloudEdit();
+                    localEdit();
                 }
                 return false;
             }
@@ -86,44 +97,35 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
         nameEt.setSelection(nameEt.getText().length());
     }
 
-    protected void cloudEdit() {
-        mLoadingDialog.show("修改中...");
+    protected void localEdit() {
         String name = nameEt.getText().toString();
-        openLockInfo.setName(name);
-        lockEngine.modifyOpenLockName(openLockInfo.getId() + "", name).subscribe(new Subscriber<ResultInfo<String>>() {
+        DeviceInfo deviceInfo = LockIndexActivity.getInstance().getLockInfo();
+        openLockDao.updateOpenLockInfo(deviceInfo.getId(), openLockInfo.getKeyid(), name).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
-            public void onCompleted() {
-                mLoadingDialog.dismiss();
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                retryCount = 3;
+                openLockInfo.setName(name);
+                EventBus.getDefault().post(openLockInfo);
+                if (CommonUtil.isNetworkAvailable(getContext())) {
+                    EventBus.getDefault().post(new CloudUpdateEvent(openLockInfo));
+                }
+                EventBus.getDefault().post(new OpenLockRefreshEvent());
+                finish();
             }
 
             @Override
             public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
-                fail();
-            }
-
-            @Override
-            public void onNext(ResultInfo<String> info) {
-                if (info != null && info.getCode() == 1) {
-                    success(info.getData());
+                if (retryCount-- > 0) {
+                    localEdit();
                 } else {
-                    String msg = "更新出错";
-                    msg = info != null && !TextUtils.isEmpty(info.getMsg()) ? info.getMsg() : msg;
-                    ToastCompat.show(getContext(), msg);
+                    retryCount = 3;
                 }
             }
         });
-    }
-
-    @Override
-    public void success(Object data) {
-        finish();
-        EventBus.getDefault().post(openLockInfo);
-    }
-
-    @Override
-    public void fail() {
-        String msg = "更新出错";
-        ToastCompat.show(getContext(), msg);
     }
 }

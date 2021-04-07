@@ -30,7 +30,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         setTitle("NFC门卡");
 
         int cardCount = 0;
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {
             cardCount = countInfo.getCardCount();
         }
@@ -58,10 +58,10 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     protected void localAddSucc() {
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setCardCount(countInfo.getCardCount() + 1);
-            CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+            CacheUtil.setCache(key, countInfo);
         }
     }
 
@@ -76,7 +76,6 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     protected void localAdd(int keyid) {
-        mLoadingDialog.show("添加卡片中...");
         localAdd(nameTv.getText().toString(), LockBLEManager.OPEN_LOCK_CARD, keyid, "");
     }
 

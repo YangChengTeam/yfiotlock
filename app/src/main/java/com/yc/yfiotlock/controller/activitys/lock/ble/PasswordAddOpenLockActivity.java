@@ -134,17 +134,17 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     protected void localAddSucc() {
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setPasswordCount(countInfo.getPasswordCount() + 1);
-            CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+            CacheUtil.setCache(key, countInfo);
         }
     }
 
     @Override
     protected void localAdd(int keyid) {
         int passwordCount = 0;
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {
             passwordCount = countInfo.getPasswordCount();
         }

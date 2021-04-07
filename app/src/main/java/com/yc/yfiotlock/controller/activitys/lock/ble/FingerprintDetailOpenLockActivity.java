@@ -40,10 +40,10 @@ public class FingerprintDetailOpenLockActivity extends BaseDetailOpenLockActivit
 
     @Override
     protected void localDelSucc() {
-        OpenLockCountInfo countInfo = CacheUtil.getCache(Config.OPEN_LOCK_LIST_URL + type, OpenLockCountInfo.class);
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {
             countInfo.setFingerprintCount(countInfo.getFingerprintCount() - 1);
-            CacheUtil.setCache(Config.OPEN_LOCK_LIST_URL + type, countInfo);
+            CacheUtil.setCache(key, countInfo);
         }
     }
 
