@@ -142,7 +142,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         lockEngine = new LockEngine(this);
         cloudHelper = new CloudHelper(this);
-        if (lockInfo.isShare() == 1) {
+        if (lockInfo.isShare()) {
             setUserUi();
         }
     }

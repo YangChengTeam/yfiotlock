@@ -84,7 +84,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
         super.initVars();
         openLockDao = App.getApp().getDb().openLockDao();
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        if (lockInfo.isShare() == 1) {
+        if (lockInfo.isShare()) {
             mFlBottom.setVisibility(View.GONE);
         }
         lockEngine = new LockEngine(this);

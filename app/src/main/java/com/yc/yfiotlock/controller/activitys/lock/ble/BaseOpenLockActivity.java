@@ -82,7 +82,6 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         lockEngine = new LockEngine(this);
         openLockDao = App.getApp().getDb().openLockDao();
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        isAdmin = lockInfo.isShare() == 0;
         groupType = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? 2 : 1;
     }
 
@@ -98,24 +97,16 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setOnRefreshListener(() -> {
-            loadData();
+            localLoadData();
         });
 
-        loadData();
+        localLoadData();
     }
 
     private void setRv() {
         openLockAdapter = new OpenLockAdapter(null);
         openLockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         openLockRecyclerView.setAdapter(openLockAdapter);
-    }
-
-    private void loadData() {
-        if (!isAdmin) {
-            cloudLoadData();
-        } else {
-            localLoadData();
-        }
     }
 
     private void localLoadData() {
@@ -198,10 +189,6 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     @Override
     public void success(Object data) {
         List<OpenLockInfo> copenlockInfos = (List<OpenLockInfo>) data;
-        if (!isAdmin) {
-            openLockAdapter.setNewInstance(copenlockInfos);
-            return;
-        }
         List<OpenLockInfo> lastOpenLockInfos = new ArrayList<>();
         for (OpenLockInfo copenLockInfo : copenlockInfos) {
             boolean isExist = false;
@@ -216,7 +203,6 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             }
         }
         if (lastOpenLockInfos.size() > 0) {
-            processData(lastOpenLockInfos);
             List<OpenLockInfo> insertOpenLockInfos = new ArrayList<>();
             for (OpenLockInfo openLockInfo : lastOpenLockInfos) {
                 if (openLockInfo.getAddUserMobile().equals("我")) {
@@ -224,7 +210,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                 }
             }
             processData(insertOpenLockInfos);
-            openLockDao.insertOpenLockInfos(lastOpenLockInfos).subscribeOn(Schedulers.io()).subscribe();
+            openLockDao.insertOpenLockInfos(insertOpenLockInfos).subscribeOn(Schedulers.io()).subscribe();
             lastOpenLockInfos.addAll(openLockAdapter.getData());
             lastOpenLockInfos.sort(new Comparator<OpenLockInfo>() {
                 @Override

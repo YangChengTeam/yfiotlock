@@ -98,7 +98,7 @@ public class IndexFragment extends BaseFragment {
                 nav2AddDevice();
             } else {
                 mDeviceInfo = (DeviceInfo) adapter.getData().get(position);
-                if (mDeviceInfo.isShare() == 1) {
+                if (mDeviceInfo.isShare()) {
                     checkLockExist();
                 } else {
                     nav2LockIndex();
@@ -125,8 +125,7 @@ public class IndexFragment extends BaseFragment {
 
             @Override
             public void onNext(ResultInfo<DeviceInfo> deviceInfoResultInfo) {
-                mLoadingDialog.dismiss();
-                if (deviceInfoResultInfo.getData().isValid() == 1) {
+                if (deviceInfoResultInfo.getData().isValid()) {
                     nav2LockIndex();
                 } else {
                     ToastCompat.show(getContext(),"设备已失效");
@@ -167,7 +166,6 @@ public class IndexFragment extends BaseFragment {
                     indexDeviceAdapter.setNewInstance(deviceInfoList);
                     CacheUtil.setCache(Config.INDEX_DETAIL_URL, resultInfo.getData());
                     OfflineManager.enqueue(getContext());
-
                 }
             }
         });

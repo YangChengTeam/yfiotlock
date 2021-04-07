@@ -28,11 +28,11 @@ public class DeviceInfo implements Serializable {
 
     // 是否是共享的锁
     @JSONField(name = "is_share")
-    private int isShare;
+    private boolean isShare;
 
     // 锁是否还有效 0失效 1 有效
     @JSONField(name = "has")
-    private int isValid;
+    private boolean isValid;
 
     private transient UserInfo user;
 
@@ -144,19 +144,19 @@ public class DeviceInfo implements Serializable {
         this.user = user;
     }
 
-    public int isShare() {
+    public boolean isShare() {
         return isShare;
     }
 
-    public void setShare(int isShare) {
+    public void setShare(boolean isShare) {
         this.isShare = isShare;
     }
 
-    public int isValid() {
+    public boolean isValid() {
         return isValid;
     }
 
-    public void setValid(int isValid) {
+    public void setValid(boolean isValid) {
         this.isValid = isValid;
     }
 }
