@@ -85,7 +85,8 @@ public class LockShareCommitActivity extends BaseBackActivity {
     private ShareDeviceEngine mEngine;
 
     private void shareDevice() {
-        mLoadingDialog.show("请求中...");
+        mLoadingDialog.show("分享中...");
+        String msg = "分享失败";
         mEngine.shareDevice(mUserInfo.getId(), lockInfo.getId() + "").subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
@@ -95,7 +96,7 @@ public class LockShareCommitActivity extends BaseBackActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "分享失败");
+                ToastCompat.show(getContext(), msg);
             }
 
             @Override
@@ -105,6 +106,10 @@ public class LockShareCommitActivity extends BaseBackActivity {
                     mLoadingDialog.dismiss();
                     EventBus.getDefault().post(ShareDeviceEngine.SHARE_DEVICE_SUCCESS);
                     finish();
+                } else {
+                    String tmsg = msg;
+                    tmsg = info != null && info.getMsg() != null ? info.getMsg() : tmsg;
+                    ToastCompat.show(getContext(), tmsg);
                 }
             }
         });

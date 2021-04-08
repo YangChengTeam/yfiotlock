@@ -115,7 +115,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             @Override
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
-                    ToastCompat.show(getContext(), "删除成功");
                     App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
                     App.getApp().getMacList().remove(lockInfo.getMacAddress());
                     SafeUtil.setSafePwdType(lockInfo, 0);
@@ -247,10 +246,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHANGE_VOLUME) {
             headView.setVolume(volume);
             lockInfo.setVolume(volume);
-            ToastCompat.show(getContext(), "设置成功");
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_RESET) {
             finish();
-            LockIndexActivity.getInstance().finish();
+            LockIndexActivity.safeFinish();
         }
     }
 

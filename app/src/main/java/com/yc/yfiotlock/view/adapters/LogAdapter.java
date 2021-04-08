@@ -25,7 +25,7 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
                 .setText(R.id.tv_log_date, logInfo.getTime());
 
         if (logInfo.getLogType() == 1) {
-            baseViewHolder.setImageResource(R.id.iv_log_icon, R.mipmap.alarm);
+            baseViewHolder.setImageResource(R.id.iv_log_icon, R.mipmap.icon_log);
         } else {
             baseViewHolder.setImageResource(R.id.iv_log_icon, R.mipmap.alarm);
         }

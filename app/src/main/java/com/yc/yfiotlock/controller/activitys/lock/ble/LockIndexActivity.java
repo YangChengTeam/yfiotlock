@@ -309,7 +309,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     protected void onDestroy() {
         super.onDestroy();
         LockBLEManager.cancelScan();
-        BleManager.getInstance().destroy();
+        LockBLEManager.destory();
 
         if (lockEngine != null) {
             lockEngine.cancelAll();

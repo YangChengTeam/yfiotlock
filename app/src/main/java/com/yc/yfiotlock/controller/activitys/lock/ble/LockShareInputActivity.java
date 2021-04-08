@@ -49,21 +49,11 @@ public class LockShareInputActivity extends BaseBackActivity {
     @Override
     protected void initViews() {
         super.initViews();
-        if (LockIndexActivity.getInstance() == null) {
-            deviceInfo = (DeviceInfo) getIntent().getSerializableExtra("deviceInfo");
-        } else {
-            deviceInfo = LockIndexActivity.getInstance().getLockInfo();
-        }
-
-        if (deviceInfo == null) {
-            ToastCompat.show(getContext(), "设备信息有误");
-            finish();
-            return;
-        }
+        deviceInfo = (DeviceInfo) getIntent().getSerializableExtra("deviceInfo");
         backNavBar.setTitle(deviceInfo.getName().concat("共享管理"));
         mTvDeviceName.setText(deviceInfo.getName());
         mEtAccount.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId== EditorInfo.IME_ACTION_DONE){
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
                 getUserInfo();
             }
             return false;
@@ -92,7 +82,6 @@ public class LockShareInputActivity extends BaseBackActivity {
         });
         mTvSure.setClickable(false);
         mEtAccount.requestFocus();
-
     }
 
     @Override
@@ -109,7 +98,8 @@ public class LockShareInputActivity extends BaseBackActivity {
     private UserEngine mUserEngine;
 
     private void getUserInfo() {
-        mLoadingDialog.show("请求中...");
+        mLoadingDialog.show("分享中...");
+        String msg = "分享失败";
         mUserEngine.getUserInfo(mEtAccount.getText().toString()).subscribe(new Observer<ResultInfo<UserInfo>>() {
             @Override
             public void onCompleted() {
@@ -119,7 +109,7 @@ public class LockShareInputActivity extends BaseBackActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "请求失败");
+                ToastCompat.show(getContext(), msg);
             }
 
             @Override
@@ -128,7 +118,9 @@ public class LockShareInputActivity extends BaseBackActivity {
                     mLoadingDialog.dismiss();
                     LockShareCommitActivity.start(getContext(), deviceInfo, info.getData());
                 } else {
-                    ToastCompat.show(getContext(), info.getMsg());
+                    String tmsg = msg;
+                    tmsg = info != null && info.getMsg() != null ? info.getMsg() : tmsg;
+                    ToastCompat.show(getContext(), tmsg);
                 }
             }
         });

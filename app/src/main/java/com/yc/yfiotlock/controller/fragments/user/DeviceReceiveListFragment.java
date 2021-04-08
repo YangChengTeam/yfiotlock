@@ -115,8 +115,10 @@ public class DeviceReceiveListFragment extends BaseFragment {
 
     private void agreeShare(int position) {
         ShareDeviceWrapper receiveDeviceInfo = mAdapter.getData().get(position);
-        mLoadingDialog.show("请求中...");
-        mEngine.receiveShare(receiveDeviceInfo.getId()+"").subscribe(new Observer<ResultInfo<String>>() {
+        mLoadingDialog.show("添加中...");
+        String msg = "添加失败";
+
+        mEngine.receiveShare(receiveDeviceInfo.getId() + "").subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
@@ -125,7 +127,7 @@ public class DeviceReceiveListFragment extends BaseFragment {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "请求失败");
+                ToastCompat.show(getContext(), msg);
             }
 
             @Override
@@ -136,7 +138,9 @@ public class DeviceReceiveListFragment extends BaseFragment {
                     mAdapter.notifyItemChanged(position, "0");
                     EventBus.getDefault().post(new IndexRefreshEvent());
                 } else {
-                    ToastCompat.show(getContext(), info.getMsg());
+                    String tmsg = msg;
+                    tmsg = info != null && info.getMsg() != null ? info.getMsg() : tmsg;
+                    ToastCompat.show(getContext(), tmsg);
                 }
             }
         });

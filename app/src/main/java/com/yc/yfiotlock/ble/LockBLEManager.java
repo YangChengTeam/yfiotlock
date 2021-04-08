@@ -89,6 +89,10 @@ public class LockBLEManager {
         return BleManager.getInstance().isConnected(bleDevice);
     }
 
+    public static void destory(){
+        BleManager.getInstance().destroy();
+    }
+
     public static void setMtu(BleDevice bleDevice) {
         // 设置mtu
         BleManager.getInstance().setMtu(bleDevice, LockBLEPackage.getMtu(), new BleMtuChangedCallback() {

@@ -95,8 +95,6 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
                 passEt.setSelection(passEt.getText().length());
             }
         });
-
-
     }
 
     private void addPwd() {

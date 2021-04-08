@@ -336,16 +336,21 @@ public class LockBLESend {
                 isReInit = true;
             }
         } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
-            if (lockBLEData.getMcmd() != LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT) {
+            if (lockBLEData.getScmd() != LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT) {
                 reset();
-            }
-            if (notifyCallback != null) {
-                if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
+                if (notifyCallback != null) {
+                    if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
+                        notifyCallback.onNotifySuccess(lockBLEData);
+                    } else {
+                        notifyCallback.onNotifyFailure(lockBLEData);
+                    }
+                }
+            } else {
+                if (notifyCallback != null) {
                     notifyCallback.onNotifySuccess(lockBLEData);
-                } else {
-                    notifyCallback.onNotifyFailure(lockBLEData);
                 }
             }
+
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             isOpOver = true;
             Log.d(TAG, "命令匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());

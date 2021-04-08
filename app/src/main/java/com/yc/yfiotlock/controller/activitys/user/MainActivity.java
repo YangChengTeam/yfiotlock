@@ -152,7 +152,7 @@ public class MainActivity extends BaseActivity {
 
                     receiveDeviceDialog.setOnBtnClick(() -> {
                         if (singleDevice) {
-                            agreeShare(info.getData().get(0).getId()+"");
+                            agreeShare(info.getData().get(0).getId() + "");
                         } else {
                             DeviceShareActivity.seeAllShare(getContext(), 1);
                         }
@@ -163,7 +163,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void agreeShare(String id) {
-        mLoadingDialog.show("请求中...");
+        mLoadingDialog.show("添加中...");
+        String msg = "添加失败";
         mEngine.receiveShare(id).subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
@@ -173,7 +174,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "请求失败");
+                ToastCompat.show(getContext(), msg);
             }
 
             @Override
@@ -182,7 +183,9 @@ public class MainActivity extends BaseActivity {
                     mLoadingDialog.dismiss();
                     EventBus.getDefault().post(new IndexRefreshEvent());
                 } else {
-                    ToastCompat.show(getContext(), info.getMsg());
+                    String tmsg = msg;
+                    tmsg = info != null && info.getMsg() != null ? info.getMsg() : tmsg;
+                    ToastCompat.show(getContext(), tmsg);
                 }
             }
         });

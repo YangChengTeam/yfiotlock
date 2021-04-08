@@ -126,7 +126,8 @@ public class LockShareManageActivity extends BaseBackActivity {
     }
 
     private void deleteUsePermission(int position) {
-        mLoadingDialog.show("请求中...");
+        mLoadingDialog.show("删除中...");
+        String msg = "删除失败";
         mEngine.deleteShare(1, mAdapter.getData().get(position).getId() + "").subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
@@ -136,15 +137,18 @@ public class LockShareManageActivity extends BaseBackActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "请求失败");
+                ToastCompat.show(getContext(), msg);
             }
 
             @Override
             public void onNext(ResultInfo<String> info) {
-                ToastCompat.show(getContext(), info.getMsg());
-                if (info.getCode() == 1) {
+                if (info != null && info.getCode() == 1) {
                     mAdapter.getData().remove(position);
                     mAdapter.notifyItemRemoved(position);
+                } else {
+                    String tmsg = msg;
+                    tmsg = info != null && info.getMsg() != null ? info.getMsg() : tmsg;
+                    ToastCompat.show(getContext(), tmsg);
                 }
             }
         });

@@ -238,6 +238,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             return;
         }
 
+        // 主设备 diff数据同步到本地
         List<OpenLockInfo> lastOpenLockInfos = new ArrayList<>();
         for (OpenLockInfo copenLockInfo : copenlockInfos) {
             boolean isExist = false;
