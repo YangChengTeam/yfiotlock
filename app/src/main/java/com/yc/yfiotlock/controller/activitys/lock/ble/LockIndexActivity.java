@@ -35,6 +35,7 @@ import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.sensor.ShakeSensor;
 import com.yc.yfiotlock.model.bean.eventbus.IndexReScanEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
@@ -228,6 +229,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
         RxView.clicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             if (LockBLEManager.isConnected(bleDevice)) {
+                return;
+            }
+
+            if ("搜索门锁中...".equals(statusTitleTv.getText().toString())) {
                 return;
             }
 
@@ -537,12 +542,16 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
         setCountInfo();
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockCountRefreshEvent object) {
         setCountInfo();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReConnect(OpenLockReConnectEvent object) {
+        connect(bleDevice);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

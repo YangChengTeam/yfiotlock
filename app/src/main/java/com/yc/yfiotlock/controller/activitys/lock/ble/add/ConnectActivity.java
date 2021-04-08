@@ -52,9 +52,9 @@ public class ConnectActivity extends BaseConnectActivity {
     private AlertDialog wifiAlertDialog;
 
     private static WeakReference<ConnectActivity> mInstance;
-    public static void finish2() {
+    public static void safeFinish() {
         if (mInstance != null && mInstance.get() != null) {
-            mInstance.get().finish();
+            mInstance.get().safeFinish();
         }
     }
 

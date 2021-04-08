@@ -11,6 +11,7 @@ import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.utils.AnimatinUtil;
@@ -77,7 +78,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
         }
         HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
         hashMap.forEach((key, bleDevice) -> {
-            if (!LockBLEManager.isFoundDevice(bleDevice.getMac())) {
+            if (!LockBLEUtils.isFoundDevice(bleDevice.getMac())) {
                 if (!isFoundOne) {
                     isFoundOne = true;
                     deviceHashMap.put(bleDevice.getMac(), bleDevice);
@@ -101,7 +102,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
                 if (deviceHashMap.get(bleDevice.getMac()) != null || !LockBLEManager.DEVICE_NAME.equals(bleDevice.getName() + "")) {
                     return;
                 }
-                if (!LockBLEManager.isFoundDevice(bleDevice.getMac())) {
+                if (!LockBLEUtils.isFoundDevice(bleDevice.getMac())) {
                     if (!isFoundOne) {
                         isFoundOne = true;
                         deviceHashMap.put(bleDevice.getMac(), bleDevice);

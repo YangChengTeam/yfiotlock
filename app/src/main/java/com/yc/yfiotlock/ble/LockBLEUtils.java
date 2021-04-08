@@ -3,6 +3,16 @@ package com.yc.yfiotlock.ble;
 import android.content.Context;
 import android.location.LocationManager;
 
+import androidx.annotation.NonNull;
+
+import com.yc.yfiotlock.App;
+import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.user.IndexInfo;
+import com.yc.yfiotlock.utils.CacheUtil;
+
+import java.util.List;
+
 public class LockBLEUtils {
     private static String key = "12345678";
 
@@ -95,6 +105,26 @@ public class LockBLEUtils {
         }
 
         return hexString.toString();
+    }
+
+    public static boolean isFoundDevice(@NonNull String mac) {
+        IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
+        List<String> macList = App.getApp().getMacList();
+        if (macList != null) {
+            for (String tmac : macList) {
+                if (mac.equals(tmac)) {
+                    return true;
+                }
+            }
+        }
+        if (indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0) {
+            for (DeviceInfo deviceInfo : indexInfo.getDeviceInfos()) {
+                if (mac.equals(deviceInfo.getMacAddress())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static boolean checkGPSIsOpen(Context context) {

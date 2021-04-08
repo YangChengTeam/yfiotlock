@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
 import android.content.Intent;
-import android.text.TextUtils;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
@@ -190,7 +189,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         intent.putExtra("device", lockInfo);
         startActivity(intent);
         finish();
-        ConnectActivity.finish2();
+        ConnectActivity.safeFinish();
         DeviceListActivity.finish2();
         ScanDeviceActivity.finish2();
     }
@@ -217,7 +216,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     public void onBackPressed() {
         if (isActiveDistributionNetwork) {
             finish();
-            ConnectActivity.finish2();
+            ConnectActivity.safeFinish();
         } else if (isDeviceAdd) {
             nav2Index();
         } else {

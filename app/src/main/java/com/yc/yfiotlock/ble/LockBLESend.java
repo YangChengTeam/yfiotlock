@@ -1,14 +1,10 @@
 package com.yc.yfiotlock.ble;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
 
 import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
-import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleNotifyCallback;
 import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
@@ -16,7 +12,7 @@ import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
 import com.yc.yfiotlock.model.bean.eventbus.IndexReScanEvent;
-import com.yc.yfiotlock.utils.CommonUtil;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,7 +28,6 @@ public class LockBLESend {
 
     private Context context;
     private BleDevice bleDevice;
-    private LoadingDialog loadingDialog;
     private byte mcmd = 0x00;
     private byte scmd = 0x00;
     private byte[] cmdBytes;
@@ -41,13 +36,13 @@ public class LockBLESend {
     private boolean isSend = false;      // 是否发送中
     private boolean isOpOver = false;    // 实际操作是否完成
     private int retryCount = 3;          // 重试次数
-    private int noResponseCount = 0;     // 超时次数
+    private int wakeUpCount = 0;         // 发送唤醒次数
     private boolean isReInit = false;    // 是否已被初始化
+    public int responseErrorCount = 0;   // 响应失败次数
 
     public LockBLESend(Context context, BleDevice bleDevice) {
         this.context = context;
         this.bleDevice = bleDevice;
-        loadingDialog = new LoadingDialog(context);
     }
 
     public void setBleDevice(BleDevice bleDevice) {
@@ -84,16 +79,8 @@ public class LockBLESend {
         this.scmd = scmd;
         this.cmdBytes = cmdBytes;
         if (!LockBLEManager.isConnected(bleDevice)) {
-            GeneralDialog generalDialog = new GeneralDialog(context);
-            generalDialog.setTitle("温馨提示");
-            generalDialog.setMsg("设备已断开, 重新连接");
-            generalDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
-                @Override
-                public void onClick(Dialog dialog) {
-                    connect();
-                }
-            });
-            generalDialog.show();
+            ToastCompat.show(context, "蓝牙已断开");
+            EventBus.getDefault().post(new OpenLockReConnectEvent());
             return;
         } else {
             if (!LockBLESend.isNotityReady()) {
@@ -105,7 +92,6 @@ public class LockBLESend {
             Log.d(TAG, "正在发送");
             isSend = true;
             isOpOver = false;
-            noResponseCount = 0;
             if (iswakeup) {
                 wakeup();
             } else {
@@ -118,13 +104,6 @@ public class LockBLESend {
 
 
     public void realSend() {
-        if (noResponseCount >= LockBLEManager.FAILED_COUNT) {  //超时三次 重新连接
-            clear();
-            connect();
-            retryCount = 3;
-            noResponseCount = 0;
-            return;
-        }
         retryCount--;
         if (retryCount < 0) return;
         Log.d(TAG, "直接发送真正指令" + retryCount);
@@ -137,7 +116,6 @@ public class LockBLESend {
             } else {
                 retryCount = 3;
                 if (!isOpOver) {
-                    noResponseCount++;
                     notifyErrorResponse("no response");
                 }
             }
@@ -152,50 +130,6 @@ public class LockBLESend {
     // 伪发送数据
     public void send(byte mcmd, byte scmd, byte[] cmdBytes) {
         send(mcmd, scmd, cmdBytes, true);
-    }
-
-    public void connect() {
-        loadingDialog.show("正在连接");
-        LockBLEManager.connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
-            @Override
-            public void onConnectStarted() {
-
-            }
-
-            @Override
-            public void onDisconnect(BleDevice bleDevice) {
-
-            }
-
-            @Override
-            public void onConnectSuccess(BleDevice bleDevice) {
-                LockBLESend.this.bleDevice = bleDevice;
-                LockBLEManager.setMtu(bleDevice);
-                if (CommonUtil.isActivityDestory(context)) {
-                    return;
-                }
-                loadingDialog.setIcon(R.mipmap.icon_finish);
-                loadingDialog.show("连接成功");
-                VUiKit.postDelayed(1500, new Runnable() {
-                    @Override
-                    public void run() {
-                        if (CommonUtil.isActivityDestory(context)) {
-                            return;
-                        }
-                        loadingDialog.dismiss();
-                    }
-                });
-            }
-
-            @Override
-            public void onConnectFailed() {
-                if (CommonUtil.isActivityDestory(context)) {
-                    return;
-                }
-                loadingDialog.dismiss();
-                ToastCompat.show(context, "连接失败");
-            }
-        });
     }
 
     public interface NotifyCallback {
@@ -229,7 +163,6 @@ public class LockBLESend {
         }
     }
 
-    private int wakeUpCount = 0;
 
     // 持续唤醒
     private void wakeup() {
@@ -288,8 +221,6 @@ public class LockBLESend {
 
                     @Override
                     public void onCharacteristicChanged(byte[] data) {
-                        errorCount = 0;
-
                         Log.d(TAG, "响应数据:" + LockBLEUtils.toHexString(data));
                         // 解析响应
                         LockBLEData lockBLEData = LockBLEPackage.getData(data);
@@ -347,7 +278,12 @@ public class LockBLESend {
                 }
             } else {
                 if (notifyCallback != null) {
-                    notifyCallback.onNotifySuccess(lockBLEData);
+                    if (lockBLEData.getStatus() >= 0 && lockBLEData.getStatus() <= (byte) 0x06) {
+                        notifyCallback.onNotifySuccess(lockBLEData);
+                    } else {
+                        reset();
+                        notifyCallback.onNotifyFailure(lockBLEData);
+                    }
                 }
             }
 
@@ -391,14 +327,12 @@ public class LockBLESend {
 
     //  bleDevice 出现未知问题
     private void rescan() {
-        if (errorCount > 3) {
-            Log.d(TAG, "超过最大错误次数:" + errorCount + " 重新搜索连接");
-            BleManager.getInstance().destroy();
+        if (responseErrorCount > 3) {
+            Log.d(TAG, "超过最大错误次数:" + responseErrorCount + " 重新搜索连接");
+            LockBLEManager.destory();
             EventBus.getDefault().post(new IndexReScanEvent());
         }
     }
-
-    public static int errorCount = 0;
 
     // 写入失败
     private void writeFailureResponse() {
@@ -408,7 +342,7 @@ public class LockBLESend {
         lockBLEData.setScmd(scmd);
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_WRITE_ERROR);
         processNotify(lockBLEData);
-        errorCount++;
+        responseErrorCount++;
         rescan();
     }
 
@@ -421,7 +355,7 @@ public class LockBLESend {
         lockBLEData.setOther(error.getBytes());
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_NOTIFY_TIMEOUT_ERROR);
         processNotify(lockBLEData);
-        errorCount++;
+        responseErrorCount++;
         rescan();
     }
 
@@ -433,7 +367,7 @@ public class LockBLESend {
         lockBLEData.setScmd(scmd);
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_WAKEUP_ERROR);
         processNotify(lockBLEData);
-        errorCount++;
+        responseErrorCount++;
         rescan();
     }
 
@@ -448,7 +382,7 @@ public class LockBLESend {
                     @Override
                     public void onWriteSuccess(final int current, final int total, final byte[] justWrite) {
                         Log.d(TAG, "写入数据:" + LockBLEUtils.toHexString(justWrite));
-                        errorCount = 0;
+                        responseErrorCount = 0;
                     }
 
                     @Override

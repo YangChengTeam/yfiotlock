@@ -10,7 +10,6 @@ import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
@@ -164,8 +163,7 @@ public class Connect2Activity extends BaseConnectActivity {
             valueAnimator.cancel();
             valueAnimator.end();
             showConnectedUi();
-            LockBLEManager.setBindWifi(bleDevice.getMac());
-            ConnectActivity.finish2();
+            ConnectActivity.safeFinish();
             bleGetAliDeviceName();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSend.setOpOver(true);

@@ -80,7 +80,6 @@ public class Config {
     public static final String DEVICE_SET_SAFE_URL = getBaseUrl() + "/userapp/v1.Locker/setOperationPwd" + isRsa();
 
     //开锁管理相关
-
     public static final String OPEN_LOCK_ADD_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdAdd" + isRsa();
     public static final String OPEN_LOCK_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdList" + isRsa();
     public static final String OPEN_LOCK_SINGLE_TYPE_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/pwdTypeList" + isRsa();
@@ -92,7 +91,6 @@ public class Config {
     public static final String OPEN_LOCK_DEL_PSW_URL2 = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDel2" + isRsa();
     public static final String OPEN_LOCK_MODIFY_PSW_URL2 = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpd2" + isRsa();
 
-
     //远程
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();
     public static final String LOG_OPEN_URL = getBaseUrl() + "/userapp/v1.locker_open_log/openLogList" + isRsa();
@@ -102,7 +100,6 @@ public class Config {
     public static final String LOG_LOCAL_ADD_URL = getBaseUrl() + "/userapp/v1.locker_local_log/logAdd" + isRsa();
 
     //分享设备相关
-
     public static final String GET_USER_INFO_URL = getBaseUrl() + "/userapp/v1.locker_share/getReceiveInfo" + isRsa();
     public static final String SHARE_DEVICE_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerShareAdd" + isRsa();
     public static final String SHARE_DEVICE_LIST_URL = getBaseUrl() + "/userapp/v1.locker_share/lockerShareList" + isRsa();

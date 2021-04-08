@@ -47,15 +47,11 @@ public class LockBLEManager {
     public static final int OPEN_LOCK_FINGERPRINT = 1;
     public static final int OPEN_LOCK_PASSWORD = 2;
     public static final int OPEN_LOCK_CARD = 3;
-    public static final int FAILED_COUNT = 3;
-
-    public static int connectionFailedCount = 0;
-    public static boolean isScaning = false;
 
     public static void initBle(Application context) {
         BleManager.getInstance()
                 .enableLog(true)
-                .setReConnectCount(2, 1000)
+                .setReConnectCount(5, 1000)
                 .setSplitWriteNum(LockBLEPackage.getMtu())
                 .setConnectOverTime(10000)
                 .setOperateTimeout(5000).init(context);
@@ -159,7 +155,6 @@ public class LockBLEManager {
             BleManager.getInstance().enableBluetooth();
             return;
         }
-
         // 设置搜索状态
         callbck.onScanStarted();
         // 开始搜索
@@ -172,8 +167,6 @@ public class LockBLEManager {
         BleManager.getInstance().scan(new BleScanCallback() {
             @Override
             public void onScanStarted(boolean success) {
-                callbck.onScanStarted();
-                isScaning = true;
             }
 
             @Override
@@ -190,7 +183,6 @@ public class LockBLEManager {
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
-                isScaning = false;
                 if (scanResultList.size() == 0) {
                     // 搜索完成未发现设备
                     callbck.onScanFailed();
@@ -212,9 +204,6 @@ public class LockBLEManager {
     }
 
     public static void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
-        if (++connectionFailedCount > FAILED_COUNT && isScaning) {
-            return;
-        }
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
             public void onStartConnect() {
@@ -223,37 +212,6 @@ public class LockBLEManager {
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                if (++connectionFailedCount > FAILED_COUNT) {
-                    // 连接失败多次 bleDevice 内部出现问题 重新搜索
-                    startScan(App.getApp(), new LockBLEScanCallbck() {
-                        @Override
-                        public void onScanStarted() {
-
-                        }
-
-                        @Override
-                        public void onScanning(BleDevice sbleDevice) {
-                            if (bleDevice != null && bleDevice.getMac().equals(sbleDevice.getMac())) {
-                                if (App.getApp().getConnectedDevices().get(sbleDevice.getMac()) != null) {
-                                    App.getApp().getConnectedDevices().remove(sbleDevice.getMac());
-                                }
-                                clear();
-                                connectionFailedCount = 0;
-                                EventBus.getDefault().post(bleDevice);
-                                connect(bleDevice, callbck);
-                            }
-                        }
-
-                        @Override
-                        public void onScanSuccess(List<BleDevice> scanResultList) {
-
-                        }
-
-                        @Override
-                        public void onScanFailed() {
-                        }
-                    });
-                }
                 callbck.onConnectFailed();
             }
 
@@ -270,33 +228,4 @@ public class LockBLEManager {
             }
         });
     }
-
-    public static boolean isFoundDevice(@NonNull String mac) {
-        IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
-        List<String> macList = App.getApp().getMacList();
-        if (macList != null) {
-            for (String tmac : macList) {
-                if (mac.equals(tmac)) {
-                    return true;
-                }
-            }
-        }
-        if (indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0) {
-            for (DeviceInfo deviceInfo : indexInfo.getDeviceInfos()) {
-                if (mac.equals(deviceInfo.getMacAddress())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static void setBindWifi(String mac) {
-        MMKV.defaultMMKV().putBoolean(mac + "_wifi", true);
-    }
-
-    public static boolean isBindWifi(String mac) {
-        return MMKV.defaultMMKV().getBoolean(mac + "_wifi", false);
-    }
-
 }

@@ -315,6 +315,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         super.onStop();
         if (lockBLESend != null) {
             lockBLESend.unregisterNotify();
+            lockBLESend.setNotifyCallback(null);
         }
     }
 
