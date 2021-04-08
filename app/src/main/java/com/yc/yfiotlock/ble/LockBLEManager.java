@@ -8,12 +8,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.tencent.mmkv.MMKV;
-import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
@@ -24,11 +19,6 @@ import com.yc.yfiotlock.libs.fastble.callback.BleScanCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.libs.fastble.scan.BleScanRuleConfig;
-import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.user.IndexInfo;
-import com.yc.yfiotlock.utils.CacheUtil;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
