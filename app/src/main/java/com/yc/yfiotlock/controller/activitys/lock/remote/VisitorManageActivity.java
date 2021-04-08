@@ -59,6 +59,7 @@ public class VisitorManageActivity extends BaseBackActivity {
 
     @Override
     protected void initViews() {
+        super.initViews();
         setRv();
         loadData();
     }

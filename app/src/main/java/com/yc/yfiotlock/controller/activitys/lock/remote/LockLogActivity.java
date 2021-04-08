@@ -98,7 +98,9 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         super.initViews();
         initViewPager();
 
-        bleFirstSynclog();
+        if (lockInfo.isShare()) {
+            bleFirstSynclog();
+        }
     }
 
     private void bleFirstSynclog() {
@@ -125,7 +127,6 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private void bleSynclog() {
         LockBLEEventCmd.event(getContext(), lastId);
     }
-
 
     private void initViewPager() {
         String[] stringArray = getResources().getStringArray(R.array.lock_log_array);
@@ -208,6 +209,9 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
+            if (LockBLEEventCmd.SCMD_NO_NEW_EVENT == lockBLEData.getScmd()) {
+                return;
+            }
             LogInfo logInfo = new LogInfo();
             logInfo.setLockId(lockInfo.getId());
             int n = 4;
@@ -246,40 +250,41 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
             logInfo.setAddtime(System.currentTimeMillis());
             int logType = 1;
-            if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
-                switch (lockBLEData.getScmd()) {
-                    case LockBLEEventCmd.SCMD_DOORBELL:
-                        logInfo.setName("门铃");
-                        break;
-                    case LockBLEEventCmd.SCMD_OPEN_DOOR_INFO:
-                        logInfo.setLogType(logType);
-                        openLockDao.getName(lockInfo.getId(), logInfo.getType(), logInfo.getGroupType(), logInfo.getKeyid()).subscribeOn(Schedulers.io()).subscribe(new Consumer<String>() {
-                            @Override
-                            public void accept(String s) throws Exception {
-                                localAdd(logInfo);
-                            }
-                        });
-                        return;
-                    case LockBLEEventCmd.SCMD_LOW_BATTERY:
-                        logInfo.setName("低电报警");
-                        break;
-                    case LockBLEEventCmd.SCMD_LOCAL_INIT:
-                        logInfo.setName("本地初始化");
-                        break;
-                    case LockBLEEventCmd.SCMD_LOCK_CLOSED:
-                        logInfo.setName("门锁锁定");
-                        break;
-                    case LockBLEEventCmd.SCMD_LOCK_UNCLOSED:
-                        logInfo.setName("门未锁好");
-                        break;
-                    case LockBLEEventCmd.SCMD_DOOR_UNCLOSED:
-                        logInfo.setName("门未关上");
-                        break;
-                    case LockBLEEventCmd.SCMD_AVOID_PRY_ALARM:
-                        logInfo.setName("防撬报警");
-                        logType = 2;
-                        break;
-                }
+
+            switch (lockBLEData.getScmd()) {
+                case LockBLEEventCmd.SCMD_DOORBELL:
+                    logInfo.setName("门铃");
+                    break;
+                case LockBLEEventCmd.SCMD_OPEN_DOOR_INFO:
+                    logInfo.setLogType(logType);
+                    openLockDao.getName(lockInfo.getId(), logInfo.getType(), logInfo.getGroupType(), logInfo.getKeyid()).subscribeOn(Schedulers.io()).subscribe(new Consumer<String>() {
+                        @Override
+                        public void accept(String s) {
+                            logInfo.setName(s);
+                            localAdd(logInfo);
+                        }
+                    });
+                    return;
+                case LockBLEEventCmd.SCMD_LOW_BATTERY:
+                    logInfo.setName("低电报警");
+                    logType = 2;
+                    break;
+                case LockBLEEventCmd.SCMD_LOCAL_INIT:
+                    logInfo.setName("本地初始化");
+                    break;
+                case LockBLEEventCmd.SCMD_LOCK_CLOSED:
+                    logInfo.setName("门锁锁定");
+                    break;
+                case LockBLEEventCmd.SCMD_LOCK_UNCLOSED:
+                    logInfo.setName("门未锁好");
+                    break;
+                case LockBLEEventCmd.SCMD_DOOR_UNCLOSED:
+                    logInfo.setName("门未关上");
+                    break;
+                case LockBLEEventCmd.SCMD_AVOID_PRY_ALARM:
+                    logInfo.setName("防撬报警");
+                    logType = 2;
+                    break;
             }
             logInfo.setLogType(logType);
             localAdd(logInfo);

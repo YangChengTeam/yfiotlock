@@ -110,7 +110,7 @@ public class IndexFragment extends BaseFragment {
     private ShareDeviceEngine mEngine;
 
     private void checkLockExist() {
-        mLoadingDialog.show("检验中...");
+        mLoadingDialog.show("设备校验中...");
         mEngine.checkLockExist(mDeviceInfo.getId()+"").subscribe(new Observer<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
@@ -120,7 +120,7 @@ public class IndexFragment extends BaseFragment {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "检验失败");
+                ToastCompat.show(getContext(), "校验失败");
             }
 
             @Override

@@ -175,6 +175,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                     if (info.getData() == null || info.getData().size() == 0) {
                         empty();
                         setCountInfo();
+                        // 分享设备同步网络数据到本地
                         if (lockInfo.isShare()) {
                             openLockDao.deleteOpenLockInfos(lockInfo.getId(), type, LockBLEManager.GROUP_TYPE).subscribeOn(Schedulers.io()).subscribe();
                         }
@@ -218,11 +219,12 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
     public abstract void setCountInfo();
 
+    @SuppressLint("CheckResult")
     @Override
     public void success(Object data) {
         List<OpenLockInfo> copenlockInfos = (List<OpenLockInfo>) data;
 
-        // 分享设备同步网络的数据
+        // 分享设备同步网络数据到本地
         if (lockInfo.isShare()) {
             openLockAdapter.setNewInstance(copenlockInfos);
             processData(copenlockInfos);
@@ -232,6 +234,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                     openLockDao.insertOpenLockInfos(copenlockInfos).subscribeOn(Schedulers.io()).subscribe();
                 }
             });
+            setCountInfo();
             return;
         }
 
@@ -267,6 +270,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
+        //添加、更新、删除 直接显示本地数据
         localLoadData(true);
     }
 

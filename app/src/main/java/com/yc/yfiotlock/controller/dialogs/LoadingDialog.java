@@ -49,6 +49,7 @@ public class LoadingDialog extends BaseDialog {
         if (ivIcon != null && ivIcon.getVisibility() == View.VISIBLE) {
             progressBar.setVisibility(View.VISIBLE);
             ivIcon.setVisibility(View.GONE);
+            ivIcon = null;
         }
         super.dismiss();
     }

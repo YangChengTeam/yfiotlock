@@ -209,7 +209,7 @@ public class LockBLESend {
 
     // 清除操作
     public void clear() {
-        BleManager.getInstance().destroy();
+
     }
 
     public void registerNotify() {

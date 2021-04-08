@@ -306,16 +306,15 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (lockBleSend != null) {
-            lockBleSend.clear();
-        }
+        LockBLEManager.cancelScan();
+        BleManager.getInstance().destroy();
+
         if (lockEngine != null) {
             lockEngine.cancelAll();
         }
         if (cloudHelper != null) {
             cloudHelper.unregisterNotify();
         }
-        LockBLEManager.cancelScan();
         LogUtil.msg("已清理");
     }
 
@@ -532,6 +531,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
         setCountInfo();
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -552,6 +552,18 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     // 开门方式数量
     private void loadLockOpenCountInfo() {
         setCountInfo();
+        int groupType = 1;
+        String key = "locker_count_" + lockInfo.getId() + groupType;
+        lockEngine.getOpenLockInfoCount(lockInfo.getId() + "", groupType + "").subscribe(new Action1<ResultInfo<OpenLockCountInfo>>() {
+            @Override
+            public void call(ResultInfo<OpenLockCountInfo> openLockCountInfoResultInfo) {
+                if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
+                    OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
+                    openCountTv.setText("指纹:" + countInfo.getFingerprintCount() + "   密码:" + countInfo.getPasswordCount() + "   NFC:" + countInfo.getCardCount());
+                    CacheUtil.setCache(key, countInfo);
+                }
+            }
+        });
     }
 
     @Override

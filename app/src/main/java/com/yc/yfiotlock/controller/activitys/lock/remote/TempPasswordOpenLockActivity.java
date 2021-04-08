@@ -1,7 +1,5 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
-import android.app.Dialog;
-import android.content.Intent;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,39 +8,26 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.BaseAddOpenLockActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
-import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.helper.TOTP;
 import com.yc.yfiotlock.model.bean.eventbus.CloudAddEvent;
-import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
-import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.LockEngine;
-import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.TempPwdAdapter;
-import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -92,6 +77,8 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
 
     @Override
     protected void initViews() {
+        super.initViews();
+
         setRv();
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setOnRefreshListener(() -> {

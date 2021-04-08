@@ -192,7 +192,7 @@ public class LoginActivity extends BaseActivity {
                 mLoadingDialog.dismiss();
                 break;
             case WAITING:
-                mLoadingDialog.show("正在开启一键登录...");
+                mLoadingDialog.show("开启一键登录...");
                 break;
             case CHECKING:
                 mLoadingDialog.show("检查环境中...");
