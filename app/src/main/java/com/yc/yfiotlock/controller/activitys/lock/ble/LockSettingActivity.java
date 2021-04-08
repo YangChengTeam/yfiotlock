@@ -61,7 +61,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
         deviceEngin = new DeviceEngin(this);
-        isAdmin = !lockInfo.isShare();
     }
 
     @Override
@@ -90,7 +89,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setMsg("是否删除该设备");
             generalDialog.setOnPositiveClickListener(dialog -> {
                 //是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
-                if (isBleDeviceConnected() || !isAdmin) {
+                if (isBleDeviceConnected() || lockInfo.isShare()) {
                     cloudDelDevice();
                 } else {
                     ToastCompat.show(getContext(), "蓝牙未连接");
@@ -127,8 +126,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                         UserInfoCache.setUserInfo(userInfo);
                         EventBus.getDefault().post(userInfo);
                     }
-                    if (isAdmin) {
-                        blereset();
+                    if (!lockInfo.isShare()) {
+                        bleReset();
                     } else {
                         EventBus.getDefault().post(new IndexRefreshEvent());
                         LockIndexActivity.safeFinish();
@@ -141,7 +140,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         });
     }
 
-    private void blereset() {
+    private void bleReset() {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.reset(this);
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes, true);
@@ -193,7 +192,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             }
         });
         CommonUtil.setItemDivider(getContext(), mRvSetting);
-        if (isAdmin) {
+        if (!lockInfo.isShare()) {
             headView = new SettingSoundView(this);
             headView.setDeviceMac(lockInfo.getMacAddress());
             headView.setVolume(headView.getVolume());
@@ -209,14 +208,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         }
     }
 
-    /**
-     * 是否是管理员
-     */
-    private boolean isAdmin = true;
+
 
     private void loadData() {
         List<SettingInfo> settingInfos = new ArrayList<>();
-        if (isAdmin) {
+        if (!lockInfo.isShare()) {
             settingInfos.add(new SettingInfo("报警管理", ""));
             settingInfos.add(new SettingInfo("设备信息", ""));
             settingInfos.add(new SettingInfo("设备名称", lockInfo.getName()));

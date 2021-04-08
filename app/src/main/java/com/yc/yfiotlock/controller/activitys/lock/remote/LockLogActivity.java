@@ -2,7 +2,6 @@ package com.yc.yfiotlock.controller.activitys.lock.remote;
 
 
 import android.content.Context;
-import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -16,7 +15,6 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
@@ -25,11 +23,11 @@ import com.yc.yfiotlock.controller.fragments.lock.remote.LogFragment;
 import com.yc.yfiotlock.dao.LockLogDao;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncDataEvent;
+import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncEndEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
-import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.VaryingTextSizeTitleView;
 
 import net.lucode.hackware.magicindicator.MagicIndicator;
@@ -40,7 +38,6 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.CommonNav
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerIndicator;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTitleView;
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.indicators.LinePagerIndicator;
-import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.ColorTransitionPagerTitleView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -48,12 +45,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.CompletableObserver;
-import io.reactivex.Scheduler;
 import io.reactivex.SingleObserver;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -74,6 +68,8 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private OpenLockDao openLockDao;
     private int retryCount = 3;
     private int lastId = 1;
+    private final int MAC_COUNT = 30;
+    private int syncCount = MAC_COUNT;
 
     @Override
     protected int getLayoutId() {
@@ -98,9 +94,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         super.initViews();
         initViewPager();
 
-        if (lockInfo.isShare()) {
-            bleFirstSynclog();
-        }
+        bleFirstSynclog();
     }
 
     private void bleFirstSynclog() {
@@ -125,7 +119,10 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
 
     private void bleSynclog() {
-        LockBLEEventCmd.event(getContext(), lastId);
+        byte[] cmdBytes = LockBLEEventCmd.event(getContext(), lastId);
+        if (lockBLESend != null) {
+            lockBLESend.send(LockBLEEventCmd.MCMD, (byte) LockBLEEventCmd.SCMD_LOG, cmdBytes, false);
+        }
     }
 
     private void initViewPager() {
@@ -191,6 +188,11 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             @Override
             public void onComplete() {
                 lastId++;
+                syncCount--;
+                if (syncCount == 0) {
+                    syncCount = MAC_COUNT;
+                    EventBus.getDefault().post(new LockLogSyncDataEvent());
+                }
                 EventBus.getDefault().post(logInfo);
                 bleSynclog();
             }
@@ -210,6 +212,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
             if (LockBLEEventCmd.SCMD_NO_NEW_EVENT == lockBLEData.getScmd()) {
+                EventBus.getDefault().post(new LockLogSyncEndEvent());
                 return;
             }
             LogInfo logInfo = new LogInfo();

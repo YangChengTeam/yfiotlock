@@ -142,15 +142,13 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         lockEngine = new LockEngine(this);
         cloudHelper = new CloudHelper(this);
-        if (lockInfo.isShare()) {
-            setUserUi();
-        }
+
     }
 
     /**
      * 设置用户的UI 而非管理员
      */
-    private void setUserUi() {
+    private void setShareDeviceUi() {
         mCdVm.setVisibility(View.GONE);
     }
 
@@ -179,6 +177,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 connect(bleDevice);
             }
         });
+
+        if (lockInfo.isShare()) {
+            setShareDeviceUi();
+        }
     }
 
     private void initShakeSensor() {
@@ -189,7 +191,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             public void onShakeComplete(SensorEvent event) {
                 if (LockBLEManager.isConnected(bleDevice)) {
                     // 开门
-                    bleopen();
+                    bleOpen();
                     vibrate();
                 }
             }
@@ -242,7 +244,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
         RxView.longClicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             if (LockBLEManager.isConnected(bleDevice)) {
-                bleopen();
+                bleOpen();
             }
         });
     }
@@ -330,7 +332,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         AnimatinUtil.scale(tabView2, 0.05f);
     }
 
-    private void bleopen() {
+    private void bleOpen() {
         if (isOpening) {
             return;
         }
@@ -496,6 +498,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     // 进入日志管理
     private void nav2Log() {
+        if(!LockBLEManager.isConnected(bleDevice)){
+            ToastCompat.show(this, "蓝牙未连接");
+            return;
+        }
         Intent intent = new Intent(getContext(), LockLogActivity.class);
         startActivity(intent);
     }

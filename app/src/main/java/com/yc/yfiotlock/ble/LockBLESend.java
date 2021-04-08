@@ -125,17 +125,21 @@ public class LockBLESend {
             noResponseCount = 0;
             return;
         }
+        retryCount--;
+        if (retryCount < 0) return;
         Log.d(TAG, "直接发送真正指令" + retryCount);
         op(cmdBytes);
         VUiKit.postDelayed(1000 * 2, () -> {
-            if (!isOpOver && retryCount-- > 0) {
-                realSend();
+            if (retryCount > 0) {
+                if (!isOpOver) {
+                    realSend();
+                }
             } else {
-                if (!isOpOver && retryCount <= 0) {
+                retryCount = 3;
+                if (!isOpOver) {
                     noResponseCount++;
                     notifyErrorResponse("no response");
                 }
-                retryCount = 3;
             }
         });
     }
@@ -331,9 +335,16 @@ public class LockBLESend {
                 // 密钥不对 设备重新初始化
                 isReInit = true;
             }
-        } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT) {
+        } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
+            if (lockBLEData.getMcmd() != LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT) {
+                reset();
+            }
             if (notifyCallback != null) {
-                notifyCallback.onNotifySuccess(lockBLEData);
+                if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
+                    notifyCallback.onNotifySuccess(lockBLEData);
+                } else {
+                    notifyCallback.onNotifyFailure(lockBLEData);
+                }
             }
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             isOpOver = true;

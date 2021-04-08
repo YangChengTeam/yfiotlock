@@ -7,6 +7,10 @@ import java.nio.ByteBuffer;
 public class LockBLEEventCmd extends LockBLEBaseCmd {
 
     public static final byte MCMD = (byte) 0x08;
+
+    // 子命令（0x01）
+    public static final byte SCMD_LOG = (byte) 0x01;
+
     // 无最新事件（0x00）
     public static final byte SCMD_NO_NEW_EVENT = (byte) 0x00;
     // 指纹录入次数
@@ -40,6 +44,6 @@ public class LockBLEEventCmd extends LockBLEBaseCmd {
 
     // 2.1 - 9
     public static byte[] event(Context context, int id) {
-        return op(context, (byte)0x00, new String(ByteBuffer.allocate(4).putInt(id).array()));
+        return op(context, SCMD_LOG, new String(ByteBuffer.allocate(4).putInt(id).array()));
     }
 }

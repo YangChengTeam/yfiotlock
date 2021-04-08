@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.controller.fragments.lock.remote;
 
+import android.view.View;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -8,6 +10,9 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.dao.LockLogDao;
+import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncDataEvent;
+import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncEndEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogListInfo;
@@ -16,6 +21,9 @@ import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.LogAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -31,6 +39,8 @@ public class LogFragment extends BaseFragment {
     RecyclerView recyclerView;
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
+    @BindView(R.id.tv_sync)
+    View syncView;
 
     protected LogEngine logEngine;
     protected LogAdapter logAdapter;
@@ -65,7 +75,6 @@ public class LogFragment extends BaseFragment {
             page = 1;
             localLoadData();
         });
-        localLoadData();
     }
 
 
@@ -81,7 +90,6 @@ public class LogFragment extends BaseFragment {
     }
 
     private void localLoadData() {
-        mSrlRefresh.setRefreshing(true);
         lockLogDao.loadLogInfos(lockInfo.getId(), type, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
             @Override
             public void accept(List<LogInfo> openLockInfos) throws Exception {
@@ -122,8 +130,8 @@ public class LogFragment extends BaseFragment {
     }
 
     public void sync2Local(List<LogInfo> data) {
+        lockLogDao.insertLogInfos(data).subscribeOn(Schedulers.io()).subscribe();
         if (data.size() == pageSize) {
-            lockLogDao.insertLogInfos(data).subscribeOn(Schedulers.io()).subscribe();
             page++;
             cloudLoadData();
         }
@@ -168,5 +176,19 @@ public class LogFragment extends BaseFragment {
             page--;
             logAdapter.getLoadMoreModule().loadMoreComplete();
         }
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSync(LockLogSyncDataEvent object) {
+        page = 1;
+        localLoadData();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSync(LockLogSyncEndEvent object) {
+        syncView.setVisibility(View.GONE);
+        page = 1;
+        localLoadData();
     }
 }
