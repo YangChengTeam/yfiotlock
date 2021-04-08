@@ -463,4 +463,11 @@ public class CommonUtil {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
+    public static String setPhoneSecret(String phone){
+        if(phone != null && phone.length() >= 11){
+           return phone.substring(0, 3)+ "****"+ phone.substring(7);
+        }
+        return phone;
+    }
 }

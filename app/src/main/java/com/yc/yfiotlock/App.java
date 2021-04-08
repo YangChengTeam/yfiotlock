@@ -2,7 +2,6 @@ package com.yc.yfiotlock;
 
 import android.app.Application;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.room.Room;
 
@@ -11,7 +10,6 @@ import com.baidu.mapapi.SDKInitializer;
 import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
-import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
 import com.kk.utils.VUiKit;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -24,7 +22,6 @@ import com.yc.yfiotlock.dao.AppDatabase;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
-import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.GlideEngine;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
@@ -35,8 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import rx.functions.Action1;
 
 
 public class App extends Application {
@@ -81,7 +76,7 @@ public class App extends Application {
         initHttp();
         initCommonConfig();
         initBauduMap();
-        //  cloudgetMacList();
+        cloudGetMacList();
         checkUpdate();
 
         db = Room.databaseBuilder(getApplicationContext(),
@@ -90,13 +85,13 @@ public class App extends Application {
 
     private int retryCount = 0;
 
-    private void cloudgetMacList() {
+    private void cloudGetMacList() {
         deviceEngin.getMacList().subscribe(info -> {
             if (info != null && info.getCode() == 1) {
                 macList = info.getData();
             } else {
                 if (retryCount-- > 0) {
-                    VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), this::cloudgetMacList);
+                    VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), this::cloudGetMacList);
                 }
             }
         });

@@ -127,7 +127,7 @@ public class SafePwdCreateActivity extends BaseActivity {
         mEtPwd.setFocusable(true);
         mEtPwd.setFocusableInTouchMode(true);
         mEtPwd.requestFocus();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
         imm.showSoftInput(mEtPwd, InputMethodManager.SHOW_IMPLICIT);
     }

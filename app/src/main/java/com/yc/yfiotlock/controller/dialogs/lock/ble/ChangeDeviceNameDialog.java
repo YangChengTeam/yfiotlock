@@ -99,7 +99,7 @@ public class ChangeDeviceNameDialog extends Dialog {
         super.show();
         mEtName.setText(name);
         if (mEtName.requestFocus()) {
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
             mEtName.setSelection(mEtName.getText().length());
         }
     }

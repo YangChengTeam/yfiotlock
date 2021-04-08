@@ -155,7 +155,7 @@ public class LoginDialog extends Dialog {
         mEtSmsCode.setFocusable(true);
         mEtSmsCode.setFocusableInTouchMode(true);
         mEtSmsCode.requestFocus();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
         imm.showSoftInput(mEtSmsCode, InputMethodManager.SHOW_IMPLICIT);
     }

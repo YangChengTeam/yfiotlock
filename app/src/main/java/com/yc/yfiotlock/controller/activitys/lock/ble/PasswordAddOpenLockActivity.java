@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 
 public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
+
     @BindView(R.id.iv_pass_show_status)
     ImageView statusIv;
 
@@ -60,7 +61,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
         super.initViews();
 
         if (passEt.requestFocus()) {
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         }
 
         RxView.clicks(commitBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {

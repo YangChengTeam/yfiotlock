@@ -54,7 +54,7 @@ public class DeviceNameEditActivity extends BaseBackActivity {
         mEtName.setSelection(mEtName.getText().length());
         CommonUtil.setEditTextLimit(mEtName, 20, true);
         mEtName.requestFocus();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     private void cloudModifyDeivceName() {

@@ -111,7 +111,8 @@ public class IndexFragment extends BaseFragment {
 
     private void checkLockExist() {
         mLoadingDialog.show("设备校验中...");
-        mEngine.checkLockExist(mDeviceInfo.getId()+"").subscribe(new Observer<ResultInfo<DeviceInfo>>() {
+        String msg = "校验失败";
+        mEngine.checkLockExist(mDeviceInfo.getId() + "").subscribe(new Observer<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
@@ -120,15 +121,17 @@ public class IndexFragment extends BaseFragment {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "校验失败");
+                ToastCompat.show(getContext(), msg);
             }
 
             @Override
-            public void onNext(ResultInfo<DeviceInfo> deviceInfoResultInfo) {
-                if (deviceInfoResultInfo.getData().isValid()) {
+            public void onNext(ResultInfo<DeviceInfo> info) {
+                if (info != null && info.getData() != null && info.getData().isValid()) {
                     nav2LockIndex();
                 } else {
-                    ToastCompat.show(getContext(),"设备已失效");
+                    String tmsg = msg;
+                    tmsg = info != null && info.getMsg() != null ? info.getMsg() : tmsg;
+                    ToastCompat.show(getContext(), tmsg);
                     loadData();
                 }
             }

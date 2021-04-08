@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import java.io.Serializable;
 
@@ -69,6 +70,7 @@ public class UserInfo implements Serializable {
     }
 
     public String getMobile() {
+        mobile = CommonUtil.setPhoneSecret(mobile);
         return mobile;
     }
 

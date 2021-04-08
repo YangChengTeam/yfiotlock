@@ -49,7 +49,7 @@ public class EditNameActivity extends BaseActivity {
         mEtName.setText(name);
         mEtName.setSelection(name.length());
         mEtName.requestFocus();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     @Override
