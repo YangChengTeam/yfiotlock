@@ -214,6 +214,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         openLockInfo.setName(name);
         openLockInfo.setType(type);
         openLockInfo.setAddtime(time);
+        openLockInfo.setMasterLockId(lockInfo.getId());
         openLockInfo.setLockId(lockInfo.getId());
         openLockInfo.setPassword(password);
         openLockInfo.setAddUserMobile("我");

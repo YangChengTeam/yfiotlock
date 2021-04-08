@@ -40,13 +40,9 @@ public class FingerprintOpenLockActivity extends BaseOpenLockActivity {
         });
     }
 
-    @Override
-    public void success(Object data) {
-        super.success(data);
-        setCountInfo();
-    }
 
-    private void setCountInfo() {
+    @Override
+    public void setCountInfo(){
         String key = "locker_count_" + lockInfo.getId() + groupType;
         OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
         if (countInfo != null) {

@@ -80,6 +80,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         openLockInfo.setName(name);
         openLockInfo.setType(type);
         openLockInfo.setLockId(lockInfo.getId());
+        openLockInfo.setMasterLockId(lockInfo.getId());
         openLockInfo.setPassword(password);
         openLockInfo.setAddUserMobile("我");
         openLockInfo.setGroupType(LockBLEManager.GROUP_TYPE);

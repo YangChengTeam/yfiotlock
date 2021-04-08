@@ -24,7 +24,7 @@ public class Config {
 
     public final static int SMS_CODE_LENGTH = 6;
 
-    //登陆
+    //登录
 
     public final static String ALI_FAST_LOGIN = getBaseUrl() + "/userapp/v1.User/oneClickLogin" + isRsa();
     public final static String LOGIN_SEND_CODE_URL = getBaseUrl() + "/userapp/v1.Sms/send" + isRsa();

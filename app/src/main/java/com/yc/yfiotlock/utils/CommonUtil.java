@@ -304,7 +304,7 @@ public class CommonUtil {
                         EventBus.getDefault().post(info.getData());
                     });
                 } else {
-                    ToastCompat.show(context, info == null ? "登陆失败" : info.getMsg());
+                    ToastCompat.show(context, info == null ? "登录失败" : info.getMsg());
                 }
             }
         });
@@ -386,12 +386,12 @@ public class CommonUtil {
                 .setLogBtnWidth(274)
                 .setLogBtnHeight(42)
                 .setLogBtnTextSize(15)
-                .setSwitchAccText("其他手机号码登陆")
+                .setSwitchAccText("其他手机号码登录")
                 .setSwitchAccTextColor(Color.WHITE)
                 .setSwitchAccTextSize(15)
                 .setAppPrivacyOne("《用户协议》", Config.PRIVACY_POLICY)
                 .setAppPrivacyTwo("《隐私政策》", Config.USER_AGREEMENT)
-                .setPrivacyBefore("登陆代表同意")
+                .setPrivacyBefore("登录代表同意")
                 .setCheckboxHidden(true)
                 .create();
         helper.setAuthUIConfig(uiConfig);

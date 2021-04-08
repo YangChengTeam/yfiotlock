@@ -10,7 +10,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -18,11 +17,9 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.BleUtil;
-import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;
@@ -32,7 +29,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -43,6 +39,7 @@ import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rx.Subscriber;
@@ -97,10 +94,18 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
 
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setOnRefreshListener(() -> {
-            localLoadData();
+            loadData();
         });
 
-        localLoadData();
+        loadData();
+    }
+
+    private void loadData() {
+        if (lockInfo.isShare()) {
+            cloudLoadData();
+        } else {
+            localLoadData();
+        }
     }
 
     private void setRv() {
@@ -110,6 +115,11 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     }
 
     private void localLoadData() {
+        localLoadData(false);
+    }
+
+    @SuppressLint("CheckResult")
+    private void localLoadData(boolean isOnlyLocal) {
         nodataView.setVisibility(View.GONE);
         noWifiView.setVisibility(View.GONE);
         mSrlRefresh.setRefreshing(true);
@@ -123,7 +133,14 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                         lastOpenLocks.add(openLockInfo);
                     }
                 }
+
                 openLockAdapter.setNewInstance(lastOpenLocks);
+                if (isOnlyLocal) {
+                    mSrlRefresh.setRefreshing(false);
+                    empty();
+                    return;
+                }
+
                 if (CommonUtil.isNetworkAvailable(getContext())) {
                     cloudLoadData();
                 } else {
@@ -135,6 +152,11 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     }
 
     private void cloudLoadData() {
+        if (lockInfo.isShare()) {
+            nodataView.setVisibility(View.GONE);
+            noWifiView.setVisibility(View.GONE);
+            mSrlRefresh.setRefreshing(true);
+        }
         lockEngine.getOpenLockWayList(lockInfo.getId() + "", type + "", groupType + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {
@@ -152,6 +174,10 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                 if (info != null && info.getCode() == 1) {
                     if (info.getData() == null || info.getData().size() == 0) {
                         empty();
+                        setCountInfo();
+                        if (lockInfo.isShare()) {
+                            openLockDao.deleteOpenLockInfos(lockInfo.getId(), type, LockBLEManager.GROUP_TYPE).subscribeOn(Schedulers.io()).subscribe();
+                        }
                     } else {
                         success(info.getData());
                     }
@@ -170,6 +196,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         }
     }
 
+
     @Override
     public void fail() {
         if (openLockAdapter.getData().size() == 0) {
@@ -182,13 +209,32 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             openLockInfo.setAdd(true);
             openLockInfo.setType(type);
             openLockInfo.setGroupType(LockBLEManager.GROUP_TYPE);
-            openLockInfo.setLockId(lockInfo.getId());
+            openLockInfo.setMasterLockId(lockInfo.getId());
+            if (openLockInfo.getLockId() == 0) {
+                openLockInfo.setLockId(lockInfo.getId());
+            }
         }
     }
+
+    public abstract void setCountInfo();
 
     @Override
     public void success(Object data) {
         List<OpenLockInfo> copenlockInfos = (List<OpenLockInfo>) data;
+
+        // 分享设备同步网络的数据
+        if (lockInfo.isShare()) {
+            openLockAdapter.setNewInstance(copenlockInfos);
+            processData(copenlockInfos);
+            openLockDao.deleteOpenLockInfos(lockInfo.getId(), type, LockBLEManager.GROUP_TYPE).subscribeOn(Schedulers.io()).subscribe(new Action() {
+                @Override
+                public void run() throws Exception {
+                    openLockDao.insertOpenLockInfos(copenlockInfos).subscribeOn(Schedulers.io()).subscribe();
+                }
+            });
+            return;
+        }
+
         List<OpenLockInfo> lastOpenLockInfos = new ArrayList<>();
         for (OpenLockInfo copenLockInfo : copenlockInfos) {
             boolean isExist = false;
@@ -203,30 +249,25 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             }
         }
         if (lastOpenLockInfos.size() > 0) {
-            List<OpenLockInfo> insertOpenLockInfos = new ArrayList<>();
-            for (OpenLockInfo openLockInfo : lastOpenLockInfos) {
-                if (openLockInfo.getAddUserMobile().equals("我")) {
-                    insertOpenLockInfos.add(openLockInfo);
-                }
-            }
-            processData(insertOpenLockInfos);
-            openLockDao.insertOpenLockInfos(insertOpenLockInfos).subscribeOn(Schedulers.io()).subscribe();
+            processData(lastOpenLockInfos);
+            openLockDao.insertOpenLockInfos(lastOpenLockInfos).subscribeOn(Schedulers.io()).subscribe();
             lastOpenLockInfos.addAll(openLockAdapter.getData());
             lastOpenLockInfos.sort(new Comparator<OpenLockInfo>() {
                 @Override
                 public int compare(OpenLockInfo o1, OpenLockInfo o2) {
-                    return o2.getKeyid() - o1.getKeyid();
+                    return o2.getId() - o1.getId();
                 }
             });
             openLockAdapter.setNewInstance(lastOpenLockInfos);
         }
         empty();
+        setCountInfo();
     }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
-        localLoadData();
+        localLoadData(true);
     }
 
     public static class OpenLockAdapter extends BaseExtendAdapter<OpenLockInfo> {

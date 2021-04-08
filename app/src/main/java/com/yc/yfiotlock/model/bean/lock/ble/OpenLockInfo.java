@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -11,7 +12,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.io.Serializable;
 
 
-@Entity(tableName = "open_lock_info")
+@Entity(tableName = "open_lock_info", indices = {@Index(value = {"key_id", "lock_id"}, unique = true)})
 public class OpenLockInfo implements Serializable {
     @PrimaryKey(autoGenerate = true)
     @NonNull
@@ -29,7 +30,12 @@ public class OpenLockInfo implements Serializable {
     @ColumnInfo(name = "password")
     private String password;
     @ColumnInfo(name = "lock_id")
+    @JSONField(name = "locker_id")
     private int lockId;
+
+    @ColumnInfo(name = "master_lock_id")
+    @JSONField(name = "master_locker_id")
+    private int masterLockId;
 
     @ColumnInfo(name = "add_user_mobile")
     @JSONField(name = "add_user_mobile")
@@ -151,5 +157,13 @@ public class OpenLockInfo implements Serializable {
 
     public void setAddtime(long addtime) {
         this.addtime = addtime;
+    }
+
+    public int getMasterLockId() {
+        return masterLockId;
+    }
+
+    public void setMasterLockId(int masterLockId) {
+        this.masterLockId = masterLockId;
     }
 }

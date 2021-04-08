@@ -457,6 +457,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             @Override
             public void onConnectFailed() {
                 stopAnimations();
+                LockIndexActivity.this.bleDevice = null;
                 statusTitleTv.setText("门锁连接失败");
                 opDespTv.setText("请打开手机蓝牙贴近门锁");
                 statusIv.setImageResource(R.mipmap.icon_nolink);

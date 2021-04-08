@@ -52,7 +52,7 @@ public class TempPwdAdapter extends BaseExtendAdapter<OpenLockInfo> implements L
     @Override
     protected void convert(@NotNull BaseViewHolder baseViewHolder, OpenLockInfo openLockInfo) {
         baseViewHolder.setText(R.id.tv_temp_pwd_name, openLockInfo.getPassword())
-                .setText(R.id.tv_temp_pwd_validity, "有效期：" + format(openLockInfo.getAddtime()));
+                .setText(R.id.tv_temp_pwd_validity, "过期时间：" + format(openLockInfo.getAddtime()));
         long millis = synctime - openLockInfo.getAddtime();
         int mins = (int) ((millis / (1000 * 60)));
         int textColor = getContext().getResources().getColor(R.color.blue_2F90F7);

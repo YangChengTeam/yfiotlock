@@ -124,7 +124,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     protected void localDel() {
         DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        openLockDao.deleteOpenLockInfo(lockInfo.getId(), openLockInfo.getKeyid()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+        openLockDao.deleteOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
 

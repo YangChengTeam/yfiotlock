@@ -26,9 +26,13 @@ public interface OpenLockDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertOpenLockInfo(OpenLockInfo openLockInfo);
 
-    // 获取本地列表数据
+    // 获取名称
     @Query("SELECT name FROM open_lock_info where lock_id=:lockId and type=:type and is_delete=0 and group_type =:groupType and key_id=:keyid")
     Single<String> getName(int lockId, int type, int groupType, int keyid);
+
+    // 删除类型本地数据
+    @Query("delete from open_lock_info where lock_id=:lockId and type=:type and group_type=:groupType and is_add=1 and is_delete=0")
+    Completable deleteOpenLockInfos(int lockId, int type, int groupType);
 
     // 删除一条本地数据
     @Query("delete from open_lock_info where lock_id=:lockId and key_id=:keyid and is_delete=1")
@@ -51,19 +55,19 @@ public interface OpenLockDao {
     Completable updateOpenLockInfo(int lockId, int keyid, String name);
 
     // 获取本地列表数据
-    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and type=:type and group_type =:groupType order by key_id desc")
+    @Query("SELECT * FROM open_lock_info where master_lock_id=:lockId and type=:type and group_type =:groupType order by id desc")
     Single<List<OpenLockInfo>> loadOpenLockInfos(int lockId, int type, int groupType);
 
     // 获取需要同步到云端的数据
-    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and is_add=0 and group_type=:groupType")
+    @Query("SELECT * FROM open_lock_info where master_lock_id=:lockId and is_add=0 and group_type=:groupType")
     Single<List<OpenLockInfo>> loadNeedAddOpenLockInfos(int lockId, int groupType);
 
     // 获取需要删除的云端数据
-    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and is_delete=1 and group_type=:groupType")
+    @Query("SELECT * FROM open_lock_info where master_lock_id=:lockId and is_delete=1 and group_type=:groupType")
     Single<List<OpenLockInfo>> loadNeedDelOpenLockInfos(int lockId, int groupType);
 
     // 获取需要更新的云端数据
-    @Query("SELECT * FROM open_lock_info where lock_id=:lockId and is_update=1 and group_type=:groupType")
+    @Query("SELECT * FROM open_lock_info where master_lock_id=:lockId and is_update=1 and group_type=:groupType")
     Single<List<OpenLockInfo>> loadNeedUpdateOpenLockInfos(int lockId, int groupType);
 
 }

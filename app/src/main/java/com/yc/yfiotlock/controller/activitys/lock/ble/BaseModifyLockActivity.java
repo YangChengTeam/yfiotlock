@@ -99,8 +99,7 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
 
     protected void localEdit() {
         String name = nameEt.getText().toString();
-        DeviceInfo deviceInfo = LockIndexActivity.getInstance().getLockInfo();
-        openLockDao.updateOpenLockInfo(deviceInfo.getId(), openLockInfo.getKeyid(), name).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+        openLockDao.updateOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid(), name).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
 

@@ -1,13 +1,11 @@
 package com.yc.yfiotlock.helper;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.dao.LockLogDao;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.model.bean.eventbus.CloudAddEvent;
@@ -23,7 +21,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import io.reactivex.schedulers.Schedulers;
-import rx.Subscriber;
 import rx.functions.Action1;
 
 public class CloudHelper {

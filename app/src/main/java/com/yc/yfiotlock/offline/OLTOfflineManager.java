@@ -123,7 +123,7 @@ public class OLTOfflineManager {
 
 
     private void autoExceOfflineDatas(DeviceInfo deviceInfo) {
-        lockLogDao.loadNeedAddLogInfos(deviceInfo.getId()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
+        lockLogDao.loadNeedAddLogInfos(deviceInfo.getId()).subscribeOn(Schedulers.io()).subscribe(new Consumer<List<LogInfo>>() {
             @Override
             public void accept(List<LogInfo> logInfos) throws Exception {
                 loopLogAdd(logInfos, 0);
@@ -132,21 +132,21 @@ public class OLTOfflineManager {
     }
 
     private void autoExceOfflineDatas(DeviceInfo deviceInfo, int type) {
-        openLockDao.loadNeedAddOpenLockInfos(deviceInfo.getId(), type).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<OpenLockInfo>>() {
+        openLockDao.loadNeedAddOpenLockInfos(deviceInfo.getId(), type).subscribeOn(Schedulers.io()).subscribe(new Consumer<List<OpenLockInfo>>() {
             @Override
             public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
                 loopAdd(openLockInfos, 0);
             }
         });
 
-        openLockDao.loadNeedDelOpenLockInfos(deviceInfo.getId(), type).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<OpenLockInfo>>() {
+        openLockDao.loadNeedDelOpenLockInfos(deviceInfo.getId(), type).subscribeOn(Schedulers.io()).subscribe(new Consumer<List<OpenLockInfo>>() {
             @Override
             public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
                 loopDel(openLockInfos, 0);
             }
         });
 
-        openLockDao.loadNeedUpdateOpenLockInfos(deviceInfo.getId(), type).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<OpenLockInfo>>() {
+        openLockDao.loadNeedUpdateOpenLockInfos(deviceInfo.getId(), type).subscribeOn(Schedulers.io()).subscribe(new Consumer<List<OpenLockInfo>>() {
             @Override
             public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
                 loopUpdate(openLockInfos, 0);

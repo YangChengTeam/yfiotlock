@@ -35,6 +35,6 @@ public interface LockLogDao {
     Single<List<LogInfo>> loadNeedAddLogInfos(int lockId);
 
     // 更新已被添加
-    @Query("update log_info set is_add=:isAdd where lock_id=:lockId and event_id=:event_id")
-    Completable updateAddLogInfo(int lockId, int event_id, boolean isAdd);
+    @Query("update log_info set is_add=:isAdd where lock_id=:lockId and event_id=:eventId")
+    Completable updateAddLogInfo(int lockId, int eventId, boolean isAdd);
 }

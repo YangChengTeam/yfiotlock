@@ -150,7 +150,7 @@ public class LoginActivity extends BaseActivity {
 
     private void onSmsCodeLogin(String code, String phone) {
 
-        mLoadingDialog.show("登陆中...");
+        mLoadingDialog.show("登录中...");
         mLoginEngin.smsCodeLogin(phone, code).subscribe(new Observer<ResultInfo<UserInfo>>() {
             @Override
             public void onCompleted() {
@@ -171,7 +171,7 @@ public class LoginActivity extends BaseActivity {
                     startActivity(new Intent(getContext(), MainActivity.class));
                     EventBus.getDefault().post(info.getData());
                 } else {
-                    ToastCompat.show(getContext(), info == null ? "登陆失败" : info.getMsg());
+                    ToastCompat.show(getContext(), info == null ? "登录失败" : info.getMsg());
                 }
             }
         });

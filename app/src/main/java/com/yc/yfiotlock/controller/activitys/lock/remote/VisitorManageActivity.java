@@ -15,6 +15,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -31,10 +32,8 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class VisitorManageActivity extends BaseActivity {
+public class VisitorManageActivity extends BaseBackActivity {
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.visitor_manage_recycler_view)
     RecyclerView recyclerView;
 
@@ -60,7 +59,6 @@ public class VisitorManageActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> onBackPressed());
         setRv();
         loadData();
     }
