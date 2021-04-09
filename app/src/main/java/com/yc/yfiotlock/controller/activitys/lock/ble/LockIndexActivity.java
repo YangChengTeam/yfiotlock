@@ -158,7 +158,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (bleDevice == null) {
             scan();
         } else {
-            if (LockBLEManager.isConnected(bleDevice)) {
+            if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 initSends();
                 setConnectedInfo();
             }
@@ -185,7 +185,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         shakeSensor.setShakeListener(new ShakeSensor.OnShakeListener() {
             @Override
             public void onShakeComplete(SensorEvent event) {
-                if (LockBLEManager.isConnected(bleDevice)) {
+                if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                     // 开门
                     bleOpen();
                     vibrate();
@@ -223,7 +223,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         });
 
         RxView.clicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (LockBLEManager.isConnected(bleDevice)) {
+            if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 return;
             }
 
@@ -243,7 +243,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         });
 
         RxView.longClicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (LockBLEManager.isConnected(bleDevice)) {
+            if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 bleOpen();
             }
         });
@@ -288,7 +288,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         initShakeSensor();
         registerNotify();
         // 重新连接
-        if (bleDevice != null && !LockBLEManager.isConnected(bleDevice)) {
+        if (bleDevice != null && !LockBLEManager.getInstance().isConnected(bleDevice)) {
             reconnect();
         }
     }
@@ -303,8 +303,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LockBLEManager.cancelScan();
-        LockBLEManager.destory();
+
+        if(lockBleSend != null){
+            lockBleSend.clear();
+        }
 
         if (lockEngine != null) {
             lockEngine.cancelAll();
@@ -342,10 +344,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         }
     }
 
-
     private void scan() {
-        LockBLEManager.initConfig2(lockInfo.getMacAddress());
-        LockBLEManager.scan(this, new LockBLEManager.LockBLEScanCallbck() {
+        LockBLEManager.getInstance().initConfig2(lockInfo.getMacAddress());
+        LockBLEManager.getInstance().scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override
             public void onScanStarted() {
                 // 设置搜索状态
@@ -359,12 +360,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             @Override
             public void onScanning(BleDevice bleDevice) {
                 // 搜索到后开始连接
-                LogUtil.msg(bleDevice.getMac());
                 if (!bleDevice.getMac().equals(lockInfo.getMacAddress())) {
                     return;
                 }
                 connect(bleDevice);
-                LockBLEManager.cancelScan();
+                LockBLEManager.getInstance().stopScan();
             }
 
             @Override
@@ -405,7 +405,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     // 连接蓝牙
     private void connect(final BleDevice bleDevice) {
         isOpening = false;
-        LockBLEManager.connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
+        LockBLEManager.getInstance().connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
             @Override
             public void onConnectStarted() {
                 setConnectingInfo();
@@ -425,7 +425,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             public void onConnectSuccess(BleDevice bleDevice) {
                 LockIndexActivity.this.bleDevice = bleDevice;
                 initSends();
-
 
                 // 设置连接成功状态
                 setConnectedInfo();
@@ -569,7 +568,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             // 恢复状态  我们目前版本使用机械反锁，所以门开关的状态事件目前版本是没有的。
             VUiKit.postDelayed(5000, () -> {
                 isOpening = false;
-                if (LockBLEManager.isConnected(bleDevice)) {
+                if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                     setConnectedInfo();
                 }
             });
@@ -580,7 +579,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_OPEN) {
             isOpening = false;
-            if (LockBLEManager.isConnected(bleDevice)) {
+            if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 setConnectedInfo();
             }
         }

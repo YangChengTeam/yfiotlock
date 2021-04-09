@@ -204,7 +204,9 @@ public abstract class BleScanPresenter implements BluetoothAdapter.LeScanCallbac
 
     public final void notifyScanStopped() {
         mHandling = false;
-        mHandlerThread.quit();
+        if(mHandlerThread != null){
+            mHandlerThread.quit();
+        }
         removeHandlerMsg();
         mMainHandler.post(new Runnable() {
             @Override

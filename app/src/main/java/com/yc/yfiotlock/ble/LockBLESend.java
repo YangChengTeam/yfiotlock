@@ -49,6 +49,9 @@ public class LockBLESend {
     public void setBleDevice(BleDevice bleDevice) {
         this.bleDevice = bleDevice;
     }
+    public BleDevice getBleDevice() {
+        return bleDevice;
+    }
 
     public boolean isOpOver() {
         return isOpOver;
@@ -63,7 +66,7 @@ public class LockBLESend {
     }
 
     public boolean isConnected() {
-        return LockBLEManager.isConnected(bleDevice);
+        return LockBLEManager.getInstance().isConnected(bleDevice);
     }
 
     public void setMcmd(byte mcmd) {
@@ -79,7 +82,7 @@ public class LockBLESend {
         this.mcmd = mcmd;
         this.scmd = scmd;
         this.cmdBytes = cmdBytes;
-        if (!LockBLEManager.isConnected(bleDevice)) {
+        if (!LockBLEManager.getInstance().isConnected(bleDevice)) {
             ToastCompat.show(App.getApp(), "蓝牙已断开");
             EventBus.getDefault().post(new OpenLockReConnectEvent());
             return;
@@ -135,6 +138,7 @@ public class LockBLESend {
 
     public interface NotifyCallback {
         void onNotifySuccess(LockBLEData lockBLEData);
+
         void onNotifyFailure(LockBLEData lockBLEData);
     }
 
@@ -147,7 +151,7 @@ public class LockBLESend {
 
     // 清除操作
     public void clear() {
-
+        LockBLEManager.getInstance().disConnect(bleDevice);
     }
 
     public void registerNotify() {
@@ -329,7 +333,7 @@ public class LockBLESend {
     private void rescan() {
         if (responseErrorCount > 3) {
             Log.d(TAG, "超过最大错误次数:" + responseErrorCount + " 重新搜索连接");
-            LockBLEManager.destory();
+            LockBLEManager.getInstance().destory();
             EventBus.getDefault().post(new ReScanEvent());
         }
     }

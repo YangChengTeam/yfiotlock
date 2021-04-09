@@ -92,9 +92,8 @@ public class DeviceListActivity extends BaseAddActivity {
         });
     }
 
-
     private void connect(BleDevice bleDevice) {
-        LockBLEManager.connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
+        LockBLEManager.getInstance().connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
             @Override
             public void onConnectStarted() {
                 mLoadingDialog.show("正在连接");

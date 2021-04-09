@@ -63,12 +63,11 @@ public class App extends Application {
         Reflection.unseal(this);
         app = this;
         deviceEngin = new DeviceEngin(this);
-        LockBLEManager.initBle(this);
+        LockBLEManager.getInstance().initBle(this);
         initSdk();
         initHttp();
         initCommonConfig();
         initBauduMap();
-        cloudGetMacList();
         checkUpdate();
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "lock").build();

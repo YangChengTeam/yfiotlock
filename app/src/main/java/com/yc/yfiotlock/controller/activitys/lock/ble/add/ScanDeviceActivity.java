@@ -5,6 +5,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -71,8 +73,8 @@ public class ScanDeviceActivity extends BaseAddActivity {
         if (deviceHashMap == null) {
             deviceHashMap = new HashMap<>();
         }
-        LockBLEManager.initConfig();
-        LockBLEManager.scan(this, new LockBLEManager.LockBLEScanCallbck() {
+        LockBLEManager.getInstance().initConfig();
+        LockBLEManager.getInstance().scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override
             public void onScanStarted() {
                 setStartInfo();
@@ -80,9 +82,6 @@ public class ScanDeviceActivity extends BaseAddActivity {
 
             @Override
             public void onScanning(BleDevice bleDevice) {
-                if (deviceHashMap.get(bleDevice.getMac()) != null || !LockBLEManager.DEVICE_NAME.equals(bleDevice.getName() + "")) {
-                    return;
-                }
                 if (!LockBLEUtils.isFoundDevice(bleDevice.getMac())) {
                     if (!isFoundOne) {
                         isFoundOne = true;
@@ -122,14 +121,12 @@ public class ScanDeviceActivity extends BaseAddActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LockBLEManager.cancelScan();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (isNav2List) {
-            LockBLEManager.cancelScan();
             setFailInfo();
             isNav2List = false;
         }
@@ -165,5 +162,18 @@ public class ScanDeviceActivity extends BaseAddActivity {
         intent.putExtra("bleDevice", bleDevice);
         intent.putExtra("family", familyInfo);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // GPS授权回调
+        if (requestCode == LockBLEManager.REQUEST_GPS) {
+            if (LockBLEUtils.checkGPSIsOpen(this)) {
+                scan();
+            }
+        }
+        // 处理授权回调
+        mPermissionHelper.onRequestPermissionsResult(this, requestCode);
     }
 }

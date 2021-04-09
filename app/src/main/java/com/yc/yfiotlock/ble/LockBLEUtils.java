@@ -15,12 +15,9 @@ import java.util.List;
 
 public class LockBLEUtils {
     private static String key = "12345678";
-
     public static void setKey(String key) {
         LockBLEUtils.key = key;
     }
-
-    public static native int crc16(byte[] bytes, int length);
 
     public static int crc16(byte[] data) {
         byte[] crc16_h = {
@@ -132,6 +129,10 @@ public class LockBLEUtils {
         if (locationManager == null)
             return false;
         return locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
+    }
+
+    public static String genKey(DeviceInfo lockInfo) {
+        return lockInfo.getMacAddress();
     }
 
 }

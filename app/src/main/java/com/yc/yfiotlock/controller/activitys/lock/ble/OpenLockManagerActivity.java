@@ -69,7 +69,7 @@ public class OpenLockManagerActivity extends BaseBackActivity {
         openLockAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
-                if (!LockBLEManager.isConnected(LockIndexActivity.getInstance().getBleDevice())) {
+                if (!LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
                     ToastCompat.show(getContext(), "蓝牙未连接");
                     return;
                 }

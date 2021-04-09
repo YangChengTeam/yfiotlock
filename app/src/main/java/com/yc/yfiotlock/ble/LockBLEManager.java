@@ -26,9 +26,11 @@ import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class LockBLEManager {
+public class LockBLEManager  {
     public static final String DEVICE_NAME = "YF-L1";
     public static final int OP_INTERVAL_TIME = 200;
     public static final String PIN_CODE = "123456";
@@ -44,12 +46,21 @@ public class LockBLEManager {
     public static final int OPEN_LOCK_PASSWORD = 2;
     public static final int OPEN_LOCK_CARD = 3;
 
-    public static boolean isConnecting = false;
-    public static BleStateReceiver bleStateReceiver;
+    private LockBLEManager() {
+    }
 
-    public static void initBle(Application context) {
+    private static LockBLEManager instance = new LockBLEManager();
+
+    public static LockBLEManager getInstance() {
+        return instance;
+    }
+
+    private Map<String, BleDevice> scannedBleDevices = new HashMap<>();
+    private boolean isConnecting = false;
+    private BleStateReceiver bleStateReceiver;
+
+    public void initBle(Application context) {
         BleManager.getInstance()
-                .enableLog(true)
                 .setReConnectCount(5, 1000)
                 .setSplitWriteNum(LockBLEPackage.getMtu())
                 .setConnectOverTime(10000 * 5)
@@ -57,7 +68,7 @@ public class LockBLEManager {
         initBleState(context);
     }
 
-    public static void initConfig() {
+    public void initConfig() {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
                 .setDeviceName(false, DEVICE_NAME)
@@ -65,11 +76,8 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
-    public static void cancelScan() {
-        BleManager.getInstance().cancelScan();
-    }
 
-    public static void initConfig2(String mac) {
+    public void initConfig2(String mac) {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
                 .setDeviceMac(mac)
@@ -77,19 +85,23 @@ public class LockBLEManager {
         BleManager.getInstance().initScanRule(builder.build());
     }
 
-    public static void clear() {
+    public void clear() {
         BleManager.getInstance().disconnectAllDevice();
     }
 
-    public static boolean isConnected(BleDevice bleDevice) {
+    public boolean isConnected(BleDevice bleDevice) {
         return BleManager.getInstance().isConnected(bleDevice);
     }
 
-    public static void destory() {
+    public void disConnect(BleDevice bleDevice) {
+        BleManager.getInstance().disconnect(bleDevice);
+    }
+
+    public void destory() {
         BleManager.getInstance().destroy();
     }
 
-    public static void setMtu(BleDevice bleDevice) {
+    public void setMtu(BleDevice bleDevice) {
         // 设置mtu
         BleManager.getInstance().setMtu(bleDevice, LockBLEPackage.getMtu(), new BleMtuChangedCallback() {
             @Override
@@ -106,8 +118,6 @@ public class LockBLEManager {
         });
     }
 
-    public static final int REQUEST_GPS = 4;
-
     public interface LockBLEScanCallbck {
         void onScanStarted();
 
@@ -117,8 +127,13 @@ public class LockBLEManager {
 
         void onScanFailed();
     }
+    public static final int REQUEST_GPS = 4;
 
-    public static void scan(BaseActivity activity, LockBLEScanCallbck callbck) {
+    public void stopScan(){
+        BleManager.getInstance().cancelScan();
+    }
+
+    public void scan(BaseActivity activity, LockBLEScanCallbck callbck) {
         PermissionHelper mPermissionHelper = activity.getPermissionHelper();
         mPermissionHelper.checkAndRequestPermission(activity, new PermissionHelper.OnRequestPermissionsCallback() {
             @Override
@@ -138,7 +153,7 @@ public class LockBLEManager {
 
                     return;
                 }
-                startScan(activity, callbck);
+                startScan(callbck);
             }
 
             @Override
@@ -149,12 +164,13 @@ public class LockBLEManager {
     }
 
     // 蓝牙状态监听
-    private static void initBleState(Context context) {
+    private void initBleState(Context context) {
         bleStateReceiver = new BleStateReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         context.registerReceiver(bleStateReceiver, intentFilter);
     }
+
     private static class BleStateReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -189,7 +205,7 @@ public class LockBLEManager {
 
 
     // 开始扫描
-    private static void startScan(Context context, LockBLEScanCallbck callbck) {
+    private void startScan(LockBLEScanCallbck callbck) {
         if (!BleManager.getInstance().isBlueEnable()) {
             BleManager.getInstance().enableBluetooth();
             return;
@@ -198,12 +214,9 @@ public class LockBLEManager {
         callbck.onScanStarted();
 
         // 开始搜索
-        List<BleDevice> bleDevices = BleManager.getInstance().getAllConnectedDevice();
-        if (bleDevices != null) {
-            for (BleDevice bleDevice : bleDevices) {
-                callbck.onScanning(bleDevice);
-            }
-        }
+        scannedBleDevices.forEach((key, value) -> {
+            callbck.onScanning(value);
+        });
 
         BleManager.getInstance().scan(new BleScanCallback() {
             @Override
@@ -213,18 +226,20 @@ public class LockBLEManager {
             @Override
             public void onLeScan(BleDevice bleDevice) {
                 super.onLeScan(bleDevice);
-                callbck.onScanning(bleDevice);
             }
 
             @Override
             public void onScanning(BleDevice bleDevice) {
                 if (bleDevice == null) return;
-                callbck.onScanning(bleDevice);
+                if (scannedBleDevices.get(bleDevice.getMac()) == null) {
+                    callbck.onScanning(bleDevice);
+                }
+                scannedBleDevices.put(bleDevice.getMac(), bleDevice);
             }
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
-                if (scanResultList.size() == 0) {
+                if (scanResultList.size() == 0 && scannedBleDevices.size() == 0) {
                     // 搜索完成未发现设备
                     callbck.onScanFailed();
                 } else {
@@ -244,9 +259,12 @@ public class LockBLEManager {
         void onConnectFailed();
     }
 
-    public static void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
+    private LockBLEConnectCallbck connectCallbck;
+
+    public void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
         if (isConnecting) return;
         isConnecting = true;
+        this.connectCallbck = callbck;
         callbck.onConnectStarted();
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
