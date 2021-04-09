@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleNotifyCallback;
@@ -79,7 +80,7 @@ public class LockBLESend {
         this.scmd = scmd;
         this.cmdBytes = cmdBytes;
         if (!LockBLEManager.isConnected(bleDevice)) {
-            ToastCompat.show(context, "蓝牙已断开");
+            ToastCompat.show(App.getApp(), "蓝牙已断开");
             EventBus.getDefault().post(new OpenLockReConnectEvent());
             return;
         } else {

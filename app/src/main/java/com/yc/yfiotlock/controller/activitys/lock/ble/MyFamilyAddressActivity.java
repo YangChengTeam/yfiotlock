@@ -11,6 +11,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
@@ -21,16 +22,14 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 
-public class MyFamilyAddressActivity extends BaseActivity {
+public class MyFamilyAddressActivity extends BaseBackActivity {
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.et_family_address)
     EditText editText;
     @BindView(R.id.tv_family_address_sure)
     TextView tvSure;
 
-    private FamilyInfo familyInfo = new FamilyInfo();
+    private FamilyInfo familyInfo;
 
 
     public static void start(Context context, FamilyInfo familyInfo) {
@@ -45,16 +44,21 @@ public class MyFamilyAddressActivity extends BaseActivity {
     }
 
     @Override
-    protected void initViews() {
-        mBnbTitle.setBackListener(view -> onBackPressed());
+    protected void initVars() {
+        super.initVars();
+        familyInfo = (FamilyInfo) getIntent().getSerializableExtra("family_info");
+        if(familyInfo == null){
+            familyInfo = new FamilyInfo();
+        }
+    }
 
-        Serializable serializable = getIntent().getSerializableExtra("family_info");
-        if (serializable instanceof FamilyInfo) {
-            this.familyInfo = (FamilyInfo) serializable;
-            if (!TextUtils.isEmpty(familyInfo.getDetailAddress())) {
-                editText.setText(familyInfo.getDetailAddress());
-                editText.setSelection(familyInfo.getDetailAddress().length());
-            }
+    @Override
+    protected void initViews() {
+        super.initViews();
+
+        if (!TextUtils.isEmpty(familyInfo.getDetailAddress())) {
+            editText.setText(familyInfo.getDetailAddress());
+            editText.setSelection(familyInfo.getDetailAddress().length());
         }
 
         RxView.clicks(tvSure).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {

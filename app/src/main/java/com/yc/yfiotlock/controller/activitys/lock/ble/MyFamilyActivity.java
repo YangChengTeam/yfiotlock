@@ -76,7 +76,7 @@ public class MyFamilyActivity extends BaseBackActivity {
         });
 
         RxView.clicks(stvAdd).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            MyFamilyAddActivity.start(MyFamilyActivity.this, null);
+            MyFamilyAddActivity.start(getContext());
         });
 
         mSrlRefresh.setRefreshing(true);
@@ -91,7 +91,7 @@ public class MyFamilyActivity extends BaseBackActivity {
         myFamilyAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull @NotNull BaseQuickAdapter<?, ?> adapter, @NonNull @NotNull View view, int position) {
-                MyFamilyAddActivity.start(MyFamilyActivity.this, myFamilyAdapter.getItem(position));
+                MyFamilyModifyActivity.start(getContext(), myFamilyAdapter.getItem(position));
             }
         });
 

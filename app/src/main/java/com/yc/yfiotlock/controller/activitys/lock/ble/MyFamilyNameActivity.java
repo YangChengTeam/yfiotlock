@@ -12,6 +12,7 @@ import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 
@@ -22,17 +23,14 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 
-public class MyFamilyNameActivity extends BaseActivity {
+public class MyFamilyNameActivity extends BaseBackActivity {
 
-
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.et_family_name)
     EditText editText;
     @BindView(R.id.tv_family_name_sure)
     TextView tvSure;
 
-    private FamilyInfo familyInfo = new FamilyInfo();
+    private FamilyInfo familyInfo;
 
     public static void start(Context context, FamilyInfo familyInfo) {
         Intent intent = new Intent(context, MyFamilyNameActivity.class);
@@ -46,17 +44,17 @@ public class MyFamilyNameActivity extends BaseActivity {
     }
 
     @Override
-    protected void initViews() {
-        mBnbTitle.setBackListener(view -> onBackPressed());
-
-        Serializable serializable = getIntent().getSerializableExtra("family_info");
-        if (serializable instanceof FamilyInfo) {
-            this.familyInfo = (FamilyInfo) serializable;
-            if (!TextUtils.isEmpty(familyInfo.getName())) {
-                editText.setText(familyInfo.getName());
-                editText.setSelection(familyInfo.getName().length());
-            }
+    protected void initVars() {
+        super.initVars();
+        familyInfo = (FamilyInfo) getIntent().getSerializableExtra("family_info");
+        if(familyInfo == null){
+            familyInfo = new FamilyInfo();
         }
+    }
+
+    @Override
+    protected void initViews() {
+        super.initViews();
 
         RxView.clicks(tvSure).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             String trim = editText.getText().toString().trim();

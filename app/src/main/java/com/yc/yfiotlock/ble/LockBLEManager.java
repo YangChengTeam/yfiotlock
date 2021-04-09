@@ -38,6 +38,8 @@ public class LockBLEManager {
     public static final int OPEN_LOCK_PASSWORD = 2;
     public static final int OPEN_LOCK_CARD = 3;
 
+    public static boolean isConnecting = false;
+
     public static void initBle(Application context) {
         BleManager.getInstance()
                 .enableLog(true)
@@ -75,7 +77,7 @@ public class LockBLEManager {
         return BleManager.getInstance().isConnected(bleDevice);
     }
 
-    public static void destory(){
+    public static void destory() {
         BleManager.getInstance().destroy();
     }
 
@@ -196,6 +198,8 @@ public class LockBLEManager {
     }
 
     public static void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
+        if (isConnecting) return;
+        isConnecting = true;
         callbck.onConnectStarted();
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
@@ -205,11 +209,13 @@ public class LockBLEManager {
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
+                isConnecting = false;
                 callbck.onConnectFailed();
             }
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                isConnecting = false;
                 callbck.onConnectSuccess(bleDevice);
                 setMtu(bleDevice);
             }

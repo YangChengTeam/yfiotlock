@@ -133,6 +133,12 @@ public class ScanDeviceActivity extends BaseAddActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LockBLEManager.cancelScan();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (isNav2List) {
@@ -166,7 +172,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
     }
 
     private void nav2List(BleDevice bleDevice) {
-        if(isNav2List) return;
+        if (isNav2List) return;
         isNav2List = true;
         Intent intent = new Intent(this, DeviceListActivity.class);
         intent.putExtra("bleDevice", bleDevice);

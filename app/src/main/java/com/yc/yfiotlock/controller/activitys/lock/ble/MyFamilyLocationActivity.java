@@ -33,33 +33,22 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.utils.MapUtil;
 import com.yc.yfiotlock.view.adapters.LocationAdapter;
-import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 
-public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.OnMapStatusChangeListener, OnGetGeoCoderResultListener {
+public class MyFamilyLocationActivity extends BaseBackActivity implements BaiduMap.OnMapStatusChangeListener, OnGetGeoCoderResultListener {
 
-    public static void start(Context context, FamilyInfo familyInfo) {
-        Intent intent = new Intent(context, MyFamilyLocationActivity.class);
-        if (familyInfo != null) {
-            intent.putExtra("family_info", familyInfo);
-        }
-        context.startActivity(intent);
-    }
 
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.mapview_location)
     MapView mMapView;
     @BindView(R.id.poi_list_location)
@@ -74,21 +63,15 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
     private LocationClient locationClient;
     private boolean isInitMap;
 
-    private FamilyInfo familyInfo = new FamilyInfo();
+    private FamilyInfo familyInfo;
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
-        if (locationClient != null) {
-            locationClient.stop();
+    public static void start(Context context, FamilyInfo familyInfo) {
+        Intent intent = new Intent(context, MyFamilyLocationActivity.class);
+        if (familyInfo != null) {
+            intent.putExtra("family_info", familyInfo);
         }
-        if (mGeoCoder != null) {
-            mGeoCoder.destroy();
-        }
-        if (mBaiduMap != null) {
-            mBaiduMap.clear();
-        }
+        context.startActivity(intent);
     }
 
     @Override
@@ -97,15 +80,19 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
     }
 
     @Override
-    protected void initViews() {
-        mBnbTitle.setBackListener(view -> onBackPressed());
-
-        Serializable serializable = getIntent().getSerializableExtra("family_info");
-        if (serializable instanceof FamilyInfo) {
-            this.familyInfo = (FamilyInfo) serializable;
+    protected void initVars() {
+        super.initVars();
+        familyInfo = (FamilyInfo) getIntent().getSerializableExtra("family_info");
+        if(familyInfo == null){
+            familyInfo = new FamilyInfo();
         }
+    }
 
-        initRecyclerView();
+
+    @Override
+    protected void initViews() {
+        super.initViews();
+        setRv();
 
         if (familyInfo.getLongitude() <= 0 || familyInfo.getLatitude() <= 0) {
             initLocationOption();
@@ -114,7 +101,7 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
         }
     }
 
-    private void initRecyclerView() {
+    private void setRv() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -371,6 +358,21 @@ public class MyFamilyLocationActivity extends BaseActivity implements BaiduMap.O
         }
         if (null != locationAdapter) {
             locationAdapter.setNewInstance(poiInfos);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (locationClient != null) {
+            locationClient.stop();
+        }
+        if (mGeoCoder != null) {
+            mGeoCoder.destroy();
+        }
+        if (mBaiduMap != null) {
+            mBaiduMap.clear();
         }
     }
 }

@@ -148,6 +148,9 @@
             android:name=".controller.activitys.lock.ble.MyFamilyAddActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity
+            android:name=".controller.activitys.lock.ble.MyFamilyModifyActivity"
+            android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
+        <activity
             android:name=".controller.activitys.lock.ble.MyFamilyAddressActivity"
             android:configChanges="orientation|keyboardHidden|navigation|screenSize" />
         <activity

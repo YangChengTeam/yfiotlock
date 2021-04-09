@@ -6,7 +6,7 @@
     android:background="@color/grayBg">
 
     <com.yc.yfiotlock.view.widgets.BackNavBar
-        android:id="@+id/bnb_title"
+        android:id="@+id/view_nav_bar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -21,7 +21,7 @@
         android:textColor="#ff999999"
         android:textSize="13sp"
         app:des="请输入家庭名称"
-        app:layout_constraintTop_toBottomOf="@id/bnb_title"
+        app:layout_constraintTop_toBottomOf="@id/view_nav_bar"
         app:text="家庭名称" />
 
     <com.yc.yfiotlock.view.widgets.RightNextTextView

@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+
 import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
@@ -13,17 +15,17 @@ import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.eventbus.FamilyAddEvent;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.engin.HomeEngine;
-import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.RightNextTextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
@@ -31,10 +33,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import rx.Observer;
 
-public class MyFamilyAddActivity extends BaseActivity {
-
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
+public class MyFamilyAddActivity extends BaseBackActivity {
     @BindView(R.id.tv_family_add_name)
     RightNextTextView tvName;
     @BindView(R.id.tv_family_add_location)
@@ -44,14 +43,11 @@ public class MyFamilyAddActivity extends BaseActivity {
     @BindView(R.id.stv_add)
     SuperTextView stvAdd;
 
-    private FamilyInfo familyInfo;
-    private HomeEngine homeEngine;
+    protected FamilyInfo familyInfo;
+    protected HomeEngine homeEngine;
 
-    public static void start(Context context, FamilyInfo familyInfo) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, MyFamilyAddActivity.class);
-        if (familyInfo != null) {
-            intent.putExtra("family_info", familyInfo);
-        }
         context.startActivity(intent);
     }
 
@@ -63,19 +59,20 @@ public class MyFamilyAddActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> onBackPressed());
-
-        initData();
+        super.initViews();
 
         RxView.clicks(tvName).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             MyFamilyNameActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
+
         RxView.clicks(tvLocation).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            location();
+            nav2Location();
         });
+
         RxView.clicks(tvAddress).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             MyFamilyAddressActivity.start(MyFamilyAddActivity.this, familyInfo);
         });
+
         RxView.clicks(stvAdd).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             if (familyInfo == null || TextUtils.isEmpty(familyInfo.getName())) {
                 ToastUtil.toast2(this, "家庭名称不能为空");
@@ -91,73 +88,42 @@ public class MyFamilyAddActivity extends BaseActivity {
         homeEngine = new HomeEngine(this);
     }
 
-    private void submit() {
-        int id = familyInfo.getId();
-        if (id <= 0) {
-            mLoadingDialog.show("添加中...");
-            homeEngine.addFamily(familyInfo.getName(), familyInfo.getLongitude(),
-                    familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetailAddress()).subscribe(new Observer<ResultInfo<String>>() {
-                @Override
-                public void onCompleted() {
-                    mLoadingDialog.dismiss();
-                }
+    public void submit() {
+        mLoadingDialog.show("添加中...");
+        homeEngine.addFamily(familyInfo.getName(), familyInfo.getLongitude(),
+                familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetailAddress()).subscribe(new Observer<ResultInfo<String>>() {
+            @Override
+            public void onCompleted() {
+                mLoadingDialog.dismiss();
+                finish();
+            }
 
-                @Override
-                public void onError(Throwable e) {
-                    mLoadingDialog.dismiss();
-                    ToastCompat.show(getContext(), e.getMessage());
-                }
+            @Override
+            public void onError(Throwable e) {
+                mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), e.getMessage());
+                finish();
+            }
 
-                @Override
-                public void onNext(ResultInfo<String> info) {
-                    if (info != null && info.getCode() == 1) {
-                        String id = info.getData();
-                        if (!TextUtils.isEmpty(id)) {
-                            familyInfo.setId(Integer.parseInt(id));
-                        }
-                        EventBus.getDefault().post(new FamilyAddEvent(familyInfo));
-                        finish();
-                    } else {
-                        String msg = "添加失败";
-                        msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
-                        ToastCompat.show(getContext(), msg);
+            @Override
+            public void onNext(ResultInfo<String> info) {
+                if (info != null && info.getCode() == 1) {
+                    String id = info.getData();
+                    if (!TextUtils.isEmpty(id)) {
+                        familyInfo.setId(Integer.parseInt(id));
                     }
-
-                }
-            });
-        } else {
-            mLoadingDialog.show("修改中...");
-            homeEngine.modifyFamily(id, familyInfo.getName(), familyInfo.getLongitude(),
-                    familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetailAddress()).subscribe(new Observer<ResultInfo<String>>() {
-                @Override
-                public void onCompleted() {
-                    mLoadingDialog.dismiss();
+                    EventBus.getDefault().post(new FamilyAddEvent(familyInfo));
+                } else {
+                    String msg = "添加失败";
+                    msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
+                    ToastCompat.show(getContext(), msg);
                 }
 
-                @Override
-                public void onError(Throwable e) {
-                    mLoadingDialog.dismiss();
-                    ToastCompat.show(getContext(), e.getMessage());
-                }
-
-                @Override
-                public void onNext(ResultInfo<String> info) {
-                    if (info != null && info.getCode() == 1) {
-                        EventBus.getDefault().post(familyInfo);
-                        ToastUtil.toast2(MyFamilyAddActivity.this, info.getMsg());
-                        mLoadingDialog.dismiss();
-                        finish();
-                    } else {
-                        String msg = "更新出错";
-                        msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
-                        ToastCompat.show(getContext(), msg);
-                    }
-                }
-            });
-        }
+            }
+        });
     }
 
-    private void location() {
+    private void nav2Location() {
         mPermissionHelper.checkAndRequestPermission(MyFamilyAddActivity.this, new PermissionHelper.OnRequestPermissionsCallback() {
             @Override
             public void onRequestPermissionSuccess() {
@@ -171,21 +137,6 @@ public class MyFamilyAddActivity extends BaseActivity {
         });
     }
 
-
-    private void initData() {
-        Serializable serializable = getIntent().getSerializableExtra("family_info");
-        if (serializable instanceof FamilyInfo) {
-            FamilyInfo familyInfo = (FamilyInfo) serializable;
-            this.familyInfo = familyInfo;
-            tvName.setTvDes(familyInfo.getName(), Color.parseColor("#000000"));
-            tvLocation.setTvDes(familyInfo.getAddress(), Color.parseColor("#000000"));
-            tvAddress.setTvDes(familyInfo.getDetailAddress(), Color.parseColor("#000000"));
-
-            mBnbTitle.setTitle(familyInfo.getName());
-        }
-    }
-
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFamilyInfo(FamilyInfo familyInfo) {
         this.familyInfo = familyInfo;
@@ -196,5 +147,11 @@ public class MyFamilyAddActivity extends BaseActivity {
         } else {
             tvAddress.setTvDes(familyInfo.getDetailAddress(), Color.parseColor("#000000"));
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPermissionHelper.onRequestPermissionsResult(this, resultCode);
     }
 }
