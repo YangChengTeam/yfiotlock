@@ -29,6 +29,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateIconDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
@@ -62,11 +63,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class PersonalInfoActivity extends BaseActivity {
-
-
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
+public class PersonalInfoActivity extends BaseBackActivity {
     @BindView(R.id.rv_info)
     RecyclerView mRvInfo;
     @BindView(R.id.stv_logout)
@@ -87,7 +84,7 @@ public class PersonalInfoActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> finish());
+        super.initViews();
         setRvInfo();
         loadUserInfo();
         mFilePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();

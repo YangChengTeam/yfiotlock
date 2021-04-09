@@ -10,6 +10,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.engin.FeedBackEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -19,11 +20,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observer;
 
-public class SuggestActivity extends BaseActivity {
+public class SuggestActivity extends BaseBackActivity {
 
-
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
     @BindView(R.id.et_suggest)
     EditText mEtSuggest;
     @BindView(R.id.ll_et)
@@ -33,17 +31,12 @@ public class SuggestActivity extends BaseActivity {
     @BindView(R.id.stv_commit)
     SuperTextView mStvCommit;
 
+    private FeedBackEngine mFeedBackEngine;
+
     @Override
     protected int getLayoutId() {
         return R.layout.user_activity_suggest;
     }
-
-    @Override
-    protected void initViews() {
-        mBnbTitle.setBackListener(view -> finish());
-    }
-
-    private FeedBackEngine mFeedBackEngine;
 
     @Override
     protected void initVars() {

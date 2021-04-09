@@ -89,7 +89,6 @@ public class ScanDeviceActivity extends BaseAddActivity {
                 }
             }
         });
-
         LockBLEManager.initConfig();
         LockBLEManager.scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override

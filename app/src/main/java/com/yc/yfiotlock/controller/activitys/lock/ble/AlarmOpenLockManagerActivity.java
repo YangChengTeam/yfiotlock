@@ -4,8 +4,8 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.dialogs.lock.ble.AlarmOpenLockManagerDialog;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
@@ -14,13 +14,11 @@ import com.yc.yfiotlock.utils.CacheUtil;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import rx.Subscriber;
 import rx.functions.Action1;
 
 public class AlarmOpenLockManagerActivity extends OpenLockManagerActivity {
+    private LockEngine lockEngine;
+
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_alarm_open_lock_manager;
@@ -30,6 +28,8 @@ public class AlarmOpenLockManagerActivity extends OpenLockManagerActivity {
     protected void initVars() {
         super.initVars();
         LockBLEManager.GROUP_TYPE = LockBLEManager.GROUP_HIJACK;
+
+        lockEngine = new LockEngine(this);
     }
 
     @Override
@@ -44,17 +44,20 @@ public class AlarmOpenLockManagerActivity extends OpenLockManagerActivity {
         }
 
         setCountInfo();
-        loadData();
     }
 
     private void setCountInfo() {
         int groupType = 2;
         String key = "locker_count_" + lockInfo.getId() + groupType;
-        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
-        if (countInfo == null) {
-            countInfo = new OpenLockCountInfo();
-            CacheUtil.setCache(key, countInfo);
-        }
+        lockEngine.getOpenLockInfoCount(lockInfo.getId() + "", groupType + "").subscribe(new Action1<ResultInfo<OpenLockCountInfo>>() {
+            @Override
+            public void call(ResultInfo<OpenLockCountInfo> openLockCountInfoResultInfo) {
+                if (openLockCountInfoResultInfo.getCode() == 1 && openLockCountInfoResultInfo.getData() != null) {
+                    OpenLockCountInfo countInfo = openLockCountInfoResultInfo.getData();
+                    CacheUtil.setCache(key, countInfo);
+                    loadData();
+                }
+            }
+        });
     }
-
 }

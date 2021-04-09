@@ -147,6 +147,7 @@ public class LockBLEManager {
         }
         // 设置搜索状态
         callbck.onScanStarted();
+
         // 开始搜索
         List<BleDevice> bleDevices = BleManager.getInstance().getAllConnectedDevice();
         if (bleDevices != null) {
@@ -154,6 +155,7 @@ public class LockBLEManager {
                 callbck.onScanning(bleDevice);
             }
         }
+
         BleManager.getInstance().scan(new BleScanCallback() {
             @Override
             public void onScanStarted(boolean success) {
@@ -194,10 +196,11 @@ public class LockBLEManager {
     }
 
     public static void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
+        callbck.onConnectStarted();
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
             public void onStartConnect() {
-                callbck.onConnectStarted();
+
             }
 
             @Override
@@ -208,6 +211,7 @@ public class LockBLEManager {
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
                 callbck.onConnectSuccess(bleDevice);
+                setMtu(bleDevice);
             }
 
             @Override

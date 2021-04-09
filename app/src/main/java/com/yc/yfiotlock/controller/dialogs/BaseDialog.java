@@ -32,7 +32,6 @@ import butterknife.ButterKnife;
 
 public abstract class BaseDialog extends Dialog {
 
-
     public BaseDialog(Context context) {
         super(context, R.style.DialogTheme);
 
@@ -40,63 +39,12 @@ public abstract class BaseDialog extends Dialog {
                 getLayoutId(), null);
         ButterKnife.bind(this, view);
         setContentView(view);
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
-
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        try {
-            layoutParams.width = ScreenUtil.getWidth(context);
-            layoutParams.height = ScreenUtil.getHeight(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        layoutParams.width = ScreenUtil.getWidth(context);
+        layoutParams.height = ScreenUtil.getHeight(context);
         view.setLayoutParams(layoutParams);
-
         setCancelable(true);
-
     }
-
-    @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void stub(EventStub stub) {
-
-    }
-
-
-    protected void setTranslucentStatus() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            Window window = getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            window.addFlags(Integer.MIN_VALUE);
-            window.setStatusBarColor(Color.TRANSPARENT);
-        } else if (Build.VERSION.SDK_INT >= 19) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        }
-    }
-
-    public BaseDialog(Context context, int style) {
-        super(context, style);
-
-        View view = LayoutInflater.from(context).inflate(
-                getLayoutId(), null);
-        ButterKnife.bind(this, view);
-        setContentView(view);
-
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        try {
-            layoutParams.width = ScreenUtil.getWidth(context);
-            layoutParams.height = ScreenUtil.getHeight(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        view.setLayoutParams(layoutParams);
-
-        setCancelable(true);
-
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,9 +53,7 @@ public abstract class BaseDialog extends Dialog {
         bindClick();
     }
 
-    public void bindClick() {
-
-    }
+    public void bindClick() {}
 
     public void setClick(@IdRes int id, @NonNull Runnable runnable) {
         RxView.clicks(findViewById(id)).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view1 -> {
@@ -128,9 +74,6 @@ public abstract class BaseDialog extends Dialog {
 
     @Override
     public void dismiss() {
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
         if (this.isShowing() && !CommonUtil.isActivityDestory(getContext())) {
             super.dismiss();
         }

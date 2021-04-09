@@ -11,6 +11,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
@@ -131,18 +132,21 @@ public class MyFamilyAddActivity extends BaseActivity {
                 @Override
                 public void onError(Throwable e) {
                     mLoadingDialog.dismiss();
+                    ToastCompat.show(getContext(), e.getMessage());
                 }
 
                 @Override
-                public void onNext(ResultInfo<String> stringResultInfo) {
-                    if(stringResultInfo.getCode()==1) {
+                public void onNext(ResultInfo<String> info) {
+                    if (info != null && info.getCode() == 1) {
                         familyInfo.setUpdateList(true);
                         EventBus.getDefault().post(familyInfo);
-                        ToastUtil.toast2(MyFamilyAddActivity.this, stringResultInfo.getMsg());
+                        ToastUtil.toast2(MyFamilyAddActivity.this, info.getMsg());
                         mLoadingDialog.dismiss();
                         finish();
-                    }else {
-                        ToastUtil.toast2(MyFamilyAddActivity.this, "更新出错");
+                    } else {
+                        String msg = "更新出错";
+                        msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
+                        ToastCompat.show(getContext(), msg);
                     }
                 }
             });

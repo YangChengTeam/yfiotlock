@@ -119,12 +119,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     App.getApp().getMacList().remove(lockInfo.getMacAddress());
                     SafeUtil.setSafePwdType(lockInfo, 0);
                     EventBus.getDefault().post(new IndexRefreshEvent());
-                    UserInfo userInfo = UserInfoCache.getUserInfo();
-                    if (userInfo != null) {
-                        userInfo.setDeviceNumber(userInfo.getDeviceNumber() - 1);
-                        UserInfoCache.setUserInfo(userInfo);
-                        EventBus.getDefault().post(userInfo);
-                    }
+                    UserInfoCache.decDeviceNumber();
                     if (!lockInfo.isShare()) {
                         bleReset();
                     } else {
@@ -206,7 +201,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             mSettingAdapter.setHeaderView(headView);
         }
     }
-
 
 
     private void loadData() {

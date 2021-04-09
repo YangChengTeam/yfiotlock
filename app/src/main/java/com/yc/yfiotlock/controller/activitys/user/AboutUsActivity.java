@@ -14,6 +14,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
 import com.yc.yfiotlock.download.DownloadManager;
 import com.yc.yfiotlock.model.bean.user.AboutInfo;
@@ -35,15 +36,16 @@ import java.util.List;
 import butterknife.BindView;
 import rx.Observer;
 
-public class AboutUsActivity extends BaseActivity {
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
+public class AboutUsActivity extends BaseBackActivity {
     @BindView(R.id.ll_logo)
     LinearLayout mLlLogo;
     @BindView(R.id.rv_about)
     RecyclerView mRvAbout;
     @BindView(R.id.stv_check)
     SuperTextView mStvCheck;
+
+    private AboutAdapter mAboutAdapter;
+
 
     @Override
     protected int getLayoutId() {
@@ -52,13 +54,12 @@ public class AboutUsActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
+        super.initViews();
         DownloadManager.setContext(new WeakReference<>(this));
-        mBnbTitle.setBackListener(view -> finish());
         setRvAbout();
         checkVersion(false);
     }
 
-    private AboutAdapter mAboutAdapter;
 
     private void setRvAbout() {
         mAboutAdapter = new AboutAdapter(null);

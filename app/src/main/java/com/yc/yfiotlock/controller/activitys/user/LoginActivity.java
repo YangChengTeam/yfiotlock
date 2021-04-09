@@ -171,7 +171,7 @@ public class LoginActivity extends BaseActivity {
                     startActivity(new Intent(getContext(), MainActivity.class));
                     EventBus.getDefault().post(info.getData());
                 } else {
-                    ToastCompat.show(getContext(), info == null ? "登录失败" : info.getMsg());
+                    ToastCompat.show(getContext(), info == null && info.getMsg() != null ? "登录失败" : info.getMsg());
                 }
             }
         });

@@ -54,7 +54,7 @@ public class ConnectActivity extends BaseConnectActivity {
     private static WeakReference<ConnectActivity> mInstance;
     public static void safeFinish() {
         if (mInstance != null && mInstance.get() != null) {
-            mInstance.get().safeFinish();
+            mInstance.get().finish();
         }
     }
 

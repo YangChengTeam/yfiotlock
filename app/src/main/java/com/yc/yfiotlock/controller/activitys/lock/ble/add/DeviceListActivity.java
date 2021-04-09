@@ -57,7 +57,7 @@ public class DeviceListActivity extends BaseAddActivity {
 
     private static WeakReference<DeviceListActivity> mInstance;
 
-    public static void finish2() {
+    public static void safeFinish() {
         if (mInstance != null && mInstance.get() != null) {
             mInstance.get().finish();
         }
@@ -113,12 +113,12 @@ public class DeviceListActivity extends BaseAddActivity {
                     hashMap.put(bleDevice.getMac(), bleDevice);
                 }
                 nav2Connect(bleDevice);
-                LockBLEManager.setMtu(bleDevice);
             }
 
             @Override
             public void onConnectFailed() {
                 mLoadingDialog.dismiss();
+                ToastCompat.show(getContext(), "连接失败");
             }
         });
     }

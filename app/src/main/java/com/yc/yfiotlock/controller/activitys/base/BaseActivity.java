@@ -124,12 +124,16 @@ public abstract class BaseActivity extends BaseSendActivity implements ILoadData
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
+        super.onStop();
         if (mLoadingDialog != null) {
             mLoadingDialog.dismiss();
         }
-        super.onDestroy();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }

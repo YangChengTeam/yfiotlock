@@ -454,9 +454,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
                 // 设置连接成功状态
                 setConnectedInfo();
-
-                LockBLEManager.setMtu(bleDevice);
-
                 EventBus.getDefault().post(bleDevice);
             }
 

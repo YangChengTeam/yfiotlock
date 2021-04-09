@@ -48,11 +48,10 @@ public class LoginDialog extends Dialog {
     @BindView(R.id.tv_timer)
     TextView mTvTimer;
 
-    LoginActivity mLoginActivity;
+    private SignCodeAdapter mSignCodeAdapter;
 
     public LoginDialog(LoginActivity context) {
         super(context);
-        mLoginActivity = context;
         View view = LayoutInflater.from(context).inflate(
                 getLayoutId(), null);
         ButterKnife.bind(this, view);
@@ -82,7 +81,6 @@ public class LoginDialog extends Dialog {
         mEtSmsCode.addTextChangedListener(mTextWatcher);
     }
 
-    SignCodeAdapter mSignCodeAdapter;
 
     private void setRvCode() {
         mSignCodeAdapter = new SignCodeAdapter(null);

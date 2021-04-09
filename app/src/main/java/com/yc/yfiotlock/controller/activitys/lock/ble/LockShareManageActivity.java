@@ -137,7 +137,7 @@ public class LockShareManageActivity extends BaseBackActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), msg);
+                ToastCompat.show(getContext(), e.getMessage());
             }
 
             @Override

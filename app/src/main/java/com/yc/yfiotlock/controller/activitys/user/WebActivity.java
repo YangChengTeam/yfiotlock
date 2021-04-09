@@ -11,6 +11,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.LockWebView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
@@ -19,11 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class WebActivity extends BaseActivity implements LockWebView.WebViewListener {
-
-
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
+public class WebActivity extends BaseBackActivity implements LockWebView.WebViewListener {
     @BindView(R.id.pb_process)
     ProgressBar mPbProcess;
     @BindView(R.id.lwv_page)
@@ -45,9 +42,8 @@ public class WebActivity extends BaseActivity implements LockWebView.WebViewList
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> finish());
         String title = getIntent().getStringExtra("title");
-        mBnbTitle.setTitle(title == null ? "" : title);
+        backNavBar.setTitle(title == null ? "" : title);
         mLwvPage.setAdWebViewListener(this);
         String url = getIntent().getStringExtra("url");
         if (url == null && title != null) {

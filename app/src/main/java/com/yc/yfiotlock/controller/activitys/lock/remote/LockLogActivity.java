@@ -86,7 +86,6 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBLESend = new LockBLESend(this, bleDevice);
-        lockBLESend.setNotifyCallback(this);
     }
 
     @Override
@@ -248,7 +247,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
             int second = wrapped.get();
 
-            String time = year + "年" + month + "月" + day + "日 " + hour + "时" + minute + "分" + second + "秒";
+            String time = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + ":";
             logInfo.setTime(time);
 
             logInfo.setAddtime(System.currentTimeMillis());
@@ -306,6 +305,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     protected void onResume() {
         super.onResume();
         if (lockBLESend != null) {
+            lockBLESend.setNotifyCallback(this);
             lockBLESend.registerNotify();
         }
     }
@@ -314,8 +314,8 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     protected void onStop() {
         super.onStop();
         if (lockBLESend != null) {
-            lockBLESend.unregisterNotify();
             lockBLESend.setNotifyCallback(null);
+            lockBLESend.unregisterNotify();
         }
     }
 

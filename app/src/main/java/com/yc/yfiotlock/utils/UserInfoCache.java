@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 
+import org.greenrobot.eventbus.EventBus;
+
 /*
  * Created by　Dullyoung on 2021/3/4
  */
@@ -21,5 +23,23 @@ public class UserInfoCache {
 
     public static void setUserInfo(UserInfo userInfo) {
         MMKV.defaultMMKV().putString("userInfo", JSON.toJSONString(userInfo));
+    }
+
+    public static void incDeviceNumber() {
+        UserInfo userInfo = UserInfoCache.getUserInfo();
+        if (userInfo != null) {
+            userInfo.setDeviceNumber(userInfo.getDeviceNumber() + 1);
+            UserInfoCache.setUserInfo(userInfo);
+            EventBus.getDefault().post(userInfo);
+        }
+    }
+
+    public static void decDeviceNumber() {
+        UserInfo userInfo = UserInfoCache.getUserInfo();
+        if (userInfo != null) {
+            userInfo.setDeviceNumber(userInfo.getDeviceNumber() - 1);
+            UserInfoCache.setUserInfo(userInfo);
+            EventBus.getDefault().post(userInfo);
+        }
     }
 }

@@ -70,11 +70,12 @@ public class DeviceNameEditActivity extends BaseBackActivity {
                 @Override
                 public void onError(Throwable e) {
                     mLoadingDialog.dismiss();
+                    ToastCompat.show(getContext(), e.getMessage());
                 }
 
                 @Override
-                public void onNext(ResultInfo<String> resultInfo) {
-                    if (resultInfo != null && resultInfo.getCode() == 1) {
+                public void onNext(ResultInfo<String> info) {
+                    if (info != null && info.getCode() == 1) {
                         deviceInfo.setName(name);
                         ToastCompat.show(getContext(), "修改成功");
                         finish();
@@ -82,7 +83,7 @@ public class DeviceNameEditActivity extends BaseBackActivity {
                         EventBus.getDefault().post(new IndexRefreshEvent());
                     } else {
                         String msg = "更新出错";
-                        msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
+                        msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
                         ToastCompat.show(getContext(), msg);
                     }
                 }

@@ -104,19 +104,19 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                 @Override
                 public void onError(Throwable e) {
                     mLoadingDialog.dismiss();
+                    ToastCompat.show(getContext(), e.getMessage());
                 }
 
                 @Override
                 public void onNext(ResultInfo<String> resultInfo) {
-                    String msg = "更新出错";
                     if (resultInfo != null && resultInfo.getCode() == 1) {
                         deviceNameDialog.dismiss();
-                        ToastCompat.show(getContext(), "修改成功");
                         lockInfo.setName(name);
                         backNavBar.setTitle(name);
                         EventBus.getDefault().post(lockInfo);
                         EventBus.getDefault().post(new IndexRefreshEvent());
                     } else {
+                        String msg = "更新出错";
                         msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
                         ToastCompat.show(getContext(), msg);
                     }
@@ -155,12 +155,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         lockInfo.setDeviceId(aliDeviceName);
         EventBus.getDefault().post(new IndexRefreshEvent());
 
-        UserInfo userInfo = UserInfoCache.getUserInfo();
-        if (userInfo != null) {
-            userInfo.setDeviceNumber(userInfo.getDeviceNumber() + 1);
-            UserInfoCache.setUserInfo(userInfo);
-            EventBus.getDefault().post(userInfo);
-        }
+        UserInfoCache.incDeviceNumber();
     }
 
     @Override
@@ -190,7 +185,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         startActivity(intent);
         finish();
         ConnectActivity.safeFinish();
-        DeviceListActivity.finish2();
+        DeviceListActivity.safeFinish();
         ScanDeviceActivity.finish2();
     }
 

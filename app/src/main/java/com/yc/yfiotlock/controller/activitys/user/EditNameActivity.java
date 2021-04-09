@@ -9,6 +9,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.UserEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
@@ -24,11 +25,7 @@ import rx.Observer;
 /**
  * @author Dullyoung
  */
-public class EditNameActivity extends BaseActivity {
-
-
-    @BindView(R.id.bnb_title)
-    BackNavBar mBnbTitle;
+public class EditNameActivity extends BaseBackActivity {
 
     @BindView(R.id.et_name)
     EditText mEtName;
@@ -40,7 +37,7 @@ public class EditNameActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        mBnbTitle.setBackListener(view -> finish());
+        super.initViews();
         String name = "";
         if (UserInfoCache.getUserInfo() != null) {
             name = UserInfoCache.getUserInfo().getNickName();
