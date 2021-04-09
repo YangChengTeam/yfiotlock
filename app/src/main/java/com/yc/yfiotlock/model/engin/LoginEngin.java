@@ -6,8 +6,10 @@ import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.engin.BaseEngin;
 import com.kk.securityhttp.engin.HttpCoreEngin;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
+import com.yc.yfiotlock.utils.UserInfoCache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +46,17 @@ public class LoginEngin extends HttpCoreEngin {
         map.put("code", code);
         HttpCoreEngin<ResultInfo<UserInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
         return httpCoreEngin.rxpost(Config.SMS_CODE_LOGIN_URL, new TypeReference<ResultInfo<UserInfo>>() {
+                }.getType(),
+                map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    public Observable<ResultInfo<UserInfo>> validateLogin() {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        HttpCoreEngin<ResultInfo<UserInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
+        return httpCoreEngin.rxpost(Config.VALIDATE_LOGIN_INFO_URL, new TypeReference<ResultInfo<UserInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }

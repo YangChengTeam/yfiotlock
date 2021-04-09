@@ -1,8 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.base;
 
-import android.Manifest;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -11,9 +9,10 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.download.DownloadManager;
-import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
+import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.utils.CommonUtil;
+import com.yc.yfiotlock.utils.UserInfoCache;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -32,24 +31,6 @@ public class SplashActivity extends BaseActivity {
         DownloadManager.init(new WeakReference<>(this));
         setFullScreen();
         setFullScreenWithCutOutScreen();
-
-        mPermissionHelper.setMustPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE});
-        mPermissionHelper.checkAndRequestPermission(this, new PermissionHelper.OnRequestPermissionsCallback() {
-            @Override
-            public void onRequestPermissionSuccess() {
-                navToMain();
-            }
-
-            @Override
-            public void onRequestPermissionError() {
-                VUiKit.postDelayed(1000, () -> {
-                    navToMain = true;
-                    if (SplashActivity.this.hasWindowFocus()) {
-                        navToMain();
-                    }
-                });
-            }
-        });
     }
 
     /**
@@ -59,16 +40,52 @@ public class SplashActivity extends BaseActivity {
      */
     private boolean navToMain = false;
 
+    /**
+     * 用户信息是否验证过
+     */
+    private boolean isValidated = false;
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && navToMain) {
-            navToMain();
+        if (hasFocus) {
+            if (navToMain) {
+                navToMain();
+            }
+            if (!isValidated) {
+                validateUserInfo();
+            }
+        } else {
+            navToMain = false;
+        }
+    }
+
+    private void validateUserInfo() {
+        if (App.isLogin()) {
+            LoginEngin loginEngin = new LoginEngin(this);
+            loginEngin.validateLogin().subscribe(resultInfo -> {
+                if (resultInfo != null) {
+                    if (resultInfo.getCode() == 1 && resultInfo.getData() != null) {
+                        UserInfoCache.setUserInfo(resultInfo.getData());
+                    } else if (resultInfo.getCode() == -100) {
+                        UserInfoCache.setUserInfo(null);
+                    }
+                    isValidated = true;
+                    navToMain = true;
+                    VUiKit.postDelayed(1000, this::navToMain);
+                }
+            });
+        } else {
+            navToMain = true;
+            VUiKit.postDelayed(1000, this::navToMain);
         }
     }
 
     private void navToMain() {
+        //因为跳转都是延时的，避免多次跳转
+        if (!navToMain) {
+            return;
+        }
         navToMain = false;
         if (App.isLogin()) {
             startActivity(new Intent(this, MainActivity.class));

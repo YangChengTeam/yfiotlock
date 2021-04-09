@@ -14,6 +14,7 @@ import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ShareDeviceWrapper;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
+import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDeviceView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
@@ -135,6 +136,7 @@ public class DeviceReceiveListFragment extends BaseFragment {
                 if (info.getCode() == 1) {
                     mLoadingDialog.dismiss();
                     receiveDeviceInfo.setShareStatus(1);
+                    UserInfoCache.incDeviceNumber();
                     mAdapter.notifyItemChanged(position, "0");
                     EventBus.getDefault().post(new IndexRefreshEvent());
                 } else {

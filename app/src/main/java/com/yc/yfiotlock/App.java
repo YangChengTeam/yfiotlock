@@ -22,6 +22,7 @@ import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.GlideEngine;
+import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
@@ -35,12 +36,14 @@ import java.util.Map;
 public class App extends Application {
     // 应用单例
     private static App app;
+
     public static App getApp() {
         return app;
     }
 
     // 已连接设备
     private HashMap<String, BleDevice> connectedDevices = new HashMap<>();
+
     public HashMap<String, BleDevice> getConnectedDevices() {
         return connectedDevices;
     }
@@ -48,12 +51,14 @@ public class App extends Application {
     private DeviceEngin deviceEngin;
     // 所有云端设备
     private List<String> macList = new ArrayList<>();
+
     public List<String> getMacList() {
         return macList;
     }
 
     // 锁数据库
     private AppDatabase db;
+
     public AppDatabase getDb() {
         return db;
     }
@@ -76,7 +81,6 @@ public class App extends Application {
         initBauduMap();
         cloudGetMacList();
         checkUpdate();
-
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "lock").build();
     }
