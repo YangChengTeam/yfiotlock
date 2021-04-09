@@ -15,6 +15,7 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.helper.PermissionHelper;
+import com.yc.yfiotlock.model.bean.eventbus.FamilyAddEvent;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.engin.HomeEngine;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
@@ -92,8 +93,8 @@ public class MyFamilyAddActivity extends BaseActivity {
 
     private void submit() {
         int id = familyInfo.getId();
-        mLoadingDialog.show("提交中");
         if (id <= 0) {
+            mLoadingDialog.show("添加中...");
             homeEngine.addFamily(familyInfo.getName(), familyInfo.getLongitude(),
                     familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetailAddress()).subscribe(new Observer<ResultInfo<String>>() {
                 @Override
@@ -104,24 +105,28 @@ public class MyFamilyAddActivity extends BaseActivity {
                 @Override
                 public void onError(Throwable e) {
                     mLoadingDialog.dismiss();
+                    ToastCompat.show(getContext(), e.getMessage());
                 }
 
                 @Override
-                public void onNext(ResultInfo<String> stringResultInfo) {
-                    ToastUtil.toast2(MyFamilyAddActivity.this, stringResultInfo.getMsg());
-
-                    String data = stringResultInfo.getData();
-
-                    if (!TextUtils.isEmpty(data)) {
-                        familyInfo.setId(Integer.parseInt(data));
+                public void onNext(ResultInfo<String> info) {
+                    if (info != null && info.getCode() == 1) {
+                        String id = info.getData();
+                        if (!TextUtils.isEmpty(id)) {
+                            familyInfo.setId(Integer.parseInt(id));
+                        }
+                        EventBus.getDefault().post(new FamilyAddEvent(familyInfo));
+                        finish();
+                    } else {
+                        String msg = "添加失败";
+                        msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
+                        ToastCompat.show(getContext(), msg);
                     }
 
-                    familyInfo.setUpdateList(true);
-                    EventBus.getDefault().post(familyInfo);
-                    finish();
                 }
             });
         } else {
+            mLoadingDialog.show("修改中...");
             homeEngine.modifyFamily(id, familyInfo.getName(), familyInfo.getLongitude(),
                     familyInfo.getLatitude(), familyInfo.getAddress(), familyInfo.getDetailAddress()).subscribe(new Observer<ResultInfo<String>>() {
                 @Override
@@ -138,7 +143,6 @@ public class MyFamilyAddActivity extends BaseActivity {
                 @Override
                 public void onNext(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {
-                        familyInfo.setUpdateList(true);
                         EventBus.getDefault().post(familyInfo);
                         ToastUtil.toast2(MyFamilyAddActivity.this, info.getMsg());
                         mLoadingDialog.dismiss();
@@ -154,8 +158,7 @@ public class MyFamilyAddActivity extends BaseActivity {
     }
 
     private void location() {
-        permissionHelper = new PermissionHelper();
-        permissionHelper.checkAndRequestPermission(MyFamilyAddActivity.this, new PermissionHelper.OnRequestPermissionsCallback() {
+        mPermissionHelper.checkAndRequestPermission(MyFamilyAddActivity.this, new PermissionHelper.OnRequestPermissionsCallback() {
             @Override
             public void onRequestPermissionSuccess() {
                 MyFamilyLocationActivity.start(MyFamilyAddActivity.this, familyInfo);
@@ -168,7 +171,6 @@ public class MyFamilyAddActivity extends BaseActivity {
         });
     }
 
-    PermissionHelper permissionHelper;
 
     private void initData() {
         Serializable serializable = getIntent().getSerializableExtra("family_info");

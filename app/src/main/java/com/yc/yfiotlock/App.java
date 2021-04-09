@@ -14,8 +14,6 @@ import com.kk.securityhttp.net.contains.HttpConfig;
 import com.kk.utils.VUiKit;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.mmkv.MMKV;
-import com.umeng.analytics.MobclickAgent;
-import com.umeng.commonsdk.UMConfigure;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.dao.AppDatabase;
@@ -155,13 +153,10 @@ public class App extends Application {
         MMKV.initialize(this);
         ImageEngine.install(new GlideEngine(this));
         if (BuildConfig.DEBUG) {
-            UMConfigure.init(this, "605afeda6ee47d382b93fdba", "Umeng", UMConfigure.DEVICE_TYPE_PHONE, "");
             CrashReport.initCrashReport(getApplicationContext(), "2efb5c9b77", true);
         } else {
             //for release
-            UMConfigure.init(this, "605afb1bb8c8d45c13addd1c", "Umeng", UMConfigure.DEVICE_TYPE_PHONE, "");
             CrashReport.initCrashReport(getApplicationContext(), "73c6b29460", false);
         }
-        MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.AUTO);
     }
 }

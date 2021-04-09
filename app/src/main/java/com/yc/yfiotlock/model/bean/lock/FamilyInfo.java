@@ -13,22 +13,11 @@ public class FamilyInfo implements Serializable {
     @JSONField(name = "detail_address")
     private String detailAddress;
     @JSONField(name = "is_def")
-    private int isDef = 1;
+    private boolean isDefault;
     private int num;
-
-    private boolean isUpdateList;
-
-    public boolean isUpdateList() {
-        return isUpdateList;
-    }
-
-    public void setUpdateList(boolean updateList) {
-        isUpdateList = updateList;
-    }
 
     public FamilyInfo() {
     }
-
 
     public int getId() {
         return id;
@@ -78,12 +67,12 @@ public class FamilyInfo implements Serializable {
         this.detailAddress = detailAddress;
     }
 
-    public int isDef() {
-        return isDef;
+    public boolean isDefault() {
+        return isDefault;
     }
 
-    public void setIsDef(int isDef) {
-        this.isDef = isDef;
+    public void setDefault(boolean isDefault) {
+        this.isDefault = !isDefault;
     }
 
     public int getNum() {

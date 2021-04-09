@@ -40,6 +40,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
     }
 
     compileSdkVersion 30
@@ -56,6 +57,13 @@ android {
         signingConfig signingConfigs.ycR
 
 
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your APK.
+            abiFilters 'arm64-v8a'
+
+        }
+
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += [
@@ -64,6 +72,8 @@ android {
                         "room.expandProjection":"true"]
             }
         }
+
+
     }
 
     compileOptions {
@@ -134,9 +144,6 @@ dependencies {
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
 
-    implementation "com.umeng.umsdk:common:9.3.6" //（必选）
-    implementation "com.umeng.umsdk:asms:1.2.0" // asms包依赖(必选)
-    implementation "com.umeng.umsdk:apm:1.1.1" // 应用性能监控SDK依赖(可选)
 
     implementation 'com.tencent.bugly:crashreport:3.3.9' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
     implementation 'com.tencent.bugly:nativecrashreport:3.9.1' //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0

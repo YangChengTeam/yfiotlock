@@ -13,7 +13,6 @@ import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
 import com.yc.yfiotlock.download.DownloadManager;
@@ -24,7 +23,6 @@ import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
-import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +43,6 @@ public class AboutUsActivity extends BaseBackActivity {
     SuperTextView mStvCheck;
 
     private AboutAdapter mAboutAdapter;
-
 
     @Override
     protected int getLayoutId() {
