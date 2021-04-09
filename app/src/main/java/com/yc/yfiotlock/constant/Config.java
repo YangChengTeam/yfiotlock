@@ -29,6 +29,7 @@ public class Config {
     public final static String ALI_FAST_LOGIN = getBaseUrl() + "/userapp/v1.User/oneClickLogin" + isRsa();
     public final static String LOGIN_SEND_CODE_URL = getBaseUrl() + "/userapp/v1.Sms/send" + isRsa();
     public final static String SMS_CODE_LOGIN_URL = getBaseUrl() + "/userapp/v1.User/codeLogin" + isRsa();
+    public final static String VALIDATE_LOGIN_INFO_URL = getBaseUrl() + "/userapp/v1.User/oneUserLogin" + isRsa();
 
 
     //首页

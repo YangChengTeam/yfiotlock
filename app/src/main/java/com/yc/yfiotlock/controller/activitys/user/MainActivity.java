@@ -35,6 +35,7 @@ import com.yc.yfiotlock.model.bean.lock.ShareDeviceWrapper;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
+import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
 
 import org.greenrobot.eventbus.EventBus;
@@ -181,6 +182,7 @@ public class MainActivity extends BaseActivity {
             public void onNext(ResultInfo<String> info) {
                 if (info.getCode() == 1) {
                     mLoadingDialog.dismiss();
+                    UserInfoCache.incDeviceNumber();
                     EventBus.getDefault().post(new IndexRefreshEvent());
                 } else {
                     String tmsg = msg;
