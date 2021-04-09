@@ -115,11 +115,14 @@ public class OpenLockManagerActivity extends BaseBackActivity {
         passwordOpenLockTypeInfo.setDesp(passwordCount + "个密码");
         openLockTypeInfos.add(passwordOpenLockTypeInfo);
 
-        OpenLockTypeInfo cardOpenLockTypeInfo = new OpenLockTypeInfo();
-        cardOpenLockTypeInfo.setIcon(R.mipmap.icon_nfc);
-        cardOpenLockTypeInfo.setName("NFC门卡");
-        cardOpenLockTypeInfo.setDesp(cardCount + "个门卡");
-        openLockTypeInfos.add(cardOpenLockTypeInfo);
+        if(LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_ADMIN){
+            OpenLockTypeInfo cardOpenLockTypeInfo = new OpenLockTypeInfo();
+            cardOpenLockTypeInfo.setIcon(R.mipmap.icon_nfc);
+            cardOpenLockTypeInfo.setName("NFC门卡");
+            cardOpenLockTypeInfo.setDesp(cardCount + "个门卡");
+            openLockTypeInfos.add(cardOpenLockTypeInfo);
+        }
+
 
         openLockAdapter.setNewInstance(openLockTypeInfos);
     }

@@ -15,7 +15,6 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -23,17 +22,15 @@ import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtils;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.CloudHelper;
-import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.sensor.ShakeSensor;
-import com.yc.yfiotlock.model.bean.eventbus.IndexReScanEvent;
+import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
@@ -49,7 +46,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -167,7 +163,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 setConnectedInfo();
             }
         }
-
 
         reConnectDialog = new GeneralDialog(this);
         reConnectDialog.setTitle("温馨提示");
@@ -289,11 +284,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         super.onResume();
 
         cloudHelper.registerNotify();
-        if (!BleManager.getInstance().isBlueEnable()) {
-            ToastCompat.show(LockIndexActivity.this, "请先打开蓝牙");
-            BleManager.getInstance().enableBluetooth();
-            return;
-        }
 
         initShakeSensor();
         registerNotify();
@@ -354,17 +344,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
 
     private void scan() {
-        if (!BleManager.getInstance().isBlueEnable()) {
-            ToastCompat.show(LockIndexActivity.this, "请先打开蓝牙");
-            BleManager.getInstance().enableBluetooth();
-            return;
-        }
-        HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
-        BleDevice bleDevice = hashMap.get(lockInfo.getMacAddress());
-        if (bleDevice != null) {
-            connect(bleDevice);
-            return;
-        }
         LockBLEManager.initConfig2(lockInfo.getMacAddress());
         LockBLEManager.scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override
@@ -447,10 +426,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 LockIndexActivity.this.bleDevice = bleDevice;
                 initSends();
 
-                HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
-                if (hashMap.get(bleDevice.getMac()) == null) {
-                    App.getApp().getConnectedDevices().put(bleDevice.getMac(), bleDevice);
-                }
 
                 // 设置连接成功状态
                 setConnectedInfo();
@@ -547,7 +522,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onReScan(IndexReScanEvent object) {
+    public void onReScan(ReScanEvent object) {
         scan();
     }
 

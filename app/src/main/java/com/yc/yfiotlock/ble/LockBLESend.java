@@ -12,7 +12,7 @@ import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
-import com.yc.yfiotlock.model.bean.eventbus.IndexReScanEvent;
+import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -135,7 +135,6 @@ public class LockBLESend {
 
     public interface NotifyCallback {
         void onNotifySuccess(LockBLEData lockBLEData);
-
         void onNotifyFailure(LockBLEData lockBLEData);
     }
 
@@ -331,7 +330,7 @@ public class LockBLESend {
         if (responseErrorCount > 3) {
             Log.d(TAG, "超过最大错误次数:" + responseErrorCount + " 重新搜索连接");
             LockBLEManager.destory();
-            EventBus.getDefault().post(new IndexReScanEvent());
+            EventBus.getDefault().post(new ReScanEvent());
         }
     }
 

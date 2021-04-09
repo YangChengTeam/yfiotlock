@@ -6,25 +6,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
-import com.kk.securityhttp.utils.LogUtil;
-import com.kk.securityhttp.utils.VUiKit;
-import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
-import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.utils.AnimatinUtil;
-import com.yc.yfiotlock.utils.CacheUtil;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 
@@ -76,19 +71,6 @@ public class ScanDeviceActivity extends BaseAddActivity {
         if (deviceHashMap == null) {
             deviceHashMap = new HashMap<>();
         }
-        HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
-        hashMap.forEach((key, bleDevice) -> {
-            if (!LockBLEUtils.isFoundDevice(bleDevice.getMac())) {
-                if (!isFoundOne) {
-                    isFoundOne = true;
-                    deviceHashMap.put(bleDevice.getMac(), bleDevice);
-                    nav2List(bleDevice);
-                } else {
-                    deviceHashMap.put(bleDevice.getMac(), bleDevice);
-                    EventBus.getDefault().post(bleDevice);
-                }
-            }
-        });
         LockBLEManager.initConfig();
         LockBLEManager.scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override
@@ -130,6 +112,11 @@ public class ScanDeviceActivity extends BaseAddActivity {
                 setFailInfo();
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReScan(ReScanEvent object) {
+        scan();
     }
 
     @Override

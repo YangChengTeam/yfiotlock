@@ -1,13 +1,16 @@
 package com.yc.yfiotlock.ble;
 
 import android.app.Application;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.provider.Settings;
-import android.widget.Toast;
 
+import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -19,6 +22,9 @@ import com.yc.yfiotlock.libs.fastble.callback.BleScanCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.libs.fastble.scan.BleScanRuleConfig;
+import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -39,14 +45,16 @@ public class LockBLEManager {
     public static final int OPEN_LOCK_CARD = 3;
 
     public static boolean isConnecting = false;
+    public static BleStateReceiver bleStateReceiver;
 
     public static void initBle(Application context) {
         BleManager.getInstance()
                 .enableLog(true)
                 .setReConnectCount(5, 1000)
                 .setSplitWriteNum(LockBLEPackage.getMtu())
-                .setConnectOverTime(10000)
+                .setConnectOverTime(10000 * 5)
                 .setOperateTimeout(5000).init(context);
+        initBleState(context);
     }
 
     public static void initConfig() {
@@ -140,10 +148,49 @@ public class LockBLEManager {
         });
     }
 
+    // 蓝牙状态监听
+    private static void initBleState(Context context) {
+        bleStateReceiver = new BleStateReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        context.registerReceiver(bleStateReceiver, intentFilter);
+    }
+    private static class BleStateReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            switch (action) {
+                case BluetoothAdapter.ACTION_STATE_CHANGED:
+                    int blState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
+                    switch (blState) {
+                        case BluetoothAdapter.STATE_TURNING_ON:
+                            VUiKit.postDelayed(1000, () -> {
+                                EventBus.getDefault().post(new ReScanEvent());
+                            });
+                            break;
+                        case BluetoothAdapter.STATE_ON:
+                            break;
+                        case BluetoothAdapter.STATE_TURNING_OFF:
+                            break;
+                        case BluetoothAdapter.STATE_OFF:
+                            break;
+                        case BluetoothAdapter.ERROR:
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        }
+    }
+
+
     // 开始扫描
     private static void startScan(Context context, LockBLEScanCallbck callbck) {
         if (!BleManager.getInstance().isBlueEnable()) {
-            ToastCompat.show(context, "请先打开蓝牙", Toast.LENGTH_LONG);
             BleManager.getInstance().enableBluetooth();
             return;
         }

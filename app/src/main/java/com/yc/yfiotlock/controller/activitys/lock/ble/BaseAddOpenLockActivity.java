@@ -48,8 +48,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         this.title = title;
     }
 
-
-    protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
+    protected int groupType = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
 
     @Override
     protected void initVars() {
@@ -66,7 +65,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
         cancelSend = new LockBLESend(this, bleDevice);
 
-        key = "locker_count_" + lockInfo.getId() + type;
+        key = "locker_count_" + lockInfo.getId() + groupType;
     }
 
 

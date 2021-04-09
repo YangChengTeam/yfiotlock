@@ -26,7 +26,6 @@ import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
-import com.yc.yfiotlock.offline.OLTOfflineManager;
 import com.yc.yfiotlock.offline.OfflineManager;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.SafeUtil;
@@ -187,7 +186,7 @@ public class IndexFragment extends BaseFragment {
     private void nav2LockIndex() {
         switch (SafeUtil.getSafePwdType(mDeviceInfo)) {
             case SafeUtil.NO_PASSWORD:
-                real2LockIndex(mDeviceInfo);
+                nav2LockIndex(mDeviceInfo);
                 break;
             case SafeUtil.PASSWORD_TYPE:
                 SafePwdCreateActivity.startCheck(getActivity());
@@ -204,7 +203,7 @@ public class IndexFragment extends BaseFragment {
         SafeUtil.useFinger(getActivity(), new Callback<String>() {
             @Override
             public void onSuccess(String resultInfo) {
-                real2LockIndex(mDeviceInfo);
+                nav2LockIndex(mDeviceInfo);
             }
 
             @Override
@@ -214,7 +213,7 @@ public class IndexFragment extends BaseFragment {
         });
     }
 
-    private void real2LockIndex(DeviceInfo deviceInfo) {
+    private void nav2LockIndex(DeviceInfo deviceInfo) {
         Intent intent = new Intent(getActivity(), LockIndexActivity.class);
         intent.putExtra("family", familyInfo);
         intent.putExtra("device", deviceInfo);
@@ -239,7 +238,7 @@ public class IndexFragment extends BaseFragment {
         if (requestCode == CHECK_PWD) {
             if (resultCode == RESULT_OK && data != null
                     && SafeUtil.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
-                real2LockIndex(mDeviceInfo);
+                nav2LockIndex(mDeviceInfo);
             } else {
                 ToastCompat.show(getContext(), "密码错误");
             }

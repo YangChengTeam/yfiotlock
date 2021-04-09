@@ -132,6 +132,7 @@ public class ConnectActivity extends BaseConnectActivity {
         intent.putExtra("device", lockInfo);
         intent.putExtra("ssid", ssid);
         intent.putExtra("pwd", pwd);
+        intent.putExtra("isActiveDistributionNetwork", isActiveDistributionNetwork);
         startActivity(intent);
     }
 

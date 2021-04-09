@@ -14,6 +14,7 @@ import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
@@ -115,7 +116,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             @Override
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
-                    App.getApp().getConnectedDevices().remove(lockInfo.getMacAddress());
                     App.getApp().getMacList().remove(lockInfo.getMacAddress());
                     SafeUtil.setSafePwdType(lockInfo, 0);
                     EventBus.getDefault().post(new IndexRefreshEvent());
@@ -160,6 +160,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         mSettingAdapter.setOnItemClickListener((adapter, view, position) -> {
             SettingInfo settingInfo = mSettingAdapter.getData().get(position);
             switch (settingInfo.getName()) {
+                case "配置网络":
+                    nav2Connect();
+                    break;
                 case "报警管理":
                     startActivity(new Intent(this, AlarmOpenLockManagerActivity.class));
                     break;
@@ -202,10 +205,19 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         }
     }
 
+    private void nav2Connect() {
+        Intent intent = new Intent(this, ConnectActivity.class);
+        intent.putExtra("bleDevice", LockIndexActivity.getInstance().getBleDevice());
+        intent.putExtra("family", LockIndexActivity.getInstance().getFamilyInfo());
+        intent.putExtra("isActiveDistributionNetwork", true);
+        startActivity(intent);
+    }
+
 
     private void loadData() {
         List<SettingInfo> settingInfos = new ArrayList<>();
         if (!lockInfo.isShare()) {
+            settingInfos.add(new SettingInfo("配置网络", ""));
             settingInfos.add(new SettingInfo("报警管理", ""));
             settingInfos.add(new SettingInfo("设备信息", ""));
             settingInfos.add(new SettingInfo("设备名称", lockInfo.getName()));

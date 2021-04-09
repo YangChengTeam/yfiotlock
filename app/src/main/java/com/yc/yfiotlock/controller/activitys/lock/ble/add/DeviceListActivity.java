@@ -108,10 +108,6 @@ public class DeviceListActivity extends BaseAddActivity {
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
                 mLoadingDialog.dismiss();
-                HashMap<String, BleDevice> hashMap = App.getApp().getConnectedDevices();
-                if (hashMap.get(bleDevice.getMac()) == null) {
-                    hashMap.put(bleDevice.getMac(), bleDevice);
-                }
                 nav2Connect(bleDevice);
             }
 

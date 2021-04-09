@@ -108,7 +108,6 @@ public class LockBLEUtils {
     }
 
     public static boolean isFoundDevice(@NonNull String mac) {
-        IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
         List<String> macList = App.getApp().getMacList();
         if (macList != null) {
             for (String tmac : macList) {
@@ -117,6 +116,7 @@ public class LockBLEUtils {
                 }
             }
         }
+        IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
         if (indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0) {
             for (DeviceInfo deviceInfo : indexInfo.getDeviceInfos()) {
                 if (mac.equals(deviceInfo.getMacAddress())) {

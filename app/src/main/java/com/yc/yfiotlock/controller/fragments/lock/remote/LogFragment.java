@@ -39,8 +39,6 @@ public class LogFragment extends BaseFragment {
     RecyclerView recyclerView;
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
-    @BindView(R.id.tv_sync)
-    View syncView;
 
     protected LogEngine logEngine;
     protected LogAdapter logAdapter;
@@ -75,6 +73,8 @@ public class LogFragment extends BaseFragment {
             page = 1;
             localLoadData();
         });
+
+        mSrlRefresh.setEnabled(false);
     }
 
 
@@ -82,7 +82,7 @@ public class LogFragment extends BaseFragment {
         logAdapter = new LogAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(logAdapter);
-
+        logAdapter.setEmptyView(new NoDataView(getActivity()));
         logAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
             page++;
             localLoadData();
@@ -187,7 +187,7 @@ public class LogFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSync(LockLogSyncEndEvent object) {
-        syncView.setVisibility(View.GONE);
+        mSrlRefresh.setEnabled(true);
         page = 1;
         localLoadData();
     }

@@ -46,6 +46,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         super.initVars();
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
+        isActiveDistributionNetwork = getIntent().getBooleanExtra("isActiveDistributionNetwork", false);
         deviceEngin = new DeviceEngin(this);
         lockBleSend = new LockBLESend(this, bleDevice);
         lockBleSend.setNotifyCallback(this);

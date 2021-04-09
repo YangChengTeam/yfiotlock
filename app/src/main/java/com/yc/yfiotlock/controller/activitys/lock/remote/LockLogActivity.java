@@ -3,6 +3,7 @@ package com.yc.yfiotlock.controller.activitys.lock.remote;
 
 import android.content.Context;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
@@ -62,6 +63,9 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     @BindView(R.id.mi_title)
     MagicIndicator mMiTitle;
 
+    @BindView(R.id.ll_sync)
+    View syncView;
+
     private DeviceInfo lockInfo;
     private LockBLESend lockBLESend;
     private LockLogDao lockLogDao;
@@ -70,6 +74,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private int lastId = 1;
     private final int MAC_COUNT = 30;
     private int syncCount = MAC_COUNT;
+
 
     @Override
     protected int getLayoutId() {
@@ -211,6 +216,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
             if (LockBLEEventCmd.SCMD_NO_NEW_EVENT == lockBLEData.getScmd()) {
+                syncView.setVisibility(View.GONE);
                 EventBus.getDefault().post(new LockLogSyncEndEvent());
                 return;
             }

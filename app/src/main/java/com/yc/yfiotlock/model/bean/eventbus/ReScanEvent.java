@@ -1,4 +1,4 @@
 package com.yc.yfiotlock.model.bean.eventbus;
 
-public class IndexReScanEvent {
+public class ReScanEvent {
 }
