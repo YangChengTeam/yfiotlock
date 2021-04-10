@@ -67,7 +67,7 @@ public class EditNameActivity extends BaseBackActivity {
             ToastCompat.showCenter(getContext(), "用户名不能为空");
             return;
         }
-        mLoadingDialog.show("提交中...");
+        mLoadingDialog.show("修改中...");
         mUserEngine.changeNickName(mEtName.getText().toString()).subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
@@ -77,6 +77,7 @@ public class EditNameActivity extends BaseBackActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
+                ToastCompat.showCenter(getContext(), e.getMessage());
             }
 
             @Override
@@ -90,7 +91,9 @@ public class EditNameActivity extends BaseBackActivity {
                     ToastCompat.showCenter(getContext(), "修改成功");
                     finish();
                 } else {
-                    ToastCompat.showCenter(getContext(), info.getMsg());
+                    String msg = "添加失败";
+                    msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
+                    ToastCompat.show(getContext(), msg);
                 }
             }
         });

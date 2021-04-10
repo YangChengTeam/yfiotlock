@@ -188,7 +188,6 @@ public class LockBLESend {
     }
 
     // 监听
-    private static int notifyRetryCount = 3;
     private static boolean isNotityReady = false;
 
     public static boolean isNotityReady() {
@@ -213,14 +212,10 @@ public class LockBLESend {
                     public void onNotifyFailure(BleException exception) {
                         Log.d(TAG, "回调通失败:" + exception.getDescription());
                         isNotityReady = false;
-                        if (notifyRetryCount-- > 0) {
-                            VUiKit.postDelayed(notifyRetryCount * (1000 - notifyRetryCount * 200), () -> {
-                                bleNotify(bleDevice);
-                            });
-                        } else {
-                            notifyRetryCount = 3;
-                            EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyFailure));
-                        }
+                        EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyFailure));
+                        LockBLEManager.getInstance().disConnect(bleDevice);
+                        LockBLEManager.getInstance().getScannedBleDevices().remove(bleDevice.getMac());
+                        EventBus.getDefault().post(new ReScanEvent());
                     }
 
                     @Override

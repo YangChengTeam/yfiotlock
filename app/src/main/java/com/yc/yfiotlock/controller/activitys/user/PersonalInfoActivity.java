@@ -304,7 +304,7 @@ public class PersonalInfoActivity extends BaseBackActivity {
     private UserEngine mUserEngine;
 
     private void changeUserFace(String face, String faceNoHost) {
-        mLoadingDialog.show("提交中...");
+        mLoadingDialog.show("修改中...");
         mUserEngine.changeFace(faceNoHost).subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
@@ -314,6 +314,7 @@ public class PersonalInfoActivity extends BaseBackActivity {
             @Override
             public void onError(Throwable e) {
                 mLoadingDialog.dismiss();
+                ToastCompat.showCenter(getContext(), e.getMessage());
             }
 
             @Override
@@ -325,7 +326,9 @@ public class PersonalInfoActivity extends BaseBackActivity {
                     EventBus.getDefault().post(userInfo);
                     ToastCompat.showCenter(getContext(), "修改成功");
                 } else {
-                    ToastCompat.showCenter(getContext(), info == null ? "修改失败" : info.getMsg());
+                    String msg = "添加失败";
+                    msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
+                    ToastCompat.showCenter(getContext(), msg);
                 }
 
             }

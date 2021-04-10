@@ -17,7 +17,6 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.eventbus.FamilyAddEvent;
@@ -25,7 +24,6 @@ import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.engin.HomeEngine;
 import com.yc.yfiotlock.view.adapters.MyFamilyAdapter;
-import com.yc.yfiotlock.view.widgets.BackNavBar;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
@@ -101,10 +99,10 @@ public class MyFamilyActivity extends BaseBackActivity {
                 switch (view.getId()) {
                     case R.id.iv_family_number_default:
                     case R.id.tv_family_number_default:
-                        updateDefault(position);
+                        updateDefaultFamily(position);
                         break;
                     case R.id.tv_family_delete:
-                        delete(position);
+                        deleteFamily(position);
                         break;
                     default:
                         break;
@@ -113,7 +111,7 @@ public class MyFamilyActivity extends BaseBackActivity {
         });
     }
 
-    private void delete(int position) {
+    private void deleteFamily(int position) {
         FamilyInfo familyInfo = myFamilyAdapter.getData().get(position);
         GeneralDialog generalDialog = new GeneralDialog(MyFamilyActivity.this);
         generalDialog.setTitle("提示");
@@ -150,7 +148,7 @@ public class MyFamilyActivity extends BaseBackActivity {
         generalDialog.show();
     }
 
-    private void updateDefault(int position) {
+    private void updateDefaultFamily(int position) {
         FamilyInfo familyInfo = myFamilyAdapter.getData().get(position);
         if (familyInfo.isDefault()) {
             return;
@@ -206,13 +204,19 @@ public class MyFamilyActivity extends BaseBackActivity {
                         empty();
                         return;
                     }
-                    List<FamilyInfo> data = info.getData();
-                    myFamilyAdapter.setNewInstance(data);
+                    success(info.getData());
                 } else {
                     fail();
                 }
             }
         });
+    }
+
+    @Override
+    public void success(Object data) {
+        super.success(data);
+        List<FamilyInfo> familyInfos = (List<FamilyInfo>) data;
+        myFamilyAdapter.setNewInstance(familyInfos);
     }
 
     @Override

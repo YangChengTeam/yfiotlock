@@ -314,6 +314,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (cloudHelper != null) {
             cloudHelper.unregisterNotify();
         }
+        
         LogUtil.msg("已清理");
     }
 

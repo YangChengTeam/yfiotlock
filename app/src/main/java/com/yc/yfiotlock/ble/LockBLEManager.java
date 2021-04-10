@@ -56,6 +56,10 @@ public class LockBLEManager  {
     }
 
     private Map<String, BleDevice> scannedBleDevices = new HashMap<>();
+    public Map<String, BleDevice> getScannedBleDevices() {
+        return scannedBleDevices;
+    }
+
     private boolean isConnecting = false;
     private BleStateReceiver bleStateReceiver;
 
