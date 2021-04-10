@@ -52,7 +52,10 @@ public class MyFamilyNameActivity extends BaseBackActivity {
     @Override
     protected void initViews() {
         super.initViews();
-
+        if (!TextUtils.isEmpty(familyInfo.getName())) {
+            editText.setText(familyInfo.getName());
+            editText.setSelection(familyInfo.getName().length());
+        }
         RxView.clicks(tvSure).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
             String trim = editText.getText().toString().trim();
             if (TextUtils.isEmpty(trim)) {
