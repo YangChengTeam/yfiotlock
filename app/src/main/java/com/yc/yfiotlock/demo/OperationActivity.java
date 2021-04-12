@@ -42,10 +42,10 @@ public class OperationActivity extends AppCompatActivity implements View.OnClick
     ProgressDialog progressDialog;
     byte[] bytes = new byte[]{(byte) 0xAA, (byte) 0x00, (byte) 0x00, (byte) 0x12, (byte) 0x00, (byte) 0x0B, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x02, (byte) 0x00, (byte) 0x23, (byte) 0x0B, (byte) 0xC3, (byte) 0x8B, (byte) 0xBB};
 
-    public static final String WRITE_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
-    public static final String NOTIFY_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
-    public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
-    public static final String NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616";
+    public static final String WRITE_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+    public static final String NOTIFY_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+    public static final String WRITE_CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+    public static final String NOTIFY_CHARACTERISTIC_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

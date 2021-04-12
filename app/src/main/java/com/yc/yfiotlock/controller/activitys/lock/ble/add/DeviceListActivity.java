@@ -56,7 +56,6 @@ public class DeviceListActivity extends BaseAddActivity {
     private DeviceAdapter mDeviceAdapter;
 
     private static WeakReference<DeviceListActivity> mInstance;
-
     public static void safeFinish() {
         if (mInstance != null && mInstance.get() != null) {
             mInstance.get().finish();

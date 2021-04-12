@@ -68,7 +68,7 @@ public class DeviceInfo implements Serializable {
 
     public String getProtocolVersion() {
         if (TextUtils.isEmpty(protocolVersion)) {
-            protocolVersion = "v1.1";
+            protocolVersion = "v1.5";
         }
         return protocolVersion;
     }

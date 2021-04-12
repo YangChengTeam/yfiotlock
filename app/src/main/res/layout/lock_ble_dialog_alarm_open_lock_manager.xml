@@ -30,10 +30,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="当遇到危险如有人肋迫、跟踪等紧急情
-况时，您可使用报警专的密码/指纹/NF
-C方式开锁，系统会向管理员手机发求
+况时，您可使用报警专的密码/指纹方式开锁，系统会向管理员手机发求
 救信息，协助脱身。请牢记报警密码/
-指纹/NFC，同时为避免引起不必要麻
+指纹，同时为避免引起不必要麻
 烦，请只在最需要时刻使用"
             android:textColor="#333333"
             android:textSize="14dp"

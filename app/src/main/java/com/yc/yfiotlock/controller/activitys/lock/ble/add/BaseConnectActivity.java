@@ -236,6 +236,17 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         }
     }
 
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
+            if (isDeviceAdd || isActiveDistributionNetwork) {
+                return;
+            }
+            isDeviceAdd = true;
+            cloudAddDevice();
+        }
+    }
+
     protected void nav2fail() {
         Intent intent = new Intent(this, ConnectFailActivity.class);
         intent.putExtra("name", bleDevice.getName());

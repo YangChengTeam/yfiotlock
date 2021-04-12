@@ -13,6 +13,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
+import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
@@ -122,13 +123,13 @@ public class DeviceEngin extends BaseEngin {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    public Observable<ResultInfo<UpgradeInfo>> getUpdateInfo(int versionCode) {
+    public Observable<ResultInfo<UpdateInfo>> getUpdateInfo(int versionCode) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("version_code", String.valueOf(versionCode));
-        return new HttpCoreEngin<ResultInfo<UpgradeInfo>>(getContext()).rxpost(Config.DEVICE_UPDATE_URL, new TypeReference<ResultInfo<UpgradeInfo>>() {
+        return new HttpCoreEngin<ResultInfo<UpdateInfo>>(getContext()).rxpost(Config.DEVICE_UPDATE_URL, new TypeReference<ResultInfo<UpdateInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }

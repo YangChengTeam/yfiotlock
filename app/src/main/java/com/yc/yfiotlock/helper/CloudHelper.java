@@ -61,25 +61,25 @@ public class CloudHelper {
     }
 
 
-    protected void cloudDel(int lockId, int keyid) {
-        lockEngine.delOpenLockWay2(lockId + "", keyid + "").subscribe(new Action1<ResultInfo<String>>() {
+    protected void cloudDel(int lockId, int keyid, int groupType) {
+        lockEngine.delOpenLockWay2(lockId + "", keyid + "", groupType + "").subscribe(new Action1<ResultInfo<String>>() {
             @Override
             public void call(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
                     LogUtil.msg("同步删除: keyid:" + keyid + " lockid:" + lockId);
-                    openLockDao.realDeleteOpenLockInfo(lockId, keyid).subscribeOn(Schedulers.io()).subscribe();
+                    openLockDao.realDeleteOpenLockInfo(lockId, keyid, groupType).subscribeOn(Schedulers.io()).subscribe();
                 }
             }
         });
     }
 
-    protected void cloudEdit(int lockId, int keyid, String name) {
-        lockEngine.modifyOpenLockName2(lockId + "", keyid + "", name).subscribe(new Action1<ResultInfo<String>>() {
+    protected void cloudEdit(int lockId, int keyid, int groupType, String name) {
+        lockEngine.modifyOpenLockName2(lockId + "", keyid + "", groupType + "", name).subscribe(new Action1<ResultInfo<String>>() {
             @Override
             public void call(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
                     LogUtil.msg("同步更新: keyid:" + keyid + " lockid:" + lockId);
-                    openLockDao.updateOpenLockInfo(lockId, keyid).subscribeOn(Schedulers.io()).subscribe();
+                    openLockDao.updateOpenLockInfo(lockId, keyid, groupType).subscribeOn(Schedulers.io()).subscribe();
                 }
             }
         });
@@ -107,13 +107,13 @@ public class CloudHelper {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCloudDelete(CloudDeleteEvent cloudDeleteEvent) {
         OpenLockInfo openLockInfo = cloudDeleteEvent.getOpenLockInfo();
-        cloudDel(openLockInfo.getLockId(), openLockInfo.getKeyid());
+        cloudDel(openLockInfo.getLockId(), openLockInfo.getKeyid(), openLockInfo.getGroupType());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCloudEdit(CloudUpdateEvent cloudUpdateEvent) {
         OpenLockInfo openLockInfo = cloudUpdateEvent.getOpenLockInfo();
-        cloudEdit(openLockInfo.getLockId(), openLockInfo.getKeyid(), openLockInfo.getName());
+        cloudEdit(openLockInfo.getLockId(), openLockInfo.getKeyid(), openLockInfo.getGroupType(), openLockInfo.getName());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

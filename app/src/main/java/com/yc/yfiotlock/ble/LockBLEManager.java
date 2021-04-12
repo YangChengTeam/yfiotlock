@@ -65,10 +65,10 @@ public class LockBLEManager  {
 
     public void initBle(Application context) {
         BleManager.getInstance()
-                .setReConnectCount(5, 1000)
+                .setReConnectCount(1, 1000)
                 .setSplitWriteNum(LockBLEPackage.getMtu())
                 .setConnectOverTime(10000 * 5)
-                .setOperateTimeout(5000).init(context);
+                .setOperateTimeout(10000).init(context);
         initBleState(context);
     }
 
@@ -76,7 +76,7 @@ public class LockBLEManager  {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
                 .setDeviceName(false, DEVICE_NAME)
-                .setScanTimeOut(10000);
+                .setScanTimeOut(12000);
         BleManager.getInstance().initScanRule(builder.build());
     }
 
@@ -85,7 +85,7 @@ public class LockBLEManager  {
         BleScanRuleConfig.Builder builder = new BleScanRuleConfig.Builder()
                 .setAutoConnect(false)
                 .setDeviceMac(mac)
-                .setScanTimeOut(10000);
+                .setScanTimeOut(12000);
         BleManager.getInstance().initScanRule(builder.build());
     }
 
@@ -235,10 +235,10 @@ public class LockBLEManager  {
             @Override
             public void onScanning(BleDevice bleDevice) {
                 if (bleDevice == null) return;
+                scannedBleDevices.put(bleDevice.getMac(), bleDevice);
                 if (scannedBleDevices.get(bleDevice.getMac()) == null) {
                     callbck.onScanning(bleDevice);
                 }
-                scannedBleDevices.put(bleDevice.getMac(), bleDevice);
             }
 
             @Override

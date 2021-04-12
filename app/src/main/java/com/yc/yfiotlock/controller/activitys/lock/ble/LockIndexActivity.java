@@ -227,11 +227,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 return;
             }
 
-            if ("搜索门锁中...".equals(statusTitleTv.getText().toString())) {
-                return;
-            }
-
-            if ("连接门锁中...".equals(statusTitleTv.getText().toString())) {
+            if (isBleWorking()) {
                 return;
             }
 
@@ -249,6 +245,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         });
     }
 
+    private boolean isBleWorking(){
+        return "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString());
+    }
+
     private void vibrate() {
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         if (vibrator.hasVibrator()) {
@@ -262,7 +262,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             lockBleSend.registerNotify();
             lockBleSend.setNotifyCallback(this);
         }
-
     }
 
     private void registerNotify() {
@@ -289,7 +288,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         registerNotify();
 
         // 重新连接
-        if (bleDevice != null && !LockBLEManager.getInstance().isConnected(bleDevice)) {
+        if (bleDevice != null && !LockBLEManager.getInstance().isConnected(bleDevice) && !isBleWorking()) {
             reconnect();
         }
     }
