@@ -8,14 +8,10 @@ import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
-import com.yc.yfiotlock.download.DownloadManager;
-import com.yc.yfiotlock.model.bean.user.PhoneTokenInfo;
+import com.yc.yfiotlock.download.AppDownloadManager;
 import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
 
@@ -28,9 +24,11 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        DownloadManager.init(new WeakReference<>(this));
+        AppDownloadManager.getInstance().init(new WeakReference<>(this));
         setFullScreen();
         setFullScreenWithCutOutScreen();
+
+        validateUserInfo();
     }
 
     /**
@@ -38,27 +36,7 @@ public class SplashActivity extends BaseActivity {
      * 更加符合用户需求（暂时有别的事要处理），而不是用户返回桌面了，过一会又打开app了
      * 如果在跳转的时候返回了，就加个标识，当用户再次切换回app的时候再跳转
      */
-    private boolean navToMain = false;
-
-    /**
-     * 用户信息是否验证过
-     */
-    private boolean isValidated = false;
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            if (navToMain) {
-                navToMain();
-            }
-            if (!isValidated) {
-                validateUserInfo();
-            }
-        } else {
-            navToMain = false;
-        }
-    }
+    private boolean isNav2Main = false;
 
     private void validateUserInfo() {
         if (App.isLogin()) {
@@ -70,36 +48,25 @@ public class SplashActivity extends BaseActivity {
                     } else if (resultInfo.getCode() == -100) {
                         UserInfoCache.setUserInfo(null);
                     }
-                    isValidated = true;
-                    navToMain = true;
-                    VUiKit.postDelayed(1000, this::navToMain);
+                    VUiKit.postDelayed(1000, this::nav2Main);
                 }
             });
         } else {
-            navToMain = true;
-            VUiKit.postDelayed(1000, this::navToMain);
+            VUiKit.postDelayed(1000, this::nav2Main);
         }
     }
 
-    private void navToMain() {
-        //因为跳转都是延时的，避免多次跳转
-        if (!navToMain) {
+    private void nav2Main() {
+        if (isNav2Main) {
             return;
         }
-        navToMain = false;
+        isNav2Main = true;
         if (App.isLogin()) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
             CommonUtil.startLogin(this);
         }
         finish();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onVerifyOpenSuccess(PhoneTokenInfo phoneTokenInfo) {
-        if (phoneTokenInfo != null && phoneTokenInfo.getCode().equals("600001")) {
-            finish();
-        }
     }
 
     @Override

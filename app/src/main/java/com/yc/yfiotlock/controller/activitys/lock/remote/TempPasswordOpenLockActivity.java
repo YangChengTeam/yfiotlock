@@ -118,8 +118,10 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
             if (info != null && info.getCode() == 1 && info.getData() != null) {
                 TimeInfo timeInfo = info.getData();
                 tempPwdAdapter.setSynctime(timeInfo.getTime() * 1000L);
-                localLoadData();
+            } else {
+                tempPwdAdapter.setSynctime(System.currentTimeMillis());
             }
+            localLoadData();
         });
     }
 

@@ -27,10 +27,9 @@ import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment;
 import com.yc.yfiotlock.controller.fragments.user.MyFragment;
-import com.yc.yfiotlock.download.DownloadManager;
+import com.yc.yfiotlock.download.AppDownloadManager;
 import com.yc.yfiotlock.helper.ThreadPoolExecutorImpl;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
-import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ShareDeviceWrapper;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
@@ -78,13 +77,13 @@ public class MainActivity extends BaseActivity {
         onSelected(0);
         getShareDevice();
         ThreadPoolExecutorImpl.getImpl().execute(this::deleteLowerVersionApkFile);
-        //checkUpdate();
+        checkUpdate();
     }
 
     private void checkUpdate() {
         UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(App.getApp().getUpdateInfo());
         if (updateInfo != null) {
-            DownloadManager.setContext(new WeakReference<>(this));
+            AppDownloadManager.getInstance().setContext(new WeakReference<>(this));
             UpdateDialog updateDialog = new UpdateDialog(this);
             updateDialog.show(updateInfo);
         }

@@ -5,11 +5,13 @@ import android.content.Intent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.baidu.lbsapi.auth.LBSAuthManager;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
@@ -47,6 +49,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private SettingAdapter mSettingAdapter;
     private LockBLESend lockBleSend;
     private DeviceEngin deviceEngin;
+    private BleDevice bleDevice;
     private SettingSoundView headView;
     private int volume;
 
@@ -59,7 +62,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     protected void initVars() {
         super.initVars();
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
-        BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
+        bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice);
         deviceEngin = new DeviceEngin(this);
     }
@@ -161,6 +164,10 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             SettingInfo settingInfo = mSettingAdapter.getData().get(position);
             switch (settingInfo.getName()) {
                 case "配置网络":
+                    if(!LockBLEManager.getInstance().isConnected(bleDevice)){
+                        ToastCompat.show(getContext(), "蓝牙未连接");
+                        return;
+                    }
                     nav2Connect();
                     break;
                 case "报警管理":
@@ -183,6 +190,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     break;
                 case "设备共享":
                     LockShareManageActivity.start(getContext(), lockInfo);
+                    break;
+                case "固件升级":
+                    startActivity(new Intent(this, FirmwareUpdateActivity.class));
                     break;
                 default:
                     break;
@@ -207,7 +217,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     private void nav2Connect() {
         Intent intent = new Intent(this, ConnectActivity.class);
-        intent.putExtra("bleDevice", LockIndexActivity.getInstance().getBleDevice());
+        intent.putExtra("bleDevice", bleDevice);
         intent.putExtra("family", LockIndexActivity.getInstance().getFamilyInfo());
         intent.putExtra("isActiveDistributionNetwork", true);
         startActivity(intent);
@@ -222,6 +232,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             settingInfos.add(new SettingInfo("设备信息", ""));
             settingInfos.add(new SettingInfo("设备名称", lockInfo.getName()));
             settingInfos.add(new SettingInfo("设备共享", ""));
+            settingInfos.add(new SettingInfo("固件升级", ""));
         }
         settingInfos.add(new SettingInfo("安全设置", ""));
         settingInfos.add(new SettingInfo("帮助与反馈", ""));

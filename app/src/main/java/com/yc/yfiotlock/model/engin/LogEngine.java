@@ -93,7 +93,7 @@ public class LogEngine extends BaseEngin {
         map.put("page", String.valueOf(page));
         map.put("page_size", String.valueOf(pageSize));
         HttpCoreEngin<ResultInfo<LogListInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.LOG_LOCAL_WARN_URL, new TypeReference<ResultInfo<WarnListInfo>>() {
+        return httpCoreEngin.rxpost(Config.LOG_LOCAL_WARN_URL, new TypeReference<ResultInfo<LogListInfo>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }

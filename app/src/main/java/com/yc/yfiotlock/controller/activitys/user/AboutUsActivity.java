@@ -15,7 +15,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateDialog;
-import com.yc.yfiotlock.download.DownloadManager;
+import com.yc.yfiotlock.download.AppDownloadManager;
 import com.yc.yfiotlock.model.bean.user.AboutInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
@@ -52,7 +52,7 @@ public class AboutUsActivity extends BaseBackActivity {
     @Override
     protected void initViews() {
         super.initViews();
-        DownloadManager.setContext(new WeakReference<>(this));
+        AppDownloadManager.getInstance().setContext(new WeakReference<>(this));
         setRvAbout();
         checkVersion(false);
     }
@@ -157,7 +157,7 @@ public class AboutUsActivity extends BaseBackActivity {
                 if (updateDialog == null) {
                     updateDialog = new UpdateDialog(getContext());
                 }
-                DownloadManager.setContext(new WeakReference<>(this));
+                AppDownloadManager.getInstance().setContext(new WeakReference<>(this));
                 updateDialog.show(updateInfo);
             }
             mStvCheck.setShaderEnable(true);

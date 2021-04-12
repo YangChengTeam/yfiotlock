@@ -287,6 +287,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
         initShakeSensor();
         registerNotify();
+
         // 重新连接
         if (bleDevice != null && !LockBLEManager.getInstance().isConnected(bleDevice)) {
             reconnect();
@@ -314,7 +315,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (cloudHelper != null) {
             cloudHelper.unregisterNotify();
         }
-        
+
+
+        stopAnimations();
+
         LogUtil.msg("已清理");
     }
 
@@ -329,6 +333,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         AnimatinUtil.scale(tabView, 0.05f);
         AnimatinUtil.scale(tabView2, 0.05f);
     }
+
 
     private void bleOpen() {
         if (isOpening) {

@@ -1,6 +1,5 @@
 package com.yc.yfiotlock.controller.dialogs.user;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,17 +10,14 @@ import android.widget.TextView;
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.controller.dialogs.BaseDialog;
-import com.yc.yfiotlock.download.DownloadManager;
+import com.yc.yfiotlock.download.AppDownloadManager;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
-import com.yc.yfiotlock.utils.CacheUtil;
-import com.yc.yfiotlock.utils.UserInfoCache;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 
 /*
  * Created by　Dullyoung on 2021/3/8
@@ -65,7 +61,7 @@ public class UpdateDialog extends BaseDialog {
         mTvContent.setText(updateInfo.getDesc());
         mTvUpdate.setText("立即更新");
         mStvVersion.setText("v".concat(updateInfo.getVersion()));
-        setBtn(DownloadManager.getUpdateInfo());
+        setProcess(AppDownloadManager.getInstance().getUpdateInfo());
         isMust = (updateInfo.getIsMust() == 1);
         mIvCancel.setVisibility(isMust ? View.GONE : View.VISIBLE);
         setCanceledOnTouchOutside(isMust);
@@ -83,21 +79,20 @@ public class UpdateDialog extends BaseDialog {
     }
 
     private boolean isMust = false;
-
     private UpdateInfo mUpdateInfo;
 
     @Override
     public void bindClick() {
         setClick(R.id.iv_cancel, this::dismiss);
-        setClick(R.id.tv_update, () -> DownloadManager.updateApp(mUpdateInfo));
+        setClick(R.id.tv_update, () -> AppDownloadManager.getInstance().updateApp(mUpdateInfo));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDownload(UpdateInfo updateInfo) {
-        setBtn(updateInfo);
+        setProcess(updateInfo);
     }
 
-    private void setBtn(UpdateInfo updateInfo) {
+    private void setProcess(UpdateInfo updateInfo) {
         if (updateInfo == null) {
             return;
         }

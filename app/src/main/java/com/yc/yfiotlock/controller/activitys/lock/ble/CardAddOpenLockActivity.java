@@ -84,7 +84,6 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             ToastCompat.show(getContext(), "卡片添加失败");
-            finish();
         }
     }
 }

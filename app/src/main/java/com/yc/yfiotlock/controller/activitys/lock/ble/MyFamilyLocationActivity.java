@@ -94,11 +94,12 @@ public class MyFamilyLocationActivity extends BaseBackActivity implements BaiduM
         super.initViews();
         setRv();
 
-        if (familyInfo.getLongitude() <= 0 || familyInfo.getLatitude() <= 0) {
+        if(familyInfo.getLongitude() <= 0 || familyInfo.getLatitude() <= 0) {
             initLocationOption();
         } else {
             initMap(familyInfo.getLatitude(), familyInfo.getLongitude());
         }
+
     }
 
     private void setRv() {

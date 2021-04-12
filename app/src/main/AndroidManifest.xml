@@ -49,6 +49,9 @@
         <activity android:name=".controller.activitys.lock.ble.SafePwdSettingActivity" />
         <activity android:name=".controller.activitys.user.WebActivity" />
 
+        <activity android:name=".controller.activitys.lock.ble.FirmwareUpdateActivity" />
+        <activity android:name=".controller.activitys.lock.ble.FirmwareUpdateNextActivity" />
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="uoKAxhRzWoIE8yW6MPErz3VkM4Q3uVyr" />

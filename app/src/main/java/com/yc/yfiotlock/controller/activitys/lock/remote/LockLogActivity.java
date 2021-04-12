@@ -70,6 +70,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private LockBLESend lockBLESend;
     private LockLogDao lockLogDao;
     private OpenLockDao openLockDao;
+    private int bleRetryCount = 3;
     private int retryCount = 3;
     private int lastId = 1;
     private final int MAC_COUNT = 30;
@@ -303,7 +304,13 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
-            bleSynclog();
+            if (bleRetryCount-- > 0) {
+                bleSynclog();
+            } else {
+                bleRetryCount = 3;
+                syncView.setVisibility(View.GONE);
+                EventBus.getDefault().post(new LockLogSyncEndEvent());
+            }
         }
     }
 

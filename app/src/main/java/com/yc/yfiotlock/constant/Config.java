@@ -76,6 +76,7 @@ public class Config {
     public static final String DEVICE_DEL_URL = getBaseUrl() + "/userapp/v1.Locker/lockerDel" + isRsa();
     public static final String DEVICE_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/lockerMacs" + isRsa();
     public static final String DEVICE_TIME_URL = getBaseUrl() + "/userapp/v1.User/getTime" + isRsa();
+    public static final String DEVICE_UPDATE_URL = getBaseUrl() + "/userapp/v1.Index/upgrade" + isRsa();
 
     // 安全设备
     public static final String DEVICE_SET_SAFE_URL = getBaseUrl() + "/userapp/v1.Locker/setOperationPwd" + isRsa();
