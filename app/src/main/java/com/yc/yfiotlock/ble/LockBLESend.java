@@ -85,7 +85,7 @@ public class LockBLESend {
         this.cmdBytes = cmdBytes;
         if (!isConnected()) {
             VUiKit.post(() -> {
-                ToastCompat.show(context, "蓝牙已断开");
+                ToastCompat.show(context, "蓝牙未连接");
             });
             EventBus.getDefault().post(new OpenLockReConnectEvent());
             return;
@@ -354,7 +354,7 @@ public class LockBLESend {
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);
-        lockBLEData.setOther(error.getBytes());
+        lockBLEData.setExtra(error.getBytes());
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_NOTIFY_TIMEOUT_ERROR);
         processNotify(lockBLEData);
         responseErrorCount++;

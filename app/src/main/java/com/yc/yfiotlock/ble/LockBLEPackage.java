@@ -20,6 +20,10 @@ public class LockBLEPackage {
     private short crc16;   //  校验位
     private byte end;      //  包尾
 
+    public void setPid(byte pid) {
+        this.pid = pid;
+    }
+
     // START = 1 PID = 1 LENGTH = 2 CRC16 = 2 END = 1  total = 7
     private int nodataLen = 7;  //非数据区长度
 
@@ -39,6 +43,29 @@ public class LockBLEPackage {
 
     public byte[] build(Context context, LockBLEData bleData) {
         data = bleData.build(context);
+        int len = data.length;
+
+        // PID = 1 LENGTH = 2
+        int precrcLen = 1 + 2;
+
+        // START = 1 CRC16 = 2 END = 1
+        length = (short) (1 + precrcLen + len + 2 + 1);
+
+        // make crc16 bytes
+        ByteBuffer byteBuffer = ByteBuffer.allocate(len + precrcLen).order(ByteOrder.BIG_ENDIAN);
+        byte[] bytes = byteBuffer.put(pid)
+                .putShort(length)
+                .put(data).array();
+
+        crc16 = (short) LockBLEUtils.crc16(bytes);
+
+        ByteBuffer packageBuffer = ByteBuffer.allocate(len + nodataLen).put(start).put(bytes).putShort(pid).put(end).order(ByteOrder.BIG_ENDIAN);
+
+        return packageBuffer.array();
+    }
+
+    public byte[] build2(Context context, LockBLEData bleData) {
+        data = bleData.build(context);
 
         int maxdataLen = (mtu - nodataLen);
         // 分包操作 目前数据量应该都是1个包
@@ -51,10 +78,10 @@ public class LockBLEPackage {
             }
             totalLen += len;
         }
-
         ByteBuffer packagesBuffer = ByteBuffer.allocate(totalLen).order(ByteOrder.BIG_ENDIAN);
         for (int i = 0; i < packageCount; i++) {
             pid = (byte) (packageCount - i - 1);
+
             int len = maxdataLen;
             if (data.length < (i + 1) * maxdataLen) {
                 // data = N
@@ -138,7 +165,7 @@ public class LockBLEPackage {
         lockBLEData.setStatus(response[12]);
         // LENGHT = 2 SEQ = 4 MCMD = 1 SCMD = 1 DATA STATUS = 1 CRC16 = 2
         if (tlen - 18 > 0) {
-            lockBLEData.setOther(Arrays.copyOfRange(response, 13, tlen - 5));
+            lockBLEData.setExtra(Arrays.copyOfRange(response, 13, tlen - 5));
         }
         return lockBLEData;
     }

@@ -16,12 +16,13 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.download.DeviceDownloadManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
-import com.yc.yfiotlock.model.bean.user.UpgradeInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.SafeUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
@@ -35,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -55,7 +57,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     // 固件升级相关
     private UpdateInfo updateInfo;
-    private int versionCode = 30;
 
     @Override
     protected int getLayoutId() {
@@ -77,18 +78,27 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         setRvSetting();
         loadData();
 
-        getUpdateInfo();
+        if (isBleDeviceConnected()) {
+            bleGetVersion();
+        } else {
+            getUpdateInfo();
+        }
     }
 
     private void getUpdateInfo() {
-        deviceEngin.getUpdateInfo(versionCode).subscribe(new Action1<ResultInfo<UpdateInfo>>() {
+        updateInfo = DeviceDownloadManager.getInstance().getUpdateInfo();
+        if (updateInfo != null && updateInfo.isUpgrade()) {
+            mSettingAdapter.notifyDataSetChanged();
+        }
+        deviceEngin.getUpdateInfo(lockInfo.getFirmwareVersion()).subscribe(new Action1<ResultInfo<UpdateInfo>>() {
             @Override
             public void call(ResultInfo<UpdateInfo> info) {
                 if (info != null && info.getCode() == 1) {
-                    updateInfo = CommonUtil.getNeedUpgradeInfo(info.getData());
-                    if (updateInfo != null) {
+                    updateInfo = info.getData();
+                    if (updateInfo != null && updateInfo.isUpgrade()) {
                         mSettingAdapter.notifyDataSetChanged();
                     }
+                    DeviceDownloadManager.getInstance().setUpdateInfo(updateInfo);
                 }
             }
         });
@@ -155,6 +165,13 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 }
             }
         });
+    }
+
+    private void bleGetVersion() {
+        if (lockBleSend != null) {
+            byte[] bytes = LockBLESettingCmd.getVersion(this);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_VERSION, bytes, true);
+        }
     }
 
     private void bleReset() {
@@ -292,6 +309,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_RESET) {
             finish();
             LockIndexActivity.safeFinish();
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_VERSION) {
+            CacheUtil.setCache("firmwareVersion", new String(Arrays.copyOfRange(lockBLEData.getExtra(), 0, 6)));
+            getUpdateInfo();
         }
     }
 
@@ -301,6 +321,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHANGE_VOLUME) {
             ToastCompat.show(getContext(), "设置失败");
             headView.resetVolume();
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_VERSION) {
+            getUpdateInfo();
         }
     }
 
@@ -313,7 +335,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         protected void convert(@NotNull BaseViewHolder holder, SettingInfo settingInfo) {
             holder.setText(R.id.tv_name, settingInfo.getName());
             holder.setText(R.id.tv_value, settingInfo.getValue());
-            if (settingInfo.getName().equals("固件升级") && updateInfo != null) {
+            if (settingInfo.getName().equals("固件升级") && updateInfo != null && updateInfo.isUpgrade()) {
                 holder.setVisible(R.id.view_update, true);
             } else {
                 holder.setVisible(R.id.view_update, false);

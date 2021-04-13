@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LockBLEManager  {
+public class LockBLEManager {
     public static final String DEVICE_NAME = "YF-L1";
     public static final int OP_INTERVAL_TIME = 200;
     public static final String PIN_CODE = "123456";
@@ -56,6 +56,7 @@ public class LockBLEManager  {
     }
 
     private Map<String, BleDevice> scannedBleDevices = new HashMap<>();
+
     public Map<String, BleDevice> getScannedBleDevices() {
         return scannedBleDevices;
     }
@@ -131,9 +132,10 @@ public class LockBLEManager  {
 
         void onScanFailed();
     }
+
     public static final int REQUEST_GPS = 4;
 
-    public void stopScan(){
+    public void stopScan() {
         BleManager.getInstance().cancelScan();
     }
 
@@ -235,9 +237,11 @@ public class LockBLEManager  {
             @Override
             public void onScanning(BleDevice bleDevice) {
                 if (bleDevice == null) return;
-                scannedBleDevices.put(bleDevice.getMac(), bleDevice);
                 if (scannedBleDevices.get(bleDevice.getMac()) == null) {
+                    scannedBleDevices.put(bleDevice.getMac(), bleDevice);
                     callbck.onScanning(bleDevice);
+                } else {
+                    scannedBleDevices.put(bleDevice.getMac(), bleDevice);
                 }
             }
 

@@ -10,10 +10,9 @@ public class LockBLEData {
 
     private byte mcmd;
     private byte scmd;
+    private byte[] data;
     private byte status;
-    private byte[] other;
-
-    private String body;
+    private byte[] extra;
 
     public byte getMcmd() {
         return mcmd;
@@ -23,12 +22,12 @@ public class LockBLEData {
         return scmd;
     }
 
-    public byte[] getOther() {
-        return other;
+    public byte[] getExtra() {
+        return extra;
     }
 
-    public void setOther(byte[] other) {
-        this.other = other;
+    public void setExtra(byte[] extra) {
+        this.extra = extra;
     }
 
     public byte getStatus() {
@@ -47,16 +46,13 @@ public class LockBLEData {
         this.scmd = scmd;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     public byte[] build(Context context) {
-
-        byte[] data = null;
         short length = 0;
-        if (body != null && body.length() > 0) {
-            data = body.getBytes();
+        if (this.data != null ) {
             length += data.length;
         }
 

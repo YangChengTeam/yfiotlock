@@ -16,6 +16,8 @@ public class UpdateInfo implements Serializable {
     @JSONField(name = "down_url")
     private String downUrl;
     private String desc;
+    @JSONField(name = "upgrade")
+    private boolean isUpgrade;
     //官网地址
     private String url;
     private String speed;
@@ -32,7 +34,6 @@ public class UpdateInfo implements Serializable {
         }
         return (int) (offsetSize * 100 / totalSize);
     }
-
 
     public String getVersion() {
         return version;
@@ -64,6 +65,14 @@ public class UpdateInfo implements Serializable {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public boolean isUpgrade() {
+        return isUpgrade;
+    }
+
+    public void setUpgrade(boolean upgrade) {
+        isUpgrade = upgrade;
     }
 
     public String getUrl() {
@@ -129,4 +138,6 @@ public class UpdateInfo implements Serializable {
     public void setIsMust(int isMust) {
         this.isMust = isMust;
     }
+
+
 }

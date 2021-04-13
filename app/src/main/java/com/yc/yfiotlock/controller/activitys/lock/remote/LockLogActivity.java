@@ -224,34 +224,34 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             LogInfo logInfo = new LogInfo();
             logInfo.setLockId(lockInfo.getId());
             int n = 4;
-            ByteBuffer wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), 0, n));
+            ByteBuffer wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), 0, n));
             logInfo.setEventId(wrapped.getInt());
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             logInfo.setKeyid(wrapped.getInt());
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             logInfo.setType(wrapped.getInt());
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             logInfo.setGroupType(wrapped.getInt());
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             int year = 2000 + wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             int month = wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             int day = wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             int hour = wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             int minute = wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getOther(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
             int second = wrapped.get();
 
             String time = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + ":";

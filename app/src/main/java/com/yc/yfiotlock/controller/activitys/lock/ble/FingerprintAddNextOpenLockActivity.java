@@ -56,10 +56,10 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
             fpIv.setImageResource(getResources().getIdentifier("fp" + lockBLEData.getStatus(), "mipmap", this.getPackageName()));
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
-                if (lockBLEData.getOther() != null) {
-                    String number = new String(Arrays.copyOfRange(lockBLEData.getOther(), 0, 8));
+                if (lockBLEData.getExtra() != null) {
+                    String number = new String(Arrays.copyOfRange(lockBLEData.getExtra(), 0, 8));
                     if (number.equals(this.number)) {
-                        int id = lockBLEData.getOther()[8];
+                        int id = lockBLEData.getExtra()[8];
                         Intent intent = new Intent(getContext(), FingerprintAddSelectHandOpenLockActivity.class);
                         intent.putExtra("keyid", id);
                         startActivity(intent);

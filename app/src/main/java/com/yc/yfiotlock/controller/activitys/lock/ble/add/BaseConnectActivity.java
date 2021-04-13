@@ -17,7 +17,6 @@ import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
-import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
@@ -187,7 +186,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         finish();
         ConnectActivity.safeFinish();
         DeviceListActivity.safeFinish();
-        ScanDeviceActivity.finish2();
+        ScanDeviceActivity.safeFinish();
     }
 
     @Override
@@ -223,7 +222,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
-            aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getOther()).replace(" ", "");
+            aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getExtra()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
             if (isDeviceAdd || isActiveDistributionNetwork) {
                 return;

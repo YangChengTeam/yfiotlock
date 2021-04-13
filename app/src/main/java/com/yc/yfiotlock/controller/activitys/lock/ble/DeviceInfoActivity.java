@@ -4,15 +4,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
+import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
-import com.yc.yfiotlock.view.widgets.BackNavBar;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class DeviceInfoActivity extends BaseBackActivity {
+public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
 
 
     @BindView(R.id.rv_device_info)
@@ -30,6 +30,7 @@ public class DeviceInfoActivity extends BaseBackActivity {
 
     private DeviceInfo deviceInfo;
     private ItemInfoAdapter mAdapter;
+    private LockBLESend lockBleSend;
 
     @Override
     protected int getLayoutId() {
@@ -40,16 +41,40 @@ public class DeviceInfoActivity extends BaseBackActivity {
     protected void initVars() {
         super.initVars();
         deviceInfo = LockIndexActivity.getInstance().getLockInfo();
+        lockBleSend = new LockBLESend(this, LockIndexActivity.getInstance().getBleDevice());
     }
 
     @Override
     protected void initViews() {
         super.initViews();
-        setRvDeviceInfo();
+        setRv();
+
+        if (lockBleSend.isConnected()) {
+            bleGetBattery();
+        } else {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (lockBleSend != null) {
+            lockBleSend.setNotifyCallback(this);
+            lockBleSend.registerNotify();
+        }
+    }
 
-    private void setRvDeviceInfo() {
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (lockBleSend != null) {
+            lockBleSend.setNotifyCallback(null);
+            lockBleSend.unregisterNotify();
+        }
+    }
+
+    private void setRv() {
         mAdapter = new ItemInfoAdapter(null);
         mRvDeviceInfo.setAdapter(mAdapter);
         mRvDeviceInfo.setLayoutManager(new LinearLayoutManager(getContext()) {
@@ -66,6 +91,27 @@ public class DeviceInfoActivity extends BaseBackActivity {
         itemInfos.add(new ItemInfo("剩余电量", deviceInfo.getBattery() + "%"));
         itemInfos.add(new ItemInfo("设备id", deviceInfo.getMacAddress().replaceAll(":", "")));
         mAdapter.setNewInstance(itemInfos);
+    }
+
+    private void bleGetBattery() {
+        if (lockBleSend != null) {
+            byte[] bytes = LockBLESettingCmd.getBattery(this);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_BATTERY, bytes, true);
+        }
+    }
+
+    @Override
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_BATTERY) {
+            int battery = lockBLEData.getExtra()[0];
+            MMKV.defaultMMKV().putInt("battery", battery);
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+
     }
 
     public class ItemInfo {

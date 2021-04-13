@@ -7,7 +7,6 @@ import android.widget.TextView;
 
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
@@ -132,24 +131,24 @@ public class Connect2Activity extends BaseConnectActivity {
     @Override
     public void onBackPressed() {
         if (!lockBleSend.isOpOver()) {
-            blecancelDialog();
+            bleCancelDialog();
         } else {
             super.onBackPressed();
         }
     }
 
-    private void blecancelDialog() {
+    private void bleCancelDialog() {
         GeneralDialog generalDialog = new GeneralDialog(getContext());
         generalDialog.setTitle("温馨提示");
         generalDialog.setMsg("确认取消操作?");
         generalDialog.setOnPositiveClickListener(dialog -> {
             mLoadingDialog.show("取消操作中...");
-            blecancel();
+            bleCancel();
         });
         generalDialog.show();
     }
 
-    private void blecancel() {
+    private void bleCancel() {
         if (cancelSend != null) {
             cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(this), false);
         }

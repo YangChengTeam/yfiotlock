@@ -157,10 +157,10 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             mLoadingDialog.dismiss();
-            if (lockBLEData.getOther() != null) {
-                String number = new String(Arrays.copyOfRange(lockBLEData.getOther(), 0, 8));
+            if (lockBLEData.getExtra() != null) {
+                String number = new String(Arrays.copyOfRange(lockBLEData.getExtra(), 0, 8));
                 if (number.equals(this.number)) {
-                    int id = lockBLEData.getOther()[8];
+                    int id = lockBLEData.getExtra()[8];
                     localAdd(id);
                 } else {
                     ToastCompat.show(getContext(), "流水号匹配不成功");

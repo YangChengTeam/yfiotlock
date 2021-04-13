@@ -123,12 +123,12 @@ public class DeviceEngin extends BaseEngin {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    public Observable<ResultInfo<UpdateInfo>> getUpdateInfo(int versionCode) {
+    public Observable<ResultInfo<UpdateInfo>> getUpdateInfo(String version) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        map.put("version_code", String.valueOf(versionCode));
+        map.put("version", version);
         return new HttpCoreEngin<ResultInfo<UpdateInfo>>(getContext()).rxpost(Config.DEVICE_UPDATE_URL, new TypeReference<ResultInfo<UpdateInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);

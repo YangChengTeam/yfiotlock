@@ -3,7 +3,9 @@ package com.yc.yfiotlock.model.bean.lock;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
+import com.yc.yfiotlock.utils.CacheUtil;
 
 import java.io.Serializable;
 
@@ -46,7 +48,7 @@ public class DeviceInfo implements Serializable {
     public void setId(int id) {
         this.id = id;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -56,8 +58,9 @@ public class DeviceInfo implements Serializable {
     }
 
     public String getFirmwareVersion() {
+        firmwareVersion = CacheUtil.getCache("firmwareVersion", String.class);
         if (TextUtils.isEmpty(firmwareVersion)) {
-            firmwareVersion = "v1.0";
+            firmwareVersion = "v1.0.0";
         }
         return firmwareVersion;
     }
@@ -68,7 +71,7 @@ public class DeviceInfo implements Serializable {
 
     public String getProtocolVersion() {
         if (TextUtils.isEmpty(protocolVersion)) {
-            protocolVersion = "v1.5";
+            protocolVersion = "v1.5.0";
         }
         return protocolVersion;
     }
@@ -86,6 +89,10 @@ public class DeviceInfo implements Serializable {
     }
 
     public int getBattery() {
+        battery = MMKV.defaultMMKV().getInt("battery", -1);
+        if (battery == -1) {
+            battery = 100;
+        }
         return battery;
     }
 
