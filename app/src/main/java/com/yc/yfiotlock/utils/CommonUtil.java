@@ -423,13 +423,17 @@ public class CommonUtil {
             return "";
         }
         WifiInfo info = wifiManager.getConnectionInfo();
-        String ssid ="";
-        if (info.getSupplicantState().equals(SupplicantState.COMPLETED)){
-            ssid=info.getSSID();
+        String ssid = "";
+        if (info.getSupplicantState().equals(SupplicantState.COMPLETED)) {
+            ssid = info.getSSID();
+            if (WifiManager.UNKNOWN_SSID.equals(ssid)) {
+                return "";
+            }
             if (!TextUtils.isEmpty(ssid)) {
                 ssid = ssid.replace("\"", "");
             }
         }
+
         return ssid;
     }
 
@@ -464,9 +468,9 @@ public class CommonUtil {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public static String setPhoneSecret(String phone){
-        if(phone != null && phone.length() >= 11){
-           return phone.substring(0, 3)+ "****"+ phone.substring(7);
+    public static String setPhoneSecret(String phone) {
+        if (phone != null && phone.length() >= 11) {
+            return phone.substring(0, 3) + "****" + phone.substring(7);
         }
         return phone;
     }
