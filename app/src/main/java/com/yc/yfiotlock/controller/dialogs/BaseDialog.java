@@ -62,7 +62,6 @@ public abstract class BaseDialog extends Dialog {
     }
 
     protected abstract int getLayoutId();
-
     protected abstract void initViews();
 
     @Override

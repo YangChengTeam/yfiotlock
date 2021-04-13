@@ -64,6 +64,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     private UpdateInfo updateInfo;
     private DeviceInfo deviceInfo;
     private LockBLESend lockBleSend;
+
     private FileInputStream in;
     private int packageCount;
     private static final int DATA_LENGTH = 200;
@@ -156,7 +157,9 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         generalDialog.setTitle("温馨提示");
         generalDialog.setMsg("正在升级中,确认取消?");
         generalDialog.setOnPositiveClickListener(dialog -> {
-            super.onBackPressed();
+            VUiKit.postDelayed(300, ()->{
+                super.onBackPressed();
+            });
         });
         generalDialog.show();
     }

@@ -16,6 +16,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
@@ -112,18 +113,18 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             @Override
             public void onSuccess(@NonNull Integer integer) {
                 lastId = integer;
-                bleSynclog();
+                bleSyncLog();
             }
 
             @Override
             public void onError(@NonNull Throwable e) {
-                bleSynclog();
+                bleSyncLog();
             }
         });
     }
 
 
-    private void bleSynclog() {
+    private void bleSyncLog() {
         byte[] cmdBytes = LockBLEEventCmd.event(getContext(), lastId);
         if (lockBLESend != null) {
             lockBLESend.send(LockBLEEventCmd.MCMD, (byte) LockBLEEventCmd.SCMD_LOG, cmdBytes, false);
@@ -199,7 +200,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
                     EventBus.getDefault().post(new LockLogSyncDataEvent());
                 }
                 EventBus.getDefault().post(logInfo);
-                bleSynclog();
+                bleSyncLog();
             }
 
             @Override
@@ -217,8 +218,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
             if (LockBLEEventCmd.SCMD_NO_NEW_EVENT == lockBLEData.getScmd()) {
-                syncView.setVisibility(View.GONE);
-                EventBus.getDefault().post(new LockLogSyncEndEvent());
+                bleSyncEnd();
                 return;
             }
             LogInfo logInfo = new LogInfo();
@@ -300,16 +300,21 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         }
     }
 
+    private void bleSyncEnd(){
+        bleRetryCount = 3;
+        syncView.setVisibility(View.GONE);
+        EventBus.getDefault().post(new LockLogSyncEndEvent());
+        ToastCompat.show(this, "同步完成");
+    }
+
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
             if (bleRetryCount-- > 0) {
-                bleSynclog();
+                bleSyncLog();
             } else {
-                bleRetryCount = 3;
-                syncView.setVisibility(View.GONE);
-                EventBus.getDefault().post(new LockLogSyncEndEvent());
+                bleSyncEnd();
             }
         }
     }

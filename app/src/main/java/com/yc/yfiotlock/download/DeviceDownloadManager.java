@@ -38,5 +38,4 @@ public class DeviceDownloadManager extends AppDownloadManager {
         return getContext().getResources().getString(R.string.app_name) + updateInfo.getVersionCode() + ".hex";
     }
 
-
 }

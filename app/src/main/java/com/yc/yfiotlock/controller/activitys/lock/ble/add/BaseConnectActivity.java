@@ -29,7 +29,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     protected boolean isDeviceAdd = false;  // 是否 设备同步云端添加成功
     protected boolean isConnected = false;  // 是否 配网成功
-    protected boolean isActiveDistributionNetwork = false;  // 是否 连接完成后 主动配网
+    protected boolean isActiveDistributionNetwork = false;  // 是否 设备同步云端添加成功后 主动配网
 
 
     protected BleDevice bleDevice;
