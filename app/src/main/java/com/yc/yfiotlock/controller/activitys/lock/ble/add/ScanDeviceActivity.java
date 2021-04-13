@@ -44,7 +44,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
 
     private static WeakReference<ScanDeviceActivity> mInstance;
 
-    public static void finish2() {
+    public static void safeFinish() {
         if (mInstance != null && mInstance.get() != null) {
             mInstance.get().finish();
         }

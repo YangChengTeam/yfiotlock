@@ -88,7 +88,7 @@ public class LockBLEUtils {
     public static String toHexString(byte[] byteArray) {
         final StringBuilder hexString = new StringBuilder("");
         if (byteArray == null || byteArray.length <= 0)
-            return null;
+            return "";
 
         for (int i = 0; i < byteArray.length; i++) {
             int v = byteArray[i] & 0xFF;

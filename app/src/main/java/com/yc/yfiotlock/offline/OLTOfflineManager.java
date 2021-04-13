@@ -74,12 +74,12 @@ public class OLTOfflineManager {
         if (openLockInfos != null && openLockInfos.size() > n) {
             OpenLockInfo openLockInfo = openLockInfos.get(n);
             if (openLockInfo == null) return;
-            lockEngine.delOpenLockWay2(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "").subscribe(new Action1<ResultInfo<String>>() {
+            lockEngine.delOpenLockWay2(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "").subscribe(new Action1<ResultInfo<String>>() {
                 @Override
                 public void call(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {
                         LogUtil.msg("同步删除: keyid:" + openLockInfo.getKeyid() + " lockid:" + openLockInfo.getLockId());
-                        openLockDao.realDeleteOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid()).subscribeOn(Schedulers.io()).subscribe();
+                        openLockDao.realDeleteOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid(), openLockInfo.getGroupType()).subscribeOn(Schedulers.io()).subscribe();
                         loopDel(openLockInfos, n + 1);
                     }
                 }
@@ -91,12 +91,12 @@ public class OLTOfflineManager {
         if (openLockInfos != null && openLockInfos.size() > n) {
             OpenLockInfo openLockInfo = openLockInfos.get(n);
             if (openLockInfo == null) return;
-            lockEngine.modifyOpenLockName2(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getName()).subscribe(new Action1<ResultInfo<String>>() {
+            lockEngine.modifyOpenLockName2(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "",openLockInfo.getGroupType() + "", openLockInfo.getName()).subscribe(new Action1<ResultInfo<String>>() {
                 @Override
                 public void call(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {
                         LogUtil.msg("同步更新: keyid:" + openLockInfo.getKeyid() + " lockid:" + openLockInfo.getLockId());
-                        openLockDao.updateOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid()).subscribeOn(Schedulers.io()).subscribe();
+                        openLockDao.updateOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid(), openLockInfo.getGroupType()).subscribeOn(Schedulers.io()).subscribe();
                         loopDel(openLockInfos, n + 1);
                     }
                 }

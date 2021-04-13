@@ -243,7 +243,7 @@ public class ConnectActivity extends BaseConnectActivity {
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
-        super.onNotifySuccess(lockBLEData);
+        super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK) {
             mLoadingDialog.dismiss();
             nav2fail();

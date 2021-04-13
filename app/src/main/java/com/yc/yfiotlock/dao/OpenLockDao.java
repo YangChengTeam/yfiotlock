@@ -23,7 +23,7 @@ public interface OpenLockDao {
     Completable insertOpenLockInfos(List<OpenLockInfo> openLockInfo);
 
     // 添加一条数据到本地
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     Completable insertOpenLockInfo(OpenLockInfo openLockInfo);
 
     // 获取名称
@@ -35,8 +35,8 @@ public interface OpenLockDao {
     Completable deleteOpenLockInfos(int lockId, int type, int groupType);
 
     // 删除一条本地数据
-    @Query("delete from open_lock_info where lock_id=:lockId and key_id=:keyid and is_delete=1")
-    Completable realDeleteOpenLockInfo(int lockId, int keyid);
+    @Query("delete from open_lock_info where lock_id=:lockId and key_id=:keyid and group_type=:groupType and is_delete=1")
+    Completable realDeleteOpenLockInfo(int lockId, int keyid, int groupType);
 
     // 更新本地已删除
     @Query("update open_lock_info set is_delete=1 where lock_id=:lockId and key_id=:keyid")
@@ -47,12 +47,12 @@ public interface OpenLockDao {
     Completable updateAddOpenLockInfo(int lockId, int keyid, boolean isAdd);
 
     // 更新已同步到云端
-    @Query("update open_lock_info set is_update=0 where lock_id=:lockId and key_id=:keyid")
-    Completable updateOpenLockInfo(int lockId, int keyid);
+    @Query("update open_lock_info set is_update=0 where lock_id=:lockId and key_id=:keyid  and group_type=:groupType")
+    Completable updateOpenLockInfo(int lockId, int keyid, int groupType);
 
     // 本地修改名称
-    @Query("update open_lock_info set name=:name,is_update=1 where lock_id=:lockId and key_id=:keyid")
-    Completable updateOpenLockInfo(int lockId, int keyid, String name);
+    @Query("update open_lock_info set name=:name,is_update=1 where lock_id=:lockId and key_id=:keyid and group_type=:groupType")
+    Completable updateOpenLockInfo(int lockId, int keyid, int groupType, String name);
 
     // 获取本地列表数据
     @Query("SELECT * FROM open_lock_info where master_lock_id=:lockId and type=:type and group_type =:groupType order by id desc")

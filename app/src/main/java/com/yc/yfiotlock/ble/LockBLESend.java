@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleNotifyCallback;
@@ -12,8 +11,8 @@ import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
-import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
+import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -26,6 +25,7 @@ public class LockBLESend {
     public static final String NOTIFY_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
     public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
     public static final String NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616";
+
 
     private Context context;
     private BleDevice bleDevice;
@@ -49,6 +49,7 @@ public class LockBLESend {
     public void setBleDevice(BleDevice bleDevice) {
         this.bleDevice = bleDevice;
     }
+
     public BleDevice getBleDevice() {
         return bleDevice;
     }
@@ -82,8 +83,10 @@ public class LockBLESend {
         this.mcmd = mcmd;
         this.scmd = scmd;
         this.cmdBytes = cmdBytes;
-        if (!LockBLEManager.getInstance().isConnected(bleDevice)) {
-            ToastCompat.show(App.getApp(), "蓝牙已断开");
+        if (!isConnected()) {
+            VUiKit.post(() -> {
+                ToastCompat.show(context, "蓝牙未连接");
+            });
             EventBus.getDefault().post(new OpenLockReConnectEvent());
             return;
         } else {
@@ -262,7 +265,7 @@ public class LockBLESend {
                     op(cmdBytes);
                 }
             } else if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_KEY_ERROR) {
-                // 密钥不对 设备重新初始化
+                // 密钥不对 设备已重新初始化
                 isReInit = true;
             }
         } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
@@ -351,7 +354,7 @@ public class LockBLESend {
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(mcmd);
         lockBLEData.setScmd(scmd);
-        lockBLEData.setOther(error.getBytes());
+        lockBLEData.setExtra(error.getBytes());
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_NOTIFY_TIMEOUT_ERROR);
         processNotify(lockBLEData);
         responseErrorCount++;

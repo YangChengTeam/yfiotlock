@@ -2,19 +2,22 @@ package com.yc.yfiotlock.model.bean.user;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 /**
  * @author Dullyoung
  * Created by　Dullyoung on 2021/3/3
  */
-public class UpdateInfo {
+public class UpdateInfo implements Serializable {
     private String version;
     @JSONField(name = "version_code")
     private int versionCode;
     @JSONField(name = "down_url")
     private String downUrl;
     private String desc;
+    @JSONField(name = "upgrade")
+    private boolean isUpgrade;
     //官网地址
     private String url;
     private String speed;
@@ -31,7 +34,6 @@ public class UpdateInfo {
         }
         return (int) (offsetSize * 100 / totalSize);
     }
-
 
     public String getVersion() {
         return version;
@@ -63,6 +65,14 @@ public class UpdateInfo {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public boolean isUpgrade() {
+        return isUpgrade;
+    }
+
+    public void setUpgrade(boolean upgrade) {
+        isUpgrade = upgrade;
     }
 
     public String getUrl() {
@@ -128,4 +138,6 @@ public class UpdateInfo {
     public void setIsMust(int isMust) {
         this.isMust = isMust;
     }
+
+
 }

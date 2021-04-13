@@ -8,11 +8,12 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import java.io.Serializable;
 
 
-@Entity(tableName = "open_lock_info", indices = {@Index(value = {"key_id", "lock_id"}, unique = true)})
+@Entity(tableName = "open_lock_info", indices = {@Index(value = {"key_id", "group_type", "lock_id"}, unique = true)})
 public class OpenLockInfo implements Serializable {
     @PrimaryKey(autoGenerate = true)
     @NonNull
@@ -120,6 +121,7 @@ public class OpenLockInfo implements Serializable {
     }
 
     public String getAddUserMobile() {
+        addUserMobile = CommonUtil.setPhoneSecret(addUserMobile);
         return addUserMobile;
     }
 

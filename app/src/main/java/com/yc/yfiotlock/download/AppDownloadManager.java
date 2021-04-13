@@ -44,10 +44,7 @@ import java.util.Map;
 public class AppDownloadManager {
     public static final String TAG = "AppDownloadManager";
 
-    private int requestPermissionRetryCount = 0;
-
     public static AppDownloadManager instance = new AppDownloadManager();
-
     public static AppDownloadManager getInstance() {
         return instance;
     }
@@ -69,6 +66,7 @@ public class AppDownloadManager {
     }
 
     public void init(WeakReference<Context> context) {
+        mContext = context;
         if (!TextUtils.isEmpty(parentDir) || context == null) {
             return;
         }
@@ -101,11 +99,15 @@ public class AppDownloadManager {
         return 0;
     }
 
+    public File getFile(){
+        return new File(parentDir, getUpdateFileName(getUpdateInfo()));
+    }
+
     private boolean checkDownLoadUrlCorrect(String url) {
         return !TextUtils.isEmpty(url) && (url.startsWith("http://") || url.startsWith("https://"));
     }
 
-    protected void setUpdateInfo(UpdateInfo updateInfo) {
+    public void setUpdateInfo(UpdateInfo updateInfo) {
         CacheUtil.setCache("downloadUpdateApkCache", updateInfo);
     }
 
@@ -114,7 +116,6 @@ public class AppDownloadManager {
     }
 
     public void updateApp(UpdateInfo updateInfo) {
-        requestPermissionRetryCount++;
         BaseActivity baseActivity = (BaseActivity) CommonUtil.findActivity(getContext());
         if (baseActivity != null && baseActivity instanceof BaseActivity) {
             baseActivity.getPermissionHelper().setMustPermissions(new String[]{
@@ -219,28 +220,23 @@ public class AppDownloadManager {
 
                 @Override
                 public void onRequestPermissionError() {
-                    if (requestPermissionRetryCount >= 3) {
-                        new GeneralDialog(getContext())
-                                .setTitle("提示")
-                                .setMsg("请授予存储权限，否则无法下载更新文件。若无权限申请弹窗，请手动到设置-应用-找到"
-                                        + getContext().getString(R.string.app_name) + "-选择权限-打开存储权限")
-                                .setPositiveText("去授权")
-                                .setOnPositiveClickListener(dialog -> {
-                                    try {
-                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                        Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
-                                        intent.setData(uri);
-                                        getContext().startActivity(intent);
-                                        ToastCompat.show(getContext(), "请授予存储权限");
-                                    } catch (Exception e) {
-                                        ToastCompat.show(getContext(), "自动跳转失败，请手动操作");
-                                        e.printStackTrace();
-                                    }
-                                }).show();
-                        return;
-                    }
-                    ToastCompat.show(getContext(), "请授予存储权限");
-                    updateApp(updateInfo);
+                    new GeneralDialog(getContext())
+                            .setTitle("提示")
+                            .setMsg("请授予存储权限，否则无法下载更新文件。若无权限申请弹窗，请手动到设置-应用-找到"
+                                    + getContext().getString(R.string.app_name) + "-选择权限-打开存储权限")
+                            .setPositiveText("去授权")
+                            .setOnPositiveClickListener(dialog -> {
+                                try {
+                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
+                                    intent.setData(uri);
+                                    getContext().startActivity(intent);
+                                    ToastCompat.show(getContext(), "请授予存储权限");
+                                } catch (Exception e) {
+                                    ToastCompat.show(getContext(), "自动跳转失败，请手动操作");
+                                    e.printStackTrace();
+                                }
+                            }).show();
                 }
             });
         }

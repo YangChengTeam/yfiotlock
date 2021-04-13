@@ -1,57 +1,30 @@
 package com.yc.yfiotlock.download;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.Settings;
-import android.text.TextUtils;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.kk.securityhttp.utils.LogUtil;
-import com.kk.securityhttp.utils.VUiKit;
-import com.liulishuo.okdownload.DownloadTask;
-import com.liulishuo.okdownload.OkDownload;
-import com.liulishuo.okdownload.SpeedCalculator;
-import com.liulishuo.okdownload.core.breakpoint.BlockInfo;
-import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
-import com.liulishuo.okdownload.core.cause.EndCause;
-import com.liulishuo.okdownload.core.dispatcher.DownloadDispatcher;
-import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
-import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
-import com.tencent.mmkv.MMKV;
-import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
-import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
-import com.yc.yfiotlock.utils.CommonUtil;
 
-import org.greenrobot.eventbus.EventBus;
-
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.List;
-import java.util.Map;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 
 public class DeviceDownloadManager extends AppDownloadManager {
 
     public static final String TAG = "DeviceDownloadManager";
 
+    public static DeviceDownloadManager instance = new DeviceDownloadManager();
+
+    public static DeviceDownloadManager getInstance() {
+        return instance;
+    }
+
     @Override
     public void installSelf(UpdateInfo updateInfo) {
     }
-    
+
     @Override
-    protected void setUpdateInfo(UpdateInfo updateInfo) {
+    public void setUpdateInfo(UpdateInfo updateInfo) {
         CacheUtil.setCache("downloadUpdateHexCache", updateInfo);
     }
 
@@ -63,5 +36,32 @@ public class DeviceDownloadManager extends AppDownloadManager {
     @Override
     protected String getUpdateFileName(UpdateInfo updateInfo) {
         return getContext().getResources().getString(R.string.app_name) + updateInfo.getVersionCode() + ".hex";
+    }
+
+    public interface DataCallback {
+        void post(byte[] buffer, int len);
+    }
+
+    private DataCallback dataCallback;
+    public void setDataCallback(DataCallback dataCallback) {
+        this.dataCallback = dataCallback;
+    }
+
+    public void postData() {
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(getFile());
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                if (dataCallback != null) {
+                    dataCallback.post(buffer, len);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
