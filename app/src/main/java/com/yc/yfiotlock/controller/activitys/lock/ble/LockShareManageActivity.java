@@ -27,6 +27,7 @@ import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDeviceView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
@@ -145,6 +146,7 @@ public class LockShareManageActivity extends BaseBackActivity {
                 if (info != null && info.getCode() == 1) {
                     mAdapter.getData().remove(position);
                     mAdapter.notifyItemRemoved(position);
+                    EventBus.getDefault().post(new ShareDeviceWrapper());
                 } else {
                     String tmsg = msg;
                     tmsg = info != null && info.getMsg() != null ? info.getMsg() : tmsg;

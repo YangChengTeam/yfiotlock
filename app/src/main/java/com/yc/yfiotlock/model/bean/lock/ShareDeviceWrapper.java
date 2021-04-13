@@ -6,6 +6,7 @@ import com.yc.yfiotlock.model.bean.user.UserInfo;
 /**
  * @author Dullyoung
  * Created by　Dullyoung on 2021/3/31
+ * 作为eventBus发送时 表示设备删除
  **/
 public class ShareDeviceWrapper {
     private int id;
