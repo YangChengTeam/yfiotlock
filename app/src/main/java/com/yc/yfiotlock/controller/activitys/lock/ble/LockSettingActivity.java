@@ -48,9 +48,10 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     @BindView(R.id.rv_setting)
     RecyclerView mRvSetting;
 
-    private DeviceInfo lockInfo;
     private SettingAdapter mSettingAdapter;
+
     private LockBLESend lockBleSend;
+    private DeviceInfo lockInfo;
     private DeviceEngin deviceEngin;
     private BleDevice bleDevice;
     private SettingSoundView headView;
@@ -69,7 +70,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         super.initVars();
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
         bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBleSend = new LockBLESend(this, bleDevice);
+        lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
         deviceEngin = new DeviceEngin(this);
     }
 
@@ -107,7 +108,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     private void bleSetVolume(int volume) {
         if (lockBleSend != null) {
-            byte[] bytes = LockBLESettingCmd.changeVolume(this, volume);
+            byte[] bytes = LockBLESettingCmd.changeVolume(lockInfo.getKey(), volume);
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHANGE_VOLUME, bytes, false);
         }
     }
@@ -167,14 +168,14 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     private void bleGetVersion() {
         if (lockBleSend != null) {
-            byte[] bytes = LockBLESettingCmd.getVersion(this);
+            byte[] bytes = LockBLESettingCmd.getVersion(lockInfo.getKey());
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_VERSION, bytes, true);
         }
     }
 
     private void bleReset() {
         if (lockBleSend != null) {
-            byte[] bytes = LockBLESettingCmd.reset(this);
+            byte[] bytes = LockBLESettingCmd.reset(lockInfo.getKey());
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes, true);
         }
     }

@@ -77,9 +77,9 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     @Override
     protected void initVars() {
         super.initVars();
-        lockBleSend = new LockBLESend(this, LockIndexActivity.getInstance().getBleDevice());
         deviceInfo = LockIndexActivity.getInstance().getLockInfo();
         updateInfo = (UpdateInfo) getIntent().getSerializableExtra("updateInfo");
+        lockBleSend = new LockBLESend(this, LockIndexActivity.getInstance().getBleDevice(), deviceInfo.getKey());
         DeviceDownloadManager.getInstance().init(new WeakReference<>(this));
     }
 
@@ -131,14 +131,14 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
 
     private void bleOpenUpdate() {
         if (lockBleSend != null) {
-            byte[] bytes = LockBLESettingCmd.openUpdate(this);
+            byte[] bytes = LockBLESettingCmd.openUpdate(deviceInfo.getKey());
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_OPEN_UPDATE, bytes, true);
         }
     }
 
     private void bleUpdate(byte[] datas) {
         if (lockBleSend != null) {
-            byte[] bytes = LockBLESettingCmd.update(this, datas, (byte) (packageCount--));
+            byte[] bytes = LockBLESettingCmd.update(deviceInfo.getKey(), datas, (byte) (packageCount--));
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_UPDATE, bytes, true);
         }
     }
@@ -155,7 +155,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     private void cancelDialog() {
         GeneralDialog generalDialog = new GeneralDialog(getContext());
         generalDialog.setTitle("温馨提示");
-        generalDialog.setMsg("正在升级中,确认取消?");
+        generalDialog.setMsg("固件升级中, 是否取消?");
         generalDialog.setOnPositiveClickListener(dialog -> {
             VUiKit.postDelayed(300, ()->{
                 super.onBackPressed();
@@ -167,7 +167,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     private void reOpenUpdate() {
         GeneralDialog generalDialog = new GeneralDialog(getContext());
         generalDialog.setTitle("温馨提示");
-        generalDialog.setMsg("开启蓝牙升级失败, 重试?");
+        generalDialog.setMsg("开启蓝牙升级失败, 是否重试?");
         generalDialog.setOnPositiveClickListener(dialog -> {
             bleOpenUpdate();
         });
@@ -177,7 +177,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     private void reUpdate() {
         GeneralDialog generalDialog = new GeneralDialog(getContext());
         generalDialog.setTitle("温馨提示");
-        generalDialog.setMsg("蓝牙升级失败, 重试?");
+        generalDialog.setMsg("蓝牙升级失败, 是否重试?");
         generalDialog.setOnPositiveClickListener(dialog -> {
             initBleUpdate();
             bleUpdate();

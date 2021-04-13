@@ -37,17 +37,17 @@ public class LockBLEEventCmd extends LockBLEBaseCmd {
     public static final byte SCMD_UPDATE_SUCCESS = (byte) 0x0A;
 
     // 2. 事件类 (0x08)
-    public static byte[] op(Context context, byte scmd, byte[] data) {
+    public static byte[] op(String key, byte scmd, byte[] data) {
         LockBLEPackage lockBLEPackage = new LockBLEPackage();
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(MCMD);
         lockBLEData.setScmd(scmd);
         lockBLEData.setData(data);
-        return lockBLEPackage.build(context, lockBLEData);
+        return lockBLEPackage.build(key, lockBLEData);
     }
 
     // 2.1 - 9
-    public static byte[] event(Context context, int id) {
-        return op(context, SCMD_LOG, ByteBuffer.allocate(4).putInt(id).array());
+    public static byte[] event(String key, int id) {
+        return op(key, SCMD_LOG, ByteBuffer.allocate(4).putInt(id).array());
     }
 }

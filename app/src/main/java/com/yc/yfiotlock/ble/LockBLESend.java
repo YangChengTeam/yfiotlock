@@ -29,6 +29,7 @@ public class LockBLESend {
 
     private Context context;
     private BleDevice bleDevice;
+    private String key;
     private byte mcmd = 0x00;
     private byte scmd = 0x00;
     private byte[] cmdBytes;
@@ -41,9 +42,10 @@ public class LockBLESend {
     private boolean isReInit = false;    // 是否已被初始化
     public int responseErrorCount = 0;   // 响应失败次数
 
-    public LockBLESend(Context context, BleDevice bleDevice) {
+    public LockBLESend(Context context, BleDevice bleDevice, String key) {
         this.context = context;
         this.bleDevice = bleDevice;
+        this.key = key;
     }
 
     public void setBleDevice(BleDevice bleDevice) {
@@ -175,7 +177,7 @@ public class LockBLESend {
     private void wakeup() {
         if (waupStatus && isSend) return;
         Log.d(TAG, "发送唤醒指令");
-        byte[] bytes = LockBLEOpCmd.wakeup(context);
+        byte[] bytes = LockBLEOpCmd.wakeup(key);
         op(bytes);
         VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
             if (waupStatus && isSend) return;

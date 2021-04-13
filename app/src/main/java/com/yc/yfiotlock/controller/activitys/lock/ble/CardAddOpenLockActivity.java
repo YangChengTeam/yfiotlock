@@ -44,7 +44,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     private void bleAddCard() {
         this.mcmd = LockBLEOpCmd.MCMD;
         this.scmd = LockBLEOpCmd.SCMD_ADD_CARD;
-        byte[] bytes = LockBLEOpCmd.addCard(this, LockBLEManager.GROUP_TYPE, number);
+        byte[] bytes = LockBLEOpCmd.addCard(lockInfo.getKey(), LockBLEManager.GROUP_TYPE, number);
         lockBleSend.send(mcmd, scmd, bytes);
         VUiKit.postDelayed(15 * 1000, () -> {
             if (!lockBleSend.isOpOver()) {

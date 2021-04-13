@@ -47,15 +47,12 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
         isActiveDistributionNetwork = getIntent().getBooleanExtra("isActiveDistributionNetwork", false);
         deviceEngin = new DeviceEngin(this);
-        lockBleSend = new LockBLESend(this, bleDevice);
-        lockBleSend.setNotifyCallback(this);
-        lockBleSend.registerNotify();
-
         if (lockInfo == null) {
             lockInfo = new DeviceInfo();
             lockInfo.setMacAddress(bleDevice.getMac());
             lockInfo.setName(bleDevice.getName());
         }
+        lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
     }
 
     @Override
@@ -128,7 +125,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {
-            byte[] cmdBytes = LockBLESettingCmd.getAliDeviceName(this);
+            byte[] cmdBytes = LockBLESettingCmd.getAliDeviceName(lockInfo.getKey());
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes, true);
         }
     }
@@ -139,7 +136,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                 @Override
                 public void call(ResultInfo<TimeInfo> info) {
                     if (info != null && info.getCode() == 1 && info.getData() != null) {
-                        byte[] cmdBytes = LockBLESettingCmd.syncTime(getContext(), info.getData().getTime());
+                        byte[] cmdBytes = LockBLESettingCmd.syncTime(lockInfo.getKey(), info.getData().getTime());
                         lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SYNC_TIME, cmdBytes, true);
                     }
                 }

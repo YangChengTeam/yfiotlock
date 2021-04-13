@@ -56,6 +56,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     SuperTextView delTv;
 
     protected OpenLockDao openLockDao;
+    protected DeviceInfo lockInfo;
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
     protected OpenLockInfo openLockInfo;
@@ -83,14 +84,14 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected void initVars() {
         super.initVars();
         openLockDao = App.getApp().getDb().openLockDao();
-        DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
+        lockInfo = LockIndexActivity.getInstance().getLockInfo();
         if (lockInfo.isShare()) {
             mFlBottom.setVisibility(View.GONE);
         }
         lockEngine = new LockEngine(this);
         openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBleSend = new LockBLESend(this, bleDevice);
+        lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
 
         key = "locker_count_" + lockInfo.getId() + type;
     }

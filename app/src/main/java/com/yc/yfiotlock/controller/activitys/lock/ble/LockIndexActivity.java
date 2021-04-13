@@ -258,7 +258,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     private void initSends() {
         if (lockBleSend == null) {
-            lockBleSend = new LockBLESend(this, bleDevice);
+            lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
             lockBleSend.registerNotify();
             lockBleSend.setNotifyCallback(this);
         }
@@ -345,7 +345,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startAnimations();
 
         if (lockBleSend != null) {
-            lockBleSend.send(LockBLEOpCmd.MCMD, LockBLEOpCmd.SCMD_OPEN, LockBLEOpCmd.open(this), false);
+            lockBleSend.send(LockBLEOpCmd.MCMD, LockBLEOpCmd.SCMD_OPEN, LockBLEOpCmd.open(lockInfo.getKey()), false);
         }
     }
 
@@ -450,7 +450,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     // 测试密钥
     private void test() {
         if (lockBleSend != null) {
-            byte[] cmdBytes = LockBLESettingCmd.reset(getContext());
+            byte[] cmdBytes = LockBLESettingCmd.reset(lockInfo.getKey());
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, cmdBytes, false);
         }
     }

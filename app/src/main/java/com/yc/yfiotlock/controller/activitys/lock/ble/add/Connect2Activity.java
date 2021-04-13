@@ -45,7 +45,7 @@ public class Connect2Activity extends BaseConnectActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        cancelSend = new LockBLESend(this, bleDevice);
+        cancelSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
     }
 
     @Override
@@ -122,7 +122,7 @@ public class Connect2Activity extends BaseConnectActivity {
             String pwd = getIntent().getStringExtra("pwd");
             valueAnimator.start();
             showConnectingUi();
-            byte[] cmdBytes = LockBLESettingCmd.wiftDistributionNetwork(this, ssid, pwd);
+            byte[] cmdBytes = LockBLESettingCmd.wiftDistributionNetwork(lockInfo.getKey(), ssid, pwd);
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK, cmdBytes);
         }
     }
@@ -150,7 +150,7 @@ public class Connect2Activity extends BaseConnectActivity {
 
     private void bleCancel() {
         if (cancelSend != null) {
-            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(this), false);
+            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(lockInfo.getKey()), false);
         }
     }
 

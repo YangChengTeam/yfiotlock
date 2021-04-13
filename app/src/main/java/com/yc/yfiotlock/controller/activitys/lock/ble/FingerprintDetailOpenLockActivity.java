@@ -34,7 +34,7 @@ public class FingerprintDetailOpenLockActivity extends BaseDetailOpenLockActivit
     protected void bleDel() {
         this.mcmd = LockBLEOpCmd.MCMD;
         this.scmd = LockBLEOpCmd.SCMD_DEL_PRINTFINGER;
-        byte[] bytes = LockBLEOpCmd.delFingerprint(this, (byte) LockBLEManager.GROUP_TYPE, (byte) openLockInfo.getKeyid());
+        byte[] bytes = LockBLEOpCmd.delFingerprint(lockInfo.getKey(), (byte) LockBLEManager.GROUP_TYPE, (byte) openLockInfo.getKeyid());
         lockBleSend.send(mcmd, scmd, bytes, false);
     }
 

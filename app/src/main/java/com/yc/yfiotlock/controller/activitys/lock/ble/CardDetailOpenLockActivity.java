@@ -33,7 +33,7 @@ public class CardDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     protected void bleDel() {
         this.mcmd = LockBLEOpCmd.MCMD;
         this.scmd = LockBLEOpCmd.SCMD_DEL_CARD;
-        byte[] bytes = LockBLEOpCmd.delCard(this, (byte) LockBLEManager.GROUP_TYPE, (byte) openLockInfo.getKeyid());
+        byte[] bytes = LockBLEOpCmd.delCard(lockInfo.getKey(), (byte) LockBLEManager.GROUP_TYPE, (byte) openLockInfo.getKeyid());
         lockBleSend.send(mcmd, scmd, bytes, false);
     }
 

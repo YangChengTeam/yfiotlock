@@ -14,11 +14,6 @@ import com.yc.yfiotlock.utils.CacheUtil;
 import java.util.List;
 
 public class LockBLEUtils {
-    private static String key = "12345678";
-    public static void setKey(String key) {
-        LockBLEUtils.key = key;
-    }
-
     public static int crc16(byte[] data) {
         byte[] crc16_h = {
                 (byte) 0x00, (byte) 0xC1, (byte) 0x81, (byte) 0x40, (byte) 0x01, (byte) 0xC0, (byte) 0x80, (byte) 0x41, (byte) 0x01, (byte) 0xC0, (byte) 0x80, (byte) 0x41, (byte) 0x00, (byte) 0xC1, (byte) 0x81, (byte) 0x40,
@@ -73,16 +68,12 @@ public class LockBLEUtils {
     }
 
 
-    public static native String encode(Object context, String key, byte[] bytes);
-
-    public static native String decode(Object context, String key, byte[] bytes);
-
-    public static String encode(Object context, byte[] bytes) {
-        return encode(context, key, bytes);
+    public static String encode(byte[] bytes, String key) {
+        return "";
     }
 
-    public static String decode(Object context, byte[] bytes) {
-        return decode(context, key, bytes);
+    public static String decode(byte[] bytes, String key) {
+        return "";
     }
 
     public static String toHexString(byte[] byteArray) {

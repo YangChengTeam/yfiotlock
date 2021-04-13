@@ -1,18 +1,16 @@
 package com.yc.yfiotlock.ble;
 
-import android.content.Context;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class LockBLEData {
-    public static boolean isAesData = false;
 
     private byte mcmd;
     private byte scmd;
     private byte[] data;
     private byte status;
     private byte[] extra;
+    public  boolean isEncrypt = false;
 
     public byte getMcmd() {
         return mcmd;
@@ -50,7 +48,15 @@ public class LockBLEData {
         this.data = data;
     }
 
-    public byte[] build(Context context) {
+    public boolean isEncrypt() {
+        return isEncrypt;
+    }
+
+    public void setEncrypt(boolean encrypt) {
+        isEncrypt = encrypt;
+    }
+
+    public byte[] build(String key) {
         short length = 0;
         if (this.data != null ) {
             length += data.length;
@@ -93,8 +99,8 @@ public class LockBLEData {
                 .putShort(crc16)
                 .array();
 
-        if (isAesData) {
-            return LockBLEUtils.encode(context, dataBytes).getBytes();
+        if (isEncrypt()) {
+            return LockBLEUtils.encode(dataBytes, key).getBytes();
         }
 
         return dataBytes;

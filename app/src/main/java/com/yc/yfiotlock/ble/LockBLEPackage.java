@@ -41,8 +41,8 @@ public class LockBLEPackage {
         this.pid = 0x00;
     }
 
-    public byte[] build(Context context, LockBLEData bleData) {
-        data = bleData.build(context);
+    public byte[] build(String key, LockBLEData bleData) {
+        data = bleData.build(key);
         int len = data.length;
 
         // PID = 1 LENGTH = 2
@@ -64,8 +64,8 @@ public class LockBLEPackage {
         return packageBuffer.array();
     }
 
-    public byte[] build2(Context context, LockBLEData bleData) {
-        data = bleData.build(context);
+    public byte[] build2(String key, LockBLEData bleData) {
+        data = bleData.build(key);
 
         int maxdataLen = (mtu - nodataLen);
         // 分包操作 目前数据量应该都是1个包

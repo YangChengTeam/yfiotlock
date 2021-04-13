@@ -59,11 +59,11 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
 
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBleSend = new LockBLESend(this, bleDevice);
+        lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
         Random rand = new Random();
         number = (10000000 + rand.nextInt(90000000)) + "";
 
-        cancelSend = new LockBLESend(this, bleDevice);
+        cancelSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
 
         key = "locker_count_" + lockInfo.getId() + groupType;
     }
@@ -148,7 +148,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
     private void bleCancel() {
         if (cancelSend != null) {
-            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(this), false);
+            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(lockInfo.getKey()), false);
         }
     }
 

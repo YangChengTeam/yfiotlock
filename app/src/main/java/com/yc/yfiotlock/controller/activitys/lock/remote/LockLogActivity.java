@@ -92,7 +92,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
 
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBLESend = new LockBLESend(this, bleDevice);
+        lockBLESend = new LockBLESend(this, bleDevice, lockInfo.getKey());
     }
 
     @Override
@@ -125,7 +125,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
 
     private void bleSyncLog() {
-        byte[] cmdBytes = LockBLEEventCmd.event(getContext(), lastId);
+        byte[] cmdBytes = LockBLEEventCmd.event(lockInfo.getKey(), lastId);
         if (lockBLESend != null) {
             lockBLESend.send(LockBLEEventCmd.MCMD, (byte) LockBLEEventCmd.SCMD_LOG, cmdBytes, false);
         }

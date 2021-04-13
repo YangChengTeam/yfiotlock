@@ -39,7 +39,7 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
     }
 
     private void bleAddFingerprint() {
-        byte[] bytes = LockBLEOpCmd.addFingerprint(this, LockBLEManager.GROUP_TYPE, number);
+        byte[] bytes = LockBLEOpCmd.addFingerprint(lockInfo.getKey(), LockBLEManager.GROUP_TYPE, number);
         lockBleSend.send(mcmd, scmd, bytes);
     }
 

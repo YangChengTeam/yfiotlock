@@ -27,6 +27,7 @@ public class DeviceInfo implements Serializable {
     @JSONField(name = "mac_address")
     private String macAddress;
     private String model = "Locker";
+    private String key;
 
     // 是否是共享的锁
     @JSONField(name = "is_share")
@@ -165,5 +166,16 @@ public class DeviceInfo implements Serializable {
 
     public void setValid(boolean isValid) {
         this.isValid = isValid;
+    }
+
+    public String getKey() {
+        if (TextUtils.isEmpty(key)) {
+            key = getMacAddress();
+        }
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

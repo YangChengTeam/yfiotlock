@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.model.bean.lock.ble;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -105,6 +107,9 @@ public class OpenLockInfo implements Serializable {
     }
 
     public String getPassword() {
+        if (TextUtils.isEmpty(password)) {
+            password = "------";
+        }
         return password;
     }
 
