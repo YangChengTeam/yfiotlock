@@ -10,6 +10,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
@@ -78,7 +79,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         setRvSetting();
         loadData();
 
-        if (isBleDeviceConnected()) {
+        if (LockBLEManager.getInstance().isConnected(bleDevice)) {
             bleGetVersion();
         } else {
             getUpdateInfo();
@@ -111,9 +112,6 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         }
     }
 
-    private boolean isBleDeviceConnected() {
-        return lockBleSend != null && lockBleSend.isConnected();
-    }
 
     @Override
     protected void bindClick() {
@@ -123,7 +121,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setMsg("是否删除该设备");
             generalDialog.setOnPositiveClickListener(dialog -> {
                 //是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
-                if (isBleDeviceConnected() || lockInfo.isShare()) {
+                if (LockBLEManager.getInstance().isConnected(bleDevice) || lockInfo.isShare()) {
                     cloudDelDevice();
                 } else {
                     ToastCompat.show(getContext(), "蓝牙未连接");
@@ -201,7 +199,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             SettingInfo settingInfo = mSettingAdapter.getData().get(position);
             switch (settingInfo.getName()) {
                 case "配置网络":
-                    if (!isBleDeviceConnected()) {
+                    if (!LockBLEManager.getInstance().isConnected(bleDevice)) {
                         ToastCompat.show(getContext(), "蓝牙未连接");
                         return;
                     }
@@ -247,7 +245,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             headView.setDeviceMac(lockInfo.getMacAddress());
             headView.setVolume(headView.getVolume());
             headView.setOnSelectChangeListener(index -> {
-                if (lockBleSend != null && lockBleSend.isConnected()) {
+                if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                     volume = index;
                     bleSetVolume(volume);
                 } else {

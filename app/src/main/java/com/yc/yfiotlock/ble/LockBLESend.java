@@ -66,7 +66,7 @@ public class LockBLESend {
         return isReInit;
     }
 
-    public boolean isConnected() {
+    private boolean isConnected() {
         return LockBLEManager.getInstance().isConnected(bleDevice);
     }
 

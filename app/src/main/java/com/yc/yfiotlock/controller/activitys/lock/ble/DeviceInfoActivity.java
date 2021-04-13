@@ -7,9 +7,11 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
@@ -28,8 +30,10 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
     @BindView(R.id.rv_device_info)
     RecyclerView mRvDeviceInfo;
 
-    private DeviceInfo deviceInfo;
     private ItemInfoAdapter mAdapter;
+
+    private DeviceInfo deviceInfo;
+    private BleDevice bleDevice;
     private LockBLESend lockBleSend;
 
     @Override
@@ -40,8 +44,9 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
     @Override
     protected void initVars() {
         super.initVars();
+        bleDevice = LockIndexActivity.getInstance().getBleDevice();
         deviceInfo = LockIndexActivity.getInstance().getLockInfo();
-        lockBleSend = new LockBLESend(this, LockIndexActivity.getInstance().getBleDevice());
+        lockBleSend = new LockBLESend(this, bleDevice);
     }
 
     @Override
@@ -49,7 +54,7 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
         super.initViews();
         setRv();
 
-        if (lockBleSend.isConnected()) {
+        if (LockBLEManager.getInstance().isConnected(bleDevice)) {
             bleGetBattery();
         } else {
             mAdapter.notifyDataSetChanged();

@@ -117,8 +117,8 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
     }
 
     //  1.12升级（0x0C）
-    public static byte[] update(Context context, byte[] bytes) {
-        return setting(context, SCMD_UPDATE, bytes);
+    public static byte[] update(Context context, byte[] bytes, byte pid) {
+        return setting(context, SCMD_UPDATE, bytes, pid);
     }
 
     //  1.13获取电量（0x0D）

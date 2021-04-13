@@ -36,6 +36,7 @@ import butterknife.ButterKnife;
 public abstract class BaseActivity extends BaseSendActivity implements ILoadData {
 
     protected PermissionHelper mPermissionHelper;
+    protected LoadingDialog mLoadingDialog;
 
     public PermissionHelper getPermissionHelper() {
         return mPermissionHelper;
@@ -59,10 +60,8 @@ public abstract class BaseActivity extends BaseSendActivity implements ILoadData
         initVars();
         initViews();
         bindClick();
-
     }
 
-    public LoadingDialog mLoadingDialog;
 
     protected void initVars() {
     }
