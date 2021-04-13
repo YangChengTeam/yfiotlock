@@ -18,6 +18,8 @@ import com.yc.yfiotlock.view.BaseExtendAdapter;
 import com.yc.yfiotlock.view.widgets.NoDeviceView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -117,6 +119,9 @@ public class DeviceShareListFragment extends BaseFragment {
 
     @Override
     public void empty() {
+        if (p == 1) {
+            mAdapter.setNewInstance(null);
+        }
         if (mAdapter.getData().size() == 0) {
             mAdapter.setEmptyView(new NoDeviceView(getContext()));
         } else {
@@ -167,6 +172,12 @@ public class DeviceShareListFragment extends BaseFragment {
             holder.setText(R.id.tv_device_name, shareDeviceInfo.getName());
             holder.setText(R.id.tv_desp, "分享至" + shareDeviceInfo.getReceiveUser().getMobile());
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDeviceDelete(ShareDeviceWrapper shareDeviceWrapper) {
+        p = 1;
+        loadData();
     }
 
 }
