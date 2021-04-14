@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.fragments.lock.remote;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -89,6 +90,7 @@ public class LogFragment extends BaseFragment {
         });
     }
 
+    @SuppressLint("CheckResult")
     private void localLoadData() {
         lockLogDao.loadLogInfos(lockInfo.getId(), type, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
             @Override
@@ -158,8 +160,9 @@ public class LogFragment extends BaseFragment {
     public void fail() {
         super.fail();
         if (logAdapter.getData().size() == 0) {
-            logAdapter.setNewInstance(null);
-            logAdapter.setEmptyView(new NoWifiView(getActivity()));
+            if (!CommonUtil.isActivityDestory(getActivity())) {
+                logAdapter.setEmptyView(new NoWifiView(getActivity()));
+            }
         } else {
             page--;
             logAdapter.getLoadMoreModule().loadMoreComplete();
@@ -170,8 +173,9 @@ public class LogFragment extends BaseFragment {
     public void empty() {
         super.empty();
         if (logAdapter.getData().size() == 0) {
-            logAdapter.setNewInstance(null);
-            logAdapter.setEmptyView(new NoDataView(getActivity()));
+            if (!CommonUtil.isActivityDestory(getActivity())) {
+                logAdapter.setEmptyView(new NoDataView(getActivity()));
+            }
         } else {
             page--;
             logAdapter.getLoadMoreModule().loadMoreComplete();
@@ -190,5 +194,11 @@ public class LogFragment extends BaseFragment {
         mSrlRefresh.setEnabled(true);
         page = 1;
         localLoadData();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        logEngine.cancelAll();
     }
 }

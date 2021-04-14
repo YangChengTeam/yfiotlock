@@ -17,14 +17,10 @@ import java.util.Map;
 
 import rx.Observable;
 
-public class LogEngine extends BaseEngin {
+public class LogEngine extends HttpCoreEngin {
+
     public LogEngine(Context context) {
         super(context);
-    }
-
-    @Override
-    public String getUrl() {
-        return null;
     }
 
     public Observable<ResultInfo<LogListInfo>> getOpenLog(String lockerId, int page, int pageSize) {
@@ -35,8 +31,7 @@ public class LogEngine extends BaseEngin {
         map.put("locker_id", String.valueOf(lockerId));
         map.put("page", String.valueOf(page));
         map.put("page_size", String.valueOf(pageSize));
-        HttpCoreEngin<ResultInfo<LogListInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.LOG_OPEN_URL, new TypeReference<ResultInfo<LogListInfo>>() {
+        return rxpost(Config.LOG_OPEN_URL, new TypeReference<ResultInfo<LogListInfo>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -48,8 +43,7 @@ public class LogEngine extends BaseEngin {
         map.put("locker_id", String.valueOf(lockerId));
         map.put("page", String.valueOf(page));
         map.put("page_size", String.valueOf(pageSize));
-        HttpCoreEngin<ResultInfo<WarnListInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.LOG_WARN_URL, new TypeReference<ResultInfo<WarnListInfo>>() {
+        return rxpost(Config.LOG_WARN_URL, new TypeReference<ResultInfo<WarnListInfo>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -65,8 +59,7 @@ public class LogEngine extends BaseEngin {
         map.put("type", String.valueOf(type));
         map.put("group_type", String.valueOf(groupType));
         map.put("time", time);
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.LOG_LOCAL_ADD_URL, new TypeReference<ResultInfo<WarnListInfo>>() {
+        return rxpost(Config.LOG_LOCAL_ADD_URL, new TypeReference<ResultInfo<WarnListInfo>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -79,8 +72,7 @@ public class LogEngine extends BaseEngin {
         map.put("locker_id", String.valueOf(lockerId));
         map.put("page", String.valueOf(page));
         map.put("page_size", String.valueOf(pageSize));
-        HttpCoreEngin<ResultInfo<LogListInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.LOG_LOCAL_OPEN_URL, new TypeReference<ResultInfo<LogListInfo>>() {
+        return rxpost(Config.LOG_LOCAL_OPEN_URL, new TypeReference<ResultInfo<LogListInfo>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -92,8 +84,7 @@ public class LogEngine extends BaseEngin {
         map.put("locker_id", String.valueOf(lockerId));
         map.put("page", String.valueOf(page));
         map.put("page_size", String.valueOf(pageSize));
-        HttpCoreEngin<ResultInfo<LogListInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.LOG_LOCAL_WARN_URL, new TypeReference<ResultInfo<LogListInfo>>() {
+        return rxpost(Config.LOG_LOCAL_WARN_URL, new TypeReference<ResultInfo<LogListInfo>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 }

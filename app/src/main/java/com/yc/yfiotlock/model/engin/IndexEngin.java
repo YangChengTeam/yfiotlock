@@ -19,14 +19,9 @@ import java.util.Map;
 
 import rx.Observable;
 
-public class IndexEngin extends BaseEngin {
+public class IndexEngin extends HttpCoreEngin {
     public IndexEngin(Context context) {
         super(context);
-    }
-
-    @Override
-    public String getUrl() {
-        return null;
     }
 
     public Observable<ResultInfo<FamilyInfo>> getDefaultFamily() {
@@ -34,7 +29,7 @@ public class IndexEngin extends BaseEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        return new HttpCoreEngin<ResultInfo<FamilyInfo>>(getContext()).rxpost(Config.INDEX_FAMILY_URL,
+        return rxpost(Config.INDEX_FAMILY_URL,
                 new TypeReference<ResultInfo<FamilyInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -44,7 +39,7 @@ public class IndexEngin extends BaseEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        return new HttpCoreEngin<ResultInfo<List<DeviceInfo>>>(getContext()).rxpost(Config.INDEX_LIST_DEVICE_LIST,
+        return rxpost(Config.INDEX_LIST_DEVICE_LIST,
                 new TypeReference<ResultInfo<List<DeviceInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -54,7 +49,7 @@ public class IndexEngin extends BaseEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        return new HttpCoreEngin<ResultInfo<IndexInfo>>(getContext()).rxpost(Config.INDEX_DETAIL_URL,
+        return rxpost(Config.INDEX_DETAIL_URL,
                 new TypeReference<ResultInfo<IndexInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }

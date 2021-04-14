@@ -274,7 +274,9 @@ public abstract class BaseEngin<T> {
         return resultInfo;
     }
 
-    public abstract String getUrl();
+    public String getUrl(){
+        return "";
+    }
 
 
 }

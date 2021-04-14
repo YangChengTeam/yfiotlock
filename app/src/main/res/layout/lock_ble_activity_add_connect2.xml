@@ -79,7 +79,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/device_add_success"
+            android:text="@string/wift_connect_success"
             android:textColor="#222222"
             android:textSize="15dp" />
 

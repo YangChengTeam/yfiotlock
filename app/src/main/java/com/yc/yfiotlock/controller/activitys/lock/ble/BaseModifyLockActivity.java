@@ -1,6 +1,5 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -9,20 +8,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding4.view.RxView;
-import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.dao.OpenLockDao;
-import com.yc.yfiotlock.model.bean.eventbus.CloudAddEvent;
-import com.yc.yfiotlock.model.bean.eventbus.CloudUpdateEvent;
+import com.yc.yfiotlock.model.bean.eventbus.CloudOpenLockUpdateEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
-import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
-import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -34,7 +28,6 @@ import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import rx.Subscriber;
 
 public abstract class BaseModifyLockActivity extends BaseBackActivity {
 
@@ -111,7 +104,7 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
                 openLockInfo.setName(name);
                 EventBus.getDefault().post(openLockInfo);
                 if (CommonUtil.isNetworkAvailable(getContext())) {
-                    EventBus.getDefault().post(new CloudUpdateEvent(openLockInfo));
+                    EventBus.getDefault().post(new CloudOpenLockUpdateEvent(openLockInfo));
                 }
                 EventBus.getDefault().post(new OpenLockRefreshEvent());
                 finish();

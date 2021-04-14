@@ -24,15 +24,11 @@ import rx.Observable;
  * <p>
  * Created by　Dullyoung on 2021/3/10
  */
-public class HomeEngine extends BaseEngin {
+public class HomeEngine extends HttpCoreEngin {
     public HomeEngine(Context context) {
         super(context);
     }
 
-    @Override
-    public String getUrl() {
-        return null;
-    }
 
     /**
      * @return list of families
@@ -43,8 +39,7 @@ public class HomeEngine extends BaseEngin {
             map.put("user_id", UserInfoCache.getUserInfo().getId());
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<List<FamilyInfo>>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.HOME_LIST_URL, new TypeReference<ResultInfo<List<FamilyInfo>>>() {
+        return rxpost(Config.HOME_LIST_URL, new TypeReference<ResultInfo<List<FamilyInfo>>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -70,8 +65,7 @@ public class HomeEngine extends BaseEngin {
         map.put("latitude", latitude.toString());
         map.put("address", address);
         map.put("detail_address", detailAddress == null ? "" : detailAddress);
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.HOME_INFO_MODIFY_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.HOME_INFO_MODIFY_URL, new TypeReference<ResultInfo<String>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -96,8 +90,7 @@ public class HomeEngine extends BaseEngin {
         map.put("latitude", latitude.toString());
         map.put("address", address);
         map.put("detail_address", detailAddress == null ? "" : detailAddress);
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.HOME_INFO_ADD_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.HOME_INFO_ADD_URL, new TypeReference<ResultInfo<String>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -112,8 +105,7 @@ public class HomeEngine extends BaseEngin {
             map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
         map.put("family_id", String.valueOf(familyId));
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.HOME_SET_DEFAULT_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.HOME_SET_DEFAULT_URL, new TypeReference<ResultInfo<String>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
@@ -128,8 +120,7 @@ public class HomeEngine extends BaseEngin {
             map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
         map.put("family_id", String.valueOf(familyId));
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.HOME_INFO_DELETE_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.HOME_INFO_DELETE_URL, new TypeReference<ResultInfo<String>>() {
         }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 

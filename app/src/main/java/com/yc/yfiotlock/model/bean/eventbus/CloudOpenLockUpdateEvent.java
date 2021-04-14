@@ -2,10 +2,10 @@ package com.yc.yfiotlock.model.bean.eventbus;
 
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 
-public class CloudUpdateEvent {
+public class CloudOpenLockUpdateEvent {
     private OpenLockInfo openLockInfo;
 
-    public CloudUpdateEvent(OpenLockInfo openLockInfo){
+    public CloudOpenLockUpdateEvent(OpenLockInfo openLockInfo){
         this.openLockInfo = openLockInfo;
     }
 

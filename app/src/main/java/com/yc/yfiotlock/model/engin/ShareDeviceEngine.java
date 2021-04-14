@@ -35,8 +35,7 @@ public class ShareDeviceEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.SHARE_DEVICE_URL, new TypeReference<ResultInfo<String>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -50,8 +49,7 @@ public class ShareDeviceEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<List<ShareDeviceWrapper>>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_LIST_URL, new TypeReference<ResultInfo<List<ShareDeviceWrapper>>>() {
+        return rxpost(Config.SHARE_DEVICE_LIST_URL, new TypeReference<ResultInfo<List<ShareDeviceWrapper>>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -65,8 +63,7 @@ public class ShareDeviceEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<List<ShareDeviceWrapper>>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_LIST_URL, new TypeReference<ResultInfo<List<ShareDeviceWrapper>>>() {
+        return rxpost(Config.SHARE_DEVICE_LIST_URL, new TypeReference<ResultInfo<List<ShareDeviceWrapper>>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -83,8 +80,7 @@ public class ShareDeviceEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_DELETE_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.SHARE_DEVICE_DELETE_URL, new TypeReference<ResultInfo<String>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -95,8 +91,7 @@ public class ShareDeviceEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_RECEIVE_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.SHARE_DEVICE_RECEIVE_URL, new TypeReference<ResultInfo<String>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -106,8 +101,7 @@ public class ShareDeviceEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<List<ShareDeviceWrapper>>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_HAS_URL, new TypeReference<ResultInfo<List<ShareDeviceWrapper>>>() {
+        return rxpost(Config.SHARE_DEVICE_HAS_URL, new TypeReference<ResultInfo<List<ShareDeviceWrapper>>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -118,8 +112,7 @@ public class ShareDeviceEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<DeviceInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_DEVICE_EXIST_URL, new TypeReference<ResultInfo<DeviceInfo>>() {
+        return rxpost(Config.SHARE_DEVICE_EXIST_URL, new TypeReference<ResultInfo<DeviceInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -131,8 +124,7 @@ public class ShareDeviceEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<List<ShareDeviceWrapper>>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SHARE_ALL_DEVICE_LIST_URL, new TypeReference<ResultInfo<List<ShareDeviceWrapper>>>() {
+        return rxpost(Config.SHARE_ALL_DEVICE_LIST_URL, new TypeReference<ResultInfo<List<ShareDeviceWrapper>>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }

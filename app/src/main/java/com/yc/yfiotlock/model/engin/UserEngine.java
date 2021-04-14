@@ -31,8 +31,7 @@ public class UserEngine extends HttpCoreEngin {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
             map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.USER_NAME_UPD_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.USER_NAME_UPD_URL, new TypeReference<ResultInfo<String>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -44,8 +43,7 @@ public class UserEngine extends HttpCoreEngin {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
             map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.USER_FACE_UPD_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.USER_FACE_UPD_URL, new TypeReference<ResultInfo<String>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -56,8 +54,7 @@ public class UserEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<UserInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.GET_USER_INFO_URL, new TypeReference<ResultInfo<UserInfo>>() {
+        return rxpost(Config.GET_USER_INFO_URL, new TypeReference<ResultInfo<UserInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }

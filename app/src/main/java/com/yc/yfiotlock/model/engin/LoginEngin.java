@@ -25,8 +25,7 @@ public class LoginEngin extends HttpCoreEngin {
     public Observable<ResultInfo<UserInfo>> aliFastLogin(String token) {
         Map<String, String> map = new HashMap<>();
         map.put("token", token);
-        HttpCoreEngin<ResultInfo<UserInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.ALI_FAST_LOGIN, new TypeReference<ResultInfo<UserInfo>>() {
+        return rxpost(Config.ALI_FAST_LOGIN, new TypeReference<ResultInfo<UserInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -34,8 +33,7 @@ public class LoginEngin extends HttpCoreEngin {
     public Observable<ResultInfo<String>> sendSmsCode(String phone) {
         Map<String, String> map = new HashMap<>();
         map.put("mobile", phone);
-        HttpCoreEngin<ResultInfo<String>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.LOGIN_SEND_CODE_URL, new TypeReference<ResultInfo<String>>() {
+        return rxpost(Config.LOGIN_SEND_CODE_URL, new TypeReference<ResultInfo<String>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -44,8 +42,7 @@ public class LoginEngin extends HttpCoreEngin {
         Map<String, String> map = new HashMap<>();
         map.put("mobile", phone);
         map.put("code", code);
-        HttpCoreEngin<ResultInfo<UserInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.SMS_CODE_LOGIN_URL, new TypeReference<ResultInfo<UserInfo>>() {
+        return rxpost(Config.SMS_CODE_LOGIN_URL, new TypeReference<ResultInfo<UserInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -55,8 +52,7 @@ public class LoginEngin extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<UserInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.VALIDATE_LOGIN_INFO_URL, new TypeReference<ResultInfo<UserInfo>>() {
+        return rxpost(Config.VALIDATE_LOGIN_INFO_URL, new TypeReference<ResultInfo<UserInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }

@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.jakewharton.rxbinding4.view.RxView;
-import com.kk.securityhttp.domain.ResultInfo;
-import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -23,7 +21,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
-import com.yc.yfiotlock.model.bean.eventbus.CloudDeleteEvent;
+import com.yc.yfiotlock.model.bean.eventbus.CloudOpenLockDeleteEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
@@ -47,7 +45,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import rx.Subscriber;
 
 public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
     @BindView(R.id.rv_open_lock)
@@ -136,7 +133,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
                 retryCount = 3;
                 localDelSucc();
                 if (CommonUtil.isNetworkAvailable(getContext())) {
-                    EventBus.getDefault().post(new CloudDeleteEvent(openLockInfo));
+                    EventBus.getDefault().post(new CloudOpenLockDeleteEvent(openLockInfo));
                 }
                 EventBus.getDefault().post(new OpenLockRefreshEvent());
                 finish();

@@ -2,6 +2,13 @@ package com.yc.yfiotlock.model.bean.lock;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+
 import com.alibaba.fastjson.annotation.JSONField;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
@@ -9,35 +16,71 @@ import com.yc.yfiotlock.utils.CacheUtil;
 
 import java.io.Serializable;
 
+@Entity(tableName = "device_info", indices = {@Index(value = {"mac_address"}, unique = true)})
 public class DeviceInfo implements Serializable {
+    @PrimaryKey(autoGenerate = true)
+    @NonNull
     private int id;
+    @ColumnInfo(name = "name")
     private String name;
+
+    @Ignore
     @JSONField(name = "firmware_version")
     private String firmwareVersion;
+    @Ignore
     @JSONField(name = "protocol_version")
     private String protocolVersion;
+
+    @ColumnInfo(name = "add_time")
     @JSONField(name = "add_time")
     private int regtime;
+
+    @Ignore
     private int battery;
+
+    @Ignore
     private int volume;
+
+    @Ignore
     @JSONField(name = "device_id")
     private String deviceId;
+
+    @Ignore
     @JSONField(name = "is_online")
     private boolean isOnline;
+
+    @ColumnInfo(name = "mac_address")
     @JSONField(name = "mac_address")
     private String macAddress;
+
+    @Ignore
     private String model = "Locker";
+
+    @ColumnInfo(name = "key")
     private String key;
 
     // 是否是共享的锁
+    @Ignore
     @JSONField(name = "is_share")
     private boolean isShare;
 
     // 锁是否还有效 0失效 1 有效
+    @Ignore
     @JSONField(name = "has")
     private boolean isValid;
 
+    @Ignore
     private transient UserInfo user;
+
+    @ColumnInfo(name = "is_add")
+    private boolean isAdd;
+    @ColumnInfo(name = "is_delete")
+    private boolean isDelete;
+    @ColumnInfo(name = "is_update")
+    private boolean isUpdate;
+
+    @ColumnInfo(name = "family_id")
+    private int familyId;
 
     public DeviceInfo() {
     }
@@ -177,5 +220,37 @@ public class DeviceInfo implements Serializable {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public int getFamilyId() {
+        return familyId;
+    }
+
+    public void setFamilyId(int familyId) {
+        this.familyId = familyId;
+    }
+
+    public boolean isAdd() {
+        return isAdd;
+    }
+
+    public void setAdd(boolean add) {
+        isAdd = add;
+    }
+
+    public boolean isDelete() {
+        return isDelete;
+    }
+
+    public void setDelete(boolean delete) {
+        isDelete = delete;
+    }
+
+    public boolean isUpdate() {
+        return isUpdate;
+    }
+
+    public void setUpdate(boolean update) {
+        isUpdate = update;
     }
 }

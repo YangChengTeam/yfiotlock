@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.fragments.lock.ble;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.view.View;
 
@@ -12,6 +13,7 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
 import com.kk.utils.ScreenUtil;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
@@ -20,9 +22,11 @@ import com.yc.yfiotlock.controller.activitys.lock.ble.add.ScanDeviceActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
+import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
@@ -35,9 +39,16 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import rx.Observer;
 import rx.Subscriber;
 
@@ -54,7 +65,7 @@ public class IndexFragment extends BaseFragment {
 
     private IndexDeviceAdapter indexDeviceAdapter;
     private IndexEngin indexEngin;
-
+    private DeviceDao deviceDao;
 
     private FamilyInfo familyInfo;
     private DeviceInfo mDeviceInfo;
@@ -69,6 +80,7 @@ public class IndexFragment extends BaseFragment {
         super.initVars();
         mEngine = new ShareDeviceEngine(getContext());
         indexEngin = new IndexEngin(getActivity());
+        deviceDao = App.getApp().getDb().deviceDao();
     }
 
     @Override
@@ -160,15 +172,64 @@ public class IndexFragment extends BaseFragment {
             public void onNext(ResultInfo<IndexInfo> resultInfo) {
                 if (resultInfo != null && resultInfo.getCode() == 1 && resultInfo.getData() != null) {
                     familyInfo = resultInfo.getData().getFamilyInfo();
-                    List<DeviceInfo> deviceInfoList = resultInfo.getData().getDeviceInfos();
-                    if (deviceInfoList == null) {
-                        deviceInfoList = new ArrayList<>();
-                    }
-                    deviceInfoList.add(new DeviceInfo());
-                    indexDeviceAdapter.setNewInstance(deviceInfoList);
-                    CacheUtil.setCache(Config.INDEX_DETAIL_URL, resultInfo.getData());
+                    localLoadData(resultInfo.getData());
                     OfflineManager.enqueue(getContext());
                 }
+            }
+        });
+    }
+
+    @SuppressLint("CheckResult")
+    private void localLoadData(IndexInfo indexInfo) {
+        List<DeviceInfo> cDeviceInfos = indexInfo.getDeviceInfos();
+        deviceDao.loadDeviceInfo(familyInfo.getId()).subscribeOn(Schedulers.io()).subscribe(new Consumer<List<DeviceInfo>>() {
+            @Override
+            public void accept(List<DeviceInfo> lDeviceInfos) throws Exception {
+                HashMap<String, DeviceInfo> hashMap = new HashMap<>();
+                List<DeviceInfo> lastDeviceInfos;
+                if (lDeviceInfos == null || lDeviceInfos.size() == 0) {
+                    lastDeviceInfos = cDeviceInfos;
+                } else {
+                    for (DeviceInfo cDeviceInfo : cDeviceInfos) {
+                        hashMap.put(cDeviceInfo.getMacAddress(), cDeviceInfo);
+                    }
+
+                    for (DeviceInfo lDeviceInfo : lDeviceInfos) {
+                        if (hashMap.get(lDeviceInfo.getKey()) != null) {
+                            if (lDeviceInfo.isDelete()) {
+                                hashMap.remove(lDeviceInfo.getKey());
+                            }
+                        } else {
+                            hashMap.put(lDeviceInfo.getMacAddress(), lDeviceInfo);
+                        }
+                    }
+
+                    lastDeviceInfos = new ArrayList<>();
+                    List<DeviceInfo> finalLastDeviceInfos = lastDeviceInfos;
+                    hashMap.forEach((k, v) -> {
+                        finalLastDeviceInfos.add(v);
+                    });
+                }
+                deviceDao.insertOpenLockInfos(lastDeviceInfos).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        lastDeviceInfos.add(new DeviceInfo());
+                        indexDeviceAdapter.setNewInstance(lastDeviceInfos);
+                        indexInfo.setDeviceInfos(lastDeviceInfos);
+                        CacheUtil.setCache(Config.INDEX_DETAIL_URL, indexInfo);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+
+                    }
+                });
+
             }
         });
     }

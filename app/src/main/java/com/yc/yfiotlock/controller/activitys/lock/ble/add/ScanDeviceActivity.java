@@ -121,6 +121,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        LockBLEManager.getInstance().stopScan();
     }
 
     @Override

@@ -17,9 +17,6 @@ import rx.Observable;
 
 public class HttpCoreEngin<T> extends BaseEngin<T> {
 
-    public HttpCoreEngin httpCoreEngin = null;
-
-
     public HttpCoreEngin(Context context) {
         super(context);
     }
@@ -35,7 +32,6 @@ public class HttpCoreEngin<T> extends BaseEngin<T> {
     public Observable<T> rxget(String url, Type type, boolean isEncryptResponse) {
         return rxget(url, type, null, null, isEncryptResponse);
     }
-
 
     public Observable<T> rxget(String url, Type type, Map<String, String> params, boolean isEncryptResponse) {
         return rxget(url, type, params, null, isEncryptResponse);

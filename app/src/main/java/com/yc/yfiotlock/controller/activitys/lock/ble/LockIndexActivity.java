@@ -36,7 +36,9 @@ import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
+import com.yc.yfiotlock.model.bean.lock.TimeInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
+import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
@@ -84,9 +86,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     private ShakeSensor shakeSensor;
     private BleDevice bleDevice;
     private LockEngine lockEngine;
+    private DeviceEngin deviceEngin;
     private FamilyInfo familyInfo;
     private DeviceInfo lockInfo;
     private LockBLESend lockBleSend;
+
 
     private CloudHelper cloudHelper;
 
@@ -137,9 +141,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
         familyInfo = (FamilyInfo) getIntent().getSerializableExtra("family");
         bleDevice = getIntent().getParcelableExtra("bleDevice");
+        deviceEngin = new DeviceEngin(this);
         lockEngine = new LockEngine(this);
         cloudHelper = new CloudHelper(this);
-
     }
 
     /**
@@ -161,6 +165,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 initSends();
                 setConnectedInfo();
+                bleSynctime();
             }
         }
 
@@ -245,7 +250,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         });
     }
 
-    private boolean isBleWorking(){
+    private boolean isBleWorking() {
         return "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString());
     }
 
@@ -304,7 +309,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     protected void onDestroy() {
         super.onDestroy();
 
-        if(lockBleSend != null){
+        if (lockBleSend != null) {
             lockBleSend.clear();
         }
 
@@ -314,7 +319,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (cloudHelper != null) {
             cloudHelper.unregisterNotify();
         }
-
 
         stopAnimations();
 
@@ -345,7 +349,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         startAnimations();
 
         if (lockBleSend != null) {
-            lockBleSend.send(LockBLEOpCmd.MCMD, LockBLEOpCmd.SCMD_OPEN, LockBLEOpCmd.open(lockInfo.getKey()), false);
+            lockBleSend.send(LockBLEOpCmd.MCMD, LockBLEOpCmd.SCMD_OPEN, LockBLEOpCmd.open(lockInfo.getKey()));
         }
     }
 
@@ -447,11 +451,26 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         });
     }
 
-    // 测试密钥
-    private void test() {
+    // 同步时间
+    protected void bleSynctime() {
         if (lockBleSend != null) {
-            byte[] cmdBytes = LockBLESettingCmd.reset(lockInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, cmdBytes, false);
+            deviceEngin.getTime().subscribe(new Action1<ResultInfo<TimeInfo>>() {
+                @Override
+                public void call(ResultInfo<TimeInfo> info) {
+                    if (info != null && info.getCode() == 1 && info.getData() != null) {
+                        byte[] cmdBytes = LockBLESettingCmd.syncTime(lockInfo.getKey(), info.getData().getTime());
+                        lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SYNC_TIME, cmdBytes);
+                    }
+                }
+            });
+        }
+    }
+
+    // 设置key
+    protected void bleSetkey(String oldKey, String newKey) {
+        if (lockBleSend != null) {
+            byte[] bytes = LockBLESettingCmd.setAesKey(oldKey, newKey);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes, false);
         }
     }
 
@@ -577,6 +596,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                     setConnectedInfo();
                 }
             });
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
+            LogUtil.msg("同步时间成功");
         }
     }
 
@@ -587,6 +608,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 setConnectedInfo();
             }
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
+            LogUtil.msg("同步时间失败");
         }
     }
 }

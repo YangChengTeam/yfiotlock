@@ -1,4 +1,4 @@
-package com.yc.yfiotlock.model.engin;
+package com.yc.yfiotlock.helper;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -18,11 +18,11 @@ import java.util.HashMap;
 /*
  * Created by　Dullyoung on 2021/3/4
  */
-public class GlideEngine implements Engine {
+public class GlideHelper implements Engine {
 
     private Context context;
 
-    public GlideEngine(Context context) {
+    public GlideHelper(Context context) {
         this.context = context;
     }
 

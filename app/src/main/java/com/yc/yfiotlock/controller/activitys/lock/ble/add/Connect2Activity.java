@@ -105,9 +105,6 @@ public class Connect2Activity extends BaseConnectActivity {
     @Override
     protected void bindClick() {
         super.bindClick();
-        setClick(mTvEdit, () -> {
-            deviceNameDialog.show(mTvEdit.getText().toString());
-        });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -173,6 +170,7 @@ public class Connect2Activity extends BaseConnectActivity {
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
+        super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK) {
             lockBleSend.setOpOver(true);
             mLoadingDialog.dismiss();

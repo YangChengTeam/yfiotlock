@@ -20,7 +20,7 @@ import io.reactivex.Single;
 public interface OpenLockDao {
     // 同步云端到本地
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insertOpenLockInfos(List<OpenLockInfo> openLockInfo);
+    Completable insertOpenLockInfos(List<OpenLockInfo> openLockInfos);
 
     // 添加一条数据到本地
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -43,8 +43,8 @@ public interface OpenLockDao {
     Completable deleteOpenLockInfo(int lockId, int keyid);
 
     // 添加已同步到云端
-    @Query("update open_lock_info set is_add=:isAdd where lock_id=:lockId and key_id=:keyid")
-    Completable updateAddOpenLockInfo(int lockId, int keyid, boolean isAdd);
+    @Query("update open_lock_info set is_add=1 where lock_id=:lockId and key_id=:keyid and group_type=:groupType")
+    Completable updateAddOpenLockInfo(int lockId, int keyid, int groupType);
 
     // 更新已同步到云端
     @Query("update open_lock_info set is_update=0 where lock_id=:lockId and key_id=:keyid  and group_type=:groupType")

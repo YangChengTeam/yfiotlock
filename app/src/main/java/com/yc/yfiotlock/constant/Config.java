@@ -78,6 +78,10 @@ public class Config {
     public static final String DEVICE_TIME_URL = getBaseUrl() + "/userapp/v1.User/getTime" + isRsa();
     public static final String DEVICE_UPDATE_URL = getBaseUrl() + "/userapp/v1.Index/upgrade" + isRsa();
 
+    public static final String DEVICE_MODIFY_LOCAL_URL = getBaseUrl() + "/userapp/v1.Locker/lockerNameUpdLocal" + isRsa();
+    public static final String DEVICE_DEL_LOCAL_URL = getBaseUrl() + "/userapp/v1.Locker/lockerDelLocal" + isRsa();
+
+
     // 安全设备
     public static final String DEVICE_SET_SAFE_URL = getBaseUrl() + "/userapp/v1.Locker/setOperationPwd" + isRsa();
 
@@ -90,8 +94,8 @@ public class Config {
     public static final String OPEN_LOCK_LONG_OPEN_URL = getBaseUrl() + "/userapp/v1.Locker/longRangeOPen" + isRsa();
     public static final String OPEN_LOCK_TEMPORARY_PWD_LIST_URL = getBaseUrl() + "/userapp/v1.Locker/temporaryPwdList" + isRsa();
 
-    public static final String OPEN_LOCK_DEL_PSW_URL2 = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDel2" + isRsa();
-    public static final String OPEN_LOCK_MODIFY_PSW_URL2 = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpd2" + isRsa();
+    public static final String OPEN_LOCK_DEL_LOCAL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDelLocal" + isRsa();
+    public static final String OPEN_LOCK_MODIFY_LOCAL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpdLocal" + isRsa();
 
     //远程
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();

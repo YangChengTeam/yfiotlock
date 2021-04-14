@@ -18,10 +18,9 @@ import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.dao.AppDatabase;
 import com.yc.yfiotlock.helper.Reflection;
-import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
-import com.yc.yfiotlock.model.engin.GlideEngine;
+import com.yc.yfiotlock.helper.GlideHelper;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
@@ -143,7 +142,7 @@ public class App extends Application {
 
     private void initSdk() {
         MMKV.initialize(this);
-        ImageEngine.install(new GlideEngine(this));
+        ImageEngine.install(new GlideHelper(this));
         if (BuildConfig.DEBUG) {
             CrashReport.initCrashReport(getApplicationContext(), "2efb5c9b77", true);
         } else {

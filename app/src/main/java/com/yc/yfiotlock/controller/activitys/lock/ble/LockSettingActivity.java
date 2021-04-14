@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,8 +18,10 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.add.ConnectActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.download.DeviceDownloadManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.CloudDeviceDelEvent;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
@@ -41,7 +44,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
-import rx.Subscriber;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
 import rx.functions.Action1;
 
 public class LockSettingActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
@@ -53,6 +58,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private LockBLESend lockBleSend;
     private DeviceInfo lockInfo;
     private DeviceEngin deviceEngin;
+    private DeviceDao deviceDao;
     private BleDevice bleDevice;
     private SettingSoundView headView;
     private int volume;
@@ -72,6 +78,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
         deviceEngin = new DeviceEngin(this);
+        deviceDao = App.getApp().getDb().deviceDao();
     }
 
     @Override
@@ -122,46 +129,32 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setMsg("是否删除该设备");
             generalDialog.setOnPositiveClickListener(dialog -> {
                 //是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
-                if (LockBLEManager.getInstance().isConnected(bleDevice) || lockInfo.isShare()) {
-                    cloudDelDevice();
+                if (lockInfo.isShare()) {
+                    localDeviceDel();
                 } else {
-                    ToastCompat.show(getContext(), "蓝牙未连接");
+                    if (LockBLEManager.getInstance().isConnected(bleDevice)) {
+                        bleReset();
+                    } else {
+                        ToastCompat.show(getContext(), "蓝牙未连接");
+                    }
                 }
             });
             generalDialog.show();
         });
     }
 
-    private void cloudDelDevice() {
-        mLoadingDialog.show("删除中...");
-        deviceEngin.delDeviceVolume(lockInfo.getId() + "").subscribe(new Subscriber<ResultInfo<String>>() {
+    @SuppressLint("CheckResult")
+    private void localDeviceDel() {
+        deviceDao.deleteDeviceInfo(lockInfo.getMacAddress()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action() {
             @Override
-            public void onCompleted() {
-                mLoadingDialog.dismiss();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
-            }
-
-            @Override
-            public void onNext(ResultInfo<String> info) {
-                if (info != null && info.getCode() == 1) {
-                    App.getApp().getMacList().remove(lockInfo.getMacAddress());
-                    SafeUtil.setSafePwdType(lockInfo, 0);
-                    EventBus.getDefault().post(new IndexRefreshEvent());
-                    UserInfoCache.decDeviceNumber();
-                    if (!lockInfo.isShare()) {
-                        bleReset();
-                    } else {
-                        EventBus.getDefault().post(new IndexRefreshEvent());
-                        LockIndexActivity.safeFinish();
-                        finish();
-                    }
-                } else {
-                    ToastCompat.show(getContext(), "删除失败");
-                }
+            public void run() throws Exception {
+                App.getApp().getMacList().remove(lockInfo.getMacAddress());
+                SafeUtil.setSafePwdType(lockInfo, 0);
+                UserInfoCache.decDeviceNumber();
+                EventBus.getDefault().post(new IndexRefreshEvent());
+                EventBus.getDefault().post(new CloudDeviceDelEvent(lockInfo));
+                LockIndexActivity.safeFinish();
+                finish();
             }
         });
     }
@@ -176,7 +169,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void bleReset() {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.reset(lockInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes, true);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes, false);
         }
     }
 
@@ -185,6 +178,10 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         loadData();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConnected(BleDevice bleDevice) {
+        this.bleDevice = bleDevice;
+    }
 
     private void setRvSetting() {
         mSettingAdapter = new SettingAdapter(null);
@@ -299,21 +296,19 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         }
     }
 
-
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHANGE_VOLUME) {
             headView.setVolume(volume);
             lockInfo.setVolume(volume);
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_RESET) {
-            finish();
-            LockIndexActivity.safeFinish();
+            mLoadingDialog.dismiss();
+            localDeviceDel();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_VERSION) {
             CacheUtil.setCache("firmwareVersion", new String(Arrays.copyOfRange(lockBLEData.getExtra(), 0, 6)));
             getUpdateInfo();
         }
     }
-
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {

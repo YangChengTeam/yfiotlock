@@ -117,7 +117,7 @@ public class LockBLESend {
         if (retryCount < 0) return;
         Log.d(TAG, "直接发送真正指令" + retryCount);
         op(cmdBytes);
-        VUiKit.postDelayed(1000 * 2, () -> {
+        VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
             if (retryCount > 0) {
                 if (!isOpOver) {
                     realSend();
@@ -153,7 +153,6 @@ public class LockBLESend {
         this.notifyCallback = notifyCallback;
     }
 
-
     // 清除操作
     public void clear() {
         LockBLEManager.getInstance().disConnect(bleDevice);
@@ -172,7 +171,6 @@ public class LockBLESend {
         }
     }
 
-
     // 持续唤醒
     private void wakeup() {
         if (waupStatus && isSend) return;
@@ -182,7 +180,6 @@ public class LockBLESend {
         VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
             if (waupStatus && isSend) return;
             if (wakeUpCount++ >= 3) {
-                //ToastCompat.show(context, "唤醒门锁失败,无法发送指令");
                 Log.d(TAG, "唤醒门锁失败,无法发送指令");
                 wakeUpCount = 0;
                 wakeupFailureResponse();
@@ -327,6 +324,7 @@ public class LockBLESend {
         mcmd = 0x00;
         scmd = 0x00;
         cmdBytes = null;
+        retryCount = 3;
     }
 
     //  bleDevice 出现未知问题

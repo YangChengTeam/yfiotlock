@@ -13,7 +13,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
-import com.yc.yfiotlock.model.bean.eventbus.CloudAddEvent;
+import com.yc.yfiotlock.model.bean.eventbus.CloudOpenLockAddEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
@@ -95,7 +95,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                 localAddSucc();
                 if (CommonUtil.isNetworkAvailable(getContext())) {
                     openLockInfo.setAdd(true);
-                    EventBus.getDefault().post(new CloudAddEvent(openLockInfo));
+                    EventBus.getDefault().post(new CloudOpenLockAddEvent(openLockInfo));
                 }
                 EventBus.getDefault().post(new OpenLockRefreshEvent());
                 finish();

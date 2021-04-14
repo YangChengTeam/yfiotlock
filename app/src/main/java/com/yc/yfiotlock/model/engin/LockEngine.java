@@ -31,11 +31,6 @@ public class LockEngine extends HttpCoreEngin {
         super(context);
     }
 
-    @Override
-    public String getUrl() {
-        return null;
-    }
-
     /**
      * @param lockerId  device id
      * @param name      device name
@@ -58,7 +53,7 @@ public class LockEngine extends HttpCoreEngin {
         map.put("pwd_type", pwdType + "");
         map.put("group_type", groupType);
         map.put("pwd", pwd == null ? "" : pwd);
-        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_ADD_URL,
+        return rxpost(Config.OPEN_LOCK_ADD_URL,
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -76,7 +71,7 @@ public class LockEngine extends HttpCoreEngin {
         }
         map.put("locker_id", lockerId);
         map.put("type", type);
-        return new HttpCoreEngin<ResultInfo<OpenLockCountInfo>>(getContext()).rxpost(Config.OPEN_LOCK_LIST_URL,
+        return rxpost(Config.OPEN_LOCK_LIST_URL,
                 new TypeReference<ResultInfo<OpenLockCountInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -95,7 +90,7 @@ public class LockEngine extends HttpCoreEngin {
         map.put("locker_id", lockerId);
         map.put("pwd_type", type);
         map.put("type", groupType);
-        return new HttpCoreEngin<ResultInfo<List<OpenLockInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
+        return rxpost(Config.OPEN_LOCK_SINGLE_TYPE_LIST_URL,
                 new TypeReference<ResultInfo<List<OpenLockInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -113,7 +108,7 @@ public class LockEngine extends HttpCoreEngin {
         }
         map.put("name", name);
         map.put("id", id);
-        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_MODIFY_PSW_URL,
+        return rxpost(Config.OPEN_LOCK_MODIFY_PSW_URL,
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -126,7 +121,7 @@ public class LockEngine extends HttpCoreEngin {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("id", id);
-        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_DEL_PSW_URL,
+        return rxpost(Config.OPEN_LOCK_DEL_PSW_URL,
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -140,14 +135,13 @@ public class LockEngine extends HttpCoreEngin {
         map.put("locker_id", lockid);
         map.put("keyid", keyid);
         map.put("group_type", groupType);
-        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_DEL_PSW_URL2,
+        return rxpost(Config.OPEN_LOCK_DEL_LOCAL_PSW_URL,
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
     // 修改名称2
     public Observable<ResultInfo<String>> modifyOpenLockName2(String lockid, String keyid, String groupType, String name) {
-
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
@@ -156,7 +150,7 @@ public class LockEngine extends HttpCoreEngin {
         map.put("locker_id", lockid);
         map.put("keyid", keyid);
         map.put("group_type", groupType);
-        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_MODIFY_PSW_URL2,
+        return rxpost(Config.OPEN_LOCK_MODIFY_LOCAL_PSW_URL,
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -168,7 +162,7 @@ public class LockEngine extends HttpCoreEngin {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", lockerId);
-        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.OPEN_LOCK_LONG_OPEN_URL,
+        return rxpost(Config.OPEN_LOCK_LONG_OPEN_URL,
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -182,7 +176,7 @@ public class LockEngine extends HttpCoreEngin {
         map.put("locker_id", lockerId);
         map.put("page", String.valueOf(page));
         map.put("page_size", String.valueOf(pageSize));
-        return new HttpCoreEngin<ResultInfo<List<PasswordInfo>>>(getContext()).rxpost(Config.OPEN_LOCK_TEMPORARY_PWD_LIST_URL,
+        return rxpost(Config.OPEN_LOCK_TEMPORARY_PWD_LIST_URL,
                 new TypeReference<ResultInfo<List<PasswordInfo>>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
@@ -193,8 +187,7 @@ public class LockEngine extends HttpCoreEngin {
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
-        HttpCoreEngin<ResultInfo<NetworkStateInfo>> httpCoreEngin = new HttpCoreEngin<>(getContext());
-        return httpCoreEngin.rxpost(Config.DEVICE_CHECK_NETWORK_URL, new TypeReference<ResultInfo<NetworkStateInfo>>() {
+        return rxpost(Config.DEVICE_CHECK_NETWORK_URL, new TypeReference<ResultInfo<NetworkStateInfo>>() {
                 }.getType(),
                 map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }

@@ -61,7 +61,6 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
     protected OpenLockDao openLockDao;
     protected DeviceInfo lockInfo;
     protected List<OpenLockInfo> allOpenLockInfos;
-    protected boolean isAdmin = true;
     protected String title;
 
 

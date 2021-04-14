@@ -68,7 +68,21 @@ public class DeviceEngin extends BaseEngin {
         map.put("locker_id", id);
         if (!TextUtils.isEmpty(aliDevname)) {
             map.put("device_id", aliDevname);
+        }
+        map.put("name", name);
+        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_MODIFY_URL,
+                new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
 
+    public Observable<ResultInfo<String>> updateDeviceInfo2(String mac, String name, String aliDevname) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("mac_address", mac);
+        if (!TextUtils.isEmpty(aliDevname)) {
+            map.put("device_id", aliDevname);
         }
         map.put("name", name);
         return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_MODIFY_URL,
@@ -92,12 +106,23 @@ public class DeviceEngin extends BaseEngin {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    public Observable<ResultInfo<String>> delDeviceVolume(String id) {
+    public Observable<ResultInfo<String>> delDeviceInfo(String id) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", id);
+        return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_DEL_URL,
+                new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    public Observable<ResultInfo<String>> delDeviceInfo2(String mac) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("mac_address", mac);
         return new HttpCoreEngin<ResultInfo<String>>(getContext()).rxpost(Config.DEVICE_DEL_URL,
                 new TypeReference<ResultInfo<String>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);

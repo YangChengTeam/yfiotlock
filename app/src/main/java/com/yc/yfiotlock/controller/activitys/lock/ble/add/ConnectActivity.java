@@ -21,8 +21,6 @@ import android.widget.TextView;
 import com.coorchice.library.SuperTextView;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.utils.CommonUtil;
@@ -52,6 +50,7 @@ public class ConnectActivity extends BaseConnectActivity {
     private AlertDialog wifiAlertDialog;
 
     private static WeakReference<ConnectActivity> mInstance;
+
     public static void safeFinish() {
         if (mInstance != null && mInstance.get() != null) {
             mInstance.get().finish();
@@ -239,21 +238,5 @@ public class ConnectActivity extends BaseConnectActivity {
         if (window != null) {
             window.setLayout(ScreenUtil.getWidth(getContext()) - 100, ScreenUtil.getHeight(getContext()) / 2);
         }
-    }
-
-    @Override
-    public void onNotifyFailure(LockBLEData lockBLEData) {
-        super.onNotifyFailure(lockBLEData);
-        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK) {
-            mLoadingDialog.dismiss();
-            nav2fail();
-        }
-    }
-
-
-    @Override
-    public void success(Object data) {
-        super.success(data);
-        nav2Index();
     }
 }

@@ -1,19 +1,19 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
-import com.kk.utils.VUiKit;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtils;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
-import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
-import com.yc.yfiotlock.controller.dialogs.lock.ble.ChangeDeviceNameDialog;
+import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.CloudDeviceAddEvent;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
@@ -22,7 +22,9 @@ import com.yc.yfiotlock.utils.UserInfoCache;
 
 import org.greenrobot.eventbus.EventBus;
 
-import rx.Subscriber;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
 import rx.functions.Action1;
 
 public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESend.NotifyCallback {
@@ -36,13 +38,14 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected DeviceInfo lockInfo;
     protected LockBLESend lockBleSend;
     protected DeviceEngin deviceEngin;
-    protected ChangeDeviceNameDialog deviceNameDialog;
+    protected DeviceDao deviceDao;
 
     protected String aliDeviceName = "000000000000";
 
     @Override
     protected void initVars() {
         super.initVars();
+        deviceDao = App.getApp().getDb().deviceDao();
         bleDevice = getIntent().getParcelableExtra("bleDevice");
         lockInfo = (DeviceInfo) getIntent().getSerializableExtra("device");
         isActiveDistributionNetwork = getIntent().getBooleanExtra("isActiveDistributionNetwork", false);
@@ -55,73 +58,24 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
     }
 
-    @Override
-    protected void initViews() {
-        super.initViews();
-        deviceNameDialog = new ChangeDeviceNameDialog(this);
-        deviceNameDialog.setOnSureClick(name -> cloudModifyDeivceName(name, aliDeviceName));
-    }
-
-    protected void cloudAddDevice() {
-        bleSynctime();
-        mLoadingDialog.show("添加设备中...");
-        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, isConnected ? 1 : 0).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
+    @SuppressLint("CheckResult")
+    protected void localDeviceAdd() {
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setFamilyId(familyInfo.getId());
+        deviceInfo.setName(bleDevice.getName());
+        deviceInfo.setMacAddress(bleDevice.getMac());
+        deviceInfo.setAdd(false);
+        deviceInfo.setDeviceId(aliDeviceName);
+        deviceDao.insertDeviceInfo(deviceInfo).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action() {
             @Override
-            public void onCompleted() {
-                mLoadingDialog.dismiss();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                mLoadingDialog.dismiss();
-                fail();
-            }
-
-            @Override
-            public void onNext(ResultInfo<DeviceInfo> resultInfo) {
-                if (resultInfo != null && resultInfo.getCode() == 1) {
-                    mLoadingDialog.dismiss();
-                    success(resultInfo.getData());
-                } else {
-                    fail();
-                }
+            public void run() throws Exception {
+                EventBus.getDefault().post(new CloudDeviceAddEvent(deviceInfo));
+                EventBus.getDefault().post(new IndexRefreshEvent());
+                UserInfoCache.incDeviceNumber();
+                nav2Index();
             }
         });
     }
-
-    protected void cloudModifyDeivceName(String name, String aliDeviceName) {
-        if (lockInfo.getId() != 0) {
-            mLoadingDialog.show("正在修改");
-            deviceEngin.updateDeviceInfo(lockInfo.getId() + "", name, aliDeviceName).subscribe(new Subscriber<ResultInfo<String>>() {
-                @Override
-                public void onCompleted() {
-                    mLoadingDialog.dismiss();
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    mLoadingDialog.dismiss();
-                    ToastCompat.show(getContext(), e.getMessage());
-                }
-
-                @Override
-                public void onNext(ResultInfo<String> resultInfo) {
-                    if (resultInfo != null && resultInfo.getCode() == 1) {
-                        deviceNameDialog.dismiss();
-                        lockInfo.setName(name);
-                        backNavBar.setTitle(name);
-                        EventBus.getDefault().post(lockInfo);
-                        EventBus.getDefault().post(new IndexRefreshEvent());
-                    } else {
-                        String msg = "更新出错";
-                        msg = resultInfo != null && resultInfo.getMsg() != null ? resultInfo.getMsg() : msg;
-                        ToastCompat.show(getContext(), msg);
-                    }
-                }
-            });
-        }
-    }
-
 
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {
@@ -130,49 +84,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         }
     }
 
-    protected void bleSynctime() {
-        if (lockBleSend != null) {
-            deviceEngin.getTime().subscribe(new Action1<ResultInfo<TimeInfo>>() {
-                @Override
-                public void call(ResultInfo<TimeInfo> info) {
-                    if (info != null && info.getCode() == 1 && info.getData() != null) {
-                        byte[] cmdBytes = LockBLESettingCmd.syncTime(lockInfo.getKey(), info.getData().getTime());
-                        lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SYNC_TIME, cmdBytes, true);
-                    }
-                }
-            });
-        }
-    }
-
-    @Override
-    public void success(Object data) {
-        lockInfo = (DeviceInfo) data;
-        lockInfo.setMacAddress(bleDevice.getMac());
-        lockInfo.setName(bleDevice.getName());
-        lockInfo.setDeviceId(aliDeviceName);
-        EventBus.getDefault().post(new IndexRefreshEvent());
-
-        UserInfoCache.incDeviceNumber();
-    }
-
-    @Override
-    public void fail() {
-        if (retryCount-- > 0) {
-            VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), () -> {
-                cloudAddDevice();
-            });
-        } else {
-            retryCount = 3;
-            GeneralDialog generalDialog = new GeneralDialog(getContext());
-            generalDialog.setTitle("温馨提示");
-            generalDialog.setMsg("同步云端失败, 请重试");
-            generalDialog.setOnPositiveClickListener(dialog -> {
-                mLoadingDialog.show("添加设备中...");
-                cloudAddDevice();
-            });
-            generalDialog.show();
-        }
-    }
 
     protected void nav2Index() {
         Intent intent = new Intent(this, LockIndexActivity.class);
@@ -225,10 +136,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                 return;
             }
             isDeviceAdd = true;
-            cloudAddDevice();
-        }
-        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
-            LogUtil.msg("同步时间成功");
+            localDeviceAdd();
         }
     }
 
@@ -239,7 +147,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                 return;
             }
             isDeviceAdd = true;
-            cloudAddDevice();
+            localDeviceAdd();
         }
     }
 

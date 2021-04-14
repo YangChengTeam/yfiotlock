@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.remote;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,7 +16,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.dao.OpenLockDao;
 import com.yc.yfiotlock.helper.TOTP;
-import com.yc.yfiotlock.model.bean.eventbus.CloudAddEvent;
+import com.yc.yfiotlock.model.bean.eventbus.CloudOpenLockAddEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
@@ -125,6 +126,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         });
     }
 
+    @SuppressLint("CheckResult")
     private void localLoadData() {
         nodataView.setVisibility(View.GONE);
         noWifiView.setVisibility(View.GONE);
@@ -219,7 +221,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
                 localAddSucc();
                 if (CommonUtil.isNetworkAvailable(getContext())) {
                     openLockInfo.setAdd(true);
-                    EventBus.getDefault().post(new CloudAddEvent(openLockInfo));
+                    EventBus.getDefault().post(new CloudOpenLockAddEvent(openLockInfo));
                 }
             }
 
