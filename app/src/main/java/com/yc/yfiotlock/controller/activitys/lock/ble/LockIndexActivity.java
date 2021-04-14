@@ -343,6 +343,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (isOpening) {
             return;
         }
+
         isOpening = true;
 
         loadingIv.setImageResource(R.mipmap.three);
@@ -471,7 +472,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     protected void bleSetkey(String oldKey, String newKey) {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.setAesKey(oldKey, newKey);
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes, false);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes);
         }
     }
 
@@ -595,6 +596,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
                 isOpening = false;
                 if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                     setConnectedInfo();
+                    if (shakeSensor != null) {
+                        shakeSensor.setCallback(false);
+                    }
                 }
             });
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
@@ -606,6 +610,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_OPEN) {
             isOpening = false;
+            if (shakeSensor != null) {
+                shakeSensor.setCallback(false);
+            }
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 setConnectedInfo();
             }

@@ -101,7 +101,7 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
     private void bleGetBattery() {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.getBattery(deviceInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_BATTERY, bytes, true);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_BATTERY, bytes);
         }
     }
 

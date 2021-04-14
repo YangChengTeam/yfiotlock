@@ -132,7 +132,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         if (lockBleSend != null) {
             mLoadingDialog.show("添加设备中...");
             byte[] cmdBytes = LockBLESettingCmd.getAliDeviceName(lockInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes, true);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes);
         }
     }
 

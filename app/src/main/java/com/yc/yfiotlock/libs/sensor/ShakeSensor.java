@@ -20,14 +20,18 @@ public class ShakeSensor implements SensorEventListener {
 
     protected final String TAG = this.getClass().getName();
 
+    public static final int DEFAULT_SHAKE_SPEED = 6;
 
     private int mSpeedShreshold = DEFAULT_SHAKE_SPEED;
     private static final int UPTATE_INTERVAL_TIME = 100;
-    public static final int DEFAULT_SHAKE_SPEED = 15;
     private boolean isStart = false;
+    private boolean isCallback = false;
 
     private long mLastUpdateTime;
 
+    public void setCallback(boolean callback) {
+        isCallback = callback;
+    }
 
     public ShakeSensor(Context context) {
         this(context, ShakeSensor.DEFAULT_SHAKE_SPEED);
@@ -72,6 +76,8 @@ public class ShakeSensor implements SensorEventListener {
     }
 
     public void onSensorChanged(SensorEvent event) {
+        if(isCallback) return;
+
         // 两次检测的时间间隔
         long currentUpdateTime = System.currentTimeMillis();
         long timeInterval = currentUpdateTime - mLastUpdateTime;
@@ -87,6 +93,7 @@ public class ShakeSensor implements SensorEventListener {
         float z = event.values[2];
 
         if (mShakeListener != null && Math.abs(x) > mSpeedShreshold && Math.abs(y) > mSpeedShreshold && Math.abs(z) > mSpeedShreshold) {
+            isCallback = true;
             mShakeListener.onShakeComplete(event);
         }
     }

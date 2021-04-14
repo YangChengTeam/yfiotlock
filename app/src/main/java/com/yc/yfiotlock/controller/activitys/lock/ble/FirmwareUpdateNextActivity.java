@@ -132,14 +132,14 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     private void bleOpenUpdate() {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.openUpdate(deviceInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_OPEN_UPDATE, bytes, true);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_OPEN_UPDATE, bytes);
         }
     }
 
     private void bleUpdate(byte[] datas) {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.update(deviceInfo.getKey(), datas, (byte) (packageCount--));
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_UPDATE, bytes, true);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_UPDATE, bytes);
         }
     }
 

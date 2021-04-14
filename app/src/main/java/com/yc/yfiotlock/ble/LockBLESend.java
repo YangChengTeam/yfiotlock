@@ -33,10 +33,10 @@ public class LockBLESend {
     private byte scmd = 0x00;
     private byte[] cmdBytes;
 
+    public static final int DEFAULT_RETRY_COUNT = 2;
     private boolean waupStatus = false;  // 唤醒状态
     private boolean isSend = false;      // 是否发送中
     private boolean isOpOver = false;    // 实际操作是否完成
-    private int retryCount = 3;          // 重试次数
     private int wakeUpCount = 0;         // 发送唤醒次数
     private boolean isReInit = false;    // 是否已被初始化
     public int responseErrorCount = 0;   // 响应失败次数
@@ -80,14 +80,12 @@ public class LockBLESend {
     }
 
     // 发送数据
-    public void send(byte mcmd, byte scmd, byte[] cmdBytes, boolean iswakeup) {
+    public void send(byte mcmd, byte scmd, byte[] cmdBytes) {
         this.mcmd = mcmd;
         this.scmd = scmd;
         this.cmdBytes = cmdBytes;
         if (!isConnected()) {
-            VUiKit.post(() -> {
-                ToastCompat.show(context, "蓝牙未连接");
-            });
+            notifyNoConnectResponse("ble no connection!");
             EventBus.getDefault().post(new OpenLockReConnectEvent());
             return;
         } else {
@@ -100,49 +98,20 @@ public class LockBLESend {
             Log.d(TAG, "正在发送");
             isSend = true;
             isOpOver = false;
-            if (iswakeup) {
-                wakeup();
-            } else {
-                realSend();
-            }
+            wakeup();
         } else {
             Log.d(TAG, "发送未完毕");
         }
     }
 
-
-    public void realSend() {
-        retryCount--;
-        if (retryCount < 0) return;
-        Log.d(TAG, "直接发送真正指令" + retryCount);
-        op(cmdBytes);
-        VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
-            if (retryCount > 0) {
-                if (!isOpOver) {
-                    realSend();
-                }
-            } else {
-                retryCount = 3;
-                if (!isOpOver) {
-                    notifyErrorResponse("no response");
-                }
-            }
-        });
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onBleDeviceChange(BleDevice bleDevice) {
         this.bleDevice = bleDevice;
-        wakeup();
-    }
-
-    // 伪发送数据
-    public void send(byte mcmd, byte scmd, byte[] cmdBytes) {
-        send(mcmd, scmd, cmdBytes, true);
     }
 
     public interface NotifyCallback {
         void onNotifySuccess(LockBLEData lockBLEData);
+
         void onNotifyFailure(LockBLEData lockBLEData);
     }
 
@@ -173,12 +142,14 @@ public class LockBLESend {
     // 持续唤醒
     private void wakeup() {
         if (waupStatus && isSend) return;
+        if (isOpOver) return;
         Log.d(TAG, "发送唤醒指令");
         byte[] bytes = LockBLEOpCmd.wakeup(key);
         op(bytes);
         VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
+            if (isOpOver) return;
             if (waupStatus && isSend) return;
-            if (wakeUpCount++ >= 3) {
+            if (wakeUpCount++ >= DEFAULT_RETRY_COUNT) {
                 Log.d(TAG, "唤醒门锁失败,无法发送指令");
                 wakeUpCount = 0;
                 wakeupFailureResponse();
@@ -323,7 +294,7 @@ public class LockBLESend {
         mcmd = 0x00;
         scmd = 0x00;
         cmdBytes = null;
-        retryCount = 3;
+        wakeUpCount = 0;
     }
 
     //  bleDevice 出现未知问题
@@ -345,6 +316,17 @@ public class LockBLESend {
         processNotify(lockBLEData);
         responseErrorCount++;
         rescan();
+    }
+
+    // 蓝牙未连接
+    public void notifyNoConnectResponse(String error) {
+        Log.d(TAG, "蓝牙未连接");
+        LockBLEData lockBLEData = new LockBLEData();
+        lockBLEData.setMcmd(mcmd);
+        lockBLEData.setScmd(scmd);
+        lockBLEData.setExtra(error.getBytes());
+        lockBLEData.setStatus(LockBLEBaseCmd.STATUS_NOTIFY_NO_CONNECTION);
+        processNotify(lockBLEData);
     }
 
     // 响应错误

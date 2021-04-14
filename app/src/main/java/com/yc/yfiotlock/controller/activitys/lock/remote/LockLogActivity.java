@@ -137,7 +137,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private void bleSyncLog() {
         byte[] cmdBytes = LockBLEEventCmd.event(lockInfo.getKey(), lastId);
         if (lockBLESend != null) {
-            lockBLESend.send(LockBLEEventCmd.MCMD, (byte) LockBLEEventCmd.SCMD_LOG, cmdBytes, false);
+            lockBLESend.send(LockBLEEventCmd.MCMD, (byte) LockBLEEventCmd.SCMD_LOG, cmdBytes);
         }
     }
 

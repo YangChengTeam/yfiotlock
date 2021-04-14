@@ -147,7 +147,7 @@ public class Connect2Activity extends BaseConnectActivity {
 
     private void bleCancel() {
         if (cancelSend != null) {
-            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(lockInfo.getKey()), false);
+            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(lockInfo.getKey()));
         }
     }
 
@@ -159,7 +159,6 @@ public class Connect2Activity extends BaseConnectActivity {
             valueAnimator.cancel();
             valueAnimator.end();
             showConnectedUi();
-            ConnectActivity.safeFinish();
             bleGetAliDeviceName();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSend.setOpOver(true);

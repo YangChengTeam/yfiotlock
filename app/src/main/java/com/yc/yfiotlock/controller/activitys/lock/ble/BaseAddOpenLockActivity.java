@@ -148,7 +148,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
     private void bleCancel() {
         if (cancelSend != null) {
-            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(lockInfo.getKey()), false);
+            cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(lockInfo.getKey()));
         }
     }
 

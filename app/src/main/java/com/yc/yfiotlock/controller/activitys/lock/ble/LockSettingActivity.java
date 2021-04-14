@@ -116,7 +116,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void bleSetVolume(int volume) {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.changeVolume(lockInfo.getKey(), volume);
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHANGE_VOLUME, bytes, false);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHANGE_VOLUME, bytes);
         }
     }
 
@@ -148,6 +148,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         deviceDao.deleteDeviceInfo(lockInfo.getMacAddress()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action() {
             @Override
             public void run() throws Exception {
+                mLoadingDialog.dismiss();
                 App.getApp().getMacList().remove(lockInfo.getMacAddress());
                 SafeUtil.setSafePwdType(lockInfo, 0);
                 UserInfoCache.decDeviceNumber();
@@ -162,14 +163,15 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void bleGetVersion() {
         if (lockBleSend != null) {
             byte[] bytes = LockBLESettingCmd.getVersion(lockInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_VERSION, bytes, true);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_VERSION, bytes);
         }
     }
 
     private void bleReset() {
         if (lockBleSend != null) {
+            mLoadingDialog.show("删除设备中...");
             byte[] bytes = LockBLESettingCmd.reset(lockInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes, false);
+            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes);
         }
     }
 
