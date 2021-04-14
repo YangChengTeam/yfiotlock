@@ -190,13 +190,14 @@ public class IndexFragment extends BaseFragment {
                 if (lDeviceInfos == null || lDeviceInfos.size() == 0) {
                     lastDeviceInfos = cDeviceInfos;
                 } else {
+
                     for (DeviceInfo cDeviceInfo : cDeviceInfos) {
                         hashMap.put(cDeviceInfo.getMacAddress(), cDeviceInfo);
                     }
 
                     for (DeviceInfo lDeviceInfo : lDeviceInfos) {
-                        if (hashMap.get(lDeviceInfo.getKey()) != null) {
-                            if (lDeviceInfo.isDelete()) {
+                        if (lDeviceInfo.isDelete()) {
+                            if (hashMap.get(lDeviceInfo.getKey()) != null) {
                                 hashMap.remove(lDeviceInfo.getKey());
                             }
                         } else {
@@ -219,6 +220,7 @@ public class IndexFragment extends BaseFragment {
                     @Override
                     public void onComplete() {
                         lastDeviceInfos.add(new DeviceInfo());
+
                         indexDeviceAdapter.setNewInstance(lastDeviceInfos);
                         indexInfo.setDeviceInfos(lastDeviceInfos);
                         CacheUtil.setCache(Config.INDEX_DETAIL_URL, indexInfo);
@@ -229,7 +231,6 @@ public class IndexFragment extends BaseFragment {
 
                     }
                 });
-
             }
         });
     }

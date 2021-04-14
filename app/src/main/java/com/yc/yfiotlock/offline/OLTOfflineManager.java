@@ -24,6 +24,9 @@ import com.yc.yfiotlock.utils.CacheUtil;
 
 import java.util.List;
 
+import io.reactivex.CompletableObserver;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rx.functions.Action1;
@@ -38,6 +41,7 @@ public class OLTOfflineManager {
     private DeviceEngin deviceEngin;
     private LockEngine lockEngine;
     private LogEngine logEngine;
+
     private OpenLockDao openLockDao;
     private LockLogDao lockLogDao;
     private DeviceDao deviceDao;
@@ -80,7 +84,7 @@ public class OLTOfflineManager {
         if (openLockInfos != null && openLockInfos.size() > n) {
             OpenLockInfo openLockInfo = openLockInfos.get(n);
             if (openLockInfo == null) return;
-            lockEngine.delOpenLockWay2(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "").subscribe(new Action1<ResultInfo<String>>() {
+            lockEngine.delOpenLockWaySyncLocal(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "").subscribe(new Action1<ResultInfo<String>>() {
                 @Override
                 public void call(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {
@@ -97,7 +101,7 @@ public class OLTOfflineManager {
         if (openLockInfos != null && openLockInfos.size() > n) {
             OpenLockInfo openLockInfo = openLockInfos.get(n);
             if (openLockInfo == null) return;
-            lockEngine.modifyOpenLockName2(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "", openLockInfo.getName()).subscribe(new Action1<ResultInfo<String>>() {
+            lockEngine.modifyOpenLockNameSyncLocal(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "", openLockInfo.getName()).subscribe(new Action1<ResultInfo<String>>() {
                 @Override
                 public void call(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {
@@ -148,12 +152,28 @@ public class OLTOfflineManager {
         if (deviceInfos != null && deviceInfos.size() > n) {
             DeviceInfo deviceInfo = deviceInfos.get(n);
             if (deviceInfo == null) return;
-            deviceEngin.delDeviceInfo(deviceInfo.getMacAddress() + "").subscribe(new Action1<ResultInfo<String>>() {
+            deviceEngin.delDeviceInfoSyncLocal(deviceInfo.getMacAddress() + "").subscribe(new Action1<ResultInfo<String>>() {
                 @Override
                 public void call(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {
                         LogUtil.msg("同步删除设备: mac:" + deviceInfo.getMacAddress());
-                        deviceDao.realDeleteDeviceInfo(deviceInfo.getMacAddress()).subscribeOn(Schedulers.io()).subscribe();
+                        deviceDao.realDeleteDeviceInfo(deviceInfo.getMacAddress()).subscribeOn(Schedulers.io()).subscribe(new CompletableObserver() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                openLockDao.deleteInfoByLockId(deviceInfo.getId()).subscribeOn(Schedulers.io()).subscribe();
+                                lockLogDao.deleteInfoByLockId(deviceInfo.getId()).subscribeOn(Schedulers.io()).subscribe();
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+
+                            }
+                        });
                         loopDeviceDel(deviceInfos, n + 1);
                     }
                 }
@@ -165,7 +185,7 @@ public class OLTOfflineManager {
         if (deviceInfos != null && deviceInfos.size() > n) {
             DeviceInfo deviceInfo = deviceInfos.get(n);
             if (deviceInfo == null) return;
-            deviceEngin.updateDeviceInfo2(deviceInfo.getMacAddress() + "", deviceInfo.getName(), "").subscribe(new Action1<ResultInfo<String>>() {
+            deviceEngin.updateDeviceInfoSyncLocal(deviceInfo.getMacAddress() + "", deviceInfo.getName(), "").subscribe(new Action1<ResultInfo<String>>() {
                 @Override
                 public void call(ResultInfo<String> info) {
                     if (info != null && info.getCode() == 1) {

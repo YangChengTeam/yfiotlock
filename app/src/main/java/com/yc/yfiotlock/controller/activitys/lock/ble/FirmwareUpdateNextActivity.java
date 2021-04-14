@@ -217,6 +217,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             }
         }
         installIv.clearAnimation();
+        DeviceDownloadManager.getInstance().stopTask();
     }
 
     @Override

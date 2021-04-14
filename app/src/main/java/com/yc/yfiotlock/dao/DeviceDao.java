@@ -47,7 +47,7 @@ public interface DeviceDao {
 
 
     // 获取需要同步到云端的数据
-    @Query("SELECT * FROM device_info where is_add = 0")
+    @Query("SELECT * FROM device_info where is_add = 0 and is_delete = 0")
     Single<List<DeviceInfo>> loadNeedAddDeviceInfos();
 
     // 获取需要删除的云端数据
@@ -58,3 +58,5 @@ public interface DeviceDao {
     @Query("SELECT * FROM device_info where is_update = 1")
     Single<List<DeviceInfo>> loadNeedUpdateDeviceInfos();
 }
+
+

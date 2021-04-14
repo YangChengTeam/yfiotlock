@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.view.Window;
 import android.view.WindowManager;
@@ -7,10 +8,13 @@ import android.widget.EditText;
 
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.dao.DeviceDao;
+import com.yc.yfiotlock.model.bean.eventbus.CloudDeviceEditEvent;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
@@ -21,6 +25,9 @@ import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
 import rx.Subscriber;
 
 /**
@@ -33,7 +40,7 @@ public class DeviceNameEditActivity extends BaseBackActivity {
     EditText mEtName;
 
     private DeviceInfo deviceInfo;
-    private DeviceEngin deviceEngin;
+    private DeviceDao deviceDao;
 
     @Override
     protected int getLayoutId() {
@@ -44,8 +51,9 @@ public class DeviceNameEditActivity extends BaseBackActivity {
     protected void initVars() {
         super.initVars();
         deviceInfo = LockIndexActivity.getInstance().getLockInfo();
-        deviceEngin = new DeviceEngin(this);
+        deviceDao  = App.getApp().getDb().deviceDao();
     }
+
 
     @Override
     protected void initViews() {
@@ -57,42 +65,23 @@ public class DeviceNameEditActivity extends BaseBackActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
-    private void cloudModifyDeivceName() {
-        if (deviceInfo.getId() != 0) {
-            String name = mEtName.getText().toString();
-            mLoadingDialog.show("正在修改");
-            deviceEngin.updateDeviceInfo(deviceInfo.getId() + "", name).subscribe(new Subscriber<ResultInfo<String>>() {
-                @Override
-                public void onCompleted() {
-                    mLoadingDialog.dismiss();
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    mLoadingDialog.dismiss();
-                    ToastCompat.show(getContext(), e.getMessage());
-                }
-
-                @Override
-                public void onNext(ResultInfo<String> info) {
-                    if (info != null && info.getCode() == 1) {
-                        deviceInfo.setName(name);
-                        ToastCompat.show(getContext(), "修改成功");
-                        finish();
-                        EventBus.getDefault().post(deviceInfo);
-                        EventBus.getDefault().post(new IndexRefreshEvent());
-                    } else {
-                        String msg = "更新出错";
-                        msg = info != null && info.getMsg() != null ? info.getMsg() : msg;
-                        ToastCompat.show(getContext(), msg);
-                    }
-                }
-            });
-        }
+    @SuppressLint("CheckResult")
+    private void localDeviceEdit(){
+        String name = mEtName.getText().toString();
+        deviceDao.updateDeviceInfo(deviceInfo.getMacAddress(), name).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action() {
+            @Override
+            public void run() throws Exception {
+                deviceInfo.setName(name);
+                EventBus.getDefault().post(deviceInfo);
+                EventBus.getDefault().post(new IndexRefreshEvent());
+                EventBus.getDefault().post(new CloudDeviceEditEvent(deviceInfo));
+                finish();
+            }
+        });
     }
 
     @Override
     protected void bindClick() {
-        setClick(R.id.tv_sure, this::cloudModifyDeivceName);
+        setClick(R.id.tv_sure, this::localDeviceEdit);
     }
 }

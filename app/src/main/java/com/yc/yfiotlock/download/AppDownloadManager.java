@@ -45,6 +45,7 @@ public class AppDownloadManager {
     public static final String TAG = "AppDownloadManager";
 
     public static AppDownloadManager instance = new AppDownloadManager();
+
     public static AppDownloadManager getInstance() {
         return instance;
     }
@@ -52,6 +53,7 @@ public class AppDownloadManager {
     private String parentDir;
     private WeakReference<Context> mContext;
     private DownloadListener4WithSpeed mDownloadListener;
+    private DownloadTask task;
 
     public Context getContext() {
         if (mContext != null && mContext.get() != null) {
@@ -99,7 +101,7 @@ public class AppDownloadManager {
         return 0;
     }
 
-    public File getFile(){
+    public File getFile() {
         return new File(parentDir, getUpdateFileName(getUpdateInfo()));
     }
 
@@ -130,13 +132,15 @@ public class AppDownloadManager {
                         return;
                     }
                     init(new WeakReference<>(baseActivity));
-                    DownloadTask task = new DownloadTask.Builder(updateInfo.getDownUrl(), new File(parentDir))
-                            .setConnectionCount(1)
-                            .setFilename(getUpdateFileName(updateInfo))
-                            .setMinIntervalMillisCallbackProcess(500)
-                            .setPassIfAlreadyCompleted(true)
-                            .setPreAllocateLength(false)
-                            .build();
+                    if (task == null) {
+                        task = new DownloadTask.Builder(updateInfo.getDownUrl(), new File(parentDir))
+                                .setConnectionCount(1)
+                                .setFilename(getUpdateFileName(updateInfo))
+                                .setMinIntervalMillisCallbackProcess(500)
+                                .setPassIfAlreadyCompleted(true)
+                                .setPreAllocateLength(false)
+                                .build();
+                    }
                     task.setTag(updateInfo);
                     mDownloadListener = new DownloadListener4WithSpeed() {
                         @Override
@@ -239,6 +243,12 @@ public class AppDownloadManager {
                             }).show();
                 }
             });
+        }
+    }
+
+    public void stopTask() {
+        if (task != null) {
+            task.cancel();
         }
     }
 

@@ -151,8 +151,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 App.getApp().getMacList().remove(lockInfo.getMacAddress());
                 SafeUtil.setSafePwdType(lockInfo, 0);
                 UserInfoCache.decDeviceNumber();
-                EventBus.getDefault().post(new IndexRefreshEvent());
                 EventBus.getDefault().post(new CloudDeviceDelEvent(lockInfo));
+                EventBus.getDefault().post(new IndexRefreshEvent());
                 LockIndexActivity.safeFinish();
                 finish();
             }
@@ -317,6 +317,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             headView.resetVolume();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_VERSION) {
             getUpdateInfo();
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_RESET) {
+            ToastCompat.show(getContext(), "删除失败");
         }
     }
 

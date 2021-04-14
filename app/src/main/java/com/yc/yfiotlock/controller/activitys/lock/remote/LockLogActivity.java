@@ -6,6 +6,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -29,6 +30,7 @@ import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncDataEvent;
 import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncEndEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
+import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
 import com.yc.yfiotlock.view.widgets.VaryingTextSizeTitleView;
 
@@ -42,6 +44,8 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTit
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.indicators.LinePagerIndicator;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -64,8 +68,14 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     @BindView(R.id.mi_title)
     MagicIndicator mMiTitle;
 
+    @BindView(R.id.tv_sync)
+    TextView syncTv;
+
     @BindView(R.id.ll_sync)
     View syncView;
+
+    @BindView(R.id.pb_process)
+    View processView;
 
     private DeviceInfo lockInfo;
     private LockBLESend lockBLESend;
@@ -300,13 +310,14 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         }
     }
 
-    private void bleSyncEnd(){
-        bleRetryCount = 3;
-        syncView.setVisibility(View.GONE);
-        EventBus.getDefault().post(new LockLogSyncEndEvent());
-        ToastCompat.show(this, "同步完成");
-    }
 
+    private void bleSyncEnd() {
+        syncTv.setText("同步完成");
+        bleRetryCount = 3;
+        processView.setVisibility(View.GONE);
+        AnimatinUtil.heightZero(syncView);
+        EventBus.getDefault().post(new LockLogSyncEndEvent());
+    }
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {

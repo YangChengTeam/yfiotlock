@@ -37,4 +37,8 @@ public interface LockLogDao {
     // 更新已被添加
     @Query("update log_info set is_add=:isAdd where lock_id=:lockId and event_id=:eventId")
     Completable updateAddLogInfo(int lockId, int eventId, boolean isAdd);
+
+    // 删除锁相关的信息
+    @Query("delete from log_info where lock_id=:lockId")
+    Completable deleteInfoByLockId(int lockId);
 }

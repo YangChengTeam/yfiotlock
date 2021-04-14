@@ -5,7 +5,6 @@ import android.content.Context;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.App;
-import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.dao.LockLogDao;
 import com.yc.yfiotlock.dao.OpenLockDao;
@@ -26,10 +25,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import io.reactivex.CompletableObserver;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rx.functions.Action1;
 
 public class CloudHelper {
+
     private LockEngine lockEngine;
     private LogEngine logEngine;
     private DeviceEngin deviceEngin;
@@ -73,7 +76,7 @@ public class CloudHelper {
 
 
     protected void cloudOpenLockDel(OpenLockInfo openLockInfo) {
-        lockEngine.delOpenLockWay2(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "").subscribe(new Action1<ResultInfo<String>>() {
+        lockEngine.delOpenLockWaySyncLocal(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "").subscribe(new Action1<ResultInfo<String>>() {
             @Override
             public void call(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
@@ -85,7 +88,7 @@ public class CloudHelper {
     }
 
     protected void cloudOpenLockEdit(OpenLockInfo openLockInfo) {
-        lockEngine.modifyOpenLockName2(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "", openLockInfo.getName()).subscribe(new Action1<ResultInfo<String>>() {
+        lockEngine.modifyOpenLockNameSyncLocal(openLockInfo.getLockId() + "", openLockInfo.getKeyid() + "", openLockInfo.getGroupType() + "", openLockInfo.getName()).subscribe(new Action1<ResultInfo<String>>() {
             @Override
             public void call(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
@@ -122,19 +125,35 @@ public class CloudHelper {
 
 
     protected void cloudDeivceDel(DeviceInfo deviceInfo) {
-        deviceEngin.delDeviceInfo(deviceInfo.getId() + "").subscribe(new Action1<ResultInfo<String>>() {
+        deviceEngin.delDeviceInfoSyncLocal(deviceInfo.getMacAddress() + "").subscribe(new Action1<ResultInfo<String>>() {
             @Override
             public void call(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
                     LogUtil.msg("同步删除设备: mac:" + deviceInfo.getMacAddress());
-                    deviceDao.realDeleteDeviceInfo(deviceInfo.getMacAddress()).subscribeOn(Schedulers.io()).subscribe();
+                    deviceDao.realDeleteDeviceInfo(deviceInfo.getMacAddress()).subscribeOn(Schedulers.io()).subscribe(new CompletableObserver() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            openLockDao.deleteInfoByLockId(deviceInfo.getId()).subscribeOn(Schedulers.io()).subscribe();
+                            lockLogDao.deleteInfoByLockId(deviceInfo.getId()).subscribeOn(Schedulers.io()).subscribe();
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+
+                        }
+                    });
                 }
             }
         });
     }
 
     protected void cloudDeivceEdit(DeviceInfo deviceInfo) {
-        deviceEngin.updateDeviceInfo(deviceInfo.getId() + "", deviceInfo.getName(), "").subscribe(new Action1<ResultInfo<String>>() {
+        deviceEngin.updateDeviceInfoSyncLocal(deviceInfo.getMacAddress() + "", deviceInfo.getName(), "").subscribe(new Action1<ResultInfo<String>>() {
             @Override
             public void call(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {

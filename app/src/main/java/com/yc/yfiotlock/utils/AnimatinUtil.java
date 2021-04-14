@@ -1,6 +1,10 @@
 package com.yc.yfiotlock.utils;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -22,5 +26,27 @@ public class AnimatinUtil {
         scale.setRepeatMode(ScaleAnimation.REVERSE);
         scale.setRepeatCount(ScaleAnimation.INFINITE);
         view.startAnimation(scale);
+    }
+
+    public static void heightZero(View view) {
+        ValueAnimator anim = ValueAnimator.ofInt(view.getMeasuredHeight(), 0);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+                layoutParams.height = val;
+                view.setLayoutParams(layoutParams);
+            }
+
+        });
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                view.setVisibility(View.GONE);
+            }
+        });
+        anim.setDuration(300);
+        anim.start();
     }
 }

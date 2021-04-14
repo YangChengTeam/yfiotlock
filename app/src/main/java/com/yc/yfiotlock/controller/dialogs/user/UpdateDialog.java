@@ -65,7 +65,7 @@ public class UpdateDialog extends BaseDialog {
         isMust = (updateInfo.getIsMust() == 1);
         mIvCancel.setVisibility(isMust ? View.GONE : View.VISIBLE);
         setCanceledOnTouchOutside(isMust);
-        if (!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
         show();
@@ -102,5 +102,11 @@ public class UpdateDialog extends BaseDialog {
             String text = updateInfo.getProgress() == 100 ? "安装" : updateInfo.getProgress() + "%";
             mTvUpdate.setText(text);
         }
+    }
+
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        AppDownloadManager.getInstance().stopTask();
     }
 }

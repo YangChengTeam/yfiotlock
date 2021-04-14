@@ -322,6 +322,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
         stopAnimations();
 
+
         LogUtil.msg("已清理");
     }
 

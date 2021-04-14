@@ -21,7 +21,6 @@ public class IndexDeviceAdapter extends BaseExtendAdapter<DeviceInfo> {
         super(R.layout.lock_ble_item_index_device, data);
     }
 
-
     @Override
     protected void convert(@NotNull BaseViewHolder holder, DeviceInfo deviceInfo) {
         holder.setText(R.id.tv_name, deviceInfo.getName());
@@ -36,6 +35,7 @@ public class IndexDeviceAdapter extends BaseExtendAdapter<DeviceInfo> {
             layoutParams.leftMargin = ScreenUtil.dip2px(getContext(), 5);
             layoutParams.rightToRight = -1;
         }
+        card.setLayoutParams(layoutParams);
 
         if (holder.getAdapterPosition() == getData().size() - 1) {
             holder.setVisible(R.id.ll_default_add, true);

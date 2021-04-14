@@ -126,8 +126,8 @@ public class LockEngine extends HttpCoreEngin {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    // 删除开门方式2
-    public Observable<ResultInfo<String>> delOpenLockWay2(String lockid, String keyid, String groupType) {
+    // 删除开门方式 同步本地
+    public Observable<ResultInfo<String>> delOpenLockWaySyncLocal(String lockid, String keyid, String groupType) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
@@ -140,8 +140,8 @@ public class LockEngine extends HttpCoreEngin {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 
-    // 修改名称2
-    public Observable<ResultInfo<String>> modifyOpenLockName2(String lockid, String keyid, String groupType, String name) {
+    // 修改名称 同步本地
+    public Observable<ResultInfo<String>> modifyOpenLockNameSyncLocal(String lockid, String keyid, String groupType, String name) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());

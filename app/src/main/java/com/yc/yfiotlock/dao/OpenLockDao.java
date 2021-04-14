@@ -70,4 +70,7 @@ public interface OpenLockDao {
     @Query("SELECT * FROM open_lock_info where master_lock_id=:lockId and is_update=1 and group_type=:groupType")
     Single<List<OpenLockInfo>> loadNeedUpdateOpenLockInfos(int lockId, int groupType);
 
+    // 删除锁相关的信息
+    @Query("delete from open_lock_info where lock_id=:lockId and lock_id=master_lock_id")
+    Completable deleteInfoByLockId(int lockId);
 }

@@ -26,7 +26,6 @@ public class LockBLESend {
     public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
     public static final String NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616";
 
-
     private Context context;
     private BleDevice bleDevice;
     private String key;
@@ -134,6 +133,7 @@ public class LockBLESend {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onBleDeviceChange(BleDevice bleDevice) {
         this.bleDevice = bleDevice;
+        wakeup();
     }
 
     // 伪发送数据
@@ -143,7 +143,6 @@ public class LockBLESend {
 
     public interface NotifyCallback {
         void onNotifySuccess(LockBLEData lockBLEData);
-
         void onNotifyFailure(LockBLEData lockBLEData);
     }
 

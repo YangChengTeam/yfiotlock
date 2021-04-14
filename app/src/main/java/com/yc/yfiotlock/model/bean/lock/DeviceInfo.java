@@ -60,7 +60,7 @@ public class DeviceInfo implements Serializable {
     private String key;
 
     // 是否是共享的锁
-    @Ignore
+    @ColumnInfo(name = "is_share")
     @JSONField(name = "is_share")
     private boolean isShare;
 
