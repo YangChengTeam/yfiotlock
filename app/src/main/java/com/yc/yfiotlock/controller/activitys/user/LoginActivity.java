@@ -14,6 +14,7 @@ import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.dialogs.user.LoginDialog;
+import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.LoginEngin;
 import com.yc.yfiotlock.model.bean.user.LoginEvent;
@@ -39,6 +40,9 @@ public class LoginActivity extends BaseActivity {
     TextView mTvUserAgreement;
     @BindView(R.id.tv_privacy_policy)
     TextView mTvPrivacyPolicy;
+
+    private LoginDialog mLoginDialog;
+    private LoginEngin mLoginEngin;
 
     @Override
     protected int getLayoutId() {
@@ -73,7 +77,6 @@ public class LoginActivity extends BaseActivity {
         mTvGetCode.setClickable(false);
     }
 
-
     @Override
     public void onBackPressed() {
         Intent home = new Intent(Intent.ACTION_MAIN);
@@ -94,30 +97,26 @@ public class LoginActivity extends BaseActivity {
     protected void initVars() {
         super.initVars();
         mLoginEngin = new LoginEngin(getContext());
+        mLoginDialog = new LoginDialog(this);
     }
-
-    LoginDialog mLoginDialog;
-    LoginEngin mLoginEngin;
 
 
     public void sendSmsCode() {
         if (mEtPhone.getText().length() != 11) {
             return;
         }
-        if (mLoginDialog == null) {
-            mLoginDialog = new LoginDialog(this);
-            mLoginDialog.setLoginResult(new LoginDialog.LoginResult() {
-                @Override
-                public void onSuccess(String code, String phone) {
-                    onSmsCodeLogin(code, phone);
-                }
 
-                @Override
-                public void onSendSmsCode() {
-                    sendSmsCode();
-                }
-            });
-        }
+        mLoginDialog.setLoginResult(new LoginDialog.LoginResult() {
+            @Override
+            public void onSuccess(String code, String phone) {
+                onSmsCodeLogin(code, phone);
+            }
+
+            @Override
+            public void onSendSmsCode() {
+                sendSmsCode();
+            }
+        });
 
         long lastTime = CacheUtil.getSendCodeTime(Config.LOGIN_SEND_CODE_URL + mEtPhone.getText().toString());
         if (System.currentTimeMillis() - lastTime < 60000) {
@@ -149,7 +148,6 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void onSmsCodeLogin(String code, String phone) {
-
         mLoadingDialog.show("登录中...");
         mLoginEngin.smsCodeLogin(phone, code).subscribe(new Observer<ResultInfo<UserInfo>>() {
             @Override
@@ -167,22 +165,20 @@ public class LoginActivity extends BaseActivity {
             public void onNext(ResultInfo<UserInfo> info) {
                 if (info != null && info.getCode() == 1) {
                     mLoadingDialog.dismiss();
-                    UserInfoCache.setUserInfo(info.getData());
+                    UserInfo userInfo = info.getData();
+                    UserInfoCache.setUserInfo(userInfo);
+                    EventBus.getDefault().post(userInfo);
+                    EventBus.getDefault().post(new IndexRefreshEvent());
                     startActivity(new Intent(getContext(), MainActivity.class));
-                    EventBus.getDefault().post(info.getData());
+                    finish();
                 } else {
-                    ToastCompat.show(getContext(), info == null && info.getMsg() != null ? "登录失败" : info.getMsg());
+                    String msg = info == null && info.getMsg() != null ? "登录失败" : info.getMsg();
+                    ToastCompat.show(getContext(), msg);
                 }
             }
         });
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLogin(UserInfo userInfo) {
-        if (App.isLogin()) {
-            finish();
-        }
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onOneKeyLogin(LoginEvent event) {

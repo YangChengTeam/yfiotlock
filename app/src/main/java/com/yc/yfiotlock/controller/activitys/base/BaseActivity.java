@@ -106,21 +106,8 @@ public abstract class BaseActivity extends BaseSendActivity implements ILoadData
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (!App.isLogin()
-                && this.getClass() != LoginActivity.class
-                && this.getClass() != SplashActivity.class
-                && this.getClass() != WebActivity.class) {
-            CommonUtil.startLogin(this);
-        }
-    }
-
-
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    public void stub(EventStub stub) {
-    }
+    public void stub(EventStub stub) {}
 
     @Override
     protected void onStop() {

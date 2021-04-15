@@ -62,7 +62,6 @@ public class MainActivity extends BaseActivity {
         return R.layout.activity_main;
     }
 
-
     private static WeakReference<MainActivity> instance;
 
     public static WeakReference<MainActivity> getInstance() {
@@ -87,6 +86,12 @@ public class MainActivity extends BaseActivity {
             UpdateDialog updateDialog = new UpdateDialog(this);
             updateDialog.show(updateInfo);
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        EventBus.getDefault().post(new IndexRefreshEvent());
     }
 
     private void setVp() {

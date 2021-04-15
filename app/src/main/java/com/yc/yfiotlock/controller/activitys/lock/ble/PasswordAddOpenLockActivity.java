@@ -70,6 +70,7 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
 
         if (isNext) {
             commitBtn.setText("添加");
+            passEt.setHint("请再次输入密码");
         }
 
         passEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {

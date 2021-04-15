@@ -61,9 +61,7 @@ public class MyFragment extends BaseFragment {
 
     @Override
     protected void bindClick() {
-        setClick(R.id.stv_face, () -> startActivity(new Intent(getContext(), PersonalInfoActivity.class)));
-        setClick(R.id.tv_user_name, () -> startActivity(new Intent(getContext(), PersonalInfoActivity.class)));
-        setClick(R.id.tv_device_number, () -> startActivity(new Intent(getContext(), PersonalInfoActivity.class)));
+        setClick(R.id.cl_user_info, () -> startActivity(new Intent(getContext(), PersonalInfoActivity.class)));
     }
 
     private void loadUserInfo() {
@@ -89,13 +87,6 @@ public class MyFragment extends BaseFragment {
         mTvDeviceNumber.setText(userInfo.getDeviceNumber() + "个智能设备");
     }
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRefresh(UserInfo userInfo) {
-        if (userInfo != null) {
-            mTvDeviceNumber.setText(userInfo.getDeviceNumber() + "个智能设备");
-        }
-    }
 
     private void setRvMy() {
         ItemAdapter itemAdapter = new ItemAdapter(null);

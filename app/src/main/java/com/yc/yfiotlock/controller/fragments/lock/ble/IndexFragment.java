@@ -12,6 +12,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
+import com.kk.utils.LogUtil;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
@@ -151,6 +152,7 @@ public class IndexFragment extends BaseFragment {
 
     private void loadData() {
         IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
+        LogUtil.msg("重新执行" + indexInfo);
         if (indexInfo != null) {
             familyInfo = indexInfo.getFamilyInfo();
             indexDeviceAdapter.setNewInstance(indexInfo.getDeviceInfos());
@@ -197,10 +199,10 @@ public class IndexFragment extends BaseFragment {
 
                     for (DeviceInfo lDeviceInfo : lDeviceInfos) {
                         if (lDeviceInfo.isDelete()) {
-                            if (hashMap.get(lDeviceInfo.getKey()) != null) {
-                                hashMap.remove(lDeviceInfo.getKey());
+                            if (hashMap.get(lDeviceInfo.getMacAddress()) != null) {
+                                hashMap.remove(lDeviceInfo.getMacAddress());
                             }
-                        } else {
+                        } else if (hashMap.get(lDeviceInfo.getMacAddress()) == null) {
                             hashMap.put(lDeviceInfo.getMacAddress(), lDeviceInfo);
                         }
                     }
@@ -210,6 +212,7 @@ public class IndexFragment extends BaseFragment {
                     hashMap.forEach((k, v) -> {
                         finalLastDeviceInfos.add(v);
                     });
+
                 }
                 deviceDao.insertOpenLockInfos(lastDeviceInfos).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
                     @Override

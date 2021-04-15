@@ -23,7 +23,7 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
     public static final byte SCMD_GET_BATTERY = (byte) 0x0D;
     public static final byte SCMD_GET_VERSION = (byte) 0x0E;
 
-    // 1.系统设置类(0x01)
+    // 1. 系统设置类(0x01)
     public static byte[] setting(String key, byte scmd, byte[] data) {
         return setting(key, scmd, data, (byte) 0x00, false);
     }
@@ -39,12 +39,12 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
         return lockBLEPackage.build(key, lockBLEData);
     }
 
-    // 1.1恢复出厂设置(0x01)
+    // 1.1 恢复出厂设置(0x01)
     public static byte[] reset(String key) {
         return setting(key, SCMD_RESET, new byte[]{EMPTY_BODY});
     }
 
-    // 1.2WIFI配网(0x02)
+    // 1.2 WIFI配网(0x02)
     public static byte[] wiftDistributionNetwork(String key, String ssid, String pwd) {
         final byte[] ssidBuffer = new byte[32];
         System.arraycopy(ssid.getBytes(), 0, ssidBuffer, 0, ssid.getBytes().length);
@@ -56,12 +56,12 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
         return setting(key, SCMD_DISTRIBUTION_NETWORK, bytes);
     }
 
-    // 1.3绑定蓝牙(0x03)
+    // 1.3 绑定蓝牙(0x03)
     public static byte[] bindBle(String key, String code) {
         return setting(key, SCMD_BIND_BLE, code.getBytes());
     }
 
-    // 1.4验证身份(0x04)
+    // 1.4 验证身份(0x04)
     public static byte[] verifyIdentidy(String key) {
         return setting(key, SCMD_VERIFY_IDENTIDY, null);
     }
@@ -71,61 +71,61 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
         return getYearSuff(year - (year / n) * n, n / 10);
     }
 
-    // 1.5同步时间(0x05)
+    // 1.5 同步时间(0x05)
     public static byte[] syncTime(String key, long timestamp) {
         Calendar cal = Calendar.getInstance(Locale.CHINA);
         cal.setTimeInMillis(timestamp * 1000L);
         int year = Calendar.getInstance().get(Calendar.YEAR);
         year = getYearSuff(year, 1000);
-        int month = Calendar.getInstance().get(Calendar.MONTH);
-        int date = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        int date = Calendar.getInstance().get(Calendar.DAY_OF_MONTH) ;
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         int minute = Calendar.getInstance().get(Calendar.MINUTE);
         int second = Calendar.getInstance().get(Calendar.SECOND);
         return setting(key, SCMD_SYNC_TIME, new byte[]{(byte) year, (byte) month, (byte) date, (byte) hour, (byte) minute, (byte) second});
     }
 
-    // 1.6设置AES密钥(0x06)
+    // 1.6 设置AES密钥(0x06)
     public static byte[] setAesKey(String key, String origkey) {
         return setting(key, SCMD_SET_AES_KEY, (key + origkey).getBytes());
     }
 
-    // 1.7取消操作(0x07)
+    // 1.7 取消操作(0x07)
     public static byte[] cancelOp(String key) {
         return setting(key, SCMD_CANCEL_OP, new byte[]{EMPTY_BODY});
     }
 
-    // 1.8修改音量(0x08)
+    // 1.8 修改音量(0x08)
     public static byte[] changeVolume(String key, int volume) {
         return setting(key, SCMD_CHANGE_VOLUME, new byte[]{(byte) volume});
     }
 
-    // 1.9解绑蓝牙(0x09)
+    // 1.9 解绑蓝牙(0x09)
     public static byte[] unbindBle(String key) {
         return setting(key, SCMD_UNBIND_BLE, new byte[]{EMPTY_BODY});
     }
 
-    //  1.10获取门锁属性（0x0A）
+    //  1.10 获取门锁属性（0x0A）
     public static byte[] getAliDeviceName(String key) {
         return setting(key, SCMD_GET_ALIDEVICE_NAME, new byte[]{EMPTY_BODY});
     }
 
-    //  1.11开启升级（0x0B）
+    //  1.11 开启升级（0x0B）
     public static byte[] openUpdate(String key) {
         return setting(key, SCMD_OPEN_UPDATE, new byte[]{EMPTY_BODY});
     }
 
-    //  1.12升级（0x0C）
+    //  1.12 升级（0x0C）
     public static byte[] update(String key, byte[] bytes, byte pid) {
         return setting(key, SCMD_UPDATE, bytes, pid, false);
     }
 
-    //  1.13获取电量（0x0D）
+    //  1.13 获取电量（0x0D）
     public static byte[] getBattery(String key) {
         return setting(key, SCMD_GET_BATTERY, new byte[]{EMPTY_BODY});
     }
 
-    //  1.14获取版本（0x0D）
+    //  1.14 获取版本（0x0D）
     public static byte[] getVersion(String key) {
         return setting(key, SCMD_GET_VERSION, new byte[]{EMPTY_BODY});
     }

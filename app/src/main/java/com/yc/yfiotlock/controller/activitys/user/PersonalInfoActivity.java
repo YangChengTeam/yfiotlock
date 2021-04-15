@@ -33,11 +33,13 @@ import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.controller.dialogs.user.UpdateIconDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
+import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.bean.user.PersonalInfo;
 import com.yc.yfiotlock.model.bean.user.PicInfo;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.UploadFileEngine;
 import com.yc.yfiotlock.model.engin.UserEngine;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.PathUtil;
 import com.yc.yfiotlock.utils.PictureUtil;
@@ -378,10 +380,6 @@ public class PersonalInfoActivity extends BaseBackActivity {
 
     private void loadUserInfo() {
         UserInfo userInfo = UserInfoCache.getUserInfo();
-        if (userInfo == null) {
-            finish();
-            return;
-        }
         List<PersonalInfo> personalInfos = new ArrayList<>();
         personalInfos.add(new PersonalInfo("头像", "", userInfo.getFace(), 0));
         personalInfos.add(new PersonalInfo("账号", userInfo.getMobile(), "", 1).setShowArrow(false));
@@ -407,14 +405,14 @@ public class PersonalInfoActivity extends BaseBackActivity {
                     mLoadingDialog.show("退出登录中...");
                     VUiKit.postDelayed(1000, () -> {
                         mLoadingDialog.dismiss();
+                        CacheUtil.setCache(Config.INDEX_DETAIL_URL, null);
                         UserInfoCache.setUserInfo(null);
-                        EventBus.getDefault().post(new UserInfo());
+                        CommonUtil.startLogin(getContext());
                         finish();
                     });
                 });
         dialog.show();
     }
-
 
     @Override
     protected void onDestroy() {
@@ -422,6 +420,7 @@ public class PersonalInfoActivity extends BaseBackActivity {
         if (mUserEngine != null) {
             mUserEngine.cancel();
         }
+        
         if (mUploadFileEngine != null) {
             mUploadFileEngine.cancel();
         }

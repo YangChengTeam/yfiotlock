@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleNotifyCallback;
 import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
@@ -160,13 +159,14 @@ public class LockBLESend {
     }
 
     // 监听
-    private static boolean isNotityReady = false;
-
+    private static boolean isNotityReady = false; // 通知是否注册成功
     public static boolean isNotityReady() {
         return isNotityReady;
     }
-
+    private static boolean isRegNotifying = false; // 是否正在注册通知
     public static void bleNotify(BleDevice bleDevice) {
+        if(isRegNotifying) return;
+        isRegNotifying = true;
         BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_SERVICE_UUID);
         BleManager.getInstance().notify(
                 bleDevice,
@@ -177,6 +177,7 @@ public class LockBLESend {
                     public void onNotifySuccess() {
                         Log.d(TAG, "回调通知成功");
                         isNotityReady = true;
+                        isRegNotifying = false;
                         EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifySuccess));
                     }
 
@@ -184,6 +185,7 @@ public class LockBLESend {
                     public void onNotifyFailure(BleException exception) {
                         Log.d(TAG, "回调通失败:" + exception.getDescription());
                         isNotityReady = false;
+                        isRegNotifying = false;
                         EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyFailure));
                         LockBLEManager.getInstance().disConnect(bleDevice);
                         LockBLEManager.getInstance().getScannedBleDevices().remove(bleDevice.getMac());
@@ -221,12 +223,11 @@ public class LockBLESend {
     // 处理响应
     private void processNotify(LockBLEData lockBLEData) {
         if (mcmd == 0x00 || scmd == 0x00) {
-            Log.d(TAG, "非正常响应:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " mscd:" + mcmd + " scmd:" + scmd);
+            Log.d(TAG, "非正常响应:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " mscd:" + mcmd + " scmd:" + scmd + " status:" + lockBLEData.getStatus());
             return;
         }
         if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_WAKE_UP) {
             // 唤醒成功后发送真正操作
-            Log.d(TAG, "唤醒状态:" + lockBLEData.getStatus());
             if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
                 if (!waupStatus) {
                     waupStatus = true;
@@ -236,6 +237,8 @@ public class LockBLESend {
             } else if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_KEY_ERROR) {
                 // 密钥不对 设备已重新初始化
                 isReInit = true;
+            } else {
+                Log.d(TAG, "唤醒失败");
             }
         } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
             if (lockBLEData.getScmd() != LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT) {
