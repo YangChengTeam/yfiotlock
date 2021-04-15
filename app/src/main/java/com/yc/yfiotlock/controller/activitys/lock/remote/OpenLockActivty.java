@@ -44,7 +44,6 @@ public class OpenLockActivty extends BaseActivity {
     @BindView(R.id.tv_open_fail_des)
     TextView tvFailDes;
 
-
     private LockEngine lockEngine;
     private BleDevice bleDevice;
     private DeviceInfo lockInfo;

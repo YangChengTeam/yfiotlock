@@ -1,7 +1,6 @@
 package com.yc.yfiotlock.controller.fragments.lock.remote;
 
 import android.annotation.SuppressLint;
-import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,7 +12,6 @@ import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.dao.LockLogDao;
 import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncDataEvent;
 import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncEndEvent;
-import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogListInfo;
@@ -23,6 +21,7 @@ import com.yc.yfiotlock.view.adapters.LogAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -30,6 +29,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rx.Observer;
@@ -95,48 +95,49 @@ public class LogFragment extends BaseFragment {
         lockLogDao.loadLogInfos(lockInfo.getId(), type, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
             @Override
             public void accept(List<LogInfo> openLockInfos) throws Exception {
-                success(openLockInfos);
-                if (CommonUtil.isNetworkAvailable(getContext()) && openLockInfos.size() == 0) {
-                    cloudLoadData();
+                if (openLockInfos.size() == 0) {
+                    // 只拉取一页数据
+                    if (CommonUtil.isNetworkAvailable(getContext())) {
+                        cloudLoadData();
+                    }
+                    return;
+                } else {
+                    success(openLockInfos);
                 }
             }
         });
     }
 
     protected void cloudLoadData() {
-        logEngine.getLocalOpenLog(lockInfo.getId() + "", page, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
+        logEngine.getLocalOpenLog(lockInfo.getId() + "", 1, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
             @Override
             public void onCompleted() {
-                mSrlRefresh.setRefreshing(false);
             }
 
             @Override
             public void onError(Throwable e) {
-                mSrlRefresh.setRefreshing(false);
-                fail();
             }
 
             @Override
             public void onNext(ResultInfo<LogListInfo> info) {
                 if (info != null && info.getCode() == 1) {
                     if (info.getData() == null || info.getData().getItems() == null || info.getData().getItems().size() == 0) {
-                        empty();
                         return;
                     }
                     sync2Local(info.getData().getItems());
-                } else {
-                    fail();
                 }
             }
         });
     }
 
+    @SuppressLint("CheckResult")
     public void sync2Local(List<LogInfo> data) {
-        lockLogDao.insertLogInfos(data).subscribeOn(Schedulers.io()).subscribe();
-        if (data.size() == pageSize) {
-            page++;
-            cloudLoadData();
-        }
+        lockLogDao.insertLogInfos(data).subscribeOn(Schedulers.io()).subscribe(new Action() {
+            @Override
+            public void run() throws Exception {
+                localLoadData();
+            }
+        });
     }
 
     @Override
@@ -157,25 +158,11 @@ public class LogFragment extends BaseFragment {
     }
 
     @Override
-    public void fail() {
-        super.fail();
-        if (logAdapter.getData().size() == 0) {
-            if (!CommonUtil.isActivityDestory(getActivity())) {
-                logAdapter.setEmptyView(new NoWifiView(getActivity()));
-            }
-        } else {
-            page--;
-            logAdapter.getLoadMoreModule().loadMoreComplete();
-        }
-    }
-
-    @Override
     public void empty() {
+        if (CommonUtil.isActivityDestory(getActivity())) return;
         super.empty();
         if (logAdapter.getData().size() == 0) {
-            if (!CommonUtil.isActivityDestory(getActivity())) {
-                logAdapter.setEmptyView(new NoDataView(getActivity()));
-            }
+            logAdapter.setEmptyView(new NoDataView(getActivity()));
         } else {
             page--;
             logAdapter.getLoadMoreModule().loadMoreComplete();

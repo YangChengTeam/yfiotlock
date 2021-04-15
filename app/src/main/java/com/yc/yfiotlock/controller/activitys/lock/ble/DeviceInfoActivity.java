@@ -94,7 +94,7 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
         itemInfos.add(new ItemInfo("协议版本", deviceInfo.getProtocolVersion()));
         itemInfos.add(new ItemInfo("注册时间", CommonUtil.formatTime(deviceInfo.getRegtime())));
         itemInfos.add(new ItemInfo("剩余电量", deviceInfo.getBattery() + "%"));
-        itemInfos.add(new ItemInfo("设备id", deviceInfo.getMacAddress().replaceAll(":", "")));
+        itemInfos.add(new ItemInfo("设备id", deviceInfo.getDeviceId().replaceAll(":", "")));
         mAdapter.setNewInstance(itemInfos);
     }
 

@@ -456,7 +456,7 @@ public class CommonUtil {
     public static String formatTime(int timestamp) {
         Calendar cal = Calendar.getInstance(Locale.CHINA);
         cal.setTimeInMillis(timestamp * 1000L);
-        return DateFormat.format("yyyy-MM-dd hh:mm:ss", cal).toString();
+        return DateFormat.format("yyyy-MM-dd HH:mm:ss", cal).toString();
     }
 
 

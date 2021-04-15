@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.model.bean.lock;
 
 import android.text.TextUtils;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -159,6 +160,9 @@ public class DeviceInfo implements Serializable {
     }
 
     public String getDeviceId() {
+        if (TextUtils.isEmpty(deviceId)) {
+            deviceId = "-";
+        }
         return deviceId;
     }
 

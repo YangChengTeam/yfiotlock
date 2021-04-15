@@ -264,7 +264,6 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         setCountInfo();
     }
 
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockRefreshEvent object) {
         //添加、更新、删除 直接显示本地数据

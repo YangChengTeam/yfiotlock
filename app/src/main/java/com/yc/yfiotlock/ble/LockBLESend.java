@@ -25,7 +25,7 @@ public class LockBLESend {
     public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
     public static final String NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616";
 
-    private Context context;
+    //private Context context;
     private BleDevice bleDevice;
     private String key;
     private byte mcmd = 0x00;
@@ -41,7 +41,7 @@ public class LockBLESend {
     public int responseErrorCount = 0;   // 响应失败次数
 
     public LockBLESend(Context context, BleDevice bleDevice, String key) {
-        this.context = context;
+        //this.context = context;
         this.bleDevice = bleDevice;
         this.key = key;
     }
@@ -255,7 +255,7 @@ public class LockBLESend {
                 }
             } else {
                 if (notifyCallback != null) {
-                    if (lockBLEData.getStatus() >= 0 && lockBLEData.getStatus() <= (byte) 0x06) {
+                    if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
                         notifyCallback.onNotifySuccess(lockBLEData);
                     } else {
                         reset();

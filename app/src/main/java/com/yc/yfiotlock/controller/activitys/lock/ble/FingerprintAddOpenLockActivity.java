@@ -45,7 +45,7 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
 
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData != null && lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT && lockBLEData.getStatus() == (byte) 0x01) {
+        if (lockBLEData != null && lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT && lockBLEData.getExtra()[0] == (byte) 0x01) {
             Intent intent = new Intent(getContext(), FingerprintAddNextOpenLockActivity.class);
             intent.putExtra("number", number);
             startActivity(intent);

@@ -65,16 +65,12 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
     @BindView(R.id.vp_lock_log)
     ViewPager viewPager;
-
     @BindView(R.id.mi_title)
     MagicIndicator mMiTitle;
-
     @BindView(R.id.tv_sync)
     TextView syncTv;
-
     @BindView(R.id.ll_sync)
     View syncView;
-
     @BindView(R.id.pb_process)
     View processView;
 
@@ -82,10 +78,8 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private LockBLESend lockBLESend;
     private LockLogDao lockLogDao;
     private OpenLockDao openLockDao;
-    private int bleRetryCount = 3;
-    private int retryCount = 3;
     private int lastId = 1;
-    private final int MAC_COUNT = 30;
+    private final int MAC_COUNT = 1;
     private int syncCount = MAC_COUNT;
 
 
@@ -138,7 +132,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private void bleSyncLog() {
         byte[] cmdBytes = LockBLEEventCmd.event(lockInfo.getKey(), lastId);
         if (lockBLESend != null) {
-            lockBLESend.send(LockBLEEventCmd.MCMD, (byte) LockBLEEventCmd.SCMD_LOG, cmdBytes);
+            lockBLESend.send(LockBLEEventCmd.MCMD, LockBLEEventCmd.SCMD_LOG, cmdBytes);
         }
     }
 
@@ -206,7 +200,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             public void onComplete() {
                 lastId++;
                 syncCount--;
-                if (syncCount == 0) {
+                if (syncCount <= 0) {
                     syncCount = MAC_COUNT;
                     EventBus.getDefault().post(new LockLogSyncDataEvent());
                 }
@@ -216,11 +210,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
             @Override
             public void onError(@NonNull Throwable e) {
-                if (retryCount-- > 0) {
-                    localAdd(logInfo);
-                } else {
-                    retryCount = 3;
-                }
+                bleSyncLog();
             }
         });
     }
@@ -229,7 +219,12 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
             if (LockBLEEventCmd.SCMD_NO_NEW_EVENT == lockBLEData.getScmd()) {
+                syncTv.setText("同步完成");
                 bleSyncEnd();
+                return;
+            }
+            if (LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT == lockBLEData.getScmd()) {
+                bleSyncLog();
                 return;
             }
             LogInfo logInfo = new LogInfo();
@@ -314,8 +309,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
     private void bleSyncEnd() {
         if (CommonUtil.isActivityDestory(this)) return;
-        bleRetryCount = 3;
-        syncTv.setText("同步完成");
+
         processView.setVisibility(View.GONE);
         AnimatinUtil.heightZero(syncView);
         EventBus.getDefault().post(new LockLogSyncEndEvent());
@@ -324,11 +318,8 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
-            if (bleRetryCount-- > 0) {
-                bleSyncLog();
-            } else {
-                bleSyncEnd();
-            }
+            syncTv.setText("同步失败");
+            bleSyncEnd();
         }
     }
 
