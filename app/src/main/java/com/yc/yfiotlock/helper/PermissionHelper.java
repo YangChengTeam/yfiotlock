@@ -137,10 +137,8 @@ public class PermissionHelper {
     }
 
     private OnRequestPermissionsCallback onRequestPermissionsCallback;
-
     public interface OnRequestPermissionsCallback {
         void onRequestPermissionSuccess();
-
         void onRequestPermissionError();
     }
 }

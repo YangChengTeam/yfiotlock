@@ -54,6 +54,7 @@ public class AppDownloadManager {
     private WeakReference<Context> mContext;
     private DownloadListener4WithSpeed mDownloadListener;
     private DownloadTask task;
+    private boolean isDownloading = false;
 
     public Context getContext() {
         if (mContext != null && mContext.get() != null) {
@@ -92,6 +93,10 @@ public class AppDownloadManager {
             MMKV.defaultMMKV().putInt(key, 0);
             updateInfo.setDownloading(false);
         }
+    }
+
+    public boolean isDownloading() {
+        return isDownloading;
     }
 
     public long getFileSize(File file) {
@@ -217,9 +222,11 @@ public class AppDownloadManager {
                             } else if (cause == EndCause.ERROR) {
                                 ToastCompat.show(getContext(), "更新失败" + realCause);
                             }
+                            isDownloading = false;
                         }
                     };
                     task.enqueue(mDownloadListener);
+                    isDownloading = true;
                 }
 
                 @Override
@@ -250,6 +257,7 @@ public class AppDownloadManager {
         if (task != null) {
             task.cancel();
         }
+        isDownloading = false;
     }
 
     public void installSelf(UpdateInfo updateInfo) {

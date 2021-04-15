@@ -138,8 +138,6 @@
     <string name="wifi_config_success">WIFI配置成功</string>
     <string name="update_now">立即升级</string>
 
-
-
     <string-array name="lock_log_array">
         <item>日志</item>
         <item>报警</item>

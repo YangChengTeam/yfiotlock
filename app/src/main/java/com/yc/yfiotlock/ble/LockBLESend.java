@@ -32,7 +32,7 @@ public class LockBLESend {
     private byte scmd = 0x00;
     private byte[] cmdBytes;
 
-    public static final int DEFAULT_RETRY_COUNT = 2;
+    public static final int DEFAULT_RETRY_COUNT = 2; // 0 - 2 实际默认次数3
     private boolean waupStatus = false;  // 唤醒状态
     private boolean isSend = false;      // 是否发送中
     private boolean isOpOver = false;    // 实际操作是否完成

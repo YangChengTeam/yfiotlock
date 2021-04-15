@@ -5,22 +5,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.download.DeviceDownloadManager;
-import com.yc.yfiotlock.download.DownloadUtils;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
-import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -61,6 +59,9 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     @BindView(R.id.tv_desp)
     TextView despTv;
 
+    @BindView(R.id.stv_update)
+    SuperTextView updateBtn;
+
     private UpdateInfo updateInfo;
     private DeviceInfo deviceInfo;
     private LockBLESend lockBleSend;
@@ -87,6 +88,16 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     protected void initViews() {
         super.initViews();
         setInfo();
+        DeviceDownloadManager.getInstance().updateApp(updateInfo);
+    }
+
+    @Override
+    protected void bindClick() {
+        super.bindClick();
+        setClick(R.id.stv_update, () -> {
+            updateBtn.setVisibility(View.GONE);
+            DeviceDownloadManager.getInstance().updateApp(updateInfo);
+        });
     }
 
     private void setInfo() {
@@ -98,6 +109,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDownload(UpdateInfo updateInfo) {
+        processDespTv.setText("正在下载");
         circularProgressBar.setProgress(updateInfo.getProgress());
         progressTv.setText(updateInfo.getProgress() + "%");
         processView.setVisibility(View.VISIBLE);
@@ -116,7 +128,14 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             lockBleSend.setNotifyCallback(this);
             lockBleSend.registerNotify();
         }
-        DeviceDownloadManager.getInstance().updateApp(updateInfo);
+
+        if(DeviceDownloadManager.getInstance().isDownloading()){
+            processDespTv.setText("下载中");
+            updateBtn.setVisibility(View.GONE);
+        } else {
+            processDespTv.setText("等待下载");
+            updateBtn.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -157,7 +176,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         generalDialog.setTitle("温馨提示");
         generalDialog.setMsg("固件升级中, 是否取消?");
         generalDialog.setOnPositiveClickListener(dialog -> {
-            VUiKit.postDelayed(300, ()->{
+            VUiKit.postDelayed(300, () -> {
                 super.onBackPressed();
             });
         });
