@@ -16,7 +16,7 @@ import com.yc.yfiotlock.utils.CacheUtil;
 
 import java.io.Serializable;
 
-@Entity(tableName = "device_info", indices = {@Index(value = {"mac_address"}, unique = true)})
+@Entity(tableName = "device_info", indices = {@Index(value = {"mac_address", "master_id"}, unique = true)})
 public class DeviceInfo implements Serializable {
     @PrimaryKey(autoGenerate = true)
     @NonNull
@@ -68,6 +68,9 @@ public class DeviceInfo implements Serializable {
     @Ignore
     @JSONField(name = "has")
     private boolean isValid;
+
+    @ColumnInfo(name = "master_id")
+    private int masterId;
 
     @Ignore
     private transient UserInfo user;
@@ -228,6 +231,14 @@ public class DeviceInfo implements Serializable {
 
     public void setFamilyId(int familyId) {
         this.familyId = familyId;
+    }
+
+    public int getMasterId() {
+        return masterId;
+    }
+
+    public void setMasterId(int masterId) {
+        this.masterId = masterId;
     }
 
     public boolean isAdd() {

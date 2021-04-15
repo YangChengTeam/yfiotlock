@@ -31,7 +31,6 @@ public class FeedBackEngine extends BaseEngin {
     public Observable<ResultInfo<String>> addInfo(String mobile, String content, String locker_id, String img) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("mobile", mobile);

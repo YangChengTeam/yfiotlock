@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 public class UserInfo implements Serializable {
 
-    private String id;
+    private int id;
     private String name;
     @JSONField(name = "nickname")
     private String nickName;
@@ -101,11 +101,11 @@ public class UserInfo implements Serializable {
         this.deviceNumber = deviceNumber;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 }

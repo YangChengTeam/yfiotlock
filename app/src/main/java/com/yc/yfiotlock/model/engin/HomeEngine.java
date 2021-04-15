@@ -36,7 +36,6 @@ public class HomeEngine extends HttpCoreEngin {
     public Observable<ResultInfo<List<FamilyInfo>>> getHomeList() {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         return rxpost(Config.HOME_LIST_URL, new TypeReference<ResultInfo<List<FamilyInfo>>>() {
@@ -57,7 +56,6 @@ public class HomeEngine extends HttpCoreEngin {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
         map.put("id", String.valueOf(id));
         map.put("name", name);
@@ -83,7 +81,6 @@ public class HomeEngine extends HttpCoreEngin {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
         map.put("name", name);
         map.put("longitude", longitude.toString());
@@ -102,7 +99,6 @@ public class HomeEngine extends HttpCoreEngin {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
         map.put("family_id", String.valueOf(familyId));
         return rxpost(Config.HOME_SET_DEFAULT_URL, new TypeReference<ResultInfo<String>>() {
@@ -117,7 +113,6 @@ public class HomeEngine extends HttpCoreEngin {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
         map.put("family_id", String.valueOf(familyId));
         return rxpost(Config.HOME_INFO_DELETE_URL, new TypeReference<ResultInfo<String>>() {

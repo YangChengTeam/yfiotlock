@@ -84,7 +84,7 @@ public class LockBLESend {
         this.scmd = scmd;
         this.cmdBytes = cmdBytes;
         if (!isConnected()) {
-            notifyNoConnectResponse("ble no connection!");
+            notifyNoConnectResponse("ble disconnection!");
             EventBus.getDefault().post(new OpenLockReConnectEvent());
             return;
         } else {
@@ -160,12 +160,15 @@ public class LockBLESend {
 
     // 监听
     private static boolean isNotityReady = false; // 通知是否注册成功
+
     public static boolean isNotityReady() {
         return isNotityReady;
     }
+
     private static boolean isRegNotifying = false; // 是否正在注册通知
+
     public static void bleNotify(BleDevice bleDevice) {
-        if(isRegNotifying) return;
+        if (isRegNotifying) return;
         isRegNotifying = true;
         BleManager.getInstance().removeNotifyCallback(bleDevice, NOTIFY_SERVICE_UUID);
         BleManager.getInstance().notify(

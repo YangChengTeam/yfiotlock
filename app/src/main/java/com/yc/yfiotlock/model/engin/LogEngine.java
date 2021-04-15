@@ -66,7 +66,6 @@ public class LogEngine extends HttpCoreEngin {
     public Observable<ResultInfo<LogListInfo>> getLocalOpenLog(String lockerId, int page, int pageSize) {
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
             map.put("sign", UserInfoCache.getUserInfo().getSign());
         }
         map.put("locker_id", String.valueOf(lockerId));

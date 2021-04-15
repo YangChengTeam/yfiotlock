@@ -292,7 +292,6 @@ public class CommonUtil {
                 Log.i("onekeylogin", "onNext: " + info);
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
                     UserInfoCache.setUserInfo(info.getData());
-
                     VUiKit.postDelayed(200, () -> {
                         context.startActivity(new Intent(context, MainActivity.class));
                         //hide loading

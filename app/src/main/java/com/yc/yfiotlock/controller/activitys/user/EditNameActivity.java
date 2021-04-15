@@ -12,6 +12,7 @@ import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.UserEngine;
+import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.BackNavBar;

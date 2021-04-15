@@ -29,11 +29,13 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.offline.OfflineManager;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.SafeUtil;
+import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.adapters.IndexDeviceAdapter;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -150,9 +152,15 @@ public class IndexFragment extends BaseFragment {
         });
     }
 
+    private void processData(List<DeviceInfo> deviceInfos) {
+        for (DeviceInfo deviceInfo : deviceInfos) {
+            deviceInfo.setFamilyId(familyInfo.getId());
+            deviceInfo.setMasterId(UserInfoCache.getUserInfo().getId());
+        }
+    }
+
     private void loadData() {
         IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
-        LogUtil.msg("重新执行" + indexInfo);
         if (indexInfo != null) {
             familyInfo = indexInfo.getFamilyInfo();
             indexDeviceAdapter.setNewInstance(indexInfo.getDeviceInfos());
@@ -194,6 +202,7 @@ public class IndexFragment extends BaseFragment {
                 } else {
 
                     for (DeviceInfo cDeviceInfo : cDeviceInfos) {
+                        cDeviceInfo.setAdd(true);
                         hashMap.put(cDeviceInfo.getMacAddress(), cDeviceInfo);
                     }
 
@@ -202,7 +211,7 @@ public class IndexFragment extends BaseFragment {
                             if (hashMap.get(lDeviceInfo.getMacAddress()) != null) {
                                 hashMap.remove(lDeviceInfo.getMacAddress());
                             }
-                        } else if (hashMap.get(lDeviceInfo.getMacAddress()) == null) {
+                        } else if (hashMap.get(lDeviceInfo.getMacAddress()) == null && !lDeviceInfo.isShare()) {
                             hashMap.put(lDeviceInfo.getMacAddress(), lDeviceInfo);
                         }
                     }
@@ -214,6 +223,7 @@ public class IndexFragment extends BaseFragment {
                     });
 
                 }
+                processData(lastDeviceInfos);
                 deviceDao.insertOpenLockInfos(lastDeviceInfos).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {

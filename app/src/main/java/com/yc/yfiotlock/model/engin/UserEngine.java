@@ -29,7 +29,6 @@ public class UserEngine extends HttpCoreEngin {
         map.put("nickname", name);
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
         return rxpost(Config.USER_NAME_UPD_URL, new TypeReference<ResultInfo<String>>() {
                 }.getType(),
@@ -41,7 +40,6 @@ public class UserEngine extends HttpCoreEngin {
         map.put("face", face);
         if (App.isLogin()) {
             map.put("sign", UserInfoCache.getUserInfo().getSign());
-            map.put("user_id", UserInfoCache.getUserInfo().getId());
         }
         return rxpost(Config.USER_FACE_UPD_URL, new TypeReference<ResultInfo<String>>() {
                 }.getType(),

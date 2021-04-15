@@ -31,6 +31,7 @@ import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncEndEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 import com.yc.yfiotlock.utils.AnimatinUtil;
+import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
 import com.yc.yfiotlock.view.widgets.VaryingTextSizeTitleView;
 
@@ -312,8 +313,9 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
 
     private void bleSyncEnd() {
-        syncTv.setText("同步完成");
+        if (CommonUtil.isActivityDestory(this)) return;
         bleRetryCount = 3;
+        syncTv.setText("同步完成");
         processView.setVisibility(View.GONE);
         AnimatinUtil.heightZero(syncView);
         EventBus.getDefault().post(new LockLogSyncEndEvent());

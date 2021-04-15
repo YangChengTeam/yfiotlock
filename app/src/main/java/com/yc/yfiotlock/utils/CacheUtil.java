@@ -16,7 +16,7 @@ import java.lang.reflect.Type;
  */
 public class CacheUtil {
     public static void setCache(String key, Object object) {
-        String uid = "";
+        int uid = 0;
         UserInfo userInfo = UserInfoCache.getUserInfo();
         if (userInfo != null) {
             uid = userInfo.getId();
@@ -26,7 +26,7 @@ public class CacheUtil {
     }
 
     public static <T> T getCache(String key, Type type) {
-        String uid = "";
+        int uid = 0;
         UserInfo userInfo = UserInfoCache.getUserInfo();
         if (userInfo != null) {
             uid = userInfo.getId();

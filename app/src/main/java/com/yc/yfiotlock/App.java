@@ -19,6 +19,7 @@ import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.dao.AppDatabase;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
+import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.helper.GlideHelper;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
@@ -34,6 +35,7 @@ import java.util.Map;
 public class App extends Application {
     // 应用单例
     private static App app;
+
     public static App getApp() {
         return app;
     }
@@ -41,16 +43,17 @@ public class App extends Application {
     private DeviceEngin deviceEngin;
     // 所有云端设备
     private List<String> macList = new ArrayList<>();
+
     public List<String> getMacList() {
         return macList;
     }
 
     // 锁数据库
     private AppDatabase db;
+
     public AppDatabase getDb() {
         return db;
     }
-
 
     public static boolean isLogin() {
         return UserInfoCache.getUserInfo() != null;
@@ -72,26 +75,11 @@ public class App extends Application {
                 AppDatabase.class, "lock").build();
     }
 
-    private int retryCount = 0;
-
-    private void cloudGetMacList() {
-        deviceEngin.getMacList().subscribe(info -> {
-            if (info != null && info.getCode() == 1) {
-                macList = info.getData();
-            } else {
-                if (retryCount-- > 0) {
-                    VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), this::cloudGetMacList);
-                }
-            }
-        });
-    }
 
     private UpdateInfo mUpdateInfo;
-
     public UpdateInfo getUpdateInfo() {
         return mUpdateInfo;
     }
-
     private void checkUpdate() {
         UpdateEngine updateEngine = new UpdateEngine(this);
         updateEngine.getUpdateInfo().subscribe(resultInfo -> {

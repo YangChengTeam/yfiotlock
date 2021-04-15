@@ -106,6 +106,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         lockInfo.setDeviceId(aliDeviceName);
         lockInfo.setFamilyId(familyInfo.getId());
         lockInfo.setAdd(true);
+        lockInfo.setMasterId(UserInfoCache.getUserInfo().getId());
         localDeviceAdd(lockInfo);
     }
 
@@ -126,7 +127,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             generalDialog.show();
         }
     }
-
 
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {

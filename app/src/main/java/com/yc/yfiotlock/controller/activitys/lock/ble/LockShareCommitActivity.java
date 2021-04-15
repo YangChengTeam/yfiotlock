@@ -87,7 +87,7 @@ public class LockShareCommitActivity extends BaseBackActivity {
     private void shareDevice() {
         mLoadingDialog.show("分享中...");
         String msg = "分享失败";
-        mEngine.shareDevice(mUserInfo.getId(), lockInfo.getId() + "").subscribe(new Observer<ResultInfo<String>>() {
+        mEngine.shareDevice(mUserInfo.getId() + "", lockInfo.getId() + "").subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
