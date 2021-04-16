@@ -10,11 +10,14 @@ import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.download.DeviceDownloadManager;
+import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.utils.AnimatinUtil;
@@ -65,7 +68,6 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     private UpdateInfo updateInfo;
     private DeviceInfo deviceInfo;
     private LockBLESend lockBleSend;
-
     private FileInputStream in;
     private int packageCount;
     private static final int DATA_LENGTH = 200;
@@ -116,6 +118,10 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         installView.setVisibility(View.GONE);
         updateSuccessView.setVisibility(View.GONE);
         if (updateInfo.getProgress() == 100) {
+            if (LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
+                ToastCompat.show(getContext(), "蓝牙未连接");
+                return;
+            }
             processDespTv.setText("等待安装");
             bleOpenUpdate();
         }
@@ -129,7 +135,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             lockBleSend.registerNotify();
         }
 
-        if(DeviceDownloadManager.getInstance().isDownloading()){
+        if (DeviceDownloadManager.getInstance().isDownloading()) {
             processDespTv.setText("下载中");
             updateBtn.setVisibility(View.GONE);
         } else {

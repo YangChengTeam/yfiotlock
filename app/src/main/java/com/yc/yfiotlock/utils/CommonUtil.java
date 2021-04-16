@@ -461,6 +461,7 @@ public class CommonUtil {
 
 
     public static boolean isNetworkAvailable(Context context) {
+        if(isActivityDestory(context)) return false;
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

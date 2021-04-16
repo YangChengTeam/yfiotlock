@@ -270,6 +270,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             int n = 4;
             ByteBuffer wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), 0, n));
             logInfo.setEventId(wrapped.getInt());
+            lastId = logInfo.getEventId();
 
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
             logInfo.setKeyid(wrapped.get() & 0xFF);
