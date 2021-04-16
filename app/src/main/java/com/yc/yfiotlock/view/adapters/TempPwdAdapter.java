@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public class TempPwdAdapter extends BaseExtendAdapter<OpenLockInfo> implements LoadMoreModule {
     private long synctime;
-    private int LIMIT = 30;
+    private int LIMIT = 5;
 
     public TempPwdAdapter() {
         super(R.layout.item_temp_pwd, null);

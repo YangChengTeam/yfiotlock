@@ -19,7 +19,6 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
-import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
@@ -117,9 +116,9 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             syncTv.setVisibility(View.VISIBLE);
             syncTv.setText("同步中，请稍候...");
             bleSyncLog();
-            timeout();
             mSrlRefresh.setEnabled(false);
             mSrlRefresh.setRefreshing(false);
+            timeout();
         });
 
         mSrlRefresh.setEnabled(false);
@@ -150,7 +149,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
             @Override
             public void onSuccess(@NonNull Integer integer) {
-                lastId = integer++;
+                lastId = integer + 1;
                 bleSyncLog();
             }
 
@@ -247,14 +246,9 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         });
     }
 
-    public void test() {
-        byte[] data = new byte[]{(byte) 0xAA, (byte) 0x00, (byte) 0x00, (byte) 0x1F, (byte) 0x00, (byte) 0x18, (byte) 0x60, (byte) 0x77, (byte) 0xFE, (byte) 0x12, (byte) 0x08, (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x01, (byte) 0x01, (byte) 0x00, (byte) 0x15, (byte) 0x04, (byte) 0x0F, (byte) 0x10, (byte) 0x2D, (byte) 0x30, (byte) 0x76, (byte) 0x6E, (byte) 0xA5, (byte) 0x43, (byte) 0xBB};
-        LockBLEData lockBLEData = LockBLEPackage.getData(data);
-        onNotifySuccess(lockBLEData);
-    }
 
     private String getDecStr(int n) {
-        return n > 9 ? "9" : "0" + n;
+        return n > 9 ? "" + n : "0" + n;
     }
 
     @Override
@@ -265,10 +259,12 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
                 bleSyncEnd();
                 return;
             }
+
             if (LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT == lockBLEData.getScmd()) {
                 bleSyncLog();
                 return;
             }
+
             LogInfo logInfo = new LogInfo();
             logInfo.setLockId(lockInfo.getId());
             int n = 4;
@@ -276,13 +272,13 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             logInfo.setEventId(wrapped.getInt());
 
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
-            logInfo.setKeyid(wrapped.get());
+            logInfo.setKeyid(wrapped.get() & 0xFF);
 
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
-            logInfo.setType(wrapped.get());
+            logInfo.setType(wrapped.get()  & 0xFF );
 
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
-            logInfo.setGroupType(wrapped.get());
+            logInfo.setGroupType(wrapped.get()  & 0xFF);
 
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
             int year = wrapped.get();
@@ -308,37 +304,44 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
             logInfo.setAddtime(System.currentTimeMillis());
             int logType = 1;
-
             switch (lockBLEData.getScmd()) {
                 case LockBLEEventCmd.SCMD_DOORBELL:
                     break;
-                case LockBLEEventCmd.SCMD_OPEN_DOOR_INFO:
-                    logInfo.setLogType(logType);
-                    localGetOpenTypeName(logInfo);
-                    return;
+                case LockBLEEventCmd.SCMD_OPEN_DOOR_INFO: {
+                    if (logInfo.getKeyid() == 0xFC || logInfo.getKeyid() == 0xFD || logInfo.getKeyid() == 0xFE || logInfo.getKeyid() == 0xFF) {
+                        break;
+                    } else {
+                        logInfo.setLogType(logType);
+                        localGetOpenTypeName(logInfo);
+                        return;
+                    }
+                }
+
                 case LockBLEEventCmd.SCMD_LOW_BATTERY:
-                    logInfo.setName("低电报警");
                     logType = 2;
                     break;
                 case LockBLEEventCmd.SCMD_LOCAL_INIT:
-                    logInfo.setName("本地初始化");
                     break;
                 case LockBLEEventCmd.SCMD_LOCK_CLOSED:
-                    logInfo.setName("门锁锁定");
                     break;
                 case LockBLEEventCmd.SCMD_LOCK_UNCLOSED:
-                    logInfo.setName("门未锁好");
                     break;
                 case LockBLEEventCmd.SCMD_DOOR_UNCLOSED:
-                    logInfo.setName("门未关上");
                     break;
                 case LockBLEEventCmd.SCMD_AVOID_PRY_ALARM:
-                    logInfo.setName("防撬报警");
                     logType = 2;
                     break;
+                default:
+                    logType = -1;
+            }
+
+            if (logType == -1) {
+                bleSyncLog();
+                return;
             }
             logInfo.setType(lockBLEData.getScmd() + 2);
             logInfo.setLogType(logType);
+            logInfo.setName("");
             localAdd(logInfo);
         }
     }
@@ -367,7 +370,6 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         lockEngine.getLockOpenTypeInfo(lockInfo.getId() + "", logInfo.getType() + "", logInfo.getGroupType() + "", logInfo.getKeyid() + "").subscribe(new Action1<ResultInfo<OpenLockInfo>>() {
             @Override
             public void call(ResultInfo<OpenLockInfo> info) {
-                logInfo.setName(info.getData().getName());
                 if (info != null && info.getCode() == 1 && info.getData() != null) {
                     logInfo.setName(info.getData().getName());
                 } else {
@@ -377,7 +379,6 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             }
         });
     }
-
 
     private void bleSyncEnd() {
         if (CommonUtil.isActivityDestory(this)) return;

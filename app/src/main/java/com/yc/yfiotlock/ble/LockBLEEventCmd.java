@@ -12,7 +12,7 @@ public class LockBLEEventCmd extends LockBLEBaseCmd {
     public static final byte SCMD_LOG = (byte) 0x01;
 
     // 无最新事件（0x00）
-    public static final byte SCMD_NO_NEW_EVENT = (byte) 0x00;
+    public static final byte SCMD_NO_NEW_EVENT = (byte) 0x0A;
     // 指纹录入次数
     public static final byte SCMD_FINGERPRINT_INPUT_COUNT = (byte) 0x01;
     // 门铃（0x02）
@@ -34,7 +34,7 @@ public class LockBLEEventCmd extends LockBLEBaseCmd {
 
 
     // 更新成功
-    public static final byte SCMD_UPDATE_SUCCESS = (byte) 0x0A;
+    public static final byte SCMD_UPDATE_SUCCESS = (byte) 0x0F;
 
     // 2. 事件类 (0x08)
     public static byte[] op(String key, byte scmd, byte[] data) {

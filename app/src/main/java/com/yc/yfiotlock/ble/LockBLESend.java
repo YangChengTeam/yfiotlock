@@ -17,6 +17,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Arrays;
+
 public class LockBLESend {
     private static final String TAG = "LockBleSend";
 
@@ -32,7 +34,7 @@ public class LockBLESend {
     private byte scmd = 0x00;
     private byte[] cmdBytes;
 
-    public static final int DEFAULT_RETRY_COUNT = 2; // 0 - 2 实际默认次数3
+    public static final int DEFAULT_RETRY_COUNT = 3; // 实际默认次数3
     private boolean waupStatus = false;  // 唤醒状态
     private boolean isSend = false;      // 是否发送中
     private boolean isOpOver = false;    // 实际操作是否完成
@@ -145,17 +147,30 @@ public class LockBLESend {
         Log.d(TAG, "发送唤醒指令");
         byte[] bytes = LockBLEOpCmd.wakeup(key);
         op(bytes);
-        VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, () -> {
+        WakeUpRunnable wakeUpRunnable = new WakeUpRunnable(Arrays.hashCode(cmdBytes));
+        VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, wakeUpRunnable);
+    }
+
+    private class WakeUpRunnable implements Runnable {
+        private final int hashCode;
+
+        public WakeUpRunnable(int hashCode) {
+            this.hashCode = hashCode;
+        }
+
+        @Override
+        public void run() {
+            if (LockBLESend.this.cmdBytes == null || this.hashCode != Arrays.hashCode(LockBLESend.this.cmdBytes)) return;
             if (isOpOver) return;
             if (waupStatus && isSend) return;
-            if (wakeUpCount++ >= DEFAULT_RETRY_COUNT) {
-                Log.d(TAG, "唤醒门锁失败,无法发送指令");
+            if (++wakeUpCount >= DEFAULT_RETRY_COUNT) {
+                Log.d(TAG, "唤醒门锁失败,无法发送真正指令");
                 wakeUpCount = 0;
                 wakeupFailureResponse();
                 return;
             }
             wakeup();
-        });
+        }
     }
 
     // 监听
@@ -200,12 +215,12 @@ public class LockBLESend {
                         Log.d(TAG, "响应数据:" + LockBLEUtils.toHexString(data));
                         // 解析响应
                         LockBLEData lockBLEData = LockBLEPackage.getData(data);
-                        if (lockBLEData != null) {
-                            Log.d(TAG, "解析成功:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());
-                            EventBus.getDefault().post(lockBLEData);
-                        } else {
+                        if (lockBLEData == null || lockBLEData.getMcmd() == (byte) 0x00 || lockBLEData.getScmd() == (byte) 0x00) {
                             Log.d(TAG, "解析失败");
                             EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyChangeFailure, "lockBLEData format error"));
+                        } else {
+                            Log.d(TAG, "解析成功:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());
+                            EventBus.getDefault().post(lockBLEData);
                         }
                     }
                 });
@@ -226,7 +241,6 @@ public class LockBLESend {
     // 处理响应
     private void processNotify(LockBLEData lockBLEData) {
         if (mcmd == 0x00 || scmd == 0x00) {
-            Log.d(TAG, "非正常响应:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " mscd:" + mcmd + " scmd:" + scmd + " status:" + lockBLEData.getStatus());
             return;
         }
         if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_WAKE_UP) {
@@ -274,7 +288,6 @@ public class LockBLESend {
                     notifyCallback.onNotifySuccess(lockBLEData);
                 }
             } else {
-                Log.d(TAG, "响应失败状态:" + lockBLEData.getStatus());
                 if (notifyCallback != null) {
                     notifyCallback.onNotifyFailure(lockBLEData);
                 }

@@ -21,13 +21,8 @@
 #-renamesourcefileattribute SourceFile
 
 #移除log代码
--assumenosideeffects class android.util.Log {
-    public static *** v(...);
-    public static *** i(...);
-    public static *** d(...);
-    public static *** w(...);
-    public static *** e(...);
-}
+
+
 # 保留系统基本组件
 -keep public class * extends android.app.Activity
 -keep public class * extends android.app.Application
@@ -37,7 +32,6 @@
 -keep public class * extends android.app.backup.BackupAgentHelper
 -keep public class * extends android.preference.Preference
 -keep public class * extends android.view.View
-
 
 # 保持support下的所有类及其内部类
 -keep class androidx.appcompat.** {*;}

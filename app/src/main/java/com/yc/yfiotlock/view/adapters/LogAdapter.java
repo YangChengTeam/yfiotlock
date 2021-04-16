@@ -42,18 +42,18 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
         switch (type) {
             case LockBLEManager
                     .OPEN_LOCK_FINGERPRINT:
-                name = "指纹";
+                name = "指纹开门";
                 break;
             case LockBLEManager
                     .OPEN_LOCK_PASSWORD:
-                name = "密码";
+                name = "密码开门";
                 break;
             case LockBLEManager
                     .OPEN_LOCK_CARD:
-                name = "NFC卡";
+                name = "NFC卡开门";
                 break;
             case LockBLEEventCmd.SCMD_DOORBELL + 2:
-                name = "门铃";
+                name = "门铃响了";
                 break;
             case LockBLEEventCmd.SCMD_LOW_BATTERY + 2:
                 name = ("低电报警");
@@ -74,8 +74,20 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
                 name = ("防撬报警");
                 break;
         }
+        switch (logInfo.getKeyid()){
+            case 0xFC:
+                name = ("临时密码开门");
+                break;
+            case 0xFD:
+                name = ("蓝牙开门");
+                break;
+            case 0xFE:
+                name = ("出厂密码开门");
+                break;
+            case 0xFF:
+                name = ("云端开门");
+        }
         baseViewHolder.setText(R.id.tv_log_name, name);
-
         baseViewHolder.setGone(R.id.view_item_log_line, baseViewHolder.getLayoutPosition() == 0);
     }
 }

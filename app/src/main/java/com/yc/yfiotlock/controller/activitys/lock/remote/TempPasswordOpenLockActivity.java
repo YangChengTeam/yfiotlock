@@ -9,6 +9,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -108,10 +109,11 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         deviceEngin.getTime().subscribe(info -> {
             if (info != null && info.getCode() == 1 && info.getData() != null) {
                 TimeInfo timeInfo = info.getData();
-                String steps = Long.toHexString(timeInfo.getTime()).toUpperCase();
-                while (steps.length() < 16)
-                    steps = "0" + steps;
-                String password = TOTP.generateTOTP(key, steps, "6");
+                long time = timeInfo.getTime();
+                if (time % 2 != 0) {
+                    time += 1;
+                }
+                String password = TOTP.generateTOTP256(key, Long.toHexString(time).toUpperCase(), "6");
                 localAdd(password, timeInfo.getTime() * 1000L);
             }
         });
