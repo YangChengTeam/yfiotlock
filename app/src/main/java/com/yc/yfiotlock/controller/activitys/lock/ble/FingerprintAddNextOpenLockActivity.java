@@ -51,7 +51,7 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData != null && lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT && lockBLEData.getExtra()[0] > (byte) 0x01) {
-            resultTv.setText(lockBLEData.getStatus() + "/6 录入成功");
+            resultTv.setText(lockBLEData.getExtra()[0] + "/6 录入成功");
             fpIv.setImageResource(getResources().getIdentifier("fp" + lockBLEData.getExtra()[0], "mipmap", this.getPackageName()));
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {

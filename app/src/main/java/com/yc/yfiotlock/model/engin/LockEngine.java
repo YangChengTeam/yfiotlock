@@ -81,7 +81,7 @@ public class LockEngine extends HttpCoreEngin {
      * @param lockerId -
      * @return list of single openLockWay's info
      */
-    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockWayList(String lockerId, String type, String groupType) {
+    public Observable<ResultInfo<List<OpenLockInfo>>> getOpenLockTypeList(String lockerId, String type, String groupType) {
 
         Map<String, String> map = new HashMap<>();
         if (App.isLogin()) {
@@ -164,6 +164,21 @@ public class LockEngine extends HttpCoreEngin {
         map.put("locker_id", lockerId);
         return rxpost(Config.OPEN_LOCK_LONG_OPEN_URL,
                 new TypeReference<ResultInfo<String>>() {
+                }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
+    }
+
+    // 获取一条开门方式
+    public Observable<ResultInfo<OpenLockInfo>> getLockOpenTypeInfo(String lockid, String keyid, String groupType, String type) {
+        Map<String, String> map = new HashMap<>();
+        if (App.isLogin()) {
+            map.put("sign", UserInfoCache.getUserInfo().getSign());
+        }
+        map.put("locker_id", lockid);
+        map.put("keyid", keyid);
+        map.put("pwd_type", type);
+        map.put("group_type", groupType);
+        return rxpost(Config.GET_OPEN_LOCK_INFO_URL,
+                new TypeReference<ResultInfo<OpenLockInfo>>() {
                 }.getType(), map, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG, Config.RESQUEST_FLAG);
     }
 

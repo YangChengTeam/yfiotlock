@@ -108,7 +108,10 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         deviceEngin.getTime().subscribe(info -> {
             if (info != null && info.getCode() == 1 && info.getData() != null) {
                 TimeInfo timeInfo = info.getData();
-                String password = TOTP.generateTOTP256(key, Long.toHexString(timeInfo.getTime()).toUpperCase(), "6");
+                String steps = Long.toHexString(timeInfo.getTime()).toUpperCase();
+                while (steps.length() < 16)
+                    steps = "0" + steps;
+                String password = TOTP.generateTOTP(key, steps, "6");
                 localAdd(password, timeInfo.getTime() * 1000L);
             }
         });
@@ -146,7 +149,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
     }
 
     private void cloudLoadData() {
-        lockEngine.getOpenLockWayList(lockInfo.getId() + "", type + "", LockBLEManager.GROUP_TYPE + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
+        lockEngine.getOpenLockTypeList(lockInfo.getId() + "", type + "", LockBLEManager.GROUP_TYPE + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);

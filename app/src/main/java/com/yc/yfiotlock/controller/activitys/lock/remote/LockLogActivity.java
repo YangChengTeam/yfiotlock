@@ -9,15 +9,18 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
+import com.kk.securityhttp.domain.ResultInfo;
+import com.kk.securityhttp.utils.VUiKit;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
+import com.yc.yfiotlock.ble.LockBLEPackage;
 import com.yc.yfiotlock.ble.LockBLESend;
-import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
@@ -29,7 +32,9 @@ import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncDataEvent;
 import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncEndEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
+import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
@@ -45,8 +50,6 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.abs.IPagerTit
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.indicators.LinePagerIndicator;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -58,11 +61,13 @@ import io.reactivex.CompletableObserver;
 import io.reactivex.SingleObserver;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import rx.functions.Action1;
 
 public class LockLogActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
 
+    @BindView(R.id.srl_refresh)
+    SwipeRefreshLayout mSrlRefresh;
     @BindView(R.id.vp_lock_log)
     ViewPager viewPager;
     @BindView(R.id.mi_title)
@@ -78,10 +83,10 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private LockBLESend lockBLESend;
     private LockLogDao lockLogDao;
     private OpenLockDao openLockDao;
+    private LockEngine lockEngine;
     private int lastId = 1;
     private final int MAC_COUNT = 1;
     private int syncCount = MAC_COUNT;
-
 
     @Override
     protected int getLayoutId() {
@@ -93,7 +98,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         super.initVars();
         lockLogDao = App.getApp().getDb().lockLogDao();
         openLockDao = App.getApp().getDb().openLockDao();
-
+        lockEngine = new LockEngine(this);
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
 
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
@@ -103,9 +108,37 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     @Override
     protected void initViews() {
         super.initViews();
-        initViewPager();
 
+        initViewPager();
+        mSrlRefresh.setColorSchemeColors(0xff3091f8);
+        mSrlRefresh.setOnRefreshListener(() -> {
+            syncView.setVisibility(View.VISIBLE);
+            processView.setVisibility(View.VISIBLE);
+            syncTv.setVisibility(View.VISIBLE);
+            syncTv.setText("同步中，请稍候...");
+            bleSyncLog();
+            timeout();
+            mSrlRefresh.setEnabled(false);
+            mSrlRefresh.setRefreshing(false);
+        });
+
+        mSrlRefresh.setEnabled(false);
         bleFirstSynclog();
+        timeout();
+    }
+
+    private void timeout() {
+        VUiKit.postDelayed(1000 * 30, () -> {
+            if (CommonUtil.isActivityDestory(this)) return;
+            if (lockBLESend.isOpOver()) return;
+
+            if (lockBLESend != null) {
+                lockBLESend.setNotifyCallback(null);
+                lockBLESend.unregisterNotify();
+            }
+            syncTv.setText("同步超时");
+            bleSyncEnd();
+        });
     }
 
     private void bleFirstSynclog() {
@@ -117,7 +150,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
             @Override
             public void onSuccess(@NonNull Integer integer) {
-                lastId = integer;
+                lastId = integer++;
                 bleSyncLog();
             }
 
@@ -127,7 +160,6 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             }
         });
     }
-
 
     private void bleSyncLog() {
         byte[] cmdBytes = LockBLEEventCmd.event(lockInfo.getKey(), lastId);
@@ -215,6 +247,16 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         });
     }
 
+    public void test() {
+        byte[] data = new byte[]{(byte) 0xAA, (byte) 0x00, (byte) 0x00, (byte) 0x1F, (byte) 0x00, (byte) 0x18, (byte) 0x60, (byte) 0x77, (byte) 0xFE, (byte) 0x12, (byte) 0x08, (byte) 0x03, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01, (byte) 0x01, (byte) 0x01, (byte) 0x00, (byte) 0x15, (byte) 0x04, (byte) 0x0F, (byte) 0x10, (byte) 0x2D, (byte) 0x30, (byte) 0x76, (byte) 0x6E, (byte) 0xA5, (byte) 0x43, (byte) 0xBB};
+        LockBLEData lockBLEData = LockBLEPackage.getData(data);
+        onNotifySuccess(lockBLEData);
+    }
+
+    private String getDecStr(int n) {
+        return n > 9 ? "9" : "0" + n;
+    }
+
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
@@ -233,34 +275,35 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
             ByteBuffer wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), 0, n));
             logInfo.setEventId(wrapped.getInt());
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
-            logInfo.setKeyid(wrapped.getInt());
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
+            logInfo.setKeyid(wrapped.get());
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
-            logInfo.setType(wrapped.getInt());
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
+            logInfo.setType(wrapped.get());
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
-            logInfo.setGroupType(wrapped.getInt());
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
+            logInfo.setGroupType(wrapped.get());
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
-            int year = 2000 + wrapped.get();
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
+            int year = wrapped.get();
+            year += 2000;
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
             int month = wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
             int day = wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
             int hour = wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
             int minute = wrapped.get();
 
-            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, n++));
+            wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
             int second = wrapped.get();
 
-            String time = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + ":";
+            String time = year + "-" + getDecStr(month) + "-" + getDecStr(day) + " " + getDecStr(hour) + ":" + getDecStr(minute) + ":" + getDecStr(second);
             logInfo.setTime(time);
 
             logInfo.setAddtime(System.currentTimeMillis());
@@ -268,17 +311,10 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
             switch (lockBLEData.getScmd()) {
                 case LockBLEEventCmd.SCMD_DOORBELL:
-                    logInfo.setName("门铃");
                     break;
                 case LockBLEEventCmd.SCMD_OPEN_DOOR_INFO:
                     logInfo.setLogType(logType);
-                    openLockDao.getName(lockInfo.getId(), logInfo.getType(), logInfo.getGroupType(), logInfo.getKeyid()).subscribeOn(Schedulers.io()).subscribe(new Consumer<String>() {
-                        @Override
-                        public void accept(String s) {
-                            logInfo.setName(s);
-                            localAdd(logInfo);
-                        }
-                    });
+                    localGetOpenTypeName(logInfo);
                     return;
                 case LockBLEEventCmd.SCMD_LOW_BATTERY:
                     logInfo.setName("低电报警");
@@ -301,18 +337,54 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
                     logType = 2;
                     break;
             }
+            logInfo.setType(lockBLEData.getScmd() + 2);
             logInfo.setLogType(logType);
             localAdd(logInfo);
         }
     }
 
+    private void localGetOpenTypeName(LogInfo logInfo) {
+        openLockDao.getName(lockInfo.getId(), logInfo.getType(), logInfo.getGroupType(), logInfo.getKeyid()).subscribeOn(Schedulers.io()).subscribe(new SingleObserver<String>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+
+            @Override
+            public void onSuccess(@NonNull String s) {
+                logInfo.setName(s);
+                localAdd(logInfo);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                cloudGetOpenTypeName(logInfo);
+            }
+        });
+    }
+
+    private void cloudGetOpenTypeName(LogInfo logInfo) {
+        lockEngine.getLockOpenTypeInfo(lockInfo.getId() + "", logInfo.getType() + "", logInfo.getGroupType() + "", logInfo.getKeyid() + "").subscribe(new Action1<ResultInfo<OpenLockInfo>>() {
+            @Override
+            public void call(ResultInfo<OpenLockInfo> info) {
+                logInfo.setName(info.getData().getName());
+                if (info != null && info.getCode() == 1 && info.getData() != null) {
+                    logInfo.setName(info.getData().getName());
+                } else {
+                    logInfo.setName("-");
+                }
+                localAdd(logInfo);
+            }
+        });
+    }
+
 
     private void bleSyncEnd() {
         if (CommonUtil.isActivityDestory(this)) return;
-
+        mSrlRefresh.setEnabled(true);
+        EventBus.getDefault().post(new LockLogSyncEndEvent());
         processView.setVisibility(View.GONE);
         AnimatinUtil.heightZero(syncView);
-        EventBus.getDefault().post(new LockLogSyncEndEvent());
     }
 
     @Override

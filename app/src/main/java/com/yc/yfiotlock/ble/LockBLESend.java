@@ -20,10 +20,10 @@ import org.greenrobot.eventbus.ThreadMode;
 public class LockBLESend {
     private static final String TAG = "LockBleSend";
 
-    public static final String WRITE_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
-    public static final String NOTIFY_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
-    public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
-    public static final String NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616";
+    public static final String WRITE_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+    public static final String NOTIFY_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+    public static final String WRITE_CHARACTERISTIC_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
+    public static final String NOTIFY_CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
 
     //private Context context;
     private BleDevice bleDevice;

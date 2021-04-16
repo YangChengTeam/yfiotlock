@@ -38,16 +38,16 @@ public class FingerprintAddSelectHandOpenLockActivity extends BaseBackActivity {
         super.initViews();
 
         RxView.clicks(leftHandBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            nav2last(rightHandBtn);
+            nav2last(leftHandBtn, FingerprintAddSelectHandNextOpenLockActivity.class);
         });
 
         RxView.clicks(rightHandBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            nav2last(rightHandBtn);
+            nav2last(rightHandBtn, FingerprintAddSelectRightHandNextOpenLockActivity.class);
         });
     }
 
-    private void nav2last(View view) {
-        Intent intent = new Intent(FingerprintAddSelectHandOpenLockActivity.this, FingerprintAddSelectHandNextOpenLockActivity.class);
+    private void nav2last(View view, Class clazz) {
+        Intent intent = new Intent(FingerprintAddSelectHandOpenLockActivity.this, clazz);
         intent.putExtra("name", view.getTag() + "");
         intent.putExtra("keyid", keyid);
         startActivity(intent);

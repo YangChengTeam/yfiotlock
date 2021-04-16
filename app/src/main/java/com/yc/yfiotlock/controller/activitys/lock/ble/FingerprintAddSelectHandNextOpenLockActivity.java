@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.view.View;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding4.view.RxView;
 import com.yc.yfiotlock.R;
@@ -11,12 +12,16 @@ import com.yc.yfiotlock.utils.CacheUtil;
 
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
 import butterknife.BindViews;
 
 public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprintAddOpenLockActivity {
 
     @BindViews({R.id.iv_finger1, R.id.iv_finger2, R.id.iv_finger3, R.id.iv_finger4, R.id.iv_finger5})
     View[] fingerBtns;
+
+    @BindView(R.id.tv_hand)
+    TextView nameTv;
 
     private String name;
     private int keyid;
@@ -43,6 +48,8 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
                 localAdd(keyid);
             });
         }
+
+        nameTv.setText(name);
     }
 
 

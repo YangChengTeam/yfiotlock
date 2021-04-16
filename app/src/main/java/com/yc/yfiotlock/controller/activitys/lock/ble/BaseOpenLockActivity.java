@@ -153,7 +153,7 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             noWifiView.setVisibility(View.GONE);
             mSrlRefresh.setRefreshing(true);
         }
-        lockEngine.getOpenLockWayList(lockInfo.getId() + "", type + "", groupType + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
+        lockEngine.getOpenLockTypeList(lockInfo.getId() + "", type + "", groupType + "").subscribe(new Subscriber<ResultInfo<List<OpenLockInfo>>>() {
             @Override
             public void onCompleted() {
                 mSrlRefresh.setRefreshing(false);

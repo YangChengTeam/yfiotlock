@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.yc.yfiotlock.view.widgets.BackNavBar
+        android:id="@+id/view_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:text="添加指纹"></com.yc.yfiotlock.view.widgets.BackNavBar>
+
+    <FrameLayout
+        android:id="@+id/ll_finger"
+        android:layout_width="260dp"
+        android:layout_height="340dp"
+        android:layout_marginTop="120dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view_nav_bar">
+
+        <ImageView
+            android:id="@+id/iv_finger1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="120dp"
+            android:src="@mipmap/finger_default"
+            android:tag="大拇指"></ImageView>
+
+        <ImageView
+            android:id="@+id/iv_finger2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="20dp"
+            android:src="@mipmap/finger_default"
+            android:tag="无名指"></ImageView>
+
+        <ImageView
+            android:id="@+id/iv_finger3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="110dp"
+            android:src="@mipmap/finger_default"
+            android:tag="中指"></ImageView>
+
+        <ImageView
+            android:id="@+id/iv_finger4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="180dp"
+            android:layout_marginTop="20dp"
+            android:src="@mipmap/finger_default"
+            android:tag="食指"></ImageView>
+
+        <ImageView
+            android:id="@+id/iv_finger5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="230dp"
+            android:layout_marginTop="70dp"
+            android:src="@mipmap/finger_default"
+            android:tag="小指"></ImageView>
+
+        <ImageView
+            android:id="@+id/iv_finger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@mipmap/finger_right"></ImageView>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_hand"
+        android:layout_width="106dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
+        android:text="右手"
+        android:textColor="#222222"
+        android:textSize="14dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll_finger" />
+
+    <TextView
+        android:id="@+id/tv_select_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="选中的手指将作为指纹名称保存"
+        android:textColor="#999999"
+        android:textSize="15dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_hand" />
+
+
+    <com.coorchice.library.SuperTextView
+        android:id="@+id/stv_add"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"
+        android:text="@string/finish_open_type"
+        android:textColor="@color/white"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:stv_corner="24dp"
+        app:stv_pressBgColor="@color/pressedColor"
+        app:stv_shaderEnable="true"
+        app:stv_shaderEndColor="#338DFC"
+        app:stv_shaderMode="topToBottom"
+        app:stv_shaderStartColor="#34A2FF" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

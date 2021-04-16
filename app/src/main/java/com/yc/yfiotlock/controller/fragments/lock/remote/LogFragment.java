@@ -1,10 +1,10 @@
 package com.yc.yfiotlock.controller.fragments.lock.remote;
 
 import android.annotation.SuppressLint;
+import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
@@ -19,9 +19,7 @@ import com.yc.yfiotlock.model.engin.LogEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.LogAdapter;
 import com.yc.yfiotlock.view.widgets.NoDataView;
-import com.yc.yfiotlock.view.widgets.NoWifiView;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -38,8 +36,9 @@ public class LogFragment extends BaseFragment {
 
     @BindView(R.id.rv_log)
     RecyclerView recyclerView;
-    @BindView(R.id.srl_refresh)
-    SwipeRefreshLayout mSrlRefresh;
+
+    @BindView(R.id.view_no_data)
+    NoDataView nodataView;
 
     protected LogEngine logEngine;
     protected LogAdapter logAdapter;
@@ -64,18 +63,15 @@ public class LogFragment extends BaseFragment {
     }
 
     @Override
+    protected void initVars() {
+        super.initVars();
+        logEngine = new LogEngine(getActivity());
+    }
+
+    @Override
     protected void initViews() {
         initRv();
-
-        logEngine = new LogEngine(getActivity());
-
-        mSrlRefresh.setColorSchemeColors(0xff3091f8);
-        mSrlRefresh.setOnRefreshListener(() -> {
-            page = 1;
-            localLoadData();
-        });
-
-        mSrlRefresh.setEnabled(false);
+        localLoadData();
     }
 
 
@@ -83,7 +79,6 @@ public class LogFragment extends BaseFragment {
         logAdapter = new LogAdapter(null);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(logAdapter);
-        logAdapter.setEmptyView(new NoDataView(getActivity()));
         logAdapter.getLoadMoreModule().setOnLoadMoreListener(() -> {
             page++;
             localLoadData();
@@ -91,17 +86,19 @@ public class LogFragment extends BaseFragment {
     }
 
     @SuppressLint("CheckResult")
-    private void localLoadData() {
+    protected void localLoadData() {
         lockLogDao.loadLogInfos(lockInfo.getId(), type, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
             @Override
             public void accept(List<LogInfo> openLockInfos) throws Exception {
                 if (openLockInfos.size() == 0) {
+                    nodataView.setVisibility(View.VISIBLE);
                     // 只拉取一页数据
                     if (CommonUtil.isNetworkAvailable(getContext())) {
                         cloudLoadData();
                     }
                     return;
                 } else {
+                    nodataView.setVisibility(View.GONE);
                     success(openLockInfos);
                 }
             }
@@ -112,6 +109,7 @@ public class LogFragment extends BaseFragment {
         logEngine.getLocalOpenLog(lockInfo.getId() + "", 1, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
             @Override
             public void onCompleted() {
+
             }
 
             @Override
@@ -178,7 +176,6 @@ public class LogFragment extends BaseFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSync(LockLogSyncEndEvent object) {
-        mSrlRefresh.setEnabled(true);
         page = 1;
         localLoadData();
     }

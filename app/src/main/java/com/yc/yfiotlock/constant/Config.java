@@ -96,6 +96,8 @@ public class Config {
 
     public static final String OPEN_LOCK_DEL_LOCAL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lokerPwdDelLocal" + isRsa();
     public static final String OPEN_LOCK_MODIFY_LOCAL_PSW_URL = getBaseUrl() + "/userapp/v1.Locker/lockerPwdUpdLocal" + isRsa();
+    public static final String GET_OPEN_LOCK_INFO_URL = getBaseUrl() + "/userapp/v1.Locker/pwdInfoByWhere" + isRsa();
+
 
     //远程
     public static final String LOG_WARN_URL = getBaseUrl() + "/userapp/v1.locker_warn_log/warnLogList" + isRsa();

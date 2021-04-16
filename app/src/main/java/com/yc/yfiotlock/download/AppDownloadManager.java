@@ -83,7 +83,7 @@ public class AppDownloadManager {
         String key = task.getId() + "redownload";
         int n = MMKV.defaultMMKV().getInt(key, 0);
         if (n < redownload) {
-            n++;
+            ++n;
             MMKV.defaultMMKV().putInt(key, n);
             LogUtil.msg("redownload times" + n);
             VUiKit.postDelayed((n + 200) * n, () -> {

@@ -72,14 +72,13 @@
             android:src="@mipmap/finger"></ImageView>
     </FrameLayout>
 
-
     <TextView
         android:id="@+id/tv_hand"
         android:layout_width="106dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:gravity="center"
-        android:text="右手"
+        android:text="左手"
         android:textColor="#222222"
         android:textSize="14dp"
         app:layout_constraintLeft_toLeftOf="parent"
