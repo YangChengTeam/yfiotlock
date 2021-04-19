@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.ble;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.kk.utils.LogUtil;
 
@@ -115,6 +116,10 @@ public class LockBLEPackage {
 
     // 解析响应数据  依照协议
     public static LockBLEData getData(byte[] response) {
+        return getData(response, "");
+    }
+
+    public static LockBLEData getData(byte[] response, String key) {
         if (response == null) {
             LogUtil.msg("LockBLEPackage-> response is null!");
             return null;
@@ -128,7 +133,6 @@ public class LockBLEPackage {
 
         // position package LENGTH = 2,3
         short len = ByteBuffer.wrap(new byte[]{response[2], response[3]}).order(ByteOrder.BIG_ENDIAN).getShort();
-        short tlen = len;
         if (len != response.length) {
             LogUtil.msg("LockBLEPackage-> LENGTH is not package length!");
             return null;
@@ -143,29 +147,36 @@ public class LockBLEPackage {
             return null;
         }
 
-        // position data LENGTH = 4, 5
-        len = ByteBuffer.wrap(new byte[]{response[4], response[5]}).getShort();
+        byte[] data;
+        if (!TextUtils.isEmpty(key)) {
+            data = LockBLEUtils.decode(Arrays.copyOfRange(response, 4, response.length - 3), key);
+        } else {
+            data = Arrays.copyOfRange(response, 4, response.length - 3);
+        }
+
+        // position data LENGTH = 0, 1
+        len = ByteBuffer.wrap(new byte[]{data[0], data[1]}).getShort();
         if (len != response.length - 7) {
             LogUtil.msg("LockBLEPackage-> LENGTH is not package length!");
             return null;
         }
 
         // position data crc16_data = 4, response.length - 5
-        crc16 = (short) LockBLEUtils.crc16(Arrays.copyOfRange(response, 4, response.length - 5));
+        crc16 = (short) LockBLEUtils.crc16(Arrays.copyOfRange(data, 0, data.length - 2));
 
         // position package CRC16 = response.length - 5, response.length - 4
-        if (crc16 != ByteBuffer.wrap(new byte[]{response[response.length - 5], response[response.length - 4]}).order(ByteOrder.BIG_ENDIAN).getShort()) {
+        if (crc16 != ByteBuffer.wrap(new byte[]{data[data.length - 2], data[data.length - 1]}).order(ByteOrder.BIG_ENDIAN).getShort()) {
             LogUtil.msg("LockBLEPackage->data CRC16 is error!");
             return null;
         }
 
         LockBLEData lockBLEData = new LockBLEData();
-        lockBLEData.setMcmd(response[10]);
-        lockBLEData.setScmd(response[11]);
-        lockBLEData.setStatus(response[12]);
+        lockBLEData.setMcmd(data[6]);
+        lockBLEData.setScmd(data[7]);
+        lockBLEData.setStatus(data[8]);
         // LENGHT = 2 SEQ = 4 MCMD = 1 SCMD = 1 DATA STATUS = 1 CRC16 = 2
-        if (tlen - 18 > 0) {
-            lockBLEData.setExtra(Arrays.copyOfRange(response, 13, tlen - 5));
+        if (len - 11 > 0) {
+            lockBLEData.setExtra(Arrays.copyOfRange(data, 9, len - 2));
         }
         return lockBLEData;
     }

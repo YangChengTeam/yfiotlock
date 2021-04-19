@@ -40,7 +40,6 @@ public class App extends Application {
         return app;
     }
 
-    private DeviceEngin deviceEngin;
     // 所有云端设备
     private List<String> macList = new ArrayList<>();
 
@@ -64,7 +63,6 @@ public class App extends Application {
         super.onCreate();
         Reflection.unseal(this);
         app = this;
-        deviceEngin = new DeviceEngin(this);
         LockBLEManager.getInstance().initBle(this);
         initSdk();
         initHttp();

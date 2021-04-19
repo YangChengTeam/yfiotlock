@@ -22,10 +22,11 @@ import java.util.Arrays;
 public class LockBLESend {
     private static final String TAG = "LockBleSend";
 
-    public static final String WRITE_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
-    public static final String NOTIFY_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
-    public static final String WRITE_CHARACTERISTIC_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
-    public static final String NOTIFY_CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
+    public static final String WRITE_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
+    public static final String NOTIFY_SERVICE_UUID = "55535343-fe7d-4ae5-8fa9-9fafd205e455";
+    public static final String WRITE_CHARACTERISTIC_UUID = "49535343-8841-43f4-a8d4-ecbe34729bb3";
+    public static final String NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616";
+
 
     //private Context context;
     private BleDevice bleDevice;
@@ -101,7 +102,7 @@ public class LockBLESend {
             isOpOver = false;
             wakeup();
         } else {
-            Log.d(TAG, "发送未完毕");
+            Log.d(TAG, "指令未发送完毕");
         }
     }
 
@@ -160,7 +161,8 @@ public class LockBLESend {
 
         @Override
         public void run() {
-            if (LockBLESend.this.cmdBytes == null || this.hashCode != Arrays.hashCode(LockBLESend.this.cmdBytes)) return;
+            if (LockBLESend.this.cmdBytes == null || this.hashCode != Arrays.hashCode(LockBLESend.this.cmdBytes))
+                return;
             if (isOpOver) return;
             if (waupStatus && isSend) return;
             if (++wakeUpCount >= DEFAULT_RETRY_COUNT) {
@@ -214,14 +216,7 @@ public class LockBLESend {
                     public void onCharacteristicChanged(byte[] data) {
                         Log.d(TAG, "响应数据:" + LockBLEUtils.toHexString(data));
                         // 解析响应
-                        LockBLEData lockBLEData = LockBLEPackage.getData(data);
-                        if (lockBLEData == null || lockBLEData.getMcmd() == (byte) 0x00 || lockBLEData.getScmd() == (byte) 0x00) {
-                            Log.d(TAG, "解析失败");
-                            EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyChangeFailure, "lockBLEData format error"));
-                        } else {
-                            Log.d(TAG, "解析成功:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());
-                            EventBus.getDefault().post(lockBLEData);
-                        }
+                        EventBus.getDefault().post(data);
                     }
                 });
     }
@@ -234,8 +229,25 @@ public class LockBLESend {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNotifySuccess(LockBLEData lockBLEData) {
-        processNotify(lockBLEData);
+    public void onNotifySuccess(byte[] data) {
+        boolean isEncrypt = true;
+        // 不需要加密的命令
+        if (mcmd == LockBLESettingCmd.MCMD && (scmd == LockBLESettingCmd.SCMD_SET_AES_KEY || scmd == LockBLESettingCmd.SCMD_UPDATE)) {
+            isEncrypt = false;
+        }
+        LockBLEData lockBLEData;
+        if (isEncrypt) {
+            lockBLEData = LockBLEPackage.getData(data, "" );
+        } else {
+            lockBLEData = LockBLEPackage.getData(data);
+        }
+        if (lockBLEData == null || lockBLEData.getMcmd() == (byte) 0x00 || lockBLEData.getScmd() == (byte) 0x00) {
+            Log.d(TAG, "解析失败");
+            notifyErrorResponse("lockBLEData format error");
+        } else {
+            Log.d(TAG, "解析成功:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());
+            processNotify(lockBLEData);
+        }
     }
 
     // 处理响应

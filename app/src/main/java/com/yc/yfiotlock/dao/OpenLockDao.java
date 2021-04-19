@@ -55,7 +55,7 @@ public interface OpenLockDao {
     Completable updateOpenLockInfo(int lockId, int keyid, int groupType, String name);
 
     // 获取本地列表数据
-    @Query("SELECT * FROM open_lock_info where master_lock_id=:lockId and type=:type and group_type =:groupType order by id desc")
+    @Query("SELECT * FROM open_lock_info where master_lock_id=:lockId and type=:type and group_type =:groupType order by add_time desc")
     Single<List<OpenLockInfo>> loadOpenLockInfos(int lockId, int type, int groupType);
 
     // 获取需要同步到云端的数据

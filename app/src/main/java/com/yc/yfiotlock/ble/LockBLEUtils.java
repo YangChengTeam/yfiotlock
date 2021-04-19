@@ -5,13 +5,28 @@ import android.location.LocationManager;
 
 import androidx.annotation.NonNull;
 
+import com.kk.utils.security.Base64;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 public class LockBLEUtils {
     public static int crc16(byte[] data) {
@@ -68,12 +83,12 @@ public class LockBLEUtils {
     }
 
 
-    public static String encode(byte[] bytes, String key) {
-        return "";
+    public static byte[] encode(byte[] bytes, String key) {
+        return null;
     }
 
-    public static String decode(byte[] bytes, String key) {
-        return "";
+    public static byte[] decode(byte[] bytes, String key) {
+        return null;
     }
 
     public static String toHexString(byte[] byteArray) {
@@ -122,8 +137,28 @@ public class LockBLEUtils {
         return locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
     }
 
-    public static String genKey(DeviceInfo lockInfo) {
-        return lockInfo.getMacAddress();
+    public static String genKey() {
+        try {
+            SecretKey secretKey = KeyGenerator.getInstance("AES").generateKey();
+            String encodedKey = Base64.encode(secretKey.getEncoded());
+            return encodedKey;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static SecretKey getKeyFromPassword(String password, String salt)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
+        SecretKey secret = new SecretKeySpec(factory.generateSecret(spec)
+                .getEncoded(), "AES");
+        return secret;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(genKey());
     }
 
 }

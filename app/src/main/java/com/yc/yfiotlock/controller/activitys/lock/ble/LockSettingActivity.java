@@ -44,7 +44,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
+import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 import rx.functions.Action1;
@@ -145,9 +148,14 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
 
     @SuppressLint("CheckResult")
     private void localDeviceDel() {
-        deviceDao.deleteDeviceInfo(lockInfo.getMacAddress()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action() {
+        deviceDao.deleteDeviceInfo(lockInfo.getMacAddress()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
-            public void run() throws Exception {
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
                 mLoadingDialog.dismiss();
                 App.getApp().getMacList().remove(lockInfo.getMacAddress());
                 SafeUtil.setSafePwdType(lockInfo, 0);
@@ -156,6 +164,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 EventBus.getDefault().post(new IndexRefreshEvent());
                 LockIndexActivity.safeFinish();
                 finish();
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+
             }
         });
     }
@@ -320,7 +333,8 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_VERSION) {
             getUpdateInfo();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_RESET) {
-            ToastCompat.show(getContext(), "删除失败");
+            mLoadingDialog.dismiss();
+            ToastCompat.show(getContext(), "删除失败,请重试");
         }
     }
 

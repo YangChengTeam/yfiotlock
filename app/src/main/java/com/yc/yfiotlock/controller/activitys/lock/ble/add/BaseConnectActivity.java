@@ -45,6 +45,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected DeviceDao deviceDao;
 
     protected String aliDeviceName = "000000000000";
+    private int retryCount = 3;
 
     @Override
     protected void initVars() {
@@ -130,7 +131,9 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     protected void bleGetAliDeviceName() {
         if (lockBleSend != null) {
-            mLoadingDialog.show("添加设备中...");
+            if (!isActiveDistributionNetwork) {
+                mLoadingDialog.show("添加设备中...");
+            }
             byte[] cmdBytes = LockBLESettingCmd.getAliDeviceName(lockInfo.getKey());
             lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes);
         }

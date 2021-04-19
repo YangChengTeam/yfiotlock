@@ -13,6 +13,7 @@ import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.dao.OpenLockDao;
@@ -114,7 +115,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
                     time += 1;
                 }
                 String password = TOTP.generateTOTP256(key, Long.toHexString(time).toUpperCase(), "6");
-                localAdd(password, timeInfo.getTime() * 1000L);
+                localAdd(password, time * 1000L);
             }
         });
     }
@@ -197,6 +198,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
     public void success(Object data) {
         List<OpenLockInfo> lockInfos = (List<OpenLockInfo>) data;
         tempPwdAdapter.setNewInstance(lockInfos);
+        openLockDao.insertOpenLockInfos(lockInfos).subscribeOn(Schedulers.io()).subscribe();
     }
 
     protected void localAdd(String keyid, long time) {
@@ -218,7 +220,6 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         openLockDao.insertOpenLockInfo(openLockInfo).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(Disposable d) {
-                retryCount = 3;
             }
 
             @Override
@@ -232,11 +233,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
 
             @Override
             public void onError(Throwable e) {
-                if (retryCount-- > 3) {
-                    localAdd(name, type, keyid, password, time);
-                } else {
-                    retryCount = 3;
-                }
+                ToastCompat.show(getContext(), "添加失败, 请重试");
             }
         });
     }

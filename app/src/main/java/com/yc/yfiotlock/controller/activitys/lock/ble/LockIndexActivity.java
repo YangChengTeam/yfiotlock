@@ -1,6 +1,8 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorEvent;
 import android.os.Vibrator;
@@ -108,7 +110,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         return familyInfo;
     }
 
-
     public LockBLESend getLockBleSend() {
         return lockBleSend;
     }
@@ -119,16 +120,15 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         if (mInstance != null && mInstance.get() != null) {
             return mInstance.get();
         }
+        System.exit(1);
         return null;
     }
-
 
     public static void safeFinish() {
         if (getInstance() != null) {
             getInstance().finish();
         }
     }
-
 
     @Override
     protected int getLayoutId() {

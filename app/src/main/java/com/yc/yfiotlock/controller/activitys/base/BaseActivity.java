@@ -12,18 +12,15 @@ import android.view.WindowManager;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.jakewharton.rxbinding4.view.RxView;
-import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.controller.activitys.user.LoginActivity;
-import com.yc.yfiotlock.controller.activitys.user.WebActivity;
 import com.yc.yfiotlock.controller.dialogs.LoadingDialog;
 import com.yc.yfiotlock.helper.PermissionHelper;
 import com.yc.yfiotlock.model.bean.eventbus.EventStub;
-import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends BaseSendActivity implements ILoadData {
+public abstract class BaseActivity extends AppCompatActivity implements ILoadData {
 
     protected PermissionHelper mPermissionHelper;
     protected LoadingDialog mLoadingDialog;

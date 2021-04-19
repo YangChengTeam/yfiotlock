@@ -11,6 +11,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.dao.OpenLockDao;
@@ -100,7 +101,6 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
 
             @Override
             public void onComplete() {
-                retryCount = 3;
                 openLockInfo.setName(name);
                 EventBus.getDefault().post(openLockInfo);
                 if (CommonUtil.isNetworkAvailable(getContext())) {
@@ -112,11 +112,7 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
 
             @Override
             public void onError(Throwable e) {
-                if (retryCount-- > 0) {
-                    localEdit();
-                } else {
-                    retryCount = 3;
-                }
+                ToastCompat.show(getContext(), "更新失败, 请重试");
             }
         });
     }

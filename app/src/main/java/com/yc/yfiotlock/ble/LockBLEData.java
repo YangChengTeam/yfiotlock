@@ -100,7 +100,7 @@ public class LockBLEData {
                 .array();
 
         if (isEncrypt()) {
-            return LockBLEUtils.encode(dataBytes, key).getBytes();
+            return LockBLEUtils.encode(dataBytes, key);
         }
 
         return dataBytes;

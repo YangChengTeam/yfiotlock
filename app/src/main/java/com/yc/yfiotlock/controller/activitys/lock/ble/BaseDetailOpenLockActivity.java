@@ -121,7 +121,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected abstract void localDelSucc();
 
     protected void localDel() {
-        DeviceInfo lockInfo = LockIndexActivity.getInstance().getLockInfo();
         openLockDao.deleteOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid()).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
@@ -130,7 +129,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
             @Override
             public void onComplete() {
-                retryCount = 3;
                 localDelSucc();
                 if (CommonUtil.isNetworkAvailable(getContext())) {
                     EventBus.getDefault().post(new CloudOpenLockDeleteEvent(openLockInfo));
@@ -141,11 +139,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
             @Override
             public void onError(@NonNull Throwable e) {
-                if (retryCount-- > 3) {
-                    localDel();
-                } else {
-                    retryCount = 3;
-                }
+                ToastCompat.show(getContext(), "删除失败, 请重试");
             }
         });
     }

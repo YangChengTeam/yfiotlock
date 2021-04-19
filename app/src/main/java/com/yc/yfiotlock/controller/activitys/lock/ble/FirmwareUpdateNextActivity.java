@@ -118,7 +118,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         installView.setVisibility(View.GONE);
         updateSuccessView.setVisibility(View.GONE);
         if (updateInfo.getProgress() == 100) {
-            if (LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
+            if (!LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
                 ToastCompat.show(getContext(), "蓝牙未连接");
                 return;
             }
@@ -170,7 +170,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
 
     @Override
     public void onBackPressed() {
-        if (updateSuccessView.getVisibility() != View.VISIBLE) {
+        if (LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice()) && updateSuccessView.getVisibility() != View.VISIBLE) {
             cancelDialog();
         } else {
             super.onBackPressed();

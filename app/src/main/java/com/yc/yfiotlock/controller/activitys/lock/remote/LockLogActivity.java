@@ -19,6 +19,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
@@ -84,7 +85,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private OpenLockDao openLockDao;
     private LockEngine lockEngine;
     private int lastId = 1;
-    private final int MAC_COUNT = 1;
+    private final int MAC_COUNT = 5;
     private int syncCount = MAC_COUNT;
 
     @Override
@@ -312,6 +313,9 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
                     if (logInfo.getKeyid() == 0xFC || logInfo.getKeyid() == 0xFD || logInfo.getKeyid() == 0xFE || logInfo.getKeyid() == 0xFF) {
                         break;
                     } else {
+                        if(logInfo.getGroupType() == LockBLEManager.GROUP_HIJACK){
+                            logType = 2;
+                        }
                         logInfo.setLogType(logType);
                         localGetOpenTypeName(logInfo);
                         return;
@@ -384,9 +388,9 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private void bleSyncEnd() {
         if (CommonUtil.isActivityDestory(this)) return;
         mSrlRefresh.setEnabled(true);
-        EventBus.getDefault().post(new LockLogSyncEndEvent());
         processView.setVisibility(View.GONE);
         AnimatinUtil.heightZero(syncView);
+        EventBus.getDefault().post(new LockLogSyncEndEvent());
     }
 
     @Override

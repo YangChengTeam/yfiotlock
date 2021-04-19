@@ -91,7 +91,6 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
             @Override
             public void onComplete() {
-                retryCount = 3;
                 localAddSucc();
                 if (CommonUtil.isNetworkAvailable(getContext())) {
                     openLockInfo.setAdd(true);
@@ -104,11 +103,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
             @Override
             public void onError(Throwable e) {
-                if (retryCount-- > 0) {
-                    localAdd(name, type, keyid, password);
-                } else {
-                    retryCount = 3;
-                }
+                ToastCompat.show(getContext(), "添加失败, 请重试");
             }
         });
     }
