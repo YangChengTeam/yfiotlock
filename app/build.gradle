@@ -50,18 +50,16 @@ android {
         applicationId "com.yc.yfiotlock"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 66
+        versionCode 105
         versionName "1.0.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         signingConfig signingConfigs.ycR
 
-
         ndk {
             // Specifies the ABI configurations of your native
             // libraries Gradle should build and package with your APK.
             abiFilters 'arm64-v8a'
-
         }
 
         javaCompileOptions {

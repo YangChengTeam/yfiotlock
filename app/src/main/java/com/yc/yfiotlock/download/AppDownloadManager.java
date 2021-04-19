@@ -50,7 +50,7 @@ public class AppDownloadManager {
         return instance;
     }
 
-    private String parentDir;
+    protected String parentDir;
     private WeakReference<Context> mContext;
     private DownloadListener4WithSpeed mDownloadListener;
     private DownloadTask task;
@@ -200,25 +200,7 @@ public class AppDownloadManager {
                         public void taskEnd(@NonNull DownloadTask task, @NonNull EndCause cause, @Nullable Exception realCause, @NonNull SpeedCalculator taskSpeed) {
                             UpdateInfo updateInfo = (UpdateInfo) task.getTag();
                             if (cause == EndCause.COMPLETED) {
-                                setUpdateInfo(updateInfo);
-                                File file = new File(parentDir, getUpdateFileName(updateInfo));
-                                long offsetSize = getFileSize(file);
-                                if (offsetSize != 0) {
-                                    String packageName = DownloadUtils.getPackageNameByFile(getContext(), file);
-                                    if (TextUtils.isEmpty(packageName)) {
-                                        if (file.delete()) {
-                                            updateInfo.setDownloading(true);
-                                        }
-                                        redownload(task, updateInfo);
-                                        return;
-                                    }
-                                    updateInfo.setTotalSize(offsetSize);
-                                    updateInfo.setOffsetSize(offsetSize);
-                                    installSelf(updateInfo);
-                                    updateInfo.setDownloading(false);
-                                    EventBus.getDefault().post(updateInfo);
-                                    setUpdateInfo(updateInfo);
-                                }
+                                installSelf(updateInfo);
                             } else if (cause == EndCause.ERROR) {
                                 ToastCompat.show(getContext(), "更新失败" + realCause);
                             }
@@ -253,6 +235,7 @@ public class AppDownloadManager {
         }
     }
 
+
     public void stopTask() {
         if (task != null) {
             task.cancel();
@@ -262,14 +245,25 @@ public class AppDownloadManager {
 
     public void installSelf(UpdateInfo updateInfo) {
         File file = new File(parentDir, getUpdateFileName(updateInfo));
-        String packageName = DownloadUtils.getPackageNameByFile(getContext(), file);
-        if (TextUtils.isEmpty(packageName)) {
-            if (file.delete()) {
-                updateInfo.setDownloading(true);
-                ToastCompat.show(getContext(), getContext().getResources().getString(R.string.download_again_tip));
+        long offsetSize = getFileSize(file);
+        if (offsetSize != 0) {
+            String packageName = DownloadUtils.getPackageNameByFile(getContext(), file);
+            if (TextUtils.isEmpty(packageName)) {
+                if (file.delete()) {
+                    updateInfo.setDownloading(true);
+                }
+                redownload(task, updateInfo);
+                return;
             }
-            updateApp(updateInfo);
-        } else {
+
+            updateInfo.setTotalSize(offsetSize);
+            updateInfo.setOffsetSize(offsetSize);
+            updateInfo.setDownloading(false);
+            
+            setUpdateInfo(updateInfo);
+
+            EventBus.getDefault().post(updateInfo);
+
             DownloadUtils.installApp(getContext(), file);
         }
     }

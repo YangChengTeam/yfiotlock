@@ -118,11 +118,11 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         installView.setVisibility(View.GONE);
         updateSuccessView.setVisibility(View.GONE);
         if (updateInfo.getProgress() == 100) {
+            processDespTv.setText("等待安装");
             if (!LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
                 ToastCompat.show(getContext(), "蓝牙未连接");
                 return;
             }
-            processDespTv.setText("等待安装");
             bleOpenUpdate();
         }
     }

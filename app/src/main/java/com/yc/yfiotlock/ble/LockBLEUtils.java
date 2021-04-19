@@ -136,29 +136,4 @@ public class LockBLEUtils {
             return false;
         return locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER);
     }
-
-    public static String genKey() {
-        try {
-            SecretKey secretKey = KeyGenerator.getInstance("AES").generateKey();
-            String encodedKey = Base64.encode(secretKey.getEncoded());
-            return encodedKey;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    public static SecretKey getKeyFromPassword(String password, String salt)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
-        SecretKey secret = new SecretKeySpec(factory.generateSecret(spec)
-                .getEncoded(), "AES");
-        return secret;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(genKey());
-    }
-
 }
