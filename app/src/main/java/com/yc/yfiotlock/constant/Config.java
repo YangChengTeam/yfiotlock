@@ -5,7 +5,7 @@ public class Config {
     public static boolean RESQUEST_FLAG = true;
 
     private final static String baseUrl = "http://yf.test.yf5g.cn/doorlockuser";
-    private final static String debugBaseUrl = "http://yf.test.yf5g.cn";
+    private final static String debugBaseUrl = "http://yf.test.yf5g.cn/doorlockuser";
 
     public final static String ALI_PHONE_SDK_APPID = "RJhiL+tSBZC+ksN3xh92OmWBY3/FgQa/TRdm9hZXk1DEvQK/eVvmMV4SU+PB7JlgTsjPBW5eKU3ozxUP+haCQOOicXODI6B85fsO2QS15fHUDqX2QuvEN98UwRRyRRQ/+8r9Gdt3GEstcDL32Aku+R6MDd/Dn191sTrT6MigMmnGeTN7xkS5V4n6Vd4hiYw5ruK9stT2fmxuzB/A8DS0IJsEVXFrCReffB9QE+60xF06+mXqG5U8VL0eiHRfrpLl6pqChcWjjWlHBlCncJDBxScg9jnlbHzrNDPUWlP7RkmPDYeVdgef0Q==";
 
