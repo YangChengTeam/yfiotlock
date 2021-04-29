@@ -285,7 +285,7 @@ public class PersonalInfoActivity extends BaseBackActivity {
                             }.getType());
                             if (info.getCode() == 1) {
                                 Log.d("aaaa", "onSuccess: " + info.getData().getPath());
-                                changeUserFace(info.getData().getUrl());
+                                changeUserFace(info.getData().getUrl(),info.getData().getPath());
                             } else {
                                 ToastCompat.show(getContext(), info.getMsg());
                             }
@@ -306,9 +306,13 @@ public class PersonalInfoActivity extends BaseBackActivity {
 
     private UserEngine mUserEngine;
 
-    private void changeUserFace(String face) {
+    /**
+     * @param face 完成的用户头像
+     * @param path 不带域名的地址
+     */
+    private void changeUserFace(String face,String path) {
         mLoadingDialog.show("修改中...");
-        mUserEngine.changeFace(face).subscribe(new Observer<ResultInfo<String>>() {
+        mUserEngine.changeFace(path).subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
