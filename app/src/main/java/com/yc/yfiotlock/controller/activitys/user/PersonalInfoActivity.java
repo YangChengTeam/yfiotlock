@@ -285,7 +285,7 @@ public class PersonalInfoActivity extends BaseBackActivity {
                             }.getType());
                             if (info.getCode() == 1) {
                                 Log.d("aaaa", "onSuccess: " + info.getData().getPath());
-                                changeUserFace(info.getData().getUrl(), info.getData().getPath());
+                                changeUserFace(info.getData().getUrl());
                             } else {
                                 ToastCompat.show(getContext(), info.getMsg());
                             }
@@ -306,9 +306,9 @@ public class PersonalInfoActivity extends BaseBackActivity {
 
     private UserEngine mUserEngine;
 
-    private void changeUserFace(String face, String faceNoHost) {
+    private void changeUserFace(String face) {
         mLoadingDialog.show("修改中...");
-        mUserEngine.changeFace(faceNoHost).subscribe(new Observer<ResultInfo<String>>() {
+        mUserEngine.changeFace(face).subscribe(new Observer<ResultInfo<String>>() {
             @Override
             public void onCompleted() {
                 mLoadingDialog.dismiss();
