@@ -18,8 +18,6 @@ add_library( # Specifies the name of the library.
 
              # Provides a relative path to your source file(s).
         src/main/cpp/ble.c
-        src/main/cpp/crc16.c
-        src/main/cpp/b64.c
         src/main/cpp/aes.c)
 
 
@@ -30,3 +28,6 @@ find_library( # Sets the name of the path variable.
         # Specifies the name of the NDK library that
         # you want CMake to locate.
         log )
+
+set(TEST_SRC_DIR src/test/cpp)
+include(src/test/cpp/CMakeLists.txt)

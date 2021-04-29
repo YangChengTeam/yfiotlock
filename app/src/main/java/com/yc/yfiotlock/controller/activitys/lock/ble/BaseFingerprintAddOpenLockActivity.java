@@ -1,11 +1,5 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import android.content.Intent;
-
-import com.kk.utils.VUiKit;
-import com.yc.yfiotlock.R;
-import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 
 public abstract class BaseFingerprintAddOpenLockActivity extends BaseAddOpenLockActivity {
@@ -14,8 +8,8 @@ public abstract class BaseFingerprintAddOpenLockActivity extends BaseAddOpenLock
         super.initVars();
         this.mcmd = LockBLEOpCmd.MCMD;
         this.scmd = LockBLEOpCmd.SCMD_ADD_PRINTFINGER;
-        lockBleSend.setMcmd(mcmd);
-        lockBleSend.setScmd(scmd);
+        lockBleSender.setMcmd(mcmd);
+        lockBleSender.setScmd(scmd);
     }
 
     @Override

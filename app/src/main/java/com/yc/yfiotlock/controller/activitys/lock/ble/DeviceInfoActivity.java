@@ -8,7 +8,7 @@ import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
@@ -24,7 +24,7 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
+public class DeviceInfoActivity extends BaseBackActivity implements LockBLESender.NotifyCallback {
 
 
     @BindView(R.id.rv_device_info)
@@ -34,7 +34,7 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
 
     private DeviceInfo deviceInfo;
     private BleDevice bleDevice;
-    private LockBLESend lockBleSend;
+    private LockBLESender lockBleSender;
 
     @Override
     protected int getLayoutId() {
@@ -46,7 +46,7 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
         super.initVars();
         bleDevice = LockIndexActivity.getInstance().getBleDevice();
         deviceInfo = LockIndexActivity.getInstance().getLockInfo();
-        lockBleSend = new LockBLESend(this, bleDevice, deviceInfo.getKey());
+        lockBleSender = new LockBLESender(this, bleDevice, deviceInfo.getKey());
     }
 
     @Override
@@ -64,18 +64,18 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
     @Override
     protected void onResume() {
         super.onResume();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(this);
-            lockBleSend.registerNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(this);
+            lockBleSender.registerNotify();
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(null);
-            lockBleSend.unregisterNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(null);
+            lockBleSender.unregisterNotify();
         }
     }
 
@@ -99,9 +99,9 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESend.
     }
 
     private void bleGetBattery() {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             byte[] bytes = LockBLESettingCmd.getBattery(deviceInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_BATTERY, bytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_BATTERY, bytes);
         }
     }
 

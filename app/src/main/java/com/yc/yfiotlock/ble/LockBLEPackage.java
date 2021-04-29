@@ -1,6 +1,5 @@
 package com.yc.yfiotlock.ble;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.kk.utils.LogUtil;
@@ -58,7 +57,7 @@ public class LockBLEPackage {
                 .putShort(length)
                 .put(data).array();
 
-        crc16 = (short) LockBLEUtils.crc16(bytes);
+        crc16 = (short) LockBLEUtil.crc16(bytes);
 
         ByteBuffer packageBuffer = ByteBuffer.allocate(len + nodataLen).put(start).put(bytes).putShort(pid).put(end).order(ByteOrder.BIG_ENDIAN);
 
@@ -101,7 +100,7 @@ public class LockBLEPackage {
                     .putShort(length)
                     .put(Arrays.copyOfRange(data, i * maxdataLen, i * maxdataLen + len)).array();
 
-            crc16 = (short) LockBLEUtils.crc16(bytes);
+            crc16 = (short) LockBLEUtil.crc16(bytes);
 
             ByteBuffer packageBuffer = ByteBuffer.allocate(len + nodataLen).order(ByteOrder.BIG_ENDIAN);
             packagesBuffer.put(packageBuffer.put(start)
@@ -139,7 +138,7 @@ public class LockBLEPackage {
         }
 
         // position package crc16_data = 1, response.length - 4
-        short crc16 = (short) LockBLEUtils.crc16(Arrays.copyOfRange(response, 1, response.length - 3));
+        short crc16 = (short) LockBLEUtil.crc16(Arrays.copyOfRange(response, 1, response.length - 3));
 
         // position package CRC16 = response.length - 3, response.length - 2
         if (crc16 != ByteBuffer.wrap(new byte[]{response[response.length - 3], response[response.length - 2]}).order(ByteOrder.BIG_ENDIAN).getShort()) {
@@ -149,7 +148,7 @@ public class LockBLEPackage {
 
         byte[] data;
         if (!TextUtils.isEmpty(key)) {
-            data = LockBLEUtils.decode(Arrays.copyOfRange(response, 4, response.length - 3), key);
+            data = LockBLEUtil.decrypt(key, Arrays.copyOfRange(response, 4, response.length - 3));
         } else {
             data = Arrays.copyOfRange(response, 4, response.length - 3);
         }
@@ -162,7 +161,7 @@ public class LockBLEPackage {
         }
 
         // position data crc16_data = 4, response.length - 5
-        crc16 = (short) LockBLEUtils.crc16(Arrays.copyOfRange(data, 0, data.length - 2));
+        crc16 = (short) LockBLEUtil.crc16(Arrays.copyOfRange(data, 0, data.length - 2));
 
         // position package CRC16 = response.length - 5, response.length - 4
         if (crc16 != ByteBuffer.wrap(new byte[]{data[data.length - 2], data[data.length - 1]}).order(ByteOrder.BIG_ENDIAN).getShort()) {

@@ -8,18 +8,15 @@ import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.ble.LockBLEUtils;
+import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
-import com.yc.yfiotlock.model.bean.eventbus.CloudDeviceAddEvent;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
-import com.yc.yfiotlock.model.bean.lock.TimeInfo;
-import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
@@ -29,9 +26,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 import rx.Subscriber;
-import rx.functions.Action1;
 
-public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESend.NotifyCallback {
+public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESender.NotifyCallback {
 
     protected boolean isDeviceAdd = false;  // 是否 设备同步云端添加成功
     protected boolean isConnected = false;  // 是否 配网成功
@@ -40,7 +36,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     protected BleDevice bleDevice;
     protected DeviceInfo lockInfo;
-    protected LockBLESend lockBleSend;
+    protected LockBLESender lockBleSender;
     protected DeviceEngin deviceEngin;
     protected DeviceDao deviceDao;
 
@@ -60,7 +56,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             lockInfo.setMacAddress(bleDevice.getMac());
             lockInfo.setName(bleDevice.getName());
         }
-        lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
+        lockBleSender = new LockBLESender(this, bleDevice, lockInfo.getKey());
     }
 
     @SuppressLint("CheckResult")
@@ -76,7 +72,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     protected void cloudDeviceAdd() {
-        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, isConnected ? 1 : 0).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
+        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, lockInfo.getKey()).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
             }
@@ -107,6 +103,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         lockInfo.setDeviceId(aliDeviceName);
         lockInfo.setFamilyId(familyInfo.getId());
         lockInfo.setAdd(true);
+        lockInfo.setKey(LockBLEUtil.genKey());
         lockInfo.setMasterId(UserInfoCache.getUserInfo().getId());
         localDeviceAdd(lockInfo);
     }
@@ -130,12 +127,12 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     protected void bleGetAliDeviceName() {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             if (!isActiveDistributionNetwork) {
                 mLoadingDialog.show("添加设备中...");
             }
             byte[] cmdBytes = LockBLESettingCmd.getAliDeviceName(lockInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes);
         }
     }
 
@@ -154,18 +151,18 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     protected void onResume() {
         super.onResume();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(this);
-            lockBleSend.registerNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(this);
+            lockBleSender.registerNotify();
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(null);
-            lockBleSend.unregisterNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(null);
+            lockBleSender.unregisterNotify();
         }
     }
 
@@ -184,7 +181,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
-            aliDeviceName = LockBLEUtils.toHexString(lockBLEData.getExtra()).replace(" ", "");
+            aliDeviceName = LockBLEUtil.toHexString(lockBLEData.getExtra()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
             if (isDeviceAdd || isActiveDistributionNetwork) {
                 return;

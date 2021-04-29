@@ -63,6 +63,7 @@ public class FirmwareUpdateActivity extends BaseBackActivity {
         Intent updateIntent = new Intent(this, FirmwareUpdateNextActivity.class);
         updateIntent.putExtra("updateInfo", updateInfo);
         startActivity(updateIntent);
+        finish();
     }
 
     private void setInfo() {

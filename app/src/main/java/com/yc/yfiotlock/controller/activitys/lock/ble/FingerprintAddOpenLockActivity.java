@@ -22,7 +22,7 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
         bleAddFingerprint();
 
         VUiKit.postDelayed(12 * 1000, () -> {
-            if (!lockBleSend.isOpOver()) {
+            if (!lockBleSender.isOpOver()) {
                 ToastCompat.show(getContext(), "操作失败");
                 finish();
             }
@@ -31,7 +31,7 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
 
     @Override
     public void onBackPressed() {
-        if (!lockBleSend.isOpOver()) {
+        if (!lockBleSender.isOpOver()) {
             bleCancelDialog();
         } else {
             super.onBackPressed();
@@ -40,7 +40,7 @@ public class FingerprintAddOpenLockActivity extends BaseFingerprintAddOpenLockAc
 
     private void bleAddFingerprint() {
         byte[] bytes = LockBLEOpCmd.addFingerprint(lockInfo.getKey(), LockBLEManager.GROUP_TYPE, number);
-        lockBleSend.send(mcmd, scmd, bytes);
+        lockBleSender.send(mcmd, scmd, bytes);
     }
 
     @Override

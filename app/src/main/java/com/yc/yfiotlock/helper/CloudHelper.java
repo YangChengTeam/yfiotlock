@@ -112,7 +112,7 @@ public class CloudHelper {
     }
 
     protected void cloudDeviceAdd(DeviceInfo deviceInfo) {
-        deviceEngin.addDeviceInfo(deviceInfo.getFamilyId() + "", deviceInfo.getName(), deviceInfo.getMacAddress(), deviceInfo.getDeviceId(), 0).subscribe(new Action1<ResultInfo<DeviceInfo>>() {
+        deviceEngin.addDeviceInfo(deviceInfo.getFamilyId() + "", deviceInfo.getName(), deviceInfo.getMacAddress(), deviceInfo.getDeviceId(), deviceInfo.getKey()).subscribe(new Action1<ResultInfo<DeviceInfo>>() {
             @Override
             public void call(ResultInfo<DeviceInfo> info) {
                 if (info != null && info.getCode() == 1) {

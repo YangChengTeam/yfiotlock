@@ -135,7 +135,7 @@ public class OLTOfflineManager {
         if (deviceInfos != null && deviceInfos.size() > n) {
             DeviceInfo deviceInfo = deviceInfos.get(n);
             if (deviceInfo == null) return;
-            deviceEngin.addDeviceInfo(deviceInfo.getFamilyId() + "", deviceInfo.getName(), deviceInfo.getMacAddress(), deviceInfo.getDeviceId(), 0).subscribe(new Action1<ResultInfo<DeviceInfo>>() {
+            deviceEngin.addDeviceInfo(deviceInfo.getFamilyId() + "", deviceInfo.getName(), deviceInfo.getMacAddress(), deviceInfo.getDeviceId(), deviceInfo.getKey()).subscribe(new Action1<ResultInfo<DeviceInfo>>() {
                 @Override
                 public void call(ResultInfo<DeviceInfo> info) {
                     if (info != null && info.getCode() == 1) {

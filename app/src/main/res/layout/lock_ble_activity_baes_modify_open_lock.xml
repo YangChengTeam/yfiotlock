@@ -32,6 +32,7 @@
         android:layout_marginTop="10dp"
         android:background="@color/white"
         android:paddingLeft="10dp"
+        android:maxLength="12"
         android:textSize="14dp"
         android:textColor="#222222"
         android:maxLines="1"

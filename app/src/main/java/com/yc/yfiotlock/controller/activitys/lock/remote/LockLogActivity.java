@@ -20,7 +20,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
@@ -64,7 +64,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import rx.functions.Action1;
 
-public class LockLogActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
+public class LockLogActivity extends BaseBackActivity implements LockBLESender.NotifyCallback {
 
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
@@ -80,7 +80,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     View processView;
 
     private DeviceInfo lockInfo;
-    private LockBLESend lockBLESend;
+    private LockBLESender lockBLESender;
     private LockLogDao lockLogDao;
     private OpenLockDao openLockDao;
     private LockEngine lockEngine;
@@ -102,7 +102,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
 
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBLESend = new LockBLESend(this, bleDevice, lockInfo.getKey());
+        lockBLESender = new LockBLESender(this, bleDevice, lockInfo.getKey());
     }
 
     @Override
@@ -130,11 +130,11 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     private void timeout() {
         VUiKit.postDelayed(1000 * 30, () -> {
             if (CommonUtil.isActivityDestory(this)) return;
-            if (lockBLESend.isOpOver()) return;
+            if (lockBLESender.isOpOver()) return;
 
-            if (lockBLESend != null) {
-                lockBLESend.setNotifyCallback(null);
-                lockBLESend.unregisterNotify();
+            if (lockBLESender != null) {
+                lockBLESender.setNotifyCallback(null);
+                lockBLESender.unregisterNotify();
             }
             syncTv.setText("同步超时");
             bleSyncEnd();
@@ -163,8 +163,8 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
 
     private void bleSyncLog() {
         byte[] cmdBytes = LockBLEEventCmd.event(lockInfo.getKey(), lastId);
-        if (lockBLESend != null) {
-            lockBLESend.send(LockBLEEventCmd.MCMD, LockBLEEventCmd.SCMD_LOG, cmdBytes);
+        if (lockBLESender != null) {
+            lockBLESender.send(LockBLEEventCmd.MCMD, LockBLEEventCmd.SCMD_LOG, cmdBytes);
         }
     }
 
@@ -404,18 +404,18 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESend.Not
     @Override
     protected void onResume() {
         super.onResume();
-        if (lockBLESend != null) {
-            lockBLESend.setNotifyCallback(this);
-            lockBLESend.registerNotify();
+        if (lockBLESender != null) {
+            lockBLESender.setNotifyCallback(this);
+            lockBLESender.registerNotify();
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (lockBLESend != null) {
-            lockBLESend.setNotifyCallback(null);
-            lockBLESend.unregisterNotify();
+        if (lockBLESender != null) {
+            lockBLESender.setNotifyCallback(null);
+            lockBLESender.unregisterNotify();
         }
     }
 

@@ -168,7 +168,6 @@ public class AboutUsActivity extends BaseBackActivity {
             mStvCheck.setSolid(Color.TRANSPARENT);
             mStvCheck.setText("有新版本可以更新");
         } else {
-            ToastCompat.showCenter(getContext(), "已是最新版本");
             mStvCheck.setSolid(getResources().getColor(R.color.blue_no_input));
             mStvCheck.setClickable(false);
             mStvCheck.setPressBgColor(Color.TRANSPARENT);

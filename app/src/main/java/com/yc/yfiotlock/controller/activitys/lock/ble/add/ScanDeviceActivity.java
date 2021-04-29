@@ -10,10 +10,10 @@ import androidx.annotation.Nullable;
 import com.coorchice.library.SuperTextView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.utils.AnimatinUtil;
+import com.yc.yfiotlock.utils.BleUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -82,7 +82,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
 
             @Override
             public void onScanning(BleDevice bleDevice) {
-                if (!LockBLEUtils.isFoundDevice(bleDevice.getMac())) {
+                if (!BleUtil.isFoundDevice(bleDevice.getMac())) {
                     if (!isFoundOne) {
                         isFoundOne = true;
                         deviceHashMap.put(bleDevice.getMac(), bleDevice);
@@ -170,7 +170,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
         super.onActivityResult(requestCode, resultCode, data);
         // GPS授权回调
         if (requestCode == LockBLEManager.REQUEST_GPS) {
-            if (LockBLEUtils.checkGPSIsOpen(this)) {
+            if (BleUtil.checkGPSIsOpen(this)) {
                 scan();
             }
         }

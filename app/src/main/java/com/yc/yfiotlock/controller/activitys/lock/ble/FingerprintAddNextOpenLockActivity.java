@@ -41,7 +41,7 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
 
     @Override
     public void onBackPressed() {
-        if (!lockBleSend.isOpOver()) {
+        if (!lockBleSender.isOpOver()) {
             bleCancelDialog();
         } else {
             super.onBackPressed();

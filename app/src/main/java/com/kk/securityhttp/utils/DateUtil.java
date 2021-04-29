@@ -1,7 +1,5 @@
 package com.kk.securityhttp.utils;
 
-import android.annotation.SuppressLint;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

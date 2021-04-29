@@ -3,7 +3,6 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.content.Intent;
 import android.text.method.PasswordTransformationMethod;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -17,15 +16,11 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
-import com.yc.yfiotlock.ble.LockBLESend;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
 
-import org.greenrobot.eventbus.EventBus;
-
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -124,11 +119,11 @@ public class PasswordAddOpenLockActivity extends BaseAddOpenLockActivity {
     }
 
     private void bleAddPwd() {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             this.mcmd = LockBLEOpCmd.MCMD;
             this.scmd = LockBLEOpCmd.SCMD_ADD_PWD;
             byte[] bytes = LockBLEOpCmd.addPwd(lockInfo.getKey(), LockBLEManager.GROUP_TYPE, number, passEt.getText() + "", new byte[]{00, 00, 00, 00, 00, 00}, new byte[]{00, 00, 00, 00, 00, 00});
-            lockBleSend.send(mcmd, scmd, bytes);
+            lockBleSender.send(mcmd, scmd, bytes);
         }
     }
 

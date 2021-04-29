@@ -57,6 +57,7 @@ public class DeviceInfo implements Serializable {
     @Ignore
     private String model = "Locker";
 
+    @JSONField(name = "aes_key")
     @ColumnInfo(name = "key")
     private String key;
 
@@ -220,9 +221,16 @@ public class DeviceInfo implements Serializable {
 
     public String getKey() {
         if (TextUtils.isEmpty(key)) {
-            key = getMacAddress();
+            key = getOrigenKey();
         }
         return key;
+    }
+
+    public String getOrigenKey(){
+        if(TextUtils.isEmpty(macAddress) || macAddress.length() < 8){
+            return "00000000";
+        }
+        return getMacAddress().replaceAll(":", "").substring(0, 8).toLowerCase();
     }
 
     public void setKey(String key) {

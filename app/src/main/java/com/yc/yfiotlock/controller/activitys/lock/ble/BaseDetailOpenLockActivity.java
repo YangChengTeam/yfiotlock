@@ -14,7 +14,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
@@ -46,7 +46,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
+public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implements LockBLESender.NotifyCallback {
     @BindView(R.id.rv_open_lock)
     RecyclerView openLockRecyclerView;
     @BindView(R.id.stv_del)
@@ -57,7 +57,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     protected OpenLockAdapter openLockAdapter;
     protected LockEngine lockEngine;
     protected OpenLockInfo openLockInfo;
-    protected LockBLESend lockBleSend;
+    protected LockBLESender lockBleSender;
     protected int type = LockBLEManager.GROUP_TYPE == LockBLEManager.GROUP_HIJACK ? LockBLEManager.ALARM_TYPE : LockBLEManager.NORMAL_TYPE;
     protected String key = "";
 
@@ -88,7 +88,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
         lockEngine = new LockEngine(this);
         openLockInfo = (OpenLockInfo) getIntent().getSerializableExtra("openlockinfo");
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
+        lockBleSender = new LockBLESender(this, bleDevice, lockInfo.getKey());
 
         key = "locker_count_" + lockInfo.getId() + type;
     }
@@ -157,18 +157,18 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     protected void onResume() {
         super.onResume();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(this);
-            lockBleSend.registerNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(this);
+            lockBleSender.registerNotify();
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(null);
-            lockBleSend.unregisterNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(null);
+            lockBleSender.unregisterNotify();
         }
     }
 

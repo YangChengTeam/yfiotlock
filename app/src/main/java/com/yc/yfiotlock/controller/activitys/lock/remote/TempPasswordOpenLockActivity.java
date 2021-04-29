@@ -60,8 +60,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
     private DeviceInfo lockInfo;
     protected int type = 2;
 
-    private String key = "3132333435363738393031323334353637383930"
-            + "313233343536373839303132";
+    private String key = "";
 
     @Override
     protected int getLayoutId() {
@@ -76,6 +75,16 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         deviceEngin = new DeviceEngin(this);
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
         LockBLEManager.GROUP_TYPE = LockBLEManager.GROUP_TYPE_TEMP_PWD;
+
+        StringBuilder prefix = new StringBuilder();
+        byte[] bytes = lockInfo.getKey().getBytes();
+        for (int i = 0; i < bytes.length; i++) {
+            prefix.append(bytes[i] % 10);
+        }
+        LogUtil.msg("prefix key:" + prefix);
+        key = prefix + "35363738393031323334353637383930"
+                + "313233343536373839303132";
+        // 31323334
     }
 
     @Override
@@ -84,9 +93,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
 
         setRv();
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
-        mSrlRefresh.setOnRefreshListener(() -> {
-            synctimeLoadData();
-        });
+        mSrlRefresh.setOnRefreshListener(this::synctimeLoadData);
 
         mSrlRefresh.setRefreshing(true);
         synctimeLoadData();
@@ -95,9 +102,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
     @Override
     protected void bindClick() {
         super.bindClick();
-        setClick(R.id.stv_add, () -> {
-            nav2add();
-        });
+        setClick(R.id.stv_add, this::nav2add);
     }
 
     private void setRv() {
@@ -203,7 +208,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
 
     protected void localAdd(String keyid, long time) {
         String name = "临时密码";
-        localAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, Integer.valueOf(keyid), keyid + "", time);
+        localAdd(name, LockBLEManager.OPEN_LOCK_PASSWORD, Integer.parseInt(keyid), keyid + "", time);
     }
 
     protected void localAdd(String name, int type, int keyid, String password, long time) {

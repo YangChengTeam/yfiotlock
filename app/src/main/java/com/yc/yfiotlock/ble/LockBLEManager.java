@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.compat.ToastCompat;
@@ -23,6 +24,7 @@ import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.libs.fastble.scan.BleScanRuleConfig;
 import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
+import com.yc.yfiotlock.utils.BleUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -111,14 +113,14 @@ public class LockBLEManager {
         BleManager.getInstance().setMtu(bleDevice, LockBLEPackage.getMtu(), new BleMtuChangedCallback() {
             @Override
             public void onSetMTUFailure(BleException exception) {
-                LockBLESend.bleNotify(bleDevice);
+                LockBLESender.bleNotify(bleDevice);
             }
 
             @Override
             public void onMtuChanged(int mtu) {
                 // 设置MTU成功，并获得当前设备传输支持的MTU值
                 LockBLEPackage.setMtu(mtu);
-                LockBLESend.bleNotify(bleDevice);
+                LockBLESender.bleNotify(bleDevice);
             }
         });
     }
@@ -145,8 +147,7 @@ public class LockBLEManager {
             @Override
             public void onRequestPermissionSuccess() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                        && !LockBLEUtils.checkGPSIsOpen(activity)) {
-
+                        && !BleUtil.checkGPSIsOpen(activity)) {
                     new GeneralDialog(activity)
                             .setTitle("提示")
                             .setMsg("为了更精确的扫描到Bluetooth LE设备, 请打开GPS定位")
@@ -222,6 +223,7 @@ public class LockBLEManager {
         // 开始搜索
         scannedBleDevices.forEach((key, value) -> {
             callbck.onScanning(value);
+            Log.d("scan cache", "name:"+value.getName() + " mac:" + value.getMac());
         });
 
         BleManager.getInstance().scan(new BleScanCallback() {
@@ -237,6 +239,8 @@ public class LockBLEManager {
             @Override
             public void onScanning(BleDevice bleDevice) {
                 if (bleDevice == null) return;
+                Log.d("scan ble", "name:"+bleDevice.getName() + " mac:" + bleDevice.getMac());
+
                 if (scannedBleDevices.get(bleDevice.getMac()) == null) {
                     scannedBleDevices.put(bleDevice.getMac(), bleDevice);
                     callbck.onScanning(bleDevice);

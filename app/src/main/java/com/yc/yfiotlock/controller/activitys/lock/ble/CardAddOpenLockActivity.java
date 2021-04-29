@@ -8,7 +8,6 @@ import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
 
@@ -45,9 +44,9 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         this.mcmd = LockBLEOpCmd.MCMD;
         this.scmd = LockBLEOpCmd.SCMD_ADD_CARD;
         byte[] bytes = LockBLEOpCmd.addCard(lockInfo.getKey(), LockBLEManager.GROUP_TYPE, number);
-        lockBleSend.send(mcmd, scmd, bytes);
+        lockBleSender.send(mcmd, scmd, bytes);
         VUiKit.postDelayed(15 * 1000, () -> {
-            if (!lockBleSend.isOpOver()) {
+            if (!lockBleSender.isOpOver()) {
                 mLoadingDialog.dismiss();
                 ToastCompat.show(getContext(), "操作失败");
                 finish();
@@ -67,7 +66,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
 
     @Override
     public void onBackPressed() {
-        if (!lockBleSend.isOpOver()) {
+        if (!lockBleSender.isOpOver()) {
             bleCancelDialog();
         } else {
             super.onBackPressed();

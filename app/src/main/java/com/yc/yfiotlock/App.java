@@ -11,10 +11,12 @@ import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
+import com.kk.utils.LogUtil;
 import com.kk.utils.VUiKit;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.dao.AppDatabase;
 import com.yc.yfiotlock.helper.Reflection;
@@ -71,6 +73,9 @@ public class App extends Application {
         checkUpdate();
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "lock").build();
+
+        byte[] bytes = LockBLEUtil.encrypt("12345678", new byte[]{ (byte)0xbd, (byte)0x33, (byte)0x4f, (byte)0x1d, (byte)0x6e, (byte)0x45, (byte)0xf2, (byte)0x5f, (byte)0xf7, (byte)0x12, (byte)0xa2, (byte)0x14, (byte)0x57, (byte)0x1f, (byte)0xa5, (byte)0xcc });
+        LogUtil.msg("#################"+LockBLEUtil.toHexString(bytes));
     }
 
 

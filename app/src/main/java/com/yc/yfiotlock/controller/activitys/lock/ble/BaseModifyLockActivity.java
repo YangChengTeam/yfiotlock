@@ -60,21 +60,21 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         }
 
+        setInfo();
+
         RxView.clicks(commitBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (nameEt.length() < 2) {
+            if (nameEt.length() < 2 && nameEt.length() <= 12) {
                 ToastUtil.toast2(getContext(), "名称长度不能少于2位");
                 return;
             }
             localEdit();
         });
 
-        setInfo();
-
         nameEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    if (nameEt.length() < 2) {
+                    if (nameEt.length() < 2 && nameEt.length() < 16) {
                         ToastUtil.toast2(getContext(), "名称长度不能少于2位");
                         return false;
                     }

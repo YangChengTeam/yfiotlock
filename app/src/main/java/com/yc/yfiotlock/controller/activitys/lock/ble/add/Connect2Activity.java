@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
@@ -35,7 +35,7 @@ public class Connect2Activity extends BaseConnectActivity {
     LinearLayout mLlConnectWifi;
 
     private ValueAnimator valueAnimator;
-    private LockBLESend cancelSend;
+    private LockBLESender cancelSend;
 
     @Override
     protected int getLayoutId() {
@@ -45,7 +45,7 @@ public class Connect2Activity extends BaseConnectActivity {
     @Override
     protected void initVars() {
         super.initVars();
-        cancelSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
+        cancelSend = new LockBLESender(this, bleDevice, lockInfo.getKey());
     }
 
     @Override
@@ -114,20 +114,20 @@ public class Connect2Activity extends BaseConnectActivity {
 
 
     private void bleBindWifi() {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             String ssid = getIntent().getStringExtra("ssid");
             String pwd = getIntent().getStringExtra("pwd");
             valueAnimator.start();
             showConnectingUi();
             byte[] cmdBytes = LockBLESettingCmd.wiftDistributionNetwork(lockInfo.getKey(), ssid, pwd);
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK, cmdBytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK, cmdBytes);
         }
     }
 
 
     @Override
     public void onBackPressed() {
-        if (!lockBleSend.isOpOver()) {
+        if (!lockBleSender.isOpOver()) {
             bleCancelDialog();
         } else {
             super.onBackPressed();
@@ -161,7 +161,7 @@ public class Connect2Activity extends BaseConnectActivity {
             showConnectedUi();
             bleGetAliDeviceName();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
-            lockBleSend.setOpOver(true);
+            lockBleSender.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();
         }
@@ -171,12 +171,12 @@ public class Connect2Activity extends BaseConnectActivity {
     public void onNotifyFailure(LockBLEData lockBLEData) {
         super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK) {
-            lockBleSend.setOpOver(true);
+            lockBleSender.setOpOver(true);
             mLoadingDialog.dismiss();
             valueAnimator.end();
             nav2fail();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
-            lockBleSend.setOpOver(true);
+            lockBleSender.setOpOver(true);
             valueAnimator.end();
             valueAnimator.cancel();
             mLoadingDialog.dismiss();

@@ -12,7 +12,7 @@ import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
@@ -48,17 +48,16 @@ import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 import rx.functions.Action1;
 
-public class LockSettingActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
+public class LockSettingActivity extends BaseBackActivity implements LockBLESender.NotifyCallback {
     @BindView(R.id.rv_setting)
     RecyclerView mRvSetting;
 
     private SettingAdapter mSettingAdapter;
 
-    private LockBLESend lockBleSend;
+    private LockBLESender lockBleSender;
     private DeviceInfo lockInfo;
     private DeviceEngin deviceEngin;
     private DeviceDao deviceDao;
@@ -79,7 +78,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
         super.initVars();
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
         bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
+        lockBleSender = new LockBLESender(this, bleDevice, lockInfo.getKey());
         deviceEngin = new DeviceEngin(this);
         deviceDao = App.getApp().getDb().deviceDao();
     }
@@ -117,9 +116,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     }
 
     private void bleSetVolume(int volume) {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             byte[] bytes = LockBLESettingCmd.changeVolume(lockInfo.getKey(), volume);
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHANGE_VOLUME, bytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHANGE_VOLUME, bytes);
         }
     }
 
@@ -174,22 +173,23 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     }
 
     private void bleGetVersion() {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             byte[] bytes = LockBLESettingCmd.getVersion(lockInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_VERSION, bytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_VERSION, bytes);
         }
     }
 
     private void bleReset() {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             mLoadingDialog.show("删除设备中...");
             byte[] bytes = LockBLESettingCmd.reset(lockInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_RESET, bytes);
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(DeviceInfo deviceInfo) {
+        updateInfo = DeviceDownloadManager.getInstance().getUpdateInfo();
         loadData();
     }
 
@@ -296,18 +296,18 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     @Override
     protected void onResume() {
         super.onResume();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(this);
-            lockBleSend.registerNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(this);
+            lockBleSender.registerNotify();
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(null);
-            lockBleSend.unregisterNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(null);
+            lockBleSender.unregisterNotify();
         }
     }
 

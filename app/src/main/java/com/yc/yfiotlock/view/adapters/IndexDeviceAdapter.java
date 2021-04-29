@@ -45,4 +45,22 @@ public class IndexDeviceAdapter extends BaseExtendAdapter<DeviceInfo> {
             holder.setVisible(R.id.ll_default_add, false);
         }
     }
+
+    @Override
+    public void setNewInstance(@Nullable List<DeviceInfo> list) {
+        if(list != null){
+            boolean isNeedAdd = true;
+            if(list.size() > 0){
+                if(list.get(list.size() - 1).getId() > 0){
+                    isNeedAdd = true;
+                } else {
+                    isNeedAdd = false;
+                }
+            }
+            if(isNeedAdd){
+                list.add(new DeviceInfo());
+            }
+        }
+        super.setNewInstance(list);
+    }
 }

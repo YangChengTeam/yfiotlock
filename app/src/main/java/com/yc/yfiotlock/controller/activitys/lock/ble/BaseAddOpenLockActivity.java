@@ -6,7 +6,7 @@ import android.app.Dialog;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
@@ -30,13 +30,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class BaseAddOpenLockActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
+public abstract class BaseAddOpenLockActivity extends BaseBackActivity implements LockBLESender.NotifyCallback {
 
     protected OpenLockDao openLockDao;
     protected LockEngine lockEngine;
     protected DeviceInfo lockInfo;
-    protected LockBLESend lockBleSend;
-    protected LockBLESend cancelSend;
+    protected LockBLESender lockBleSender;
+    protected LockBLESender cancelSend;
     protected byte mcmd;
     protected byte scmd;
 
@@ -59,11 +59,11 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
 
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
-        lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
+        lockBleSender = new LockBLESender(this, bleDevice, lockInfo.getKey());
         Random rand = new Random();
         number = (10000000 + rand.nextInt(90000000)) + "";
 
-        cancelSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
+        cancelSend = new LockBLESender(this, bleDevice, lockInfo.getKey());
 
         key = "locker_count_" + lockInfo.getId() + groupType;
     }
@@ -111,8 +111,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     @Override
     protected void onResume() {
         super.onResume();
-        lockBleSend.setNotifyCallback(this);
-        lockBleSend.registerNotify();
+        lockBleSender.setNotifyCallback(this);
+        lockBleSender.registerNotify();
         cancelSend.setNotifyCallback(this);
         cancelSend.registerNotify();
     }
@@ -120,8 +120,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     @Override
     protected void onStop() {
         super.onStop();
-        lockBleSend.setNotifyCallback(null);
-        lockBleSend.unregisterNotify();
+        lockBleSender.setNotifyCallback(null);
+        lockBleSender.unregisterNotify();
         cancelSend.setNotifyCallback(null);
         cancelSend.unregisterNotify();
     }
@@ -162,7 +162,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                 }
             }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
-            lockBleSend.setOpOver(true);
+            lockBleSender.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();
         }
@@ -171,7 +171,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
-            lockBleSend.setOpOver(true);
+            lockBleSender.setOpOver(true);
             mLoadingDialog.dismiss();
             finish();
         }

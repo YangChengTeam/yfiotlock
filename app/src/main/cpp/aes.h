@@ -1,11 +1,8 @@
 #ifndef _AES_H_
 #define _AES_H_
 
-#include <android/log.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <jni.h>
-#include "b64.h"
 
 // #define the macros below to 1/0 to enable/disable the mode of operation.
 //
@@ -19,9 +16,6 @@
 
 #ifndef ECB
 #define ECB 1
-#endif
-#ifndef LOGE
-#define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,"fyble",__VA_ARGS__)
 #endif
 
 static const unsigned char HEX[16] = {0x10, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,

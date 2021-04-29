@@ -12,24 +12,21 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.listeners.Callback;
 import com.kk.securityhttp.net.entry.Response;
-import com.kk.utils.LogUtil;
 import com.kk.utils.ScreenUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
-import com.yc.yfiotlock.controller.activitys.lock.ble.SafePwdCreateActivity;
-import com.yc.yfiotlock.controller.activitys.lock.ble.add.ScanDeviceActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.activitys.lock.ble.MyFamilyActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.SafePwdCreateActivity;
+import com.yc.yfiotlock.controller.activitys.lock.ble.add.ScanDeviceActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
-import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
-import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
 import com.yc.yfiotlock.offline.OfflineManager;
@@ -232,8 +229,6 @@ public class IndexFragment extends BaseFragment {
 
                     @Override
                     public void onComplete() {
-                        lastDeviceInfos.add(new DeviceInfo());
-
                         indexDeviceAdapter.setNewInstance(lastDeviceInfos);
                         indexInfo.setDeviceInfos(lastDeviceInfos);
                         CacheUtil.setCache(Config.INDEX_DETAIL_URL, indexInfo);

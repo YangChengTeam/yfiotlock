@@ -218,7 +218,9 @@ public abstract class BleScanPresenter implements BluetoothAdapter.LeScanCallbac
 
     public final void removeHandlerMsg() {
         mMainHandler.removeCallbacksAndMessages(null);
-        mHandler.removeCallbacksAndMessages(null);
+        if(mHandler != null){
+            mHandler.removeCallbacksAndMessages(null);
+        }
     }
 
     public abstract void onScanStarted(boolean success);

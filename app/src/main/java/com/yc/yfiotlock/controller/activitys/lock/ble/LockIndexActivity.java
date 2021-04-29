@@ -1,8 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorEvent;
 import android.os.Vibrator;
@@ -21,9 +19,8 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
-import com.yc.yfiotlock.ble.LockBLEUtils;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
@@ -32,10 +29,12 @@ import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.CloudHelper;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.sensor.ShakeSensor;
-import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
+import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
+import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
+import com.yc.yfiotlock.model.bean.eventbus.SyncTimeEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
@@ -43,6 +42,7 @@ import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
+import com.yc.yfiotlock.utils.BleUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -50,13 +50,14 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import rx.functions.Action1;
 
-public class LockIndexActivity extends BaseActivity implements LockBLESend.NotifyCallback {
+public class LockIndexActivity extends BaseActivity implements LockBLESender.NotifyCallback {
     @BindView(R.id.iv_back)
     View backBtn;
     @BindView(R.id.iv_setting)
@@ -91,8 +92,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     private DeviceEngin deviceEngin;
     private FamilyInfo familyInfo;
     private DeviceInfo lockInfo;
-    private LockBLESend lockBleSend;
-
+    private LockBLESender lockBleSender;
+    private LockBLESender syncTimeBlesender;
 
     private CloudHelper cloudHelper;
 
@@ -110,8 +111,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         return familyInfo;
     }
 
-    public LockBLESend getLockBleSend() {
-        return lockBleSend;
+    public LockBLESender getLockBleSender() {
+        return lockBleSender;
     }
 
     private static WeakReference<LockIndexActivity> mInstance;
@@ -144,6 +145,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         deviceEngin = new DeviceEngin(this);
         lockEngine = new LockEngine(this);
         cloudHelper = new CloudHelper(this);
+        syncTimeBlesender = new LockBLESender(this, bleDevice, lockInfo.getKey());
     }
 
     /**
@@ -165,7 +167,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 initSends();
                 setConnectedInfo();
-                bleSynctime();
+                bleSynctime(true);
             }
         }
 
@@ -262,24 +264,37 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     }
 
     private void initSends() {
-        if (lockBleSend == null) {
-            lockBleSend = new LockBLESend(this, bleDevice, lockInfo.getKey());
-            lockBleSend.registerNotify();
-            lockBleSend.setNotifyCallback(this);
+        if (lockBleSender == null) {
+            lockBleSender = new LockBLESender(this, bleDevice, lockInfo.getKey());
+            lockBleSender.registerNotify();
+            lockBleSender.setNotifyCallback(this);
         }
+
+
     }
 
     private void registerNotify() {
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(this);
-            lockBleSend.registerNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(this);
+            lockBleSender.registerNotify();
         }
+
+        if (syncTimeBlesender != null) {
+            syncTimeBlesender.registerNotify();
+            syncTimeBlesender.setNotifyCallback(this);
+        }
+
     }
 
     private void unregisterNotify() {
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(null);
-            lockBleSend.unregisterNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(null);
+            lockBleSender.unregisterNotify();
+        }
+
+        if (syncTimeBlesender != null) {
+            syncTimeBlesender.setNotifyCallback(null);
+            syncTimeBlesender.unregisterNotify();
         }
     }
 
@@ -309,8 +324,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     protected void onDestroy() {
         super.onDestroy();
 
-        if (lockBleSend != null) {
-            lockBleSend.clear();
+        if (lockBleSender != null) {
+            lockBleSender.clear();
         }
 
         if (lockEngine != null) {
@@ -321,7 +336,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         }
 
         stopAnimations();
-
 
         LogUtil.msg("已清理");
     }
@@ -350,8 +364,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         statusTitleTv.setText("正在开锁...");
         startAnimations();
 
-        if (lockBleSend != null) {
-            lockBleSend.send(LockBLEOpCmd.MCMD, LockBLEOpCmd.SCMD_OPEN, LockBLEOpCmd.open(lockInfo.getKey()));
+        if (lockBleSender != null) {
+            lockBleSender.send(LockBLEOpCmd.MCMD, LockBLEOpCmd.SCMD_OPEN, LockBLEOpCmd.open(lockInfo.getKey()));
         }
     }
 
@@ -454,14 +468,14 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
     }
 
     // 同步时间
-    protected void bleSynctime() {
-        if (lockBleSend != null) {
+    protected void bleSynctime(boolean wakup) {
+        if (syncTimeBlesender != null) {
             deviceEngin.getTime().subscribe(new Action1<ResultInfo<TimeInfo>>() {
                 @Override
                 public void call(ResultInfo<TimeInfo> info) {
                     if (info != null && info.getCode() == 1 && info.getData() != null) {
                         byte[] cmdBytes = LockBLESettingCmd.syncTime(lockInfo.getKey(), info.getData().getTime());
-                        lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SYNC_TIME, cmdBytes);
+                        syncTimeBlesender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SYNC_TIME, cmdBytes, wakup);
                     }
                 }
             });
@@ -470,9 +484,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
 
     // 设置key
     protected void bleSetkey(String oldKey, String newKey) {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             byte[] bytes = LockBLESettingCmd.setAesKey(oldKey, newKey);
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes);
         }
     }
 
@@ -556,6 +570,14 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         this.bleDevice = bleDevice;
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNotify(BleNotifyEvent bleNotifyEvent) {
+        if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
+            bleSynctime(true);
+        }
+    }
+
     // 开门方式数量
     private void loadLockOpenCountInfo() {
         setCountInfo();
@@ -578,7 +600,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
         super.onActivityResult(requestCode, resultCode, data);
         // GPS授权回调
         if (requestCode == LockBLEManager.REQUEST_GPS) {
-            if (LockBLEUtils.checkGPSIsOpen(this)) {
+            if (BleUtil.checkGPSIsOpen(this)) {
                 scan();
             }
         }
@@ -603,6 +625,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             });
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
             LogUtil.msg("同步时间成功");
+            bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
+            LogUtil.msg("设置密钥成功");
         }
     }
 
@@ -618,6 +643,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESend.Notif
             }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
             LogUtil.msg("同步时间失败");
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
+            LogUtil.msg("设置密钥失败");
         }
     }
 }

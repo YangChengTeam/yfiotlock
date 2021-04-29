@@ -6,12 +6,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLESend;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
@@ -24,6 +25,7 @@ import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.view.widgets.CircularProgressBar;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -36,7 +38,7 @@ import java.util.Arrays;
 
 import butterknife.BindView;
 
-public class FirmwareUpdateNextActivity extends BaseBackActivity implements LockBLESend.NotifyCallback {
+public class FirmwareUpdateNextActivity extends BaseBackActivity implements LockBLESender.NotifyCallback {
     @BindView(R.id.fl_process)
     View processView;
     @BindView(R.id.ll_update_success)
@@ -62,15 +64,21 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     @BindView(R.id.tv_desp)
     TextView despTv;
 
+    @BindView(R.id.ll_update_desc)
+    View updateDescView;
+
     @BindView(R.id.stv_update)
     SuperTextView updateBtn;
 
+    private int count = 0;
+
     private UpdateInfo updateInfo;
     private DeviceInfo deviceInfo;
-    private LockBLESend lockBleSend;
+    private LockBLESender lockBleSender;
     private FileInputStream in;
     private int packageCount;
     private static final int DATA_LENGTH = 200;
+    private boolean isUpdating = false;
 
     @Override
     protected int getLayoutId() {
@@ -82,7 +90,8 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         super.initVars();
         deviceInfo = LockIndexActivity.getInstance().getLockInfo();
         updateInfo = (UpdateInfo) getIntent().getSerializableExtra("updateInfo");
-        lockBleSend = new LockBLESend(this, LockIndexActivity.getInstance().getBleDevice(), deviceInfo.getKey());
+        BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
+        lockBleSender = new LockBLESender(this, bleDevice, deviceInfo.getKey());
         DeviceDownloadManager.getInstance().init(new WeakReference<>(this));
     }
 
@@ -117,6 +126,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         processView.setVisibility(View.VISIBLE);
         installView.setVisibility(View.GONE);
         updateSuccessView.setVisibility(View.GONE);
+        updateBtn.setVisibility(View.GONE);
         if (updateInfo.getProgress() == 100) {
             processDespTv.setText("等待安装");
             if (!LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
@@ -130,64 +140,57 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     @Override
     protected void onResume() {
         super.onResume();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(this);
-            lockBleSend.registerNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(this);
+            lockBleSender.registerNotify();
         }
 
-        if (DeviceDownloadManager.getInstance().isDownloading()) {
-            processDespTv.setText("下载中");
-            updateBtn.setVisibility(View.GONE);
-        } else {
-            processDespTv.setText("等待下载");
-            updateBtn.setVisibility(View.VISIBLE);
+        if(!isUpdating){
+            if (DeviceDownloadManager.getInstance().isDownloading()) {
+                processDespTv.setText("下载中");
+                updateBtn.setVisibility(View.GONE);
+            } else {
+                processDespTv.setText("等待下载");
+                updateBtn.setVisibility(View.VISIBLE);
+            }
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (lockBleSend != null) {
-            lockBleSend.setNotifyCallback(null);
-            lockBleSend.unregisterNotify();
+        if (lockBleSender != null) {
+            lockBleSender.setNotifyCallback(null);
+            lockBleSender.unregisterNotify();
         }
+
         clear();
     }
 
     private void bleOpenUpdate() {
-        if (lockBleSend != null) {
+        if (lockBleSender != null) {
             byte[] bytes = LockBLESettingCmd.openUpdate(deviceInfo.getKey());
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_OPEN_UPDATE, bytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_OPEN_UPDATE, bytes);
         }
     }
 
     private void bleUpdate(byte[] datas) {
-        if (lockBleSend != null) {
-            byte[] bytes = LockBLESettingCmd.update(deviceInfo.getKey(), datas, (byte) (packageCount--));
-            lockBleSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_UPDATE, bytes);
+        if (lockBleSender != null) {
+            packageCount -= 1;
+            byte[] bytes = LockBLESettingCmd.update(deviceInfo.getKey(), datas, (byte) (packageCount));
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_UPDATE, bytes, false);
         }
     }
 
     @Override
     public void onBackPressed() {
         if (LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice()) && updateSuccessView.getVisibility() != View.VISIBLE) {
-            cancelDialog();
+            ToastCompat.show(this, "正在升级中, 请谨慎操作, 切勿退出当前界面?");
         } else {
             super.onBackPressed();
         }
     }
 
-    private void cancelDialog() {
-        GeneralDialog generalDialog = new GeneralDialog(getContext());
-        generalDialog.setTitle("温馨提示");
-        generalDialog.setMsg("固件升级中, 是否取消?");
-        generalDialog.setOnPositiveClickListener(dialog -> {
-            VUiKit.postDelayed(300, () -> {
-                super.onBackPressed();
-            });
-        });
-        generalDialog.show();
-    }
 
     private void reOpenUpdate() {
         GeneralDialog generalDialog = new GeneralDialog(getContext());
@@ -215,7 +218,8 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             File file = DeviceDownloadManager.getInstance().getFile();
             in = new FileInputStream(file);
             int dlen = DATA_LENGTH;
-            packageCount = file.length() / dlen + (file.length() % dlen) > 0 ? 1 : 0;
+            packageCount = (int) (file.length() / dlen) + ((file.length() % dlen) > 0 ? 1 : 0);
+            LogUtil.msg("文件大小:" + file.length() + " 包数量:" + packageCount);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -227,7 +231,9 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         int len;
         try {
             len = in.read(buffer);
-            bleUpdate(Arrays.copyOfRange(buffer, 0, len));
+            VUiKit.postDelayed(30, () -> {
+                bleUpdate(Arrays.copyOfRange(buffer, 0, len));
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -248,20 +254,38 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_OPEN_UPDATE) {
-            processView.setVisibility(View.GONE);
-            updateSuccessView.setVisibility(View.GONE);
-            installView.setVisibility(View.VISIBLE);
-            AnimatinUtil.rotate(installIv);
-            initBleUpdate();
-            bleUpdate();
+            count++;
+            if(count == 2){
+                count = 0;
+                processView.setVisibility(View.GONE);
+                updateSuccessView.setVisibility(View.GONE);
+                installView.setVisibility(View.VISIBLE);
+                AnimatinUtil.rotate(installIv);
+                initBleUpdate();
+                bleUpdate();
+                isUpdating = true;
+            } else {
+                bleOpenUpdate();
+            }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_UPDATE) {
             bleUpdate();
         } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_UPDATE_SUCCESS) {
             processView.setVisibility(View.GONE);
             installView.setVisibility(View.GONE);
+            updateBtn.setVisibility(View.GONE);
+            updateDescView.setVisibility(View.GONE);
             updateSuccessView.setVisibility(View.VISIBLE);
+            newVersionTv.setText("当前已是最新版本");
+            updateVersionTv.setText("当前版本：" + updateInfo.getVersion());
             clear();
+            updateInfo.setUpgrade(false);
+            DeviceDownloadManager.getInstance().setUpdateInfo(updateInfo);
             CacheUtil.setCache("firmwareVersion", updateInfo.getVersion());
+            EventBus.getDefault().post(deviceInfo);
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
+            lockBleSender.setOpOver(true);
+            mLoadingDialog.dismiss();
+            finish();
         }
     }
 
@@ -270,6 +294,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_OPEN_UPDATE) {
             reOpenUpdate();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_UPDATE) {
+            isUpdating = false;
             reUpdate();
         }
     }
