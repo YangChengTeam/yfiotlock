@@ -26,6 +26,7 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 /*****************************************************************************/
 
 #include "aes.h"
+#include <string.h>
 
 /*****************************************************************************/
 /* Defines:                                                                  */
@@ -178,148 +179,148 @@ static const uint8_t Rcon[255] = {
 /* Private functions:                                                        */
 /*****************************************************************************/
 static uint8_t getSBoxValue(uint8_t num) {
-  return sbox[num];
+    return sbox[num];
 }
 
 static uint8_t getSBoxInvert(uint8_t num) {
-  return rsbox[num];
+    return rsbox[num];
 }
 
 // This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states.
 static void KeyExpansion(void) {
-  uint32_t i, j, k;
-  uint8_t tempa[4]; // Used for the column/row operations
+    uint32_t i, j, k;
+    uint8_t tempa[4]; // Used for the column/row operations
 
-  // The first round key is the key itself.
-  for (i = 0; i < Nk; ++i) {
-    RoundKey[(i * 4) + 0] = Key[(i * 4) + 0];
-    RoundKey[(i * 4) + 1] = Key[(i * 4) + 1];
-    RoundKey[(i * 4) + 2] = Key[(i * 4) + 2];
-    RoundKey[(i * 4) + 3] = Key[(i * 4) + 3];
-  }
-
-  // All other round keys are found from the previous round keys.
-  for (; (i < (Nb * (Nr + 1))); ++i) {
-    for (j = 0; j < 4; ++j) {
-      tempa[j] = RoundKey[(i - 1) * 4 + j];
+    // The first round key is the key itself.
+    for (i = 0; i < Nk; ++i) {
+        RoundKey[(i * 4) + 0] = Key[(i * 4) + 0];
+        RoundKey[(i * 4) + 1] = Key[(i * 4) + 1];
+        RoundKey[(i * 4) + 2] = Key[(i * 4) + 2];
+        RoundKey[(i * 4) + 3] = Key[(i * 4) + 3];
     }
-    if (i % Nk == 0) {
-      // This function rotates the 4 bytes in a word to the left once.
-      // [a0,a1,a2,a3] becomes [a1,a2,a3,a0]
 
-      // Function RotWord()
-      {
-        k = tempa[0];
-        tempa[0] = tempa[1];
-        tempa[1] = tempa[2];
-        tempa[2] = tempa[3];
-        tempa[3] = k;
-      }
+    // All other round keys are found from the previous round keys.
+    for (; (i < (Nb * (Nr + 1))); ++i) {
+        for (j = 0; j < 4; ++j) {
+            tempa[j] = RoundKey[(i - 1) * 4 + j];
+        }
+        if (i % Nk == 0) {
+            // This function rotates the 4 bytes in a word to the left once.
+            // [a0,a1,a2,a3] becomes [a1,a2,a3,a0]
 
-      // SubWord() is a function that takes a four-byte input word and
-      // applies the S-box to each of the four bytes to produce an output word.
+            // Function RotWord()
+            {
+                k = tempa[0];
+                tempa[0] = tempa[1];
+                tempa[1] = tempa[2];
+                tempa[2] = tempa[3];
+                tempa[3] = k;
+            }
 
-      // Function Subword()
-      {
-        tempa[0] = getSBoxValue(tempa[0]);
-        tempa[1] = getSBoxValue(tempa[1]);
-        tempa[2] = getSBoxValue(tempa[2]);
-        tempa[3] = getSBoxValue(tempa[3]);
-      }
+            // SubWord() is a function that takes a four-byte input word and
+            // applies the S-box to each of the four bytes to produce an output word.
 
-      tempa[0] = tempa[0] ^ Rcon[i / Nk];
-    } else if (Nk > 6 && i % Nk == 4) {
-      // Function Subword()
-      {
-        tempa[0] = getSBoxValue(tempa[0]);
-        tempa[1] = getSBoxValue(tempa[1]);
-        tempa[2] = getSBoxValue(tempa[2]);
-        tempa[3] = getSBoxValue(tempa[3]);
-      }
+            // Function Subword()
+            {
+                tempa[0] = getSBoxValue(tempa[0]);
+                tempa[1] = getSBoxValue(tempa[1]);
+                tempa[2] = getSBoxValue(tempa[2]);
+                tempa[3] = getSBoxValue(tempa[3]);
+            }
+
+            tempa[0] = tempa[0] ^ Rcon[i / Nk];
+        } else if (Nk > 6 && i % Nk == 4) {
+            // Function Subword()
+            {
+                tempa[0] = getSBoxValue(tempa[0]);
+                tempa[1] = getSBoxValue(tempa[1]);
+                tempa[2] = getSBoxValue(tempa[2]);
+                tempa[3] = getSBoxValue(tempa[3]);
+            }
+        }
+        RoundKey[i * 4 + 0] = RoundKey[(i - Nk) * 4 + 0] ^ tempa[0];
+        RoundKey[i * 4 + 1] = RoundKey[(i - Nk) * 4 + 1] ^ tempa[1];
+        RoundKey[i * 4 + 2] = RoundKey[(i - Nk) * 4 + 2] ^ tempa[2];
+        RoundKey[i * 4 + 3] = RoundKey[(i - Nk) * 4 + 3] ^ tempa[3];
     }
-    RoundKey[i * 4 + 0] = RoundKey[(i - Nk) * 4 + 0] ^ tempa[0];
-    RoundKey[i * 4 + 1] = RoundKey[(i - Nk) * 4 + 1] ^ tempa[1];
-    RoundKey[i * 4 + 2] = RoundKey[(i - Nk) * 4 + 2] ^ tempa[2];
-    RoundKey[i * 4 + 3] = RoundKey[(i - Nk) * 4 + 3] ^ tempa[3];
-  }
 }
 
 // This function adds the round key to state.
 // The round key is added to the state by an XOR function.
 static void AddRoundKey(uint8_t round) {
-  uint8_t i, j;
-  for (i = 0; i < 4; ++i) {
-    for (j = 0; j < 4; ++j) {
-      (*state)[i][j] ^= RoundKey[round * Nb * 4 + i * Nb + j];
+    uint8_t i, j;
+    for (i = 0; i < 4; ++i) {
+        for (j = 0; j < 4; ++j) {
+            (*state)[i][j] ^= RoundKey[round * Nb * 4 + i * Nb + j];
+        }
     }
-  }
 }
 
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
 static void SubBytes(void) {
-  uint8_t i, j;
-  for (i = 0; i < 4; ++i) {
-    for (j = 0; j < 4; ++j) {
-      (*state)[j][i] = getSBoxValue((*state)[j][i]);
+    uint8_t i, j;
+    for (i = 0; i < 4; ++i) {
+        for (j = 0; j < 4; ++j) {
+            (*state)[j][i] = getSBoxValue((*state)[j][i]);
+        }
     }
-  }
 }
 
 // The ShiftRows() function shifts the rows in the state to the left.
 // Each row is shifted with different offset.
 // Offset = Row number. So the first row is not shifted.
 static void ShiftRows(void) {
-  uint8_t temp;
+    uint8_t temp;
 
-  // Rotate first row 1 columns to left
-  temp = (*state)[0][1];
-  (*state)[0][1] = (*state)[1][1];
-  (*state)[1][1] = (*state)[2][1];
-  (*state)[2][1] = (*state)[3][1];
-  (*state)[3][1] = temp;
+    // Rotate first row 1 columns to left
+    temp = (*state)[0][1];
+    (*state)[0][1] = (*state)[1][1];
+    (*state)[1][1] = (*state)[2][1];
+    (*state)[2][1] = (*state)[3][1];
+    (*state)[3][1] = temp;
 
-  // Rotate second row 2 columns to left
-  temp = (*state)[0][2];
-  (*state)[0][2] = (*state)[2][2];
-  (*state)[2][2] = temp;
+    // Rotate second row 2 columns to left
+    temp = (*state)[0][2];
+    (*state)[0][2] = (*state)[2][2];
+    (*state)[2][2] = temp;
 
-  temp = (*state)[1][2];
-  (*state)[1][2] = (*state)[3][2];
-  (*state)[3][2] = temp;
+    temp = (*state)[1][2];
+    (*state)[1][2] = (*state)[3][2];
+    (*state)[3][2] = temp;
 
-  // Rotate third row 3 columns to left
-  temp = (*state)[0][3];
-  (*state)[0][3] = (*state)[3][3];
-  (*state)[3][3] = (*state)[2][3];
-  (*state)[2][3] = (*state)[1][3];
-  (*state)[1][3] = temp;
+    // Rotate third row 3 columns to left
+    temp = (*state)[0][3];
+    (*state)[0][3] = (*state)[3][3];
+    (*state)[3][3] = (*state)[2][3];
+    (*state)[2][3] = (*state)[1][3];
+    (*state)[1][3] = temp;
 }
 
 static uint8_t xtime(uint8_t x) {
-  return ((x << 1) ^ (((x >> 7) & 1) * 0x1b));
+    return ((x << 1) ^ (((x >> 7) & 1) * 0x1b));
 }
 
 // MixColumns function mixes the columns of the state matrix
 static void MixColumns(void) {
-  uint8_t i;
-  uint8_t Tmp, Tm, t;
-  for (i = 0; i < 4; ++i) {
-    t = (*state)[i][0];
-    Tmp = (*state)[i][0] ^ (*state)[i][1] ^ (*state)[i][2] ^ (*state)[i][3];
-    Tm = (*state)[i][0] ^ (*state)[i][1];
-    Tm = xtime(Tm);
-    (*state)[i][0] ^= Tm ^ Tmp;
-    Tm = (*state)[i][1] ^ (*state)[i][2];
-    Tm = xtime(Tm);
-    (*state)[i][1] ^= Tm ^ Tmp;
-    Tm = (*state)[i][2] ^ (*state)[i][3];
-    Tm = xtime(Tm);
-    (*state)[i][2] ^= Tm ^ Tmp;
-    Tm = (*state)[i][3] ^ t;
-    Tm = xtime(Tm);
-    (*state)[i][3] ^= Tm ^ Tmp;
-  }
+    uint8_t i;
+    uint8_t Tmp, Tm, t;
+    for (i = 0; i < 4; ++i) {
+        t = (*state)[i][0];
+        Tmp = (*state)[i][0] ^ (*state)[i][1] ^ (*state)[i][2] ^ (*state)[i][3];
+        Tm = (*state)[i][0] ^ (*state)[i][1];
+        Tm = xtime(Tm);
+        (*state)[i][0] ^= Tm ^ Tmp;
+        Tm = (*state)[i][1] ^ (*state)[i][2];
+        Tm = xtime(Tm);
+        (*state)[i][1] ^= Tm ^ Tmp;
+        Tm = (*state)[i][2] ^ (*state)[i][3];
+        Tm = xtime(Tm);
+        (*state)[i][2] ^= Tm ^ Tmp;
+        Tm = (*state)[i][3] ^ t;
+        Tm = xtime(Tm);
+        (*state)[i][3] ^= Tm ^ Tmp;
+    }
 }
 
 // Multiply is used to multiply numbers in the field GF(2^8)
@@ -346,117 +347,117 @@ static uint8_t Multiply(uint8_t x, uint8_t y)
 // The method used to multiply may be difficult to understand for the inexperienced.
 // Please use the references to gain more information.
 static void InvMixColumns(void) {
-  int i;
-  uint8_t a, b, c, d;
-  for (i = 0; i < 4; ++i) {
-    a = (*state)[i][0];
-    b = (*state)[i][1];
-    c = (*state)[i][2];
-    d = (*state)[i][3];
+    int i;
+    uint8_t a, b, c, d;
+    for (i = 0; i < 4; ++i) {
+        a = (*state)[i][0];
+        b = (*state)[i][1];
+        c = (*state)[i][2];
+        d = (*state)[i][3];
 
-    (*state)[i][0] =
-            Multiply(a, 0x0e) ^ Multiply(b, 0x0b) ^ Multiply(c, 0x0d) ^ Multiply(d, 0x09);
-    (*state)[i][1] =
-            Multiply(a, 0x09) ^ Multiply(b, 0x0e) ^ Multiply(c, 0x0b) ^ Multiply(d, 0x0d);
-    (*state)[i][2] =
-            Multiply(a, 0x0d) ^ Multiply(b, 0x09) ^ Multiply(c, 0x0e) ^ Multiply(d, 0x0b);
-    (*state)[i][3] =
-            Multiply(a, 0x0b) ^ Multiply(b, 0x0d) ^ Multiply(c, 0x09) ^ Multiply(d, 0x0e);
-  }
+        (*state)[i][0] =
+                Multiply(a, 0x0e) ^ Multiply(b, 0x0b) ^ Multiply(c, 0x0d) ^ Multiply(d, 0x09);
+        (*state)[i][1] =
+                Multiply(a, 0x09) ^ Multiply(b, 0x0e) ^ Multiply(c, 0x0b) ^ Multiply(d, 0x0d);
+        (*state)[i][2] =
+                Multiply(a, 0x0d) ^ Multiply(b, 0x09) ^ Multiply(c, 0x0e) ^ Multiply(d, 0x0b);
+        (*state)[i][3] =
+                Multiply(a, 0x0b) ^ Multiply(b, 0x0d) ^ Multiply(c, 0x09) ^ Multiply(d, 0x0e);
+    }
 }
 
 
 // The SubBytes Function Substitutes the values in the
 // state matrix with values in an S-box.
 static void InvSubBytes(void) {
-  uint8_t i, j;
-  for (i = 0; i < 4; ++i) {
-    for (j = 0; j < 4; ++j) {
-      (*state)[j][i] = getSBoxInvert((*state)[j][i]);
+    uint8_t i, j;
+    for (i = 0; i < 4; ++i) {
+        for (j = 0; j < 4; ++j) {
+            (*state)[j][i] = getSBoxInvert((*state)[j][i]);
+        }
     }
-  }
 }
 
 static void InvShiftRows(void) {
-  uint8_t temp;
+    uint8_t temp;
 
-  // Rotate first row 1 columns to right
-  temp = (*state)[3][1];
-  (*state)[3][1] = (*state)[2][1];
-  (*state)[2][1] = (*state)[1][1];
-  (*state)[1][1] = (*state)[0][1];
-  (*state)[0][1] = temp;
+    // Rotate first row 1 columns to right
+    temp = (*state)[3][1];
+    (*state)[3][1] = (*state)[2][1];
+    (*state)[2][1] = (*state)[1][1];
+    (*state)[1][1] = (*state)[0][1];
+    (*state)[0][1] = temp;
 
-  // Rotate second row 2 columns to right
-  temp = (*state)[0][2];
-  (*state)[0][2] = (*state)[2][2];
-  (*state)[2][2] = temp;
+    // Rotate second row 2 columns to right
+    temp = (*state)[0][2];
+    (*state)[0][2] = (*state)[2][2];
+    (*state)[2][2] = temp;
 
-  temp = (*state)[1][2];
-  (*state)[1][2] = (*state)[3][2];
-  (*state)[3][2] = temp;
+    temp = (*state)[1][2];
+    (*state)[1][2] = (*state)[3][2];
+    (*state)[3][2] = temp;
 
-  // Rotate third row 3 columns to right
-  temp = (*state)[0][3];
-  (*state)[0][3] = (*state)[1][3];
-  (*state)[1][3] = (*state)[2][3];
-  (*state)[2][3] = (*state)[3][3];
-  (*state)[3][3] = temp;
+    // Rotate third row 3 columns to right
+    temp = (*state)[0][3];
+    (*state)[0][3] = (*state)[1][3];
+    (*state)[1][3] = (*state)[2][3];
+    (*state)[2][3] = (*state)[3][3];
+    (*state)[3][3] = temp;
 }
 
 
 // Cipher is the main function that encrypts the PlainText.
 static void Cipher(void) {
-  uint8_t round = 0;
+    uint8_t round = 0;
 
-  // Add the First round key to the state before starting the rounds.
-  AddRoundKey(0);
+    // Add the First round key to the state before starting the rounds.
+    AddRoundKey(0);
 
-  // There will be Nr rounds.
-  // The first Nr-1 rounds are identical.
-  // These Nr-1 rounds are executed in the loop below.
-  for (round = 1; round < Nr; ++round) {
+    // There will be Nr rounds.
+    // The first Nr-1 rounds are identical.
+    // These Nr-1 rounds are executed in the loop below.
+    for (round = 1; round < Nr; ++round) {
+        SubBytes();
+        ShiftRows();
+        MixColumns();
+        AddRoundKey(round);
+    }
+
+    // The last round is given below.
+    // The MixColumns function is not here in the last round.
     SubBytes();
     ShiftRows();
-    MixColumns();
-    AddRoundKey(round);
-  }
-
-  // The last round is given below.
-  // The MixColumns function is not here in the last round.
-  SubBytes();
-  ShiftRows();
-  AddRoundKey(Nr);
+    AddRoundKey(Nr);
 }
 
 static void InvCipher(void) {
-  uint8_t round = 0;
+    uint8_t round = 0;
 
-  // Add the First round key to the state before starting the rounds.
-  AddRoundKey(Nr);
+    // Add the First round key to the state before starting the rounds.
+    AddRoundKey(Nr);
 
-  // There will be Nr rounds.
-  // The first Nr-1 rounds are identical.
-  // These Nr-1 rounds are executed in the loop below.
-  for (round = Nr - 1; round > 0; round--) {
+    // There will be Nr rounds.
+    // The first Nr-1 rounds are identical.
+    // These Nr-1 rounds are executed in the loop below.
+    for (round = Nr - 1; round > 0; round--) {
+        InvShiftRows();
+        InvSubBytes();
+        AddRoundKey(round);
+        InvMixColumns();
+    }
+
+    // The last round is given below.
+    // The MixColumns function is not here in the last round.
     InvShiftRows();
     InvSubBytes();
-    AddRoundKey(round);
-    InvMixColumns();
-  }
-
-  // The last round is given below.
-  // The MixColumns function is not here in the last round.
-  InvShiftRows();
-  InvSubBytes();
-  AddRoundKey(0);
+    AddRoundKey(0);
 }
 
 static void BlockCopy(uint8_t *output, uint8_t *input) {
-  uint8_t i;
-  for (i = 0; i < KEYLEN; ++i) {
-    output[i] = input[i];
-  }
+    uint8_t i;
+    for (i = 0; i < KEYLEN; ++i) {
+        output[i] = input[i];
+    }
 }
 
 
@@ -468,96 +469,106 @@ static void BlockCopy(uint8_t *output, uint8_t *input) {
 
 
 void AES128_ECB_encrypt(uint8_t *input, const uint8_t *key, uint8_t *output) {
-  // Copy input to output, and work in-memory on output
-  BlockCopy(output, input);
-  state = (state_t *) output;
+    // Copy input to output, and work in-memory on output
+    BlockCopy(output, input);
+    state = (state_t *) output;
 
-  Key = key;
-  KeyExpansion();
+    Key = key;
+    KeyExpansion();
 
-  // The next function call encrypts the PlainText with the Key using AES algorithm.
-  Cipher();
+    // The next function call encrypts the PlainText with the Key using AES algorithm.
+    Cipher();
 }
 
 void AES128_ECB_decrypt(uint8_t *input, const uint8_t *key, uint8_t *output) {
-  // Copy input to output, and work in-memory on output
-  BlockCopy(output, input);
-  state = (state_t *) output;
+    // Copy input to output, and work in-memory on output
+    BlockCopy(output, input);
+    state = (state_t *) output;
 
-  // The KeyExpansion routine must be called before encryption.
-  Key = key;
-  KeyExpansion();
+    // The KeyExpansion routine must be called before encryption.
+    Key = key;
+    KeyExpansion();
 
-  InvCipher();
+    InvCipher();
 }
 
 /**
  * 不定长加密,pkcs5padding
  */
-char *AES_128_ECB_PKCS5Padding_Encrypt(const char *in, const uint8_t *key) {
+char *AES_128_ECB_PKCS5Padding_Encrypt(const char *in, const uint8_t *skey) {
+    int BUFFER_SIZE = sizeof(skey) + 25;
+    uint8_t key[BUFFER_SIZE];
+    strcpy(key, skey);
+    strcat(key, "28aed2a6abf7158809cf4f3c");
+    key[BUFFER_SIZE - 1] = '\0';
+    int inLength = (int) strlen(in);//输入的长度
+    int remainder = inLength % 16;
+    uint8_t *paddingInput;
+    int paddingInputLengt = 0;
+    int group = inLength / 16;
+    int size = 16 * (group + 1);
+    paddingInput = (uint8_t *) malloc(size);
+    paddingInputLengt = size;
 
-  int inLength = (int) strlen(in);//输入的长度
-  int remainder = inLength % 16;
-  uint8_t *paddingInput;
-  int paddingInputLengt = 0;
-  int group = inLength / 16;
-  int size = 16 * (group + 1);
-  paddingInput = (uint8_t *) malloc(size);
-  paddingInputLengt = size;
-
-  int dif = size - inLength;
-  int i;
-  for (i = 0; i < size; i++) {
-    if (i < inLength) {
-      paddingInput[i] = in[i];
-    } else {
-      if (remainder == 0) {
-        //刚好是16倍数,就填充16个16
-        paddingInput[i] = HEX[0];
-      } else {    //如果不足16位 少多少位就补几个几  如：少4为就补4个4 以此类推
-        paddingInput[i] = HEX[dif];
-      }
+    int dif = size - inLength;
+    int i;
+    for (i = 0; i < size; i++) {
+        if (i < inLength) {
+            paddingInput[i] = in[i];
+        } else {
+            if (remainder == 0) {
+                //刚好是16倍数,就填充16个16
+                paddingInput[i] = HEX[0];
+            } else {    //如果不足16位 少多少位就补几个几  如：少4为就补4个4 以此类推
+                paddingInput[i] = HEX[dif];
+            }
+        }
     }
-  }
 
-  int count = paddingInputLengt / 16;
-  //开始分段加密
-  char *out = (char *) malloc(paddingInputLengt);
-  for (i = 0; i < count; ++i) {
-    AES128_ECB_encrypt(paddingInput + i * 16, key, out + i * 16);
-  }
+    int count = paddingInputLengt / 16;
+    //开始分段加密
+    char *out = (char *) malloc(paddingInputLengt);
+    for (i = 0; i < count; ++i) {
+        AES128_ECB_encrypt(paddingInput + i * 16, key, out + i * 16);
+    }
 
-  free(paddingInput);
-  return out;
+    free(paddingInput);
+    return out;
 }
 
 
 /**
  * 不定长解密,pkcs5padding
  */
-char *AES_128_ECB_PKCS5Padding_Decrypt(const char *in, const uint8_t *key) {
-  const size_t inputLength = strlen(in);
-  uint8_t *out = malloc(inputLength);
-  memset(out, 0, inputLength);
-  size_t count = inputLength / 16;
-  if (count <= 0) {
-    count = 1;
-  }
-  size_t i;
-  for (i = 0; i < count; ++i) {
-    AES128_ECB_decrypt(in + i * 16, key, out + i * 16);
-  }
+char *AES_128_ECB_PKCS5Padding_Decrypt(const char *in, const uint8_t *skey) {
+    int BUFFER_SIZE = sizeof(skey) + 25;
+    uint8_t key[BUFFER_SIZE];
+    strcpy(key, skey);
+    strcat(key, "28aed2a6abf7158809cf4f3c");
+    key[BUFFER_SIZE - 1] = '\0';
+    const size_t inputLength = strlen(in);
+    uint8_t *out = malloc(inputLength);
+    memset(out, 0, inputLength);
+    size_t count = inputLength / 16;
+    if (count <= 0) {
+        count = 1;
+    }
+    size_t i;
+    for (i = 0; i < count; ++i) {
+        AES128_ECB_decrypt(in + i * 16, key, out + i * 16);
+    }
 
+    //去除结尾垃圾字符串 begin
+    int index = findPaddingIndex(out);
+    if (index == NULL) {
+        return (char *) out;
+    }
 
-  //去除结尾垃圾字符串 begin
-  int index = findPaddingIndex(out);
-  if (index == NULL) {
+    if (index < strlen(out)) {//  if (index>strlen)  will crash.
+        memset(out + index, '\0', strlen(out) - index);
+    }
+
     return (char *) out;
-  }
-  if (index < strlen(out)) {//  if (index>strlen)  will crash.
-    memset(out + index, '\0', strlen(out) - index);
-  }
-  return (char *) out;
 }
 
 /**
@@ -566,7 +577,7 @@ char *AES_128_ECB_PKCS5Padding_Decrypt(const char *in, const uint8_t *key) {
  * @return  int         ：   垃圾字符串的开始位置
  */
 int findPaddingIndex(uint8_t *str) {
-  return (int) (strlen(str) - str[strlen(str) - 1]);
+    return (int) (strlen(str) - str[strlen(str) - 1]);
 }
 
 #endif // #if defined(ECB) && ECB

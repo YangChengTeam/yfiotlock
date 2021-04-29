@@ -74,7 +74,7 @@ public class App extends Application {
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "lock").build();
 
-        byte[] bytes = LockBLEUtil.encrypt("2b7e151628aed2a6abf7158809cf4f3c", "a".getBytes());
+        byte[] bytes = LockBLEUtil.encrypt("12345678", "a".getBytes());
         LogUtil.msg("#################"+LockBLEUtil.toHexString(bytes));
     }
 
