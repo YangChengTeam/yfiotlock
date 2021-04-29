@@ -49,7 +49,7 @@ public class Config {
 
     //上传图片
 
-    public static final String UPLOAD_PIC_URL = getBaseUrl() + "/userapp/v1.User/uploads" + "?rea=5";
+    public static final String UPLOAD_PIC_URL = getBaseUrl() + "/userapp/v1.User/uploads" + "?is_test=1";
 
     //反馈 建议
 
@@ -122,7 +122,7 @@ public class Config {
     public static final int CLICK_LIMIT = 500;
 
     public static String isRsa() {
-        return RESQUEST_FLAG ? "" : "?rea=5";
+        return RESQUEST_FLAG ? "" : "?is_test=1";
     }
 
     public static String getBaseUrl() {

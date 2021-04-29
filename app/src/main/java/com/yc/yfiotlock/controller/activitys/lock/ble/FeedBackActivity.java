@@ -253,6 +253,7 @@ public class FeedBackActivity extends BaseActivity {
             @Override
             public void onNext(ResultInfo<String> info) {
                 if (info != null && info.getCode() == 1) {
+                    mLoadingDialog.dismiss();
                     ToastCompat.showCenter(getContext(), "提交成功");
                     finish();
                 } else {
