@@ -16,6 +16,7 @@ if (${ENABLE_CPP_TESTS} MATCHES "true")
 
     # Path to Google Test source dir included into Android NDK.
     # Note: Another Google Test implementation can be used.
+
     set(GTEST_DIR ${ANDROID_NDK}/sources/third_party/googletest)
 
     add_library(gtest STATIC ${GTEST_DIR}/src/gtest_main.cc ${GTEST_DIR}/src/gtest-all.cc)
