@@ -79,9 +79,6 @@ public class UserInfo implements Serializable {
     }
 
     public String getFace() {
-        if (!face.startsWith(Config.getBaseUrl())) {
-            face = Config.getBaseUrl().concat(face);
-        }
         return face;
     }
 
