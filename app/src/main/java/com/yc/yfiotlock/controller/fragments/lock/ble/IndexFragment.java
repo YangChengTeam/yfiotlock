@@ -53,6 +53,7 @@ import rx.Observer;
 import rx.Subscriber;
 
 import static android.app.Activity.RESULT_OK;
+import static com.yc.yfiotlock.controller.activitys.lock.ble.SafePwdCreateActivity.CHECK_PWD;
 
 public class IndexFragment extends BaseFragment {
     @BindView(R.id.iv_device_add)
@@ -278,9 +279,14 @@ public class IndexFragment extends BaseFragment {
 
             @Override
             public void onFailure(Response response) {
-
+                if (response.code == SafeUtil.ON_USER_CLICK_NEGATIVE || response.code == SafeUtil.ON_USE_FINGER_FAILED) {
+                    if (response.code == SafeUtil.ON_USE_FINGER_FAILED) {
+                        ToastCompat.show(getContext(), "指纹识别暂不可用，请使用安全密码");
+                    }
+                    SafePwdCreateActivity.startCheck(getActivity());
+                }
             }
-        });
+        }, "", "使用密码");
     }
 
     private void nav2LockIndex(DeviceInfo deviceInfo) {
@@ -300,17 +306,17 @@ public class IndexFragment extends BaseFragment {
         startActivity(intent);
     }
 
-    public static final int CHECK_PWD = 111;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CHECK_PWD) {
-            if (resultCode == RESULT_OK && data != null
-                    && SafeUtil.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
-                nav2LockIndex(mDeviceInfo);
-            } else {
-                ToastCompat.show(getContext(), "密码错误");
+            if (resultCode == RESULT_OK) {
+                if (data != null && SafeUtil.getSafePwd(mDeviceInfo).equals(data.getStringExtra("pwd"))) {
+                    nav2LockIndex(mDeviceInfo);
+                } else {
+                    ToastCompat.show(getContext(), "密码错误");
+                }
             }
         }
     }

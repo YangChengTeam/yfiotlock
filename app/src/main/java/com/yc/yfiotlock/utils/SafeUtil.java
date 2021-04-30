@@ -3,6 +3,7 @@ package com.yc.yfiotlock.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.biometrics.BiometricPrompt;
+import android.util.Log;
 
 import androidx.annotation.IntRange;
 
@@ -34,6 +35,15 @@ public class SafeUtil {
      * 指纹
      */
     public static final int FINGERPRINT_TYPE = 2;
+
+    /**
+     * 用户点击取消按键
+     */
+    public static final int ON_USER_CLICK_NEGATIVE = 99999;
+    /**
+     * 指纹状态错误，如失败太多次 指纹被禁用等
+     */
+    public static final int ON_USE_FINGER_FAILED = 999999;
 
     /**
      * {@link com.yc.yfiotlock.model.bean.lock.DeviceSafeSettingInfo }
@@ -79,10 +89,10 @@ public class SafeUtil {
     }
 
     public static void useFinger(Activity context, Callback<String> stringCallback) {
-        useFinger(context, stringCallback, "");
+        useFinger(context, stringCallback, "","取消");
     }
 
-    public static void useFinger(Activity context, Callback<String> stringCallback, String laseFailReason) {
+    public static void useFinger(Activity context, Callback<String> stringCallback, String lastFailReason,String negativeText) {
         switch (FingerManager.checkSupport(context)) {
             case DEVICE_UNSUPPORTED:
                 stringCallback.onFailure(new Response());
@@ -96,8 +106,8 @@ public class SafeUtil {
                 FingerManager.build().setApplication(App.getApp())
                         .setTitle("指纹验证")
                         .setDes("请按下指纹")
-                        .setSubTitle(laseFailReason)
-                        .setNegativeText("取消")
+                        .setSubTitle(lastFailReason)
+                        .setNegativeText(negativeText)
                         .setFingerCheckCallback(new SimpleFingerCheckCallback() {
 
                             @Override
@@ -107,23 +117,31 @@ public class SafeUtil {
 
                             @Override
                             public void onError(int code, String error) {
+                                if (code == ON_USER_CLICK_NEGATIVE) {
+                                    stringCallback.onFailure(new Response(ON_USER_CLICK_NEGATIVE));
+                                    return;
+                                }
+                                if (code == BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT
+                                        || code == BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT_PERMANENT){
+                                    stringCallback.onFailure(new Response(ON_USE_FINGER_FAILED));
+                                    return;
+                                }
                                 SafeUtil.showFailTip(context, code);
-
                                 /**
                                  * 只要不是  7 9 10 就重试
                                  *
-                                 * 7 {@link android.hardware.biometrics.BiometricPrompt#BIOMETRIC_ERROR_LOCKOUT}
+                                 * 7 {@link BiometricPrompt#BIOMETRIC_ERROR_LOCKOUT}
                                  * 该操作被取消，因为该API由于尝试过多而被锁定。尝试5次失败后会发生这种情况，持续30秒。
-                                 * 9 {@link android.hardware.biometrics.BiometricPrompt#BIOMETRIC_ERROR_LOCKOUT_PERMANENT}
+                                 * 9 {@link BiometricPrompt#BIOMETRIC_ERROR_LOCKOUT_PERMANENT}
                                  * 该操作被取消，因为BIOMETRIC_ERROR_LOCKOUT发生了太多次。禁用生物特征认证，直到用户通过强认证（PIN /图案/密码）解锁
                                  * 5是代码取消验证  不会走onError 而是走onCancel
                                  * 10是用户取消验证
                                  */
-                                if (code != BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT
-                                        && code != BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT_PERMANENT
-                                        && code != BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED) {
-                                    useFinger(context, stringCallback);
-                                }
+                                    if (code != BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT
+                                            && code != BiometricPrompt.BIOMETRIC_ERROR_LOCKOUT_PERMANENT
+                                            && code != BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED) {
+                                        useFinger(context, stringCallback);
+                                    }
 
                             }
 
@@ -134,7 +152,7 @@ public class SafeUtil {
 
                             @Override
                             public void onCancel() {
-
+                                Log.i("aaaa", "onCancel: ");
                             }
                         })
                         .setFingerChangeCallback(new AonFingerChangeCallback() {

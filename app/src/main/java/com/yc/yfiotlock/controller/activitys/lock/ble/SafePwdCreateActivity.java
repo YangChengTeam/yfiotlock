@@ -1,12 +1,9 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -19,19 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseActivity;
-import com.yc.yfiotlock.model.bean.lock.DeviceSafeSettingInfo;
 import com.yc.yfiotlock.view.adapters.SignCodeAdapter;
 import com.yc.yfiotlock.view.widgets.BackNavBar;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
-import static com.yc.yfiotlock.controller.fragments.lock.ble.IndexFragment.CHECK_PWD;
 
 /**
  * @author Dullyoung
@@ -54,35 +46,73 @@ public class SafePwdCreateActivity extends BaseActivity {
     }
 
 
-    /**
-     * 是否是验证密码
-     */
-    private boolean isForCheck = false;
-
     private void setUi() {
-        if (isForCheck) {
-            mBnbTitle.setTitle("验证安全密码");
-            mTvInputNew.setText("请输入密码");
-        } else {
-            mBnbTitle.setTitle("创建安全密码");
-            mTvInputNew.setText("输入新密码");
+        switch (getIntent().getIntExtra("type", 0)) {
+            case CHECK_PWD:
+                mBnbTitle.setTitle("验证安全密码");
+                mTvInputNew.setText("请输入安全密码");
+                break;
+            case INPUT_NEW_PWD:
+                mBnbTitle.setTitle("更改安全密码");
+                mTvInputNew.setText("请输入新密码");
+                break;
+            case INPUT_NEW_PWD_AGAIN:
+                mBnbTitle.setTitle("更改安全密码");
+                mTvInputNew.setText("请再次输入新密码");
+                break;
+            case CHECK_ORIGIN_PWD:
+                mBnbTitle.setTitle("更改安全密码");
+                mTvInputNew.setText("请输入原密码");
+                break;
+            case CREATE_NEW_PWD:
+                mBnbTitle.setTitle("创建安全密码");
+                mTvInputNew.setText("请输入密码");
+                break;
         }
+
     }
 
-    /**
-     * @param context 启动验证密码界面
-     */
+    public static final int CHECK_PWD = 111;//检验密码
+    public static final int INPUT_NEW_PWD = 112;//输入新密码
+    public static final int INPUT_NEW_PWD_AGAIN = 113;//再次输入新密码
+    public static final int CHECK_ORIGIN_PWD = 114;//检验原密码
+    public static final int CREATE_NEW_PWD = 115;//创建新密码
+
+
     public static void startCheck(Activity context) {
         Intent intent = new Intent(context, SafePwdCreateActivity.class);
-        intent.putExtra("check", true);
-        context.startActivityForResult(intent,CHECK_PWD);
+        intent.putExtra("type", CHECK_PWD);
+        context.startActivityForResult(intent, CHECK_PWD);
+    }
+
+    public static void createNewPwd(Activity context) {
+        Intent intent = new Intent(context, SafePwdCreateActivity.class);
+        intent.putExtra("type", CREATE_NEW_PWD);
+        context.startActivityForResult(intent, CREATE_NEW_PWD);
+    }
+
+    public static void checkOrigin(Activity context) {
+        Intent intent = new Intent(context, SafePwdCreateActivity.class);
+        intent.putExtra("type", CHECK_ORIGIN_PWD);
+        context.startActivityForResult(intent, CHECK_ORIGIN_PWD);
+    }
+
+    public static void inputNew(Activity context) {
+        Intent intent = new Intent(context, SafePwdCreateActivity.class);
+        intent.putExtra("type", INPUT_NEW_PWD);
+        context.startActivityForResult(intent, INPUT_NEW_PWD);
+    }
+
+    public static void inputNewAgain(Activity context) {
+        Intent intent = new Intent(context, SafePwdCreateActivity.class);
+        intent.putExtra("type", INPUT_NEW_PWD_AGAIN);
+        context.startActivityForResult(intent, INPUT_NEW_PWD_AGAIN);
     }
 
     @Override
     protected void initViews() {
         mBnbTitle.setBackListener(view -> finish());
         mEtPwd.setOnLongClickListener(v -> true);
-        isForCheck = getIntent().getBooleanExtra("check", false);
         setRvPwd();
         showInput();
         setUi();

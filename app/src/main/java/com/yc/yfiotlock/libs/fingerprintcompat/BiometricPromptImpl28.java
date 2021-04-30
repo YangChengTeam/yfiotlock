@@ -44,7 +44,7 @@ public class BiometricPromptImpl28 implements IBiometricPromptImpl {
                         activity.getMainExecutor(), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                mCallback.onCancel();
+                                mCallback.onError(99999,"点击"+fingerManagerController.getNegativeText());
                                 userCancel = true;
                                 mCancellationSignal.cancel();
                             }
