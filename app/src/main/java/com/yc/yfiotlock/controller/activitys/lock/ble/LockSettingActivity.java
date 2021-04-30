@@ -157,7 +157,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             public void onComplete() {
                 mLoadingDialog.dismiss();
                 App.getApp().getMacList().remove(lockInfo.getMacAddress());
-                SafeUtil.setSafePwdType(lockInfo, 0);
+                SafeUtil.setSafePwdType(lockInfo, SafeUtil.NO_PASSWORD);
                 UserInfoCache.decDeviceNumber();
                 EventBus.getDefault().post(new CloudDeviceDelEvent(lockInfo));
                 EventBus.getDefault().post(new IndexRefreshEvent());
