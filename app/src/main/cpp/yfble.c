@@ -2,7 +2,7 @@
 #include <jni.h>
 #include <string.h>
 #include <sys/ptrace.h>
-#include "ble.h"
+#include "yfble.h"
 #include "aes.h"
 
 
@@ -27,9 +27,6 @@ JNIEXPORT jbyteArray JNICALL encrypt(JNIEnv *env,  jclass clazz, jstring  key, j
 
     char *result = AES_128_ECB_PKCS5Padding_Encrypt(in, AES_KEY);
 
-    (*env)->ReleaseStringUTFChars(env, key, AES_KEY);
-    (*env)->ReleaseByteArrayElements(env, data, in, 0);
-
     return char2byteArray(env, result);
 }
 
@@ -40,9 +37,6 @@ JNIEXPORT jbyteArray JNICALL decrypt(JNIEnv *env, jclass clazz, jstring  key, jb
     const char *in = (char *) (*env)->GetByteArrayElements(env, data, NULL);
 
     char *result = AES_128_ECB_PKCS5Padding_Decrypt(in, AES_KEY);
-
-    (*env)->ReleaseStringUTFChars(env, key, AES_KEY);
-    (*env)->ReleaseByteArrayElements(env, data, in, 0);
 
     return char2byteArray(env, result);
 }
@@ -60,13 +54,13 @@ static int registerNativeMethods(JNIEnv *env, const char *className,
     if (clazz == NULL) {
         return JNI_FALSE;
     }
+
     if ((*env)->RegisterNatives(env, clazz, gMethods, numMethods) < 0) {
         return JNI_FALSE;
     }
 
     return JNI_TRUE;
 }
-
 
 int register_ndk_load(JNIEnv *env) {
     return registerNativeMethods(env, JNIREG_CLASS,

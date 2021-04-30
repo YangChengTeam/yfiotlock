@@ -1,5 +1,5 @@
-#ifndef YF_IOT_LOCK_BLE_H
-#define YF_IOT_LOCK_BLE_H
+#ifndef YF_IOT_LOCK_YFBLE_H
+#define YF_IOT_LOCK_YFBLE_H
 
 #include <android/log.h>
 
@@ -10,4 +10,4 @@
 # define NELEM(x) ((int) (sizeof(x) / sizeof((x)[0])))
 # define JNIREG_CLASS "com/yc/yfiotlock/ble/LockBLEUtil"
 
-#endif //YF_IOT_LOCK_BLE_H
+#endif //YF_IOT_LOCK_YFBLE_H
