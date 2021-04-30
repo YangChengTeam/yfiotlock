@@ -42,6 +42,7 @@ public class WebActivity extends BaseBackActivity implements LockWebView.WebView
 
     @Override
     protected void initViews() {
+        super.initViews();
         String title = getIntent().getStringExtra("title");
         backNavBar.setTitle(title == null ? "" : title);
         mLwvPage.setAdWebViewListener(this);

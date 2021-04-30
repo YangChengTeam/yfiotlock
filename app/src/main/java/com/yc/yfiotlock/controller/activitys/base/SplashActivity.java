@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.user.MainActivity;
 import com.yc.yfiotlock.download.AppDownloadManager;
 import com.yc.yfiotlock.model.engin.LoginEngin;
@@ -45,7 +46,7 @@ public class SplashActivity extends BaseActivity {
                 if (resultInfo != null) {
                     if (resultInfo.getCode() == 1 && resultInfo.getData() != null) {
                         UserInfoCache.setUserInfo(resultInfo.getData());
-                    } else if (resultInfo.getCode() == -100) {
+                    } else if (resultInfo.getCode() == Config.LOGIN_EXPIRE) {
                         UserInfoCache.setUserInfo(null);
                     }
                     VUiKit.postDelayed(1000, this::nav2Main);

@@ -11,6 +11,8 @@ import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtil;
+import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.DeviceDao;
@@ -29,10 +31,10 @@ import rx.Subscriber;
 
 public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESender.NotifyCallback {
 
-    protected boolean isDeviceAdd = false;  // 是否 设备同步云端添加成功
+    protected boolean isDoDeviceAddAction = false;  // 是否 设备同步云端添加成功
     protected boolean isConnected = false;  // 是否 配网成功
     protected boolean isActiveDistributionNetwork = false;  // 是否 设备同步云端添加成功后 主动配网
-
+    protected boolean isDeviceAdd = false;
 
     protected BleDevice bleDevice;
     protected DeviceInfo lockInfo;
@@ -41,7 +43,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected DeviceDao deviceDao;
 
     protected String aliDeviceName = "000000000000";
-    private int retryCount = 3;
 
     @Override
     protected void initVars() {
@@ -75,21 +76,26 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, lockInfo.getKey()).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
+                isDoDeviceAddAction = false;
+                mLoadingDialog.dismiss();
             }
 
             @Override
             public void onError(Throwable e) {
+                isDoDeviceAddAction = false;
                 mLoadingDialog.dismiss();
-                fail();
             }
 
             @Override
             public void onNext(ResultInfo<DeviceInfo> resultInfo) {
-                if (resultInfo != null && (resultInfo.getCode() == 1)) {
-                    mLoadingDialog.dismiss();
+                if (resultInfo != null && resultInfo.getCode() == 1) {
                     success(resultInfo.getData());
+                } else if (resultInfo != null && resultInfo.getCode() == Config.DEVICE_ADDED) {
+                    String msg = resultInfo.getMsg() != null ? resultInfo.getMsg() : "设备添加失败";
+                    ToastCompat.show(getContext(), msg);
                 } else {
-                    fail();
+                    String msg = "设备添加失败";
+                    ToastCompat.show(getContext(), msg);
                 }
             }
         });
@@ -97,6 +103,8 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
     @Override
     public void success(Object data) {
+        isDeviceAdd = true;
+
         lockInfo = (DeviceInfo) data;
         lockInfo.setMacAddress(bleDevice.getMac());
         lockInfo.setName(bleDevice.getName());
@@ -106,24 +114,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         lockInfo.setKey(LockBLEUtil.genKey());
         lockInfo.setMasterId(UserInfoCache.getUserInfo().getId());
         localDeviceAdd(lockInfo);
-    }
-
-    @Override
-    public void fail() {
-        if (retryCount-- > 0) {
-            VUiKit.postDelayed(retryCount * (1000 - retryCount * 200), this::cloudDeviceAdd);
-        } else {
-            retryCount = 3;
-            mLoadingDialog.dismiss();
-            GeneralDialog generalDialog = new GeneralDialog(getContext());
-            generalDialog.setTitle("温馨提示");
-            generalDialog.setMsg("同步云端失败, 请重试");
-            generalDialog.setOnPositiveClickListener(dialog -> {
-                mLoadingDialog.show("添加设备中...");
-                cloudDeviceAdd();
-            });
-            generalDialog.show();
-        }
     }
 
     protected void bleGetAliDeviceName() {
@@ -183,10 +173,10 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
             aliDeviceName = LockBLEUtil.toHexString(lockBLEData.getExtra()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
-            if (isDeviceAdd || isActiveDistributionNetwork) {
+            if (isDoDeviceAddAction || isActiveDistributionNetwork) {
                 return;
             }
-            isDeviceAdd = true;
+            isDoDeviceAddAction = true;
             cloudDeviceAdd();
         }
     }
@@ -194,10 +184,10 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
-            if (isDeviceAdd || isActiveDistributionNetwork) {
+            if (isDoDeviceAddAction || isActiveDistributionNetwork) {
                 return;
             }
-            isDeviceAdd = true;
+            isDoDeviceAddAction = true;
             cloudDeviceAdd();
         }
     }
