@@ -196,7 +196,8 @@ public class IndexFragment extends BaseFragment {
                 List<DeviceInfo> lastDeviceInfos;
                 if (lDeviceInfos == null || lDeviceInfos.size() == 0) {
                     lastDeviceInfos = cDeviceInfos;
-                } else {
+                }
+                else {
 
                     for (DeviceInfo cDeviceInfo : cDeviceInfos) {
                         cDeviceInfo.setAdd(true);

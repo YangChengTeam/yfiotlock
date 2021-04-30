@@ -4,6 +4,9 @@ public class Config {
     public static boolean DEBUG = false;
     public static boolean RESQUEST_FLAG = true;
 
+    public static int LOGIN_EXPIRE = -100;
+    public static int DEVICE_ADDED = -101;
+
     private final static String baseUrl = "http://yf.test.yf5g.cn/doorlockuser";
     private final static String debugBaseUrl = "http://yf.test.yf5g.cn/doorlockuser";
 
