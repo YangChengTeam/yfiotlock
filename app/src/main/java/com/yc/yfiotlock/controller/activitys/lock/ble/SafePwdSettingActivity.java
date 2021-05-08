@@ -125,6 +125,7 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
                 ToastCompat.show(getContext(), "密码创建成功");
                 mSafePwd.setChecked(true);
                 setSafeType(SafeUtil.PASSWORD_TYPE);
+                mLLFinger.setVisibility(View.VISIBLE);
                 SafeUtil.setSafePwd(mDeviceInfo, data.getStringExtra("pwd"));
             }
         }
