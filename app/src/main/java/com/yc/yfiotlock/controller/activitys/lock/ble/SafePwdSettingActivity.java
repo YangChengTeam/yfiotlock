@@ -123,6 +123,8 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
         if (CREATE_NEW_PWD == requestCode) {
             if (resultCode == RESULT_OK && data != null && data.getStringExtra("pwd") != null) {
                 ToastCompat.show(getContext(), "密码创建成功");
+                mSafePwd.setChecked(true);
+                setSafeType(SafeUtil.PASSWORD_TYPE);
                 SafeUtil.setSafePwd(mDeviceInfo, data.getStringExtra("pwd"));
             }
         }
