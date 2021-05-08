@@ -51,7 +51,7 @@
 
     </LinearLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <com.yc.yfiotlock.view.widgets.VpSwipeRefreshLayout
         android:id="@+id/srl_refresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -63,5 +63,5 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </com.yc.yfiotlock.view.widgets.VpSwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

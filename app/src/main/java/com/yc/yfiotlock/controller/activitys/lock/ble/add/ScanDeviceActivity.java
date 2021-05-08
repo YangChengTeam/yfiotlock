@@ -97,7 +97,6 @@ public class ScanDeviceActivity extends BaseAddActivity {
             @Override
             public void onScanSuccess(List<BleDevice> bleDevices) {
                 if (isFoundOne) {
-                    finish();
                     deviceHashMap.clear();
                     deviceHashMap = null;
                     isFoundOne = false;
@@ -113,8 +112,11 @@ public class ScanDeviceActivity extends BaseAddActivity {
         });
     }
 
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReScan(ReScanEvent object) {
+        isFoundOne = false;
+        LockBLEManager.getInstance().stopScan();
         scan();
     }
 
@@ -136,6 +138,8 @@ public class ScanDeviceActivity extends BaseAddActivity {
     @Override
     protected void bindClick() {
         setClick(mStvRescan, () -> {
+            LockBLEManager.getInstance().stopScan();
+            isFoundOne = false;
             setStartInfo();
             scan();
         });

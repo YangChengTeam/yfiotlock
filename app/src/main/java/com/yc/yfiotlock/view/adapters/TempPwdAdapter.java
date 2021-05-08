@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.view.adapters;
 
+import android.view.View;
+
 import com.chad.library.adapter.base.module.LoadMoreModule;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.yc.yfiotlock.R;

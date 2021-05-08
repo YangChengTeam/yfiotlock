@@ -104,6 +104,9 @@ public class ConnectActivity extends BaseConnectActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(wifiScanReceiver);
+        if (lockBleSender != null) {
+            lockBleSender.clear();
+        }
     }
 
 

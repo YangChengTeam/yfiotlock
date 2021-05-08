@@ -96,7 +96,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     protected void initViews() {
         super.initViews();
-        setNavTitle(title + "详情");
+        setNavTitle(openLockInfo.getName());
 
         delTv.setText(delTv.getText() + title);
         RxView.clicks(delTv).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
@@ -147,9 +147,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(OpenLockInfo openLockInfo) {
-        List<OpenLockInfo> openLockInfos = new ArrayList<>();
-        openLockInfos.add(openLockInfo);
-        openLockAdapter.setNewInstance(openLockInfos);
+        setNavTitle(openLockInfo.getName());
         EventBus.getDefault().post(new OpenLockRefreshEvent());
     }
 
@@ -183,14 +181,12 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
 
     public static class OpenLockAdapter extends BaseExtendAdapter<OpenLockInfo> {
         public OpenLockAdapter(@Nullable List<OpenLockInfo> data) {
-            super(R.layout.lock_ble_item_base_open_lock, data);
+            super(R.layout.lock_ble_item_base_detail_open_lock, data);
         }
 
         @Override
         protected void convert(@NotNull BaseViewHolder holder, OpenLockInfo openLockInfo) {
-            holder.setText(R.id.tv_name, openLockInfo.getName());
-            String text = "我".equals(openLockInfo.getAddUserMobile()) ? "" : "用户";
-            holder.setText(R.id.tv_from, text + openLockInfo.getAddUserMobile() + "添加");
+            holder.setText(R.id.tv_name, "修改名称");
             if (holder.getAdapterPosition() == getData().size() - 1) {
                 holder.setVisible(R.id.view_line, false);
             } else {

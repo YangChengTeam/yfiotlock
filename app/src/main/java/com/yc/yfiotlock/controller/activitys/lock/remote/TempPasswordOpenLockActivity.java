@@ -3,10 +3,13 @@ package com.yc.yfiotlock.controller.activitys.lock.remote;
 import android.annotation.SuppressLint;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
@@ -26,6 +29,7 @@ import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.adapters.TempPwdAdapter;
+import com.yc.yfiotlock.view.widgets.FooterView;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
@@ -97,6 +101,8 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
 
         mSrlRefresh.setRefreshing(true);
         synctimeLoadData();
+
+
     }
 
     @Override
@@ -109,6 +115,17 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         tempPwdAdapter = new TempPwdAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(tempPwdAdapter);
+
+        tempPwdAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
+                OpenLockInfo openLockInfo = (OpenLockInfo) adapter.getData().get(position);
+                CommonUtil.copy(getContext(), openLockInfo.getPassword());
+                ToastCompat.show(getContext(), "临时密码已复制");
+            }
+        });
+
+
     }
 
     private void nav2add() {
@@ -189,6 +206,10 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         if (tempPwdAdapter.getData().size() == 0) {
             nodataView.setVisibility(View.VISIBLE);
             nodataView.setMessage("暂无临时密码数据");
+        } else {
+            FooterView footerView = new FooterView(getContext());
+            tempPwdAdapter.removeAllFooterView();
+            tempPwdAdapter.addFooterView(footerView);
         }
     }
 
@@ -234,6 +255,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
                     openLockInfo.setAdd(true);
                     EventBus.getDefault().post(new CloudOpenLockAddEvent(openLockInfo));
                 }
+                ToastCompat.show(getContext(), "添加成功");
             }
 
             @Override

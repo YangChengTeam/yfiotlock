@@ -110,6 +110,7 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESende
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_BATTERY) {
             int battery = lockBLEData.getExtra()[0];
             MMKV.defaultMMKV().putInt("battery", battery);
+            mAdapter.getData().get(3).setValue(battery + "");
             mAdapter.notifyDataSetChanged();
         }
     }
