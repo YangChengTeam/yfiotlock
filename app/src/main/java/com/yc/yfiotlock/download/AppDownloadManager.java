@@ -259,7 +259,7 @@ public class AppDownloadManager {
             updateInfo.setTotalSize(offsetSize);
             updateInfo.setOffsetSize(offsetSize);
             updateInfo.setDownloading(false);
-            
+
             setUpdateInfo(updateInfo);
 
             EventBus.getDefault().post(updateInfo);
@@ -269,7 +269,7 @@ public class AppDownloadManager {
     }
 
     protected String getUpdateFileName(UpdateInfo updateInfo) {
-        return getContext().getResources().getString(R.string.app_name) + updateInfo.getVersionCode() + ".apk";
+        return getContext().getResources().getString(R.string.app_name) + "app" + updateInfo.getVersionCode() + ".apk";
     }
 
 }

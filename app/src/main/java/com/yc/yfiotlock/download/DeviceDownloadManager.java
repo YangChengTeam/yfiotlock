@@ -36,7 +36,7 @@ public class DeviceDownloadManager extends AppDownloadManager {
 
     @Override
     protected String getUpdateFileName(UpdateInfo updateInfo) {
-        return getContext().getResources().getString(R.string.app_name) + updateInfo.getVersionCode() + ".bin";
+        return getContext().getResources().getString(R.string.app_name) + "device" + updateInfo.getVersion() + ".bin";
     }
 
     @Override

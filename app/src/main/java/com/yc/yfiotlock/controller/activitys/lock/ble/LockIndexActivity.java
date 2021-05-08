@@ -612,6 +612,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_OPEN) {
             stopAnimations();
+            statusIv.setImageResource(R.mipmap.icon_lock_open);
             statusTitleTv.setText("门锁已打开");
             // 恢复状态  我们目前版本使用机械反锁，所以门开关的状态事件目前版本是没有的。
             VUiKit.postDelayed(5000, () -> {

@@ -4,11 +4,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding4.view.RxView;
+import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import java.util.concurrent.TimeUnit;
 
@@ -74,5 +76,18 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
         }
     }
 
-
+    @Override
+    public void finish() {
+        mLoadingDialog.setIcon(R.mipmap.icon_finish);
+        mLoadingDialog.show("添加成功");
+        VUiKit.postDelayed(1500, new Runnable() {
+            @Override
+            public void run() {
+                if (CommonUtil.isActivityDestory(getContext())) {
+                    return;
+                }
+                FingerprintAddSelectHandNextOpenLockActivity.super.finish();
+            }
+        });
+    }
 }

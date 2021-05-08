@@ -162,6 +162,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 EventBus.getDefault().post(new CloudDeviceDelEvent(lockInfo));
                 EventBus.getDefault().post(new IndexRefreshEvent());
                 LockIndexActivity.safeFinish();
+                if (lockBleSender != null) {
+                    lockBleSender.clear();
+                }
                 finish();
             }
 

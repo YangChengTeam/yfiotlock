@@ -34,7 +34,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
             cardCount = countInfo.getCardCount();
         }
         cardCount += 1;
-        String name =  title + ((cardCount) > 9 ? cardCount + "" : "0" + cardCount);
+        String name = title + ((cardCount) > 9 ? cardCount + "" : "0" + cardCount);
         nameTv.setText(name);
 
         bleAddCard();
@@ -83,6 +83,7 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
         super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             ToastCompat.show(getContext(), "卡片添加失败");
+            finish();
         }
     }
 }

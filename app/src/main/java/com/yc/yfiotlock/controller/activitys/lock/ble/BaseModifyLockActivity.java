@@ -107,6 +107,7 @@ public abstract class BaseModifyLockActivity extends BaseBackActivity {
                     EventBus.getDefault().post(new CloudOpenLockUpdateEvent(openLockInfo));
                 }
                 EventBus.getDefault().post(new OpenLockRefreshEvent());
+                ToastCompat.show(getContext(), "修改成功");
                 finish();
             }
 

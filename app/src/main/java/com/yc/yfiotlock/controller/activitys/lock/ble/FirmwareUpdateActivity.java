@@ -67,7 +67,7 @@ public class FirmwareUpdateActivity extends BaseBackActivity {
     }
 
     private void setInfo() {
-        if (updateInfo != null) {
+        if (updateInfo != null && updateInfo.isUpgrade()) {
             updateView.setVisibility(View.VISIBLE);
             despTv.setText(updateInfo.getDesc());
             newVersionTv.setText(Html.fromHtml("升级" + "(<font color='#999999'>" + updateInfo.getVersion() + "</font>)"));

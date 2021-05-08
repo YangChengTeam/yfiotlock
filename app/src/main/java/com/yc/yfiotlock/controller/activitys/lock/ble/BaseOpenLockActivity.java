@@ -22,6 +22,7 @@ import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.BleUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
+import com.yc.yfiotlock.view.widgets.FooterView;
 import com.yc.yfiotlock.view.widgets.NoDataView;
 import com.yc.yfiotlock.view.widgets.NoWifiView;
 
@@ -93,6 +94,8 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             loadData();
         });
 
+
+
         loadData();
     }
 
@@ -131,6 +134,9 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                 }
 
                 openLockAdapter.setNewInstance(lastOpenLocks);
+                FooterView footerView = new FooterView(getContext());
+                openLockAdapter.removeAllFooterView();
+                openLockAdapter.addFooterView(footerView);
                 if (isOnlyLocal) {
                     mSrlRefresh.setRefreshing(false);
                     empty();
@@ -223,6 +229,9 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
         // 分享设备同步网络数据到本地
         if (lockInfo.isShare()) {
             openLockAdapter.setNewInstance(copenlockInfos);
+            FooterView footerView = new FooterView(getContext());
+            openLockAdapter.removeAllFooterView();
+            openLockAdapter.addFooterView(footerView);
             processData(copenlockInfos);
             openLockDao.deleteOpenLockInfos(lockInfo.getId(), type, LockBLEManager.GROUP_TYPE).subscribeOn(Schedulers.io()).subscribe(new Action() {
                 @Override
@@ -259,6 +268,9 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
                 }
             });
             openLockAdapter.setNewInstance(lastOpenLockInfos);
+            FooterView footerView = new FooterView(getContext());
+            openLockAdapter.removeAllFooterView();
+            openLockAdapter.addFooterView(footerView);
         }
         empty();
         setCountInfo();

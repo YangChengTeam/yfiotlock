@@ -71,6 +71,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
 
     protected abstract void localAddSucc();
 
+
     protected abstract void localAdd(int keyid);
 
     protected void localAdd(String name, int type, int keyid, String password) {
@@ -97,6 +98,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
                     EventBus.getDefault().post(new CloudOpenLockAddEvent(openLockInfo));
                 }
                 EventBus.getDefault().post(new OpenLockRefreshEvent());
+                ToastCompat.show(getContext(), "添加成功");
                 finish();
             }
 

@@ -8,14 +8,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +46,7 @@ public class DeviceListActivity extends BaseAddActivity {
     private DeviceAdapter mDeviceAdapter;
 
     private static WeakReference<DeviceListActivity> mInstance;
+
     public static void safeFinish() {
         if (mInstance != null && mInstance.get() != null) {
             mInstance.get().finish();
@@ -123,10 +127,14 @@ public class DeviceListActivity extends BaseAddActivity {
     protected void bindClick() {
         setClick(mStvScan, () -> {
             finish();
+            VUiKit.postDelayed(300, () -> {
+                EventBus.getDefault().post(new ReScanEvent());
+            });
         });
     }
 
-    private class DeviceAdapter extends BaseExtendAdapter<LockInfo> {
+
+    private static class DeviceAdapter extends BaseExtendAdapter<LockInfo> {
         public DeviceAdapter(@Nullable List<LockInfo> data) {
             super(R.layout.item_scan_device, data);
         }
