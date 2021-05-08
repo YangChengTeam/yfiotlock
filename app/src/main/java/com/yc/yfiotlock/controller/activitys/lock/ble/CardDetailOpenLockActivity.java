@@ -15,7 +15,7 @@ import com.yc.yfiotlock.utils.CacheUtil;
 public class CardDetailOpenLockActivity extends BaseDetailOpenLockActivity {
     @Override
     protected void initViews() {
-        setTitle("NDF门卡");
+        setTitle("NFC门卡");
         super.initViews();
 
         openLockAdapter.setOnItemClickListener(new OnItemClickListener() {
