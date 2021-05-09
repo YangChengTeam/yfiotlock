@@ -8,11 +8,13 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.PasswordInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
+import com.yc.yfiotlock.view.widgets.NoDataView;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -42,6 +44,22 @@ public class TempPwdAdapter extends BaseExtendAdapter<OpenLockInfo> implements L
         return cal.getTimeInMillis();
     }
 
+    @Override
+    public void setNewInstance(@Nullable List<OpenLockInfo> list) {
+        List lastlist = new ArrayList();
+        for(OpenLockInfo openLockInfo : list){
+            long millis = synctime - openLockInfo.getAddtime();
+            int mins = (int) ((millis / (1000 * 60)));
+            if (mins <= LIMIT) {
+                lastlist.add(openLockInfo);
+            }
+        }
+        if(lastlist.size() == 0){
+            setEmptyView(new NoDataView(getContext()));
+        }
+        super.setNewInstance(lastlist);
+    }
+
     private String format(long time) {
         if(time == 0) return "-";
 
@@ -55,17 +73,11 @@ public class TempPwdAdapter extends BaseExtendAdapter<OpenLockInfo> implements L
     protected void convert(@NotNull BaseViewHolder baseViewHolder, OpenLockInfo openLockInfo) {
         baseViewHolder.setText(R.id.tv_temp_pwd_name, openLockInfo.getPassword())
                 .setText(R.id.tv_temp_pwd_validity, "过期时间：" + format(openLockInfo.getAddtime()));
-        long millis = synctime - openLockInfo.getAddtime();
-        int mins = (int) ((millis / (1000 * 60)));
+
         int textColor = getContext().getResources().getColor(R.color.blue_2F90F7);
         baseViewHolder.setText(R.id.tv_temp_pwd_state, "有效")
                 .setTextColor(R.id.tv_temp_pwd_state, textColor);
-        if (mins > LIMIT) {
-            textColor = getContext().getResources().getColor(R.color.gray_999);
-            baseViewHolder.setText(R.id.tv_temp_pwd_state, "已失效")
-                    .setTextColor(R.id.tv_temp_pwd_state, textColor);
-        }
-
+        
         baseViewHolder.setGone(R.id.view_line, baseViewHolder.getAdapterPosition() == 0);
     }
 }

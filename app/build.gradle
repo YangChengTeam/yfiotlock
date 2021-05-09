@@ -96,12 +96,7 @@ android {
     lintOptions {
         checkReleaseBuilds false
     }
-    externalNativeBuild {
-        cmake {
-            path file('CMakeLists.txt')
-            version "3.10.2"
-        }
-    }
+
 }
 
 

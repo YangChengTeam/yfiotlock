@@ -1,11 +1,11 @@
 package com.yc.yfiotlock.ble;
 
+import com.yc.yfiotlock.utils.RC4Util;
+
 import java.util.Random;
 
 public class LockBLEUtil {
-    static {
-        System.loadLibrary("yfble");
-    }
+
     public static int crc16(byte[] data) {
         byte[] crc16_h = {
                 (byte) 0x00, (byte) 0xC1, (byte) 0x81, (byte) 0x40, (byte) 0x01, (byte) 0xC0, (byte) 0x80, (byte) 0x41, (byte) 0x01, (byte) 0xC0, (byte) 0x80, (byte) 0x41, (byte) 0x00, (byte) 0xC1, (byte) 0x81, (byte) 0x40,
@@ -60,8 +60,13 @@ public class LockBLEUtil {
     }
 
 
-    public native static byte[] encrypt(String key, byte[] bytes);
-    public native static byte[] decrypt(String key, byte[] bytes);
+    public static byte[] encrypt(String key, byte[] bytes) {
+        return RC4Util.encrypt(key, bytes);
+    }
+
+    public static byte[] decrypt(String key, byte[] bytes) {
+        return RC4Util.encrypt(key, bytes);
+    }
 
     public static String toHexString(byte[] byteArray) {
         final StringBuilder hexString = new StringBuilder("");
@@ -82,7 +87,7 @@ public class LockBLEUtil {
         return hexString.toString();
     }
 
-    public static String genKey(){
+    public static String genKey() {
         int leftLimit = 97; // letter 'a'
         int rightLimit = 122; // letter 'z'
         int targetStringLength = 8;

@@ -1,15 +1,17 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "../../main/cpp/aes.h"
+#include "../../main/cpp/cr4.h"
+
 }
 
 
-TEST(BleTest, NotEmpty) {
-    const uint8_t *AES_KEY = (uint8_t *) "12345678";
-    const char *in = "a";
-    char *result = AES_128_ECB_PKCS5Padding_Encrypt(in, AES_KEY);
-    ASSERT_EQ(result[0], 0x1A);
+
+TEST(CR4Test, ENCRYT) {
+    unsigned char *AES_KEY = (uint8_t *) "12345678";
+    unsigned char *in = (unsigned char *) "a";
+    struct rc4_key s;
+    prepare_key(AES_KEY, sizeof(AES_KEY), &s);
+    rc4(in, sizeof(in), &s);
+    ASSERT_EQ(in[0], 0x1A);
 }
-
-
