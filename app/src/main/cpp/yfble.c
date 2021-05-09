@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/ptrace.h>
 #include "yfble.h"
-#include "aes.h"
+#include "cr4.h"
 
 
 jbyteArray char2byteArray(JNIEnv *envPtr, char *src) {
@@ -18,27 +18,44 @@ jbyteArray char2byteArray(JNIEnv *envPtr, char *src) {
     return barr;
 }
 
+jbyteArray as_byte_array(JNIEnv *envPtr, unsigned char* buf, int len) {
+    JNIEnv env = *envPtr;
+    jbyteArray array = env->NewByteArray (env, len);
+    env->SetByteArrayRegion (env, array, 0, len, buf);
+    return array;
+}
+
+unsigned char* as_unsigned_char_array(JNIEnv *envPtr, jbyteArray array) {
+    JNIEnv env = *envPtr;
+    int len = env->GetArrayLength (env, array);
+    unsigned char* buf[len];
+    memset(buf,0, len);
+    env->GetByteArrayRegion (env, array, 0, len, buf);
+    return buf;
+}
+
 
 
 JNIEXPORT jbyteArray JNICALL encrypt(JNIEnv *env,  jclass clazz, jstring  key, jbyteArray data) {
 
-    uint8_t *AES_KEY = (uint8_t *)(*env)->GetStringUTFChars(env, key, 0);
-    const char *in = (char *) (*env)->GetByteArrayElements(env, data, NULL);
-
-    char *result = AES_128_ECB_PKCS5Padding_Encrypt(in, AES_KEY);
-
-    return char2byteArray(env, result);
+    unsigned char  *AES_KEY = (unsigned char *)(*env)->GetByteArrayElements(env, data, NULL);
+    unsigned char *in = (unsigned char *)(*env)->GetByteArrayElements(env, data, NULL);
+    struct rc4_key s;
+    prepare_key(AES_KEY, sizeof(AES_KEY), &s);
+    rc4(in, sizeof(in), &s);
+    return as_unsigned_char_array(env, in);
 }
 
 
 JNIEXPORT jbyteArray JNICALL decrypt(JNIEnv *env, jclass clazz, jstring  key, jbyteArray data) {
 
-    uint8_t *AES_KEY = (uint8_t *)(*env)->GetStringUTFChars(env, key, 0);
-    const char *in = (char *) (*env)->GetByteArrayElements(env, data, NULL);
+    unsigned char  *AES_KEY = (unsigned char *)(*env)->GetByteArrayElements(env, data, NULL);
+    unsigned char *in = (char *) (*env)->GetByteArrayElements(env, data, NULL);
 
-    char *result = AES_128_ECB_PKCS5Padding_Decrypt(in, AES_KEY);
-
-    return char2byteArray(env, result);
+    struct rc4_key s;
+    prepare_key(AES_KEY, sizeof(AES_KEY), &s);
+    rc4(in, sizeof(in), &s);
+    return as_unsigned_char_array(env, in);
 }
 
 static JNINativeMethod method_table[] = {
