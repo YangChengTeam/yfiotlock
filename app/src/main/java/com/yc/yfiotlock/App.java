@@ -73,9 +73,6 @@ public class App extends Application {
         checkUpdate();
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "lock").build();
-
-        byte[] bytes = LockBLEUtil.encrypt("123458", "a".getBytes());
-        LogUtil.msg("#################"+LockBLEUtil.toHexString(bytes));
     }
 
 

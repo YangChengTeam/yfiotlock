@@ -1,6 +1,6 @@
 package com.yc.yfiotlock.utils;
 
-public class RC4Util {
+public class CR4Util {
     private static final byte[] S = new byte[256];
     private static final byte[] T = new byte[256];
     private static int keylen;
