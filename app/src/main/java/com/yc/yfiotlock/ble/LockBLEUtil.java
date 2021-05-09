@@ -1,6 +1,6 @@
 package com.yc.yfiotlock.ble;
 
-import com.yc.yfiotlock.utils.RC4Util;
+import com.yc.yfiotlock.utils.CR4Util;
 
 import java.util.Random;
 
@@ -61,11 +61,11 @@ public class LockBLEUtil {
 
 
     public static byte[] encrypt(String key, byte[] bytes) {
-        return RC4Util.encrypt(key, bytes);
+        return CR4Util.encrypt(key, bytes);
     }
 
     public static byte[] decrypt(String key, byte[] bytes) {
-        return RC4Util.encrypt(key, bytes);
+        return CR4Util.encrypt(key, bytes);
     }
 
     public static String toHexString(byte[] byteArray) {
