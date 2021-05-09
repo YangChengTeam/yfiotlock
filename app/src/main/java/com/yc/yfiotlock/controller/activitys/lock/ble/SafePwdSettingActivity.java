@@ -145,7 +145,9 @@ public class SafePwdSettingActivity extends BaseActivity implements Switch.OnChe
                     //开启开关之前 先验证对应的安全方式，在安全方式验证成功的回调中再通过代码打开开关
                     buttonView.setChecked(false);
                     checkFinger();
+                    return;
                 }
+                setSafeType(SafeUtil.PASSWORD_TYPE);
                 break;
             //密码
             case R.id.s_safe_pwd:
