@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.download;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.yc.yfiotlock.R;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 
 public class DeviceDownloadManager extends AppDownloadManager {
@@ -24,19 +26,30 @@ public class DeviceDownloadManager extends AppDownloadManager {
         return instance;
     }
 
+    private String mac;
+
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
+
+    public void init(WeakReference<Context> context, String mac) {
+        this.mac = mac;
+        super.init(context);
+    }
+
     @Override
     public void setUpdateInfo(UpdateInfo updateInfo) {
-        CacheUtil.setCache("downloadUpdateBinCache", updateInfo);
+        CacheUtil.setCache("downloadUpdateBinCache" + mac, updateInfo);
     }
 
     @Override
     public UpdateInfo getUpdateInfo() {
-        return CacheUtil.getCache("downloadUpdateBinCache", UpdateInfo.class);
+        return CacheUtil.getCache("downloadUpdateBinCache" + mac, UpdateInfo.class);
     }
 
     @Override
     protected String getUpdateFileName(UpdateInfo updateInfo) {
-        return getContext().getResources().getString(R.string.app_name) + "device" + updateInfo.getVersion() + ".bin";
+        return getContext().getResources().getString(R.string.app_name) + mac + "device" + updateInfo.getVersion() + ".bin";
     }
 
     @Override

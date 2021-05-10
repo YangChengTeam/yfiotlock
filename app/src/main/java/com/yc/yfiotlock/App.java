@@ -2,6 +2,8 @@ package com.yc.yfiotlock;
 
 import android.app.Application;
 import android.os.Build;
+import android.os.IBinder;
+import android.os.IGpioService;
 
 import androidx.room.Room;
 
@@ -28,6 +30,7 @@ import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +76,15 @@ public class App extends Application {
         checkUpdate();
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "lock").build();
+
+        Method method = null;
+        try {
+            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
+            IBinder binder = (IBinder) method.invoke(null, new Object[]{"gpio"});
+            IGpioService gpioService = IGpioService.Stub.asInterface(binder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

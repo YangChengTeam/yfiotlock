@@ -323,7 +323,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             mLoadingDialog.dismiss();
             localDeviceDel();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_VERSION) {
-            CacheUtil.setCache("firmwareVersion", new String(Arrays.copyOfRange(lockBLEData.getExtra(), 0, 6)));
+            lockInfo.setFirmwareVersion(new String(Arrays.copyOfRange(lockBLEData.getExtra(), 0, 6)));
             getUpdateInfo();
         }
     }

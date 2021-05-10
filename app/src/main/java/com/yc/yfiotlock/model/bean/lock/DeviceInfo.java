@@ -107,7 +107,7 @@ public class DeviceInfo implements Serializable {
     }
 
     public String getFirmwareVersion() {
-        firmwareVersion = CacheUtil.getCache("firmwareVersion", String.class);
+        firmwareVersion = CacheUtil.getCache("firmwareVersion" + macAddress, String.class);
         if (TextUtils.isEmpty(firmwareVersion)) {
             firmwareVersion = "v1.0.0";
         }
@@ -115,6 +115,7 @@ public class DeviceInfo implements Serializable {
     }
 
     public void setFirmwareVersion(String firmwareVersion) {
+        CacheUtil.setCache("firmwareVersion" + macAddress, firmwareVersion);
         this.firmwareVersion = firmwareVersion;
     }
 

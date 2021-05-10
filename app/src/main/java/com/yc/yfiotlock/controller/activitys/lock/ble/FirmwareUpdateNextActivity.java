@@ -92,7 +92,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         updateInfo = (UpdateInfo) getIntent().getSerializableExtra("updateInfo");
         BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBleSender = new LockBLESender(this, bleDevice, deviceInfo.getKey());
-        DeviceDownloadManager.getInstance().init(new WeakReference<>(this));
+        DeviceDownloadManager.getInstance().init(new WeakReference<>(this), deviceInfo.getMacAddress());
     }
 
     @Override
@@ -280,7 +280,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             clear();
             updateInfo.setUpgrade(false);
             DeviceDownloadManager.getInstance().setUpdateInfo(updateInfo);
-            CacheUtil.setCache("firmwareVersion", updateInfo.getVersion());
+            deviceInfo.setFirmwareVersion(updateInfo.getVersion());
             EventBus.getDefault().post(deviceInfo);
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSender.setOpOver(true);
