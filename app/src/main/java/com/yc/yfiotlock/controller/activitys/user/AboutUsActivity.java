@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.user;
 
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.widget.LinearLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -62,17 +63,17 @@ public class AboutUsActivity extends BaseBackActivity {
         mAboutAdapter = new AboutAdapter(null);
         mAboutAdapter.setOnItemClickListener((adapter, view, position) -> {
             AboutInfo aboutInfo = mAboutAdapter.getData().get(position);
-            switch (position) {
-                case 0:
+            switch (aboutInfo.getName()) {
+                case "官方网站":
                     CommonUtil.startBrowser(getContext(), aboutInfo.getValue());
                     break;
-                case 1:
+                case "官方QQ群":
                     CommonUtil.joinQQGroup(getContext(), aboutInfo.getValue());
                     break;
-                case 2:
+                case "客服邮箱":
                     CommonUtil.copyWithToast(getContext(), aboutInfo.getValue(), "邮箱已复制");
                     break;
-                case 3:
+                case "当前版本":
                     break;
                 default:
                     break;
@@ -143,13 +144,30 @@ public class AboutUsActivity extends BaseBackActivity {
 
     UpdateDialog updateDialog;
 
+    private void setAboutAdapterInfo(UpgradeInfo upgradeInfo) {
+        List<AboutInfo> aboutInfos = new ArrayList<>();
+        if (!TextUtils.isEmpty(upgradeInfo.getOfficialWeb())) {
+            aboutInfos.add(new AboutInfo("官方网站", upgradeInfo.getOfficialWeb()));
+        }
+        if (!TextUtils.isEmpty(upgradeInfo.getKfQqQun())) {
+            aboutInfos.add(new AboutInfo("官方QQ群", upgradeInfo.getKfQqQun()));
+        }
+        if (!TextUtils.isEmpty(upgradeInfo.getKfEmail())) {
+            aboutInfos.add(new AboutInfo("客服邮箱", upgradeInfo.getKfEmail()));
+        }
+        String versionCode = "";
+        if (GoagalInfo.get() != null && GoagalInfo.get().getPackageInfo() != null) {
+            versionCode = GoagalInfo.get().getPackageInfo().versionName;
+        }
+        aboutInfos.add(new AboutInfo("当前版本", "v" + versionCode));
+        mAboutAdapter.setNewInstance(aboutInfos);
+    }
+
+
     private void onSuccess(ResultInfo<UpgradeInfo> info, boolean showDialog) {
         UpgradeInfo upgradeInfo = info.getData();
 
-        mAboutAdapter.getData().get(0).setValue(upgradeInfo.getOfficialWeb());
-        mAboutAdapter.getData().get(1).setValue(upgradeInfo.getKfQqQun());
-        mAboutAdapter.getData().get(2).setValue(upgradeInfo.getKfEmail());
-        mAboutAdapter.notifyDataSetChanged();
+        setAboutAdapterInfo(upgradeInfo);
 
         UpdateInfo updateInfo = CommonUtil.getNeedUpgradeInfo(info.getData().getUpgrade());
         if (updateInfo != null) {
