@@ -76,15 +76,6 @@ public class App extends Application {
         checkUpdate();
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "lock").build();
-
-        Method method = null;
-        try {
-            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
-            IBinder binder = (IBinder) method.invoke(null, new Object[]{"gpio"});
-            IGpioService gpioService = IGpioService.Stub.asInterface(binder);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 
