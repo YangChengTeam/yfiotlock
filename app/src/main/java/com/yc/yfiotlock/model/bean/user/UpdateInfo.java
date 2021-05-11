@@ -28,6 +28,9 @@ public class UpdateInfo implements Serializable {
     private int downloadStatus;
     private int isMust;
 
+    @JSONField(name = "md5")
+    private String fileMd5;
+
     public int getProgress() {
         if (totalSize == 0) {
             return 0;
@@ -139,5 +142,11 @@ public class UpdateInfo implements Serializable {
         this.isMust = isMust;
     }
 
+    public String getFileMd5() {
+        return fileMd5;
+    }
 
+    public void setFileMd5(String fileMd5) {
+        this.fileMd5 = fileMd5;
+    }
 }

@@ -59,9 +59,13 @@ import com.yc.yfiotlock.view.widgets.MyItemDivider;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -478,27 +482,33 @@ public class CommonUtil {
         return phone;
     }
 
-    private static char[] hexDigits = "0123456789abcdef".toCharArray();
-    public static String md5(InputStream is) throws IOException {
-        String md5 = "";
+    public static String file2MD5(File file) {
         try {
-            byte[] bytes = new byte[4096];
-            int read;
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            while ((read = is.read(bytes)) != -1) {
-                digest.update(bytes, 0, read);
+            byte[] hash;
+            byte[] buffer = new byte[8192];
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            FileInputStream fis = new FileInputStream(file);
+            int len;
+            while ((len = fis.read(buffer)) != -1) {
+                md.update(buffer, 0, len);
             }
-            byte[] messageDigest = digest.digest();
-            StringBuilder sb = new StringBuilder(32);
-            for (byte b : messageDigest) {
-                sb.append(hexDigits[(b >> 4) & 0x0f]);
-                sb.append(hexDigits[b & 0x0f]);
+            hash = md.digest();
+            StringBuilder hex = new StringBuilder(hash.length * 2);
+            for (byte b : hash) {
+                if ((b & 0xFF) < 0x10) {
+                    hex.append("0");
+                }
+                hex.append(Integer.toHexString(b & 0xFF));
             }
-            md5 = sb.toString();
-        } catch (Exception e) {
+            return hex.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        return md5;
+        return "";
     }
 
 }

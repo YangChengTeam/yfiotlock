@@ -2,8 +2,6 @@ package com.yc.yfiotlock;
 
 import android.app.Application;
 import android.os.Build;
-import android.os.IBinder;
-import android.os.IGpioService;
 
 import androidx.room.Room;
 
@@ -13,24 +11,18 @@ import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
-import com.kk.utils.LogUtil;
-import com.kk.utils.VUiKit;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.ble.LockBLEManager;
-import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.dao.AppDatabase;
+import com.yc.yfiotlock.helper.GlideHelper;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
-import com.yc.yfiotlock.model.bean.user.UserInfo;
-import com.yc.yfiotlock.model.engin.DeviceEngin;
-import com.yc.yfiotlock.helper.GlideHelper;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
