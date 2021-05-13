@@ -57,23 +57,21 @@ public class LockBLEData {
     }
 
     public byte[] build(String key) {
-        short length = 0;
-        if (this.data != null ) {
-            length += data.length;
-        }
-
-        int seq = (int) (System.currentTimeMillis() / 1000);
-
         // LENGTH = 2 Seq = 4 MCMD = 1 SCMD = 1
         int precrcLen = 2 + 4 + 1 + 1;
 
         // CRC16 = 2
-        length += precrcLen + 2;
+        short length = (short) (precrcLen + 2);
+
 
         int len = precrcLen;
+
         byte[] bytes;
+        int seq = (int) (System.currentTimeMillis() / 1000);
+
         if (data != null) {
             len += data.length;
+            length += data.length;
             ByteBuffer byteBuffer = ByteBuffer.allocate(len).order(ByteOrder.BIG_ENDIAN);
             bytes = byteBuffer.putShort(length)
                     .putInt(seq)
@@ -93,8 +91,8 @@ public class LockBLEData {
         short crc16 = (short) LockBLEUtil.crc16(bytes);
 
         // CRC16 = 2
-        ByteBuffer packageBuffer = ByteBuffer.allocate(len + 2).order(ByteOrder.BIG_ENDIAN);
-        byte[] dataBytes = packageBuffer
+        ByteBuffer dataBuffer = ByteBuffer.allocate(len + 2).order(ByteOrder.BIG_ENDIAN);
+        byte[] dataBytes = dataBuffer
                 .put(bytes)
                 .putShort(crc16)
                 .array();

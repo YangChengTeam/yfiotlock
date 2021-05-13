@@ -71,6 +71,9 @@ public class LogFragment extends BaseFragment {
     @Override
     protected void initViews() {
         initRv();
+        if (CommonUtil.isNetworkAvailable(getContext())) {
+            cloudLoadData();
+        }
         localLoadData();
     }
 
@@ -90,16 +93,11 @@ public class LogFragment extends BaseFragment {
         lockLogDao.loadLogInfos(lockInfo.getId(), type, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
             @Override
             public void accept(List<LogInfo> openLockInfos) throws Exception {
-                if (openLockInfos.size() == 0) {
-                    nodataView.setVisibility(View.VISIBLE);
-                    // 只拉取一页数据
-                    if (CommonUtil.isNetworkAvailable(getContext())) {
-                        cloudLoadData();
-                    }
-                    return;
-                } else {
+                if (openLockInfos.size() != 0) {
                     nodataView.setVisibility(View.GONE);
                     success(openLockInfos);
+                } else {
+                    nodataView.setVisibility(View.VISIBLE);
                 }
             }
         });

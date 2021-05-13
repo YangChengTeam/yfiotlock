@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.annotation.SuppressLint;
 import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
@@ -77,6 +78,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     private LockBLESender lockBleSender;
     private FileInputStream in;
     private int packageCount;
+    private int totalPackageCount;
     private static final int DATA_LENGTH = 200;
     private boolean isUpdating = false;
 
@@ -219,6 +221,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             in = new FileInputStream(file);
             int dlen = DATA_LENGTH;
             packageCount = (int) (file.length() / dlen) + ((file.length() % dlen) > 0 ? 1 : 0);
+            totalPackageCount = packageCount;
             LogUtil.msg("文件大小:" + file.length() + " 包数量:" + packageCount);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -251,6 +254,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         DeviceDownloadManager.getInstance().stopTask();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_OPEN_UPDATE) {
@@ -264,10 +268,18 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
                 initBleUpdate();
                 bleUpdate();
                 isUpdating = true;
+                processDespTv.setText("正在安装");
+                int process = (int)((totalPackageCount-packageCount)/(float)totalPackageCount);
+                circularProgressBar.setProgress(process);
+                progressTv.setText( process + "%");
+                processView.setVisibility(View.VISIBLE);
             } else {
                 bleOpenUpdate();
             }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_UPDATE) {
+            int process = (int)((totalPackageCount-packageCount)/(float)totalPackageCount);
+            circularProgressBar.setProgress(process);
+            progressTv.setText( process + "%");
             bleUpdate();
         } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_UPDATE_SUCCESS) {
             processView.setVisibility(View.GONE);

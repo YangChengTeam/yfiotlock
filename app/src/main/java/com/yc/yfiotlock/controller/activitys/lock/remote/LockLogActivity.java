@@ -123,6 +123,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
         });
 
         mSrlRefresh.setEnabled(false);
+
         bleFirstSynclog();
         timeout();
     }
