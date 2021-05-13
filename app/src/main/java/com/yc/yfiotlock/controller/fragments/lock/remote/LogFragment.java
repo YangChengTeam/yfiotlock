@@ -45,7 +45,7 @@ public class LogFragment extends BaseFragment {
     protected LockLogDao lockLogDao;
     protected DeviceInfo lockInfo;
 
-    protected int type = 1;
+    protected int logtype = 1;
     protected int page = 1;
     protected int pageSize = 200;
 
@@ -71,9 +71,7 @@ public class LogFragment extends BaseFragment {
     @Override
     protected void initViews() {
         initRv();
-        if (CommonUtil.isNetworkAvailable(getContext())) {
-            cloudLoadData();
-        }
+        cloudLoadData();
         localLoadData();
     }
 
@@ -90,7 +88,7 @@ public class LogFragment extends BaseFragment {
 
     @SuppressLint("CheckResult")
     protected void localLoadData() {
-        lockLogDao.loadLogInfos(lockInfo.getId(), type, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
+        lockLogDao.loadLogInfos(lockInfo.getId(), logtype, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
             @Override
             public void accept(List<LogInfo> openLockInfos) throws Exception {
                 if (openLockInfos.size() != 0) {
@@ -120,6 +118,7 @@ public class LogFragment extends BaseFragment {
                     if (info.getData() == null || info.getData().getItems() == null || info.getData().getItems().size() == 0) {
                         return;
                     }
+
                     sync2Local(info.getData().getItems());
                 }
             }
@@ -127,8 +126,11 @@ public class LogFragment extends BaseFragment {
     }
 
     @SuppressLint("CheckResult")
-    public void sync2Local(List<LogInfo> data) {
-        lockLogDao.insertLogInfos(data).subscribeOn(Schedulers.io()).subscribe(new Action() {
+    public void sync2Local(List<LogInfo> logInfos) {
+        for(LogInfo logInfo: logInfos){
+            logInfo.setLogType(logtype);
+        }
+        lockLogDao.insertLogInfos(logInfos).subscribeOn(Schedulers.io()).subscribe(new Action() {
             @Override
             public void run() throws Exception {
                 localLoadData();

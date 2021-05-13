@@ -5,32 +5,41 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 @Entity(tableName = "log_info", primaryKeys = {"id", "event_id"})
 public class LogInfo {
     @NonNull
     private int id;
 
+    @JSONField(name = "event_id")
     @ColumnInfo(name = "event_id")
     private int eventId;
 
+    @JSONField(name = "log_type")
     @ColumnInfo(name = "log_type")
     private int logType;  // 日志 报警
 
+    @JSONField(name = "pwd_type")
     @ColumnInfo(name = "type")
     private int type;  // 类型
 
+    @JSONField(name = "group_type")
     @ColumnInfo(name = "group_type")
     private int groupType; // 设备权根
 
     @ColumnInfo(name = "time")
     private String time;
 
+    @JSONField(name = "add_time")
     @ColumnInfo(name = "addtime")
     private long addtime;
 
+    @JSONField(name = "locker_id")
     @ColumnInfo(name = "lock_id")
     private int lockId;
 
+    @JSONField(name = "keyid")
     @ColumnInfo(name = "key_id")
     private int keyid;
 
