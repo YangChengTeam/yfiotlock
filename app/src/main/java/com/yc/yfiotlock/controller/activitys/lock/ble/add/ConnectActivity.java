@@ -19,11 +19,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.ScreenUtil;
+import com.kk.utils.VUiKit;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLEOpCmd;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.helper.PermissionHelper;
+import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
 import com.yc.yfiotlock.utils.CommonUtil;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -69,6 +80,8 @@ public class ConnectActivity extends BaseConnectActivity {
         super.initVars();
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         registerScanWifiReceiver();
+
+        bleCheckLock();
     }
 
     private void registerScanWifiReceiver() {
@@ -109,6 +122,12 @@ public class ConnectActivity extends BaseConnectActivity {
         }
     }
 
+    private void bleCheckLock() {
+        if (lockBleSender != null) {
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getKey()));
+        }
+    }
+
 
     private void setInfo() {
         mEtSsid.setText(CommonUtil.getSsid(this));
@@ -118,6 +137,10 @@ public class ConnectActivity extends BaseConnectActivity {
     }
 
     private void nav2next() {
+        if (!isMatch) {
+            ToastCompat.show(this, "设备已经添加");
+            return;
+        }
         String ssid = mEtSsid.getText().toString();
         String pwd = mEtPwd.getText().toString();
         if (TextUtils.isEmpty(ssid)) {
@@ -240,6 +263,21 @@ public class ConnectActivity extends BaseConnectActivity {
         Window window = wifiAlertDialog.getWindow();
         if (window != null) {
             window.setLayout(ScreenUtil.getWidth(getContext()) - 100, ScreenUtil.getHeight(getContext()) / 2);
+        }
+    }
+
+
+    @Override
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            isMatch = true;
+        }
+    }
+
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            isMatch = false;
         }
     }
 }

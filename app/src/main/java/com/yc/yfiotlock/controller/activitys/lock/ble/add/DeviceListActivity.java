@@ -11,8 +11,10 @@ import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
 import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.utils.CommonUtil;
@@ -44,6 +46,7 @@ public class DeviceListActivity extends BaseAddActivity {
     SuperTextView mStvScan;
 
     private DeviceAdapter mDeviceAdapter;
+
 
     private static WeakReference<DeviceListActivity> mInstance;
 

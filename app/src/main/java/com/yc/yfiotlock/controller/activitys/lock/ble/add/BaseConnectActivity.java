@@ -41,6 +41,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected LockBLESender lockBleSender;
     protected DeviceEngin deviceEngin;
     protected DeviceDao deviceDao;
+    protected boolean isMatch;
 
     protected String aliDeviceName = "000000000000";
 
@@ -117,6 +118,10 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     protected void bleGetAliDeviceName() {
+        if (!isMatch) {
+            ToastCompat.show(this, "设备已经添加");
+            return;
+        }
         if (lockBleSender != null) {
             if (!isActiveDistributionNetwork) {
                 mLoadingDialog.show("添加设备中...");

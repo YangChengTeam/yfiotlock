@@ -269,7 +269,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
                 bleUpdate();
                 isUpdating = true;
                 processDespTv.setText("正在安装");
-                int process = (int)((totalPackageCount-packageCount)/(float)totalPackageCount);
+                int process = (int)(((totalPackageCount-packageCount)/(float)totalPackageCount) * 100);
                 circularProgressBar.setProgress(process);
                 progressTv.setText( process + "%");
                 processView.setVisibility(View.VISIBLE);
@@ -277,7 +277,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
                 bleOpenUpdate();
             }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_UPDATE) {
-            int process = (int)((totalPackageCount-packageCount)/(float)totalPackageCount);
+            int process = (int)(((totalPackageCount-packageCount)/(float)totalPackageCount) * 100);
             circularProgressBar.setProgress(process);
             progressTv.setText( process + "%");
             bleUpdate();
@@ -291,8 +291,8 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             updateVersionTv.setText("当前版本：" + updateInfo.getVersion());
             clear();
             updateInfo.setUpgrade(false);
-            DeviceDownloadManager.getInstance().setUpdateInfo(updateInfo);
             deviceInfo.setFirmwareVersion(updateInfo.getVersion());
+            DeviceDownloadManager.getInstance().setUpdateInfo(updateInfo);
             EventBus.getDefault().post(deviceInfo);
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSender.setOpOver(true);

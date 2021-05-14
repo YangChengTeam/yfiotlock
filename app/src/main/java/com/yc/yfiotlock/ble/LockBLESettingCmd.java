@@ -22,6 +22,7 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
     public static final byte SCMD_UPDATE = (byte) 0x0C;
     public static final byte SCMD_GET_BATTERY = (byte) 0x0D;
     public static final byte SCMD_GET_VERSION = (byte) 0x0E;
+    public static final byte SCMD_CHECK_LOCK = (byte) 0x10;
 
     // 1. 系统设置类(0x01)
     public static byte[] setting(String key, byte scmd, byte[] data) {
@@ -125,9 +126,14 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
         return setting(key, SCMD_GET_BATTERY, new byte[]{EMPTY_BODY});
     }
 
-    //  1.14 获取版本（0x0D）
+    //  1.14 获取版本（0x0E）
     public static byte[] getVersion(String key) {
         return setting(key, SCMD_GET_VERSION, new byte[]{EMPTY_BODY});
+    }
+
+    //  1.15 检测是否匹配
+    public static byte[] checkLock(String okey, String key) {
+        return setting(okey, SCMD_GET_VERSION, key.getBytes());
     }
 }
 

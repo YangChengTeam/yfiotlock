@@ -28,10 +28,10 @@ public class LogInfo {
     @ColumnInfo(name = "group_type")
     private int groupType; // 设备权根
 
+    @JSONField(name = "current_time")
     @ColumnInfo(name = "time")
     private String time;
 
-    @JSONField(name = "add_time")
     @ColumnInfo(name = "addtime")
     private long addtime;
 

@@ -1,5 +1,6 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.hardware.SensorEvent;
@@ -15,6 +16,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -34,7 +36,6 @@ import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
-import com.yc.yfiotlock.model.bean.eventbus.SyncTimeEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
 import com.yc.yfiotlock.model.bean.lock.TimeInfo;
@@ -50,7 +51,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -98,6 +98,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     private CloudHelper cloudHelper;
 
     private boolean isOpening;
+    private boolean isMatch;
 
     public DeviceInfo getLockInfo() {
         return lockInfo;
@@ -146,6 +147,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         lockEngine = new LockEngine(this);
         cloudHelper = new CloudHelper(this);
         syncTimeBlesender = new LockBLESender(this, bleDevice, lockInfo.getKey());
+
+        isMatch = MMKV.defaultMMKV().getBoolean("ismatch", false);
+
     }
 
     /**
@@ -162,12 +166,16 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         loadLockOpenCountInfo();
 
         if (bleDevice == null) {
-            scan();
+            if (isMatch) {
+                scan();
+            } else {
+                setOffsetlineInfo();
+            }
         } else {
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 initSends();
                 setConnectedInfo();
-                bleSynctime(true);
+                bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
             }
         }
 
@@ -230,6 +238,8 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         });
 
         RxView.clicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
+            if (!isMatch) return;
+
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 return;
             }
@@ -308,6 +318,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         registerNotify();
 
         // 重新连接
+        if (!isMatch) return;
         if (bleDevice != null && !LockBLEManager.getInstance().isConnected(bleDevice) && !isBleWorking()) {
             reconnect();
         }
@@ -369,6 +380,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         }
     }
 
+    private void bleCheckLock() {
+        if (lockBleSender != null) {
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getKey()));
+        }
+    }
+
     private void scan() {
         LockBLEManager.getInstance().initConfig2(lockInfo.getMacAddress());
         LockBLEManager.getInstance().scan(this, new LockBLEManager.LockBLEScanCallbck() {
@@ -427,8 +444,26 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         statusIv.setImageResource(R.mipmap.icon_bluetooth);
     }
 
+    // 连接失败
+    private void setConnectFailureInfo() {
+        statusTitleTv.setText("门锁未连接");
+        opDespTv.setText("请打开手机蓝牙贴近门锁");
+        statusIv.setImageResource(R.mipmap.icon_nolink);
+        loadingIv.setImageResource(R.mipmap.one);
+    }
+
+    // 设置已离线
+    private void setOffsetlineInfo() {
+        statusTitleTv.setText("门锁已离线");
+        opDespTv.setText("");
+        statusIv.setImageResource(R.mipmap.icon_nolink);
+        loadingIv.setImageResource(R.mipmap.one);
+    }
+
+
     // 连接蓝牙
     private void connect(final BleDevice bleDevice) {
+        if (!isMatch) return;
         isOpening = false;
         LockBLEManager.getInstance().connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
             @Override
@@ -440,10 +475,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             public void onDisconnect(BleDevice bleDevice) {
                 // 设置连接失败状态
                 stopAnimations();
-                statusTitleTv.setText("门锁未连接");
-                opDespTv.setText("请打开手机蓝牙贴近门锁");
-                statusIv.setImageResource(R.mipmap.icon_nolink);
-                loadingIv.setImageResource(R.mipmap.one);
+                setConnectFailureInfo();
             }
 
             @Override
@@ -459,10 +491,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             @Override
             public void onConnectFailed() {
                 stopAnimations();
-                statusTitleTv.setText("门锁连接失败");
-                opDespTv.setText("请打开手机蓝牙贴近门锁");
-                statusIv.setImageResource(R.mipmap.icon_nolink);
-                loadingIv.setImageResource(R.mipmap.one);
+                setConnectFailureInfo();
             }
         });
     }
@@ -523,6 +552,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         startActivity(intent);
     }
 
+    @SuppressLint("SetTextI18n")
     private void setCountInfo() {
         int groupType = 1;
         String key = "locker_count_" + lockInfo.getId() + groupType;
@@ -574,7 +604,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNotify(BleNotifyEvent bleNotifyEvent) {
         if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
-            bleSynctime(true);
+            bleCheckLock();
         }
     }
 
@@ -626,9 +656,14 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             });
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
             LogUtil.msg("同步时间成功");
-            bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
             LogUtil.msg("设置密钥成功");
+            bleSynctime(true);
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            LogUtil.msg("key匹配失败" + lockInfo.getKey());
+            MMKV.defaultMMKV().putBoolean("ismatch", false);
+            isMatch = true;
+            bleSynctime(true);
         }
     }
 
@@ -646,6 +681,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             LogUtil.msg("同步时间失败");
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
             LogUtil.msg("设置密钥失败");
+            bleSynctime(true);
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            LogUtil.msg("key匹配失败");
+            LockBLEManager.getInstance().disConnect(bleDevice);
+            setOffsetlineInfo();
         }
     }
+
 }

@@ -31,6 +31,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import rx.Observer;
+import rx.functions.Action1;
 
 public class LogFragment extends BaseFragment {
 
@@ -102,18 +103,9 @@ public class LogFragment extends BaseFragment {
     }
 
     protected void cloudLoadData() {
-        logEngine.getLocalOpenLog(lockInfo.getId() + "", 1, pageSize).subscribe(new Observer<ResultInfo<LogListInfo>>() {
+        logEngine.getLocalOpenLog(lockInfo.getId() + "", 1, pageSize).subscribe(new Action1<ResultInfo<LogListInfo>>() {
             @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onNext(ResultInfo<LogListInfo> info) {
+            public void call(ResultInfo<LogListInfo> info) {
                 if (info != null && info.getCode() == 1) {
                     if (info.getData() == null || info.getData().getItems() == null || info.getData().getItems().size() == 0) {
                         return;
@@ -128,6 +120,7 @@ public class LogFragment extends BaseFragment {
     @SuppressLint("CheckResult")
     public void sync2Local(List<LogInfo> logInfos) {
         for(LogInfo logInfo: logInfos){
+            logInfo.setAddtime(System.currentTimeMillis());
             logInfo.setLogType(logtype);
         }
         lockLogDao.insertLogInfos(logInfos).subscribeOn(Schedulers.io()).subscribe(new Action() {

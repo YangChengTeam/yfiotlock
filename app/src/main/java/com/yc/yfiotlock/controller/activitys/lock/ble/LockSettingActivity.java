@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.kk.securityhttp.domain.ResultInfo;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -130,8 +131,10 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setTitle("温馨提示");
             generalDialog.setMsg("是否删除该设备");
             generalDialog.setOnPositiveClickListener(dialog -> {
-                //是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
-                if (lockInfo.isShare()) {
+                // 是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
+                // 设备端重置了的也可以直接删
+                boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch", false);
+                if (lockInfo.isShare() || !isMatch) {
                     localDeviceDel();
                 } else {
                     if (LockBLEManager.getInstance().isConnected(bleDevice)) {
