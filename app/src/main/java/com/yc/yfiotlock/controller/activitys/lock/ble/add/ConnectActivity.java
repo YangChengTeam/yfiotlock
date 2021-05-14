@@ -20,8 +20,8 @@ import android.widget.TextView;
 
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.utils.LogUtil;
+import com.kk.securityhttp.utils.VUiKit;
 import com.kk.utils.ScreenUtil;
-import com.kk.utils.VUiKit;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -57,11 +57,12 @@ public class ConnectActivity extends BaseConnectActivity {
     @BindView(R.id.tv_skip)
     TextView mStvSkip;
 
+    private boolean showScanWifiResult = false;
+
     private WifiManager mWifiManager;
     private AlertDialog wifiAlertDialog;
 
     private static WeakReference<ConnectActivity> mInstance;
-
     public static void safeFinish() {
         if (mInstance != null && mInstance.get() != null) {
             mInstance.get().finish();
@@ -73,7 +74,6 @@ public class ConnectActivity extends BaseConnectActivity {
         return R.layout.lock_ble_activity_add_connect;
     }
 
-    private boolean showScanWifiResult = false;
 
     @Override
     protected void initVars() {
@@ -81,7 +81,7 @@ public class ConnectActivity extends BaseConnectActivity {
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         registerScanWifiReceiver();
 
-        bleCheckLock();
+        VUiKit.postDelayed(1000, this::bleCheckLock);
     }
 
     private void registerScanWifiReceiver() {
@@ -130,7 +130,6 @@ public class ConnectActivity extends BaseConnectActivity {
 
 
     private void setInfo() {
-        mEtSsid.setText(CommonUtil.getSsid(this));
         if (isActiveDistributionNetwork) {
             mStvSkip.setVisibility(View.GONE);
         }
@@ -271,6 +270,7 @@ public class ConnectActivity extends BaseConnectActivity {
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             isMatch = true;
+            LogUtil.msg("key匹配成功");
         }
     }
 
@@ -278,6 +278,7 @@ public class ConnectActivity extends BaseConnectActivity {
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             isMatch = false;
+            LogUtil.msg("key匹配失败");
         }
     }
 }

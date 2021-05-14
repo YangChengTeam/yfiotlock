@@ -133,7 +133,7 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
 
     //  1.15 检测是否匹配
     public static byte[] checkLock(String okey, String key) {
-        return setting(okey, SCMD_GET_VERSION, key.getBytes());
+        return setting(okey, SCMD_CHECK_LOCK, key.getBytes());
     }
 }
 
