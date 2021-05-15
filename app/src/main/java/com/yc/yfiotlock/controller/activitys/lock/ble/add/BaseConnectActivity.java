@@ -5,7 +5,6 @@ import android.content.Intent;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
-import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLESender;
@@ -14,7 +13,6 @@ import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
-import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
@@ -41,7 +39,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     protected LockBLESender lockBleSender;
     protected DeviceEngin deviceEngin;
     protected DeviceDao deviceDao;
-    protected boolean isMatch;
 
     protected String aliDeviceName = "000000000000";
 
@@ -118,10 +115,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     protected void bleGetAliDeviceName() {
-        if (!isMatch) {
-            ToastCompat.show(this, "设备已经添加");
-            return;
-        }
         if (lockBleSender != null) {
             if (!isActiveDistributionNetwork) {
                 mLoadingDialog.show("添加设备中...");

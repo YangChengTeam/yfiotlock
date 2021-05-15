@@ -98,7 +98,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     private CloudHelper cloudHelper;
 
     private boolean isOpening;
-    private boolean isMatch;
 
     public DeviceInfo getLockInfo() {
         return lockInfo;
@@ -147,9 +146,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         lockEngine = new LockEngine(this);
         cloudHelper = new CloudHelper(this);
         syncTimeBlesender = new LockBLESender(this, bleDevice, lockInfo.getKey());
-
-        isMatch = MMKV.defaultMMKV().getBoolean("ismatch", false);
-
     }
 
     /**
@@ -164,7 +160,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         mInstance = new WeakReference<>(this);
         setFullScreen();
         loadLockOpenCountInfo();
-
+        boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch", false);
         if (bleDevice == null) {
             if (isMatch) {
                 scan();
@@ -172,6 +168,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
                 setOffsetlineInfo();
             }
         } else {
+            bleDevice.setMatch(isMatch);
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 initSends();
                 setConnectedInfo();
@@ -238,8 +235,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         });
 
         RxView.clicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (!isMatch) return;
-
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 return;
             }
@@ -318,7 +313,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         registerNotify();
 
         // 重新连接
-        if (!isMatch) return;
         if (bleDevice != null && !LockBLEManager.getInstance().isConnected(bleDevice) && !isBleWorking()) {
             reconnect();
         }
@@ -463,7 +457,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
 
     // 连接蓝牙
     private void connect(final BleDevice bleDevice) {
-        if (!isMatch) return;
         isOpening = false;
         LockBLEManager.getInstance().connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
             @Override
@@ -482,10 +475,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             public void onConnectSuccess(BleDevice bleDevice) {
                 LockIndexActivity.this.bleDevice = bleDevice;
                 initSends();
-
-                // 设置连接成功状态
-                setConnectedInfo();
-                EventBus.getDefault().post(bleDevice);
             }
 
             @Override
@@ -660,12 +649,18 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             LogUtil.msg("设置密钥成功");
             bleSynctime(true);
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
-            LogUtil.msg("key匹配失败" + lockInfo.getKey());
-            MMKV.defaultMMKV().putBoolean("ismatch", false);
-            isMatch = true;
+            LogUtil.msg("key匹配成功" + lockInfo.getKey());
+            // 设置连接成功状态
+            setConnectedInfo();
+            bleDevice.setMatch(true);
+            MMKV.defaultMMKV().putBoolean("ismatch", true);
             bleSynctime(true);
+            EventBus.getDefault().post(bleDevice);
         }
     }
+
+    // 检测锁是否匹配
+    private int retryCount = 3;
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
@@ -684,8 +679,13 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             bleSynctime(true);
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             LogUtil.msg("key匹配失败");
-            LockBLEManager.getInstance().disConnect(bleDevice);
-            setOffsetlineInfo();
+            if (retryCount-- > 0) {
+                bleCheckLock();
+            } else {
+                bleDevice.setMatch(false);
+                setOffsetlineInfo();
+                retryCount = 3;
+            }
         }
     }
 

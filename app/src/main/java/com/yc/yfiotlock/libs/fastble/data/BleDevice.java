@@ -12,16 +12,18 @@ public class BleDevice implements Parcelable {
     private byte[] mScanRecord;
     private int mRssi;
     private long mTimestampNanos;
+    private boolean isMatch = false;
 
     public BleDevice(BluetoothDevice device) {
         mDevice = device;
     }
 
-    public BleDevice(BluetoothDevice device, int rssi, byte[] scanRecord, long timestampNanos) {
+    public BleDevice(BluetoothDevice device, int rssi, byte[] scanRecord, long timestampNanos, boolean isMatch) {
         mDevice = device;
         mScanRecord = scanRecord;
         mRssi = rssi;
         mTimestampNanos = timestampNanos;
+        this.isMatch = isMatch;
     }
 
     protected BleDevice(Parcel in) {
@@ -29,6 +31,7 @@ public class BleDevice implements Parcelable {
         mScanRecord = in.createByteArray();
         mRssi = in.readInt();
         mTimestampNanos = in.readLong();
+        isMatch = in.readByte() == (byte) 0x01;
     }
 
     @Override
@@ -37,6 +40,7 @@ public class BleDevice implements Parcelable {
         dest.writeByteArray(mScanRecord);
         dest.writeInt(mRssi);
         dest.writeLong(mTimestampNanos);
+        dest.writeByte(isMatch ? (byte) 0x01 : (byte) 0x00);
     }
 
     @Override
@@ -106,4 +110,11 @@ public class BleDevice implements Parcelable {
         this.mTimestampNanos = timestampNanos;
     }
 
+    public boolean isMatch() {
+        return isMatch;
+    }
+
+    public void setMatch(boolean match) {
+        isMatch = match;
+    }
 }

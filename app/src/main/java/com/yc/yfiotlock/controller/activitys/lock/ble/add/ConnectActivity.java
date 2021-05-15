@@ -74,14 +74,14 @@ public class ConnectActivity extends BaseConnectActivity {
         return R.layout.lock_ble_activity_add_connect;
     }
 
-
     @Override
     protected void initVars() {
         super.initVars();
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         registerScanWifiReceiver();
 
-        VUiKit.postDelayed(1000, this::bleCheckLock);
+        mLoadingDialog.show("检测中...");
+        VUiKit.postDelayed(2000, this::bleCheckLock);
     }
 
     private void registerScanWifiReceiver() {
@@ -136,10 +136,6 @@ public class ConnectActivity extends BaseConnectActivity {
     }
 
     private void nav2next() {
-        if (!isMatch) {
-            ToastCompat.show(this, "设备已经添加");
-            return;
-        }
         String ssid = mEtSsid.getText().toString();
         String pwd = mEtPwd.getText().toString();
         if (TextUtils.isEmpty(ssid)) {
@@ -266,19 +262,5 @@ public class ConnectActivity extends BaseConnectActivity {
     }
 
 
-    @Override
-    public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
-            isMatch = true;
-            LogUtil.msg("key匹配成功");
-        }
-    }
 
-    @Override
-    public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
-            isMatch = false;
-            LogUtil.msg("key匹配失败");
-        }
-    }
 }

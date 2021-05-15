@@ -8,9 +8,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
@@ -37,7 +40,7 @@ import butterknife.BindView;
  *
  * @author Dullyoung
  */
-public class DeviceListActivity extends BaseAddActivity {
+public class DeviceListActivity extends BaseAddActivity implements LockBLESender.NotifyCallback {
     @BindView(R.id.tv_scan_title)
     TextView mTvScanTitle;
     @BindView(R.id.rv_devices)
@@ -45,7 +48,10 @@ public class DeviceListActivity extends BaseAddActivity {
     @BindView(R.id.stv_scan)
     SuperTextView mStvScan;
 
+    protected LockBLESender lockBleSender;
+    private BleDevice bleDevice;
     private DeviceAdapter mDeviceAdapter;
+    private LockInfo lockInfo;
 
 
     private static WeakReference<DeviceListActivity> mInstance;
@@ -80,12 +86,12 @@ public class DeviceListActivity extends BaseAddActivity {
         mRvDevices.setLayoutManager(new LinearLayoutManager(getContext()));
         CommonUtil.setItemDivider(getContext(), mRvDevices);
         mDeviceAdapter.setOnItemClickListener((adapter, view, position) -> {
-            LockInfo tlockInfo = (LockInfo) adapter.getData().get(position);
-            connect(tlockInfo.getBleDevice());
+            DeviceListActivity.this.lockInfo = (LockInfo) adapter.getData().get(position);
+            connect(DeviceListActivity.this.lockInfo.getBleDevice(), DeviceListActivity.this.lockInfo.getKey());
         });
     }
 
-    private void connect(BleDevice bleDevice) {
+    private void connect(BleDevice bleDevice, String key) {
         LockBLEManager.getInstance().connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
             @Override
             public void onConnectStarted() {
@@ -100,7 +106,10 @@ public class DeviceListActivity extends BaseAddActivity {
             @Override
             public void onConnectSuccess(BleDevice bleDevice) {
                 mLoadingDialog.dismiss();
-                nav2Connect(bleDevice);
+                DeviceListActivity.this.bleDevice = bleDevice;
+                lockBleSender = new LockBLESender(getContext(), bleDevice, key);
+                lockBleSender.registerNotify();
+                lockBleSender.setNotifyCallback(DeviceListActivity.this);
             }
 
             @Override
@@ -126,6 +135,15 @@ public class DeviceListActivity extends BaseAddActivity {
         mDeviceAdapter.addData(lockInfo);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNotify(BleNotifyEvent bleNotifyEvent) {
+        if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
+            mLoadingDialog.show("检测中...");
+            bleCheckLock();
+        }
+    }
+
+
     @Override
     protected void bindClick() {
         setClick(mStvScan, () -> {
@@ -148,5 +166,34 @@ public class DeviceListActivity extends BaseAddActivity {
         }
     }
 
+    private void bleCheckLock() {
+        if (lockBleSender != null) {
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getKey()));
+        }
+    }
+
+    @Override
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            mLoadingDialog.dismiss();
+            LogUtil.msg("key匹配成功");
+            nav2Connect(bleDevice);
+        }
+    }
+
+    private int retryCount = 3;
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            mLoadingDialog.dismiss();
+            LogUtil.msg("key匹配失败");
+            if (retryCount-- > 0) {
+                bleCheckLock();
+            } else {
+                retryCount = 3;
+                ToastCompat.show(this, "设备已被添加");
+            }
+        }
+    }
 
 }

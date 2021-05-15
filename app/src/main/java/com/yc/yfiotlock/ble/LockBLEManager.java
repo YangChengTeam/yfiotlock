@@ -97,7 +97,7 @@ public class LockBLEManager {
     }
 
     public boolean isConnected(BleDevice bleDevice) {
-        return BleManager.getInstance().isConnected(bleDevice);
+        return bleDevice != null && BleManager.getInstance().isConnected(bleDevice) && bleDevice.isMatch();
     }
 
     public void disConnect(BleDevice bleDevice) {
@@ -223,7 +223,7 @@ public class LockBLEManager {
         // 开始搜索
         scannedBleDevices.forEach((key, value) -> {
             callbck.onScanning(value);
-            Log.d("scan cache", "name:"+value.getName() + " mac:" + value.getMac());
+            Log.d("scan cache", "name:" + value.getName() + " mac:" + value.getMac());
         });
 
         BleManager.getInstance().scan(new BleScanCallback() {
@@ -239,7 +239,7 @@ public class LockBLEManager {
             @Override
             public void onScanning(BleDevice bleDevice) {
                 if (bleDevice == null) return;
-                Log.d("scan ble", "name:"+bleDevice.getName() + " mac:" + bleDevice.getMac());
+                Log.d("scan ble", "name:" + bleDevice.getName() + " mac:" + bleDevice.getMac());
 
                 if (scannedBleDevices.get(bleDevice.getMac()) == null) {
                     scannedBleDevices.put(bleDevice.getMac(), bleDevice);
