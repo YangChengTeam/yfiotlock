@@ -40,7 +40,6 @@ public class LockBLESender {
     private boolean isSend = false;      // 是否发送中
     private boolean isOpOver = false;    // 实际操作是否完成
     private int wakeUpCount = 0;         // 发送唤醒次数
-    private boolean isReInit = false;    // 是否已被初始化
     public int responseErrorCount = 0;   // 响应失败次数
 
     public LockBLESender(Context context, BleDevice bleDevice, String key) {
@@ -65,12 +64,8 @@ public class LockBLESender {
         isOpOver = opOver;
     }
 
-    public boolean isReInit() {
-        return isReInit;
-    }
-
     private boolean isConnected() {
-        return LockBLEManager.getInstance().isConnected(bleDevice);
+        return (mcmd == LockBLESettingCmd.MCMD && scmd == LockBLESettingCmd.SCMD_CHECK_LOCK) || LockBLEManager.getInstance().isConnected(bleDevice);
     }
 
     public void setMcmd(byte mcmd) {
@@ -233,13 +228,9 @@ public class LockBLESender {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNotifySuccess(byte[] data) {
         boolean isEncrypt = true;
-        // 不需要加密的命令
-        if (mcmd == LockBLESettingCmd.MCMD && (scmd == LockBLESettingCmd.SCMD_SET_AES_KEY || scmd == LockBLESettingCmd.SCMD_UPDATE)) {
-            isEncrypt = false;
-        }
         LockBLEData lockBLEData;
         if (isEncrypt) {
-            lockBLEData = LockBLEPackage.getData(data, "");
+            lockBLEData = LockBLEPackage.getData(data, key);
         } else {
             lockBLEData = LockBLEPackage.getData(data);
         }
@@ -263,9 +254,6 @@ public class LockBLESender {
                     Log.d(TAG, "唤醒成功,发送真正指令");
                     op(cmdBytes);
                 }
-            } else if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_KEY_ERROR) {
-                // 密钥不对 设备已重新初始化
-                isReInit = true;
             } else {
                 Log.d(TAG, "唤醒失败");
             }

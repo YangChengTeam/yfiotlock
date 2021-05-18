@@ -32,14 +32,6 @@ public class BleUtil {
     }
 
     public static boolean isFoundDevice(@NonNull String mac) {
-        List<String> macList = App.getApp().getMacList();
-        if (macList != null) {
-            for (String tmac : macList) {
-                if (mac.equals(tmac)) {
-                    return true;
-                }
-            }
-        }
         IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
         if (indexInfo != null && indexInfo.getDeviceInfos() != null && indexInfo.getDeviceInfos().size() > 0) {
             for (DeviceInfo deviceInfo : indexInfo.getDeviceInfos()) {

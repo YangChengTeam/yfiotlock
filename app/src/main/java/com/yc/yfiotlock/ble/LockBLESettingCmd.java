@@ -26,7 +26,11 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
 
     // 1. 系统设置类(0x01)
     public static byte[] setting(String key, byte scmd, byte[] data) {
-        return setting(key, scmd, data, (byte) 0x00, false);
+        boolean isEncrypt = true;
+        if (scmd == SCMD_UPDATE) {
+            isEncrypt = false;
+        }
+        return setting(key, scmd, data, (byte) 0x00, isEncrypt);
     }
 
     public static byte[] setting(String key, byte scmd, byte[] data, byte pid, boolean isEncrypt) {
@@ -79,7 +83,7 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
         int year = Calendar.getInstance().get(Calendar.YEAR);
         year = getYearSuff(year, 1000);
         int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        int date = Calendar.getInstance().get(Calendar.DAY_OF_MONTH) ;
+        int date = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         int minute = Calendar.getInstance().get(Calendar.MINUTE);
         int second = Calendar.getInstance().get(Calendar.SECOND);

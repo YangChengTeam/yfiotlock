@@ -37,13 +37,6 @@ public class App extends Application {
         return app;
     }
 
-    // 所有云端设备
-    private List<String> macList = new ArrayList<>();
-
-    public List<String> getMacList() {
-        return macList;
-    }
-
     // 锁数据库
     private AppDatabase db;
 

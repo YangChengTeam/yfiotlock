@@ -64,6 +64,7 @@ public class IndexFragment extends BaseFragment {
     @BindView(R.id.srl_refresh)
     SwipeRefreshLayout mSrlRefresh;
 
+    private ShareDeviceEngine mEngine;
     private IndexDeviceAdapter indexDeviceAdapter;
     private IndexEngin indexEngin;
     private DeviceDao deviceDao;
@@ -119,7 +120,6 @@ public class IndexFragment extends BaseFragment {
         });
     }
 
-    private ShareDeviceEngine mEngine;
 
     private void checkLockExist() {
         mLoadingDialog.show("设备校验中...");

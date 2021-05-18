@@ -18,7 +18,9 @@ import com.kk.securityhttp.utils.LogUtil;
 import com.kk.utils.VUiKit;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEBaseCmd;
 import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.ble.LockBLESender;
@@ -160,16 +162,16 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         mInstance = new WeakReference<>(this);
         setFullScreen();
         loadLockOpenCountInfo();
-        boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch", false);
         if (bleDevice == null) {
+            boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + lockInfo.getMacAddress(), false);
             if (isMatch) {
                 scan();
             } else {
                 setOffsetlineInfo();
             }
         } else {
-            bleDevice.setMatch(isMatch);
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
+                MMKV.defaultMMKV().getBoolean("ismatch" + lockInfo.getMacAddress(), true);
                 initSends();
                 setConnectedInfo();
                 bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
@@ -274,8 +276,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             lockBleSender.registerNotify();
             lockBleSender.setNotifyCallback(this);
         }
-
-
     }
 
     private void registerNotify() {
@@ -288,7 +288,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             syncTimeBlesender.registerNotify();
             syncTimeBlesender.setNotifyCallback(this);
         }
-
     }
 
     private void unregisterNotify() {
@@ -627,6 +626,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
     }
 
+
+    private int retryCount = 3;
+
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_OPEN) {
@@ -653,14 +655,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             // 设置连接成功状态
             setConnectedInfo();
             bleDevice.setMatch(true);
-            MMKV.defaultMMKV().putBoolean("ismatch", true);
             bleSynctime(true);
+            MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), true);
             EventBus.getDefault().post(bleDevice);
         }
     }
-
-    // 检测锁是否匹配
-    private int retryCount = 3;
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
@@ -676,15 +675,23 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             LogUtil.msg("同步时间失败");
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
             LogUtil.msg("设置密钥失败");
-            bleSynctime(true);
-        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
-            LogUtil.msg("key匹配失败");
             if (retryCount-- > 0) {
-                bleCheckLock();
+                bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
             } else {
-                bleDevice.setMatch(false);
-                setOffsetlineInfo();
                 retryCount = 3;
+                bleSynctime(false);
+            }
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_ERROR) {
+                LogUtil.msg("key匹配失败");
+                if (retryCount-- > 0) {
+                    bleCheckLock();
+                } else {
+                    bleDevice.setMatch(false);
+                    setOffsetlineInfo();
+                    retryCount = 3;
+                    MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), false);
+                }
             }
         }
     }

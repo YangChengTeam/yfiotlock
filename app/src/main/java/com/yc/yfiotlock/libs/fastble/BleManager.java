@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Looper;
 
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.libs.fastble.bluetooth.BleBluetooth;
 import com.yc.yfiotlock.libs.fastble.bluetooth.MultipleBluetoothController;
 import com.yc.yfiotlock.libs.fastble.bluetooth.SplitWriter;
@@ -367,13 +368,14 @@ public class BleManager {
     /**
      * connect a device through its mac without scan,whether or not it has been connected
      *
-     * @param mac
-     * @param bleGattCallback
+     * @param  @param bleGattCallbackmac
+     *      *
      * @return
      */
     public BluetoothGatt connect(String mac, BleGattCallback bleGattCallback) {
         BluetoothDevice bluetoothDevice = getBluetoothAdapter().getRemoteDevice(mac);
-        BleDevice bleDevice = new BleDevice(bluetoothDevice, 0, null, 0);
+        boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + mac, false);
+        BleDevice bleDevice = new BleDevice(bluetoothDevice, 0, null, 0, isMatch);
         return connect(bleDevice, bleGattCallback);
     }
 
@@ -795,7 +797,8 @@ public class BleManager {
         if (scanRecord != null)
             bytes = scanRecord.getBytes();
         long timestampNanos = scanResult.getTimestampNanos();
-        return new BleDevice(bluetoothDevice, rssi, bytes, timestampNanos);
+        boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + bluetoothDevice.getAddress(), false);
+        return new BleDevice(bluetoothDevice, rssi, bytes, timestampNanos, isMatch);
     }
 
     public BleBluetooth getBleBluetooth(BleDevice bleDevice) {

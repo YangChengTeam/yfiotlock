@@ -79,9 +79,6 @@ public class ConnectActivity extends BaseConnectActivity {
         super.initVars();
         mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         registerScanWifiReceiver();
-
-        mLoadingDialog.show("检测中...");
-        VUiKit.postDelayed(2000, this::bleCheckLock);
     }
 
     private void registerScanWifiReceiver() {
@@ -117,17 +114,7 @@ public class ConnectActivity extends BaseConnectActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(wifiScanReceiver);
-        if (lockBleSender != null) {
-            lockBleSender.clear();
-        }
     }
-
-    private void bleCheckLock() {
-        if (lockBleSender != null) {
-            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getKey()));
-        }
-    }
-
 
     private void setInfo() {
         if (isActiveDistributionNetwork) {

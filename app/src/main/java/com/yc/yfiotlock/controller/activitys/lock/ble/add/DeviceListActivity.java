@@ -10,6 +10,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
+import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -168,7 +169,7 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
 
     private void bleCheckLock() {
         if (lockBleSender != null) {
-            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getKey()));
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getOrigenKey()));
         }
     }
 
@@ -176,7 +177,9 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             mLoadingDialog.dismiss();
+            bleDevice.setMatch(true);
             LogUtil.msg("key匹配成功");
+            MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), true);
             nav2Connect(bleDevice);
         }
     }
@@ -192,6 +195,7 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
             } else {
                 retryCount = 3;
                 ToastCompat.show(this, "设备已被添加");
+                MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), false);
             }
         }
     }

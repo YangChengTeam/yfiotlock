@@ -63,7 +63,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         deviceDao.insertDeviceInfo(deviceInfo).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action() {
             @Override
             public void run() throws Exception {
-                EventBus.getDefault().post(new IndexRefreshEvent());
                 UserInfoCache.incDeviceNumber();
                 nav2Index();
             }
@@ -71,6 +70,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     protected void cloudDeviceAdd() {
+        lockInfo.setKey(LockBLEUtil.genKey());
         deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, lockInfo.getKey()).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
             @Override
             public void onCompleted() {
@@ -102,15 +102,16 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     @Override
     public void success(Object data) {
         isDeviceAdd = true;
-
+        String key = lockInfo.getKey();
         lockInfo = (DeviceInfo) data;
         lockInfo.setMacAddress(bleDevice.getMac());
         lockInfo.setName(bleDevice.getName());
         lockInfo.setDeviceId(aliDeviceName);
         lockInfo.setFamilyId(familyInfo.getId());
+        lockInfo.setKey(key);
         lockInfo.setAdd(true);
-        lockInfo.setKey(LockBLEUtil.genKey());
         lockInfo.setMasterId(UserInfoCache.getUserInfo().getId());
+        EventBus.getDefault().post(new IndexRefreshEvent());
         localDeviceAdd(lockInfo);
     }
 

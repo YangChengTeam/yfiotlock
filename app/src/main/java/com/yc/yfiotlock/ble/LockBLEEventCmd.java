@@ -43,6 +43,7 @@ public class LockBLEEventCmd extends LockBLEBaseCmd {
         lockBLEData.setMcmd(MCMD);
         lockBLEData.setScmd(scmd);
         lockBLEData.setData(data);
+        lockBLEData.setEncrypt(true);
         return lockBLEPackage.build(key, lockBLEData);
     }
 

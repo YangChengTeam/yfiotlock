@@ -105,7 +105,7 @@ public abstract class BleScanPresenter implements BluetoothAdapter.LeScanCallbac
 
         Message message = mHandler.obtainMessage();
         message.what = BleMsg.MSG_SCAN_DEVICE;
-        message.obj = new BleDevice(device, rssi, scanRecord, System.currentTimeMillis());
+        message.obj = new BleDevice(device, rssi, scanRecord, System.currentTimeMillis(), false);
         mHandler.sendMessage(message);
     }
 
