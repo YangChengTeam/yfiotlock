@@ -34,6 +34,7 @@ import com.yc.yfiotlock.helper.CloudHelper;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.sensor.ShakeSensor;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
+import com.yc.yfiotlock.model.bean.eventbus.ForamtErrorEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockCountRefreshEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
@@ -245,6 +246,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
                 return;
             }
 
+            if(isBleOffline()){
+                return;
+            }
+
             if (bleDevice == null) {
                 scan();
             } else {
@@ -260,7 +265,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     }
 
     private boolean isBleWorking() {
-        return "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString());
+        return  "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString());
+    }
+
+    private boolean isBleOffline(){
+        return "门锁已离线".equals(statusTitleTv.getText().toString());
     }
 
     private void vibrate() {
@@ -503,7 +512,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     protected void bleSetkey(String oldKey, String newKey) {
         if (lockBleSender != null) {
             byte[] bytes = LockBLESettingCmd.setAesKey(oldKey, newKey);
-            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes, false);
         }
     }
 
@@ -588,6 +597,13 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         this.bleDevice = bleDevice;
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFormatError(ForamtErrorEvent object) {
+        bleDevice.setMatch(false);
+        setOffsetlineInfo();
+        MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), false);
+    }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNotify(BleNotifyEvent bleNotifyEvent) {
@@ -649,6 +665,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             LogUtil.msg("同步时间成功");
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
             LogUtil.msg("设置密钥成功");
+            lockBleSender.setKey(lockInfo.getKey());
             bleSynctime(true);
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             LogUtil.msg("key匹配成功" + lockInfo.getKey());

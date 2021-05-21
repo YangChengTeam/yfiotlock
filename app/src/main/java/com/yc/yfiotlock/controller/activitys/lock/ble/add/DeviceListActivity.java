@@ -12,6 +12,7 @@ import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEBaseCmd;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESender;
@@ -185,17 +186,20 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
     }
 
     private int retryCount = 3;
+
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
-            mLoadingDialog.dismiss();
-            LogUtil.msg("key匹配失败");
-            if (retryCount-- > 0) {
-                bleCheckLock();
-            } else {
-                retryCount = 3;
-                ToastCompat.show(this, "设备已被添加");
-                MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), false);
+            if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_ERROR || lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_KEY_ERROR) {
+                mLoadingDialog.dismiss();
+                LogUtil.msg("key匹配失败");
+                if (retryCount-- > 0) {
+                    bleCheckLock();
+                } else {
+                    retryCount = 3;
+                    ToastCompat.show(this, "设备已被添加");
+                    MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), false);
+                }
             }
         }
     }

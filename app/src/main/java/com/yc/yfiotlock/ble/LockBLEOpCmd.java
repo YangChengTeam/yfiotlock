@@ -25,7 +25,11 @@ public class LockBLEOpCmd extends LockBLEBaseCmd {
         lockBLEData.setMcmd(MCMD);
         lockBLEData.setScmd(scmd);
         lockBLEData.setData(data);
-        lockBLEData.setEncrypt(true);
+        if (scmd != SCMD_WAKE_UP) {
+            lockBLEData.setEncrypt(true);
+        } else {
+            lockBLEData.setEncrypt(false);
+        }
         return lockBLEPackage.build(key, lockBLEData);
     }
 

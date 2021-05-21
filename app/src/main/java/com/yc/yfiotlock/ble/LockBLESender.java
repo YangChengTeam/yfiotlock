@@ -10,6 +10,7 @@ import com.yc.yfiotlock.libs.fastble.callback.BleWriteCallback;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.fastble.exception.BleException;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
+import com.yc.yfiotlock.model.bean.eventbus.ForamtErrorEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.model.bean.eventbus.SyncTimeEvent;
@@ -45,6 +46,10 @@ public class LockBLESender {
     public LockBLESender(Context context, BleDevice bleDevice, String key) {
         //this.context = context;
         this.bleDevice = bleDevice;
+        this.key = key;
+    }
+
+    public void setKey(String key) {
         this.key = key;
     }
 
@@ -103,6 +108,7 @@ public class LockBLESender {
                 wakeup();
             } else {
                 Log.d(TAG, "直接发送真正指令");
+                waupStatus = true;
                 op(cmdBytes);
             }
         } else {
@@ -212,7 +218,6 @@ public class LockBLESender {
                         isRegNotifying = false;
                         EventBus.getDefault().post(new BleNotifyEvent(BleNotifyEvent.onNotifyFailure));
                         LockBLEManager.getInstance().disConnect(bleDevice);
-                        LockBLEManager.getInstance().getScannedBleDevices().remove(bleDevice.getMac());
                         EventBus.getDefault().post(new ReScanEvent());
                     }
 
@@ -227,15 +232,20 @@ public class LockBLESender {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNotifySuccess(byte[] data) {
-        boolean isEncrypt = true;
+        if (mcmd == 0x00 || scmd == 0x00) {
+            return;
+        }
+        boolean isEncrypt = waupStatus;
         LockBLEData lockBLEData;
         if (isEncrypt) {
             lockBLEData = LockBLEPackage.getData(data, key);
+            Log.d(TAG, "唤醒后加密码状态:" + isEncrypt + " mcmd:" + mcmd + " scmd:" + scmd);
         } else {
             lockBLEData = LockBLEPackage.getData(data);
+            Log.d(TAG, "唤醒前加密码状态:" + isEncrypt + " mcmd:" + mcmd + " scmd:" + scmd);
         }
         if (lockBLEData == null || lockBLEData.getMcmd() == (byte) 0x00 || lockBLEData.getScmd() == (byte) 0x00) {
-            notifyErrorResponse("lockBLEData format error");
+            EventBus.getDefault().post(new ForamtErrorEvent());
         } else {
             processNotify(lockBLEData);
         }
@@ -243,9 +253,6 @@ public class LockBLESender {
 
     // 处理响应
     private void processNotify(LockBLEData lockBLEData) {
-        if (mcmd == 0x00 || scmd == 0x00) {
-            return;
-        }
         if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_WAKE_UP) {
             // 唤醒成功后发送真正操作
             if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
@@ -319,6 +326,7 @@ public class LockBLESender {
     //  bleDevice 出现未知问题
     private void rescan() {
         if (responseErrorCount > 3) {
+            responseErrorCount = 0;
             Log.d(TAG, "超过最大错误次数:" + responseErrorCount + " 重新搜索连接");
             LockBLEManager.getInstance().destory();
             EventBus.getDefault().post(new ReScanEvent());
@@ -345,6 +353,7 @@ public class LockBLESender {
         lockBLEData.setScmd(scmd);
         lockBLEData.setExtra(error.getBytes());
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_NOTIFY_NO_CONNECTION);
+        responseErrorCount++;
         processNotify(lockBLEData);
     }
 
@@ -356,6 +365,19 @@ public class LockBLESender {
         lockBLEData.setScmd(scmd);
         lockBLEData.setExtra(error.getBytes());
         lockBLEData.setStatus(LockBLEBaseCmd.STATUS_NOTIFY_TIMEOUT_ERROR);
+        processNotify(lockBLEData);
+        responseErrorCount++;
+        rescan();
+    }
+
+    // 响应错误
+    public void notifyFormatError(String error) {
+        Log.d(TAG, error);
+        LockBLEData lockBLEData = new LockBLEData();
+        lockBLEData.setMcmd(mcmd);
+        lockBLEData.setScmd(scmd);
+        lockBLEData.setExtra(error.getBytes());
+        lockBLEData.setStatus(LockBLEBaseCmd.STATUS_KEY_ERROR);
         processNotify(lockBLEData);
         responseErrorCount++;
         rescan();

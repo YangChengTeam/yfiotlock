@@ -59,10 +59,6 @@ public class LockBLEManager {
 
     private Map<String, BleDevice> scannedBleDevices = new HashMap<>();
 
-    public Map<String, BleDevice> getScannedBleDevices() {
-        return scannedBleDevices;
-    }
-
     private boolean isConnecting = false;
     private BleStateReceiver bleStateReceiver;
 
@@ -97,7 +93,7 @@ public class LockBLEManager {
     }
 
     public boolean isConnected(BleDevice bleDevice) {
-        return bleDevice != null && BleManager.getInstance().isConnected(bleDevice) && bleDevice.isMatch();
+        return BleManager.getInstance().isConnected(bleDevice) && bleDevice.isMatch();
     }
 
     public void disConnect(BleDevice bleDevice) {
