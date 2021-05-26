@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.coorchice.library.SuperTextView;
+import com.kk.securityhttp.utils.LogUtil;
+import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
@@ -89,8 +91,12 @@ public class ScanDeviceActivity extends BaseAddActivity {
                         nav2List(bleDevice);
                     } else {
                         deviceHashMap.put(bleDevice.getMac(), bleDevice);
-                        EventBus.getDefault().post(bleDevice);
+                        VUiKit.postDelayed(1000, () -> {
+                            EventBus.getDefault().post(bleDevice);
+                        });
                     }
+                } else {
+                    LogUtil.msg("已经添加的锁不进入列表:" + bleDevice.getKey());
                 }
             }
 

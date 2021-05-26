@@ -43,6 +43,7 @@ public class LockBLESender {
     private int wakeUpCount = 0;         // 发送唤醒次数
     public int responseErrorCount = 0;   // 响应失败次数
 
+
     public LockBLESender(Context context, BleDevice bleDevice, String key) {
         //this.context = context;
         this.bleDevice = bleDevice;
@@ -105,6 +106,7 @@ public class LockBLESender {
             isSend = true;
             isOpOver = false;
             if (isWakeup) {
+                waupStatus = false;
                 wakeup();
             } else {
                 Log.d(TAG, "直接发送真正指令");
@@ -235,14 +237,12 @@ public class LockBLESender {
         if (mcmd == 0x00 || scmd == 0x00) {
             return;
         }
-        boolean isEncrypt = waupStatus;
-        LockBLEData lockBLEData;
-        if (isEncrypt) {
-            lockBLEData = LockBLEPackage.getData(data, key);
-            Log.d(TAG, "唤醒后加密码状态:" + isEncrypt + " mcmd:" + mcmd + " scmd:" + scmd);
-        } else {
+        LockBLEData lockBLEData = LockBLEPackage.getData(data, key);
+        if (lockBLEData == null || lockBLEData.getMcmd() == (byte) 0x00 || lockBLEData.getScmd() == (byte) 0x00) {
             lockBLEData = LockBLEPackage.getData(data);
-            Log.d(TAG, "唤醒前加密码状态:" + isEncrypt + " mcmd:" + mcmd + " scmd:" + scmd);
+            Log.d(TAG, "非加密状态:" + " mcmd:" + mcmd + " scmd:" + scmd);
+        } else {
+            Log.d(TAG, "加密状态:" + " mcmd:" + mcmd + " scmd:" + scmd);
         }
         if (lockBLEData == null || lockBLEData.getMcmd() == (byte) 0x00 || lockBLEData.getScmd() == (byte) 0x00) {
             EventBus.getDefault().post(new ForamtErrorEvent());

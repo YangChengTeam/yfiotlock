@@ -59,7 +59,7 @@ public class LockBLEPackage {
 
         crc16 = (short) LockBLEUtil.crc16(bytes);
 
-        ByteBuffer packageBuffer = ByteBuffer.allocate(len + nodataLen).put(start).put(bytes).putShort(pid).put(end).order(ByteOrder.BIG_ENDIAN);
+        ByteBuffer packageBuffer = ByteBuffer.allocate(len + nodataLen).put(start).put(bytes).putShort(crc16).put(end).order(ByteOrder.BIG_ENDIAN);
 
         return packageBuffer.array();
     }

@@ -277,6 +277,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
     private void nav2Connect() {
         Intent intent = new Intent(this, ConnectActivity.class);
         intent.putExtra("bleDevice", bleDevice);
+        intent.putExtra("device", lockInfo);
         intent.putExtra("family", LockIndexActivity.getInstance().getFamilyInfo());
         intent.putExtra("isActiveDistributionNetwork", true);
         startActivity(intent);

@@ -164,12 +164,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         setFullScreen();
         loadLockOpenCountInfo();
         if (bleDevice == null) {
-            boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + lockInfo.getMacAddress(), false);
-            if (isMatch) {
-                scan();
-            } else {
-                setOffsetlineInfo();
-            }
+            scan();
         } else {
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                 MMKV.defaultMMKV().getBoolean("ismatch" + lockInfo.getMacAddress(), true);

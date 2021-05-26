@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.ble;
 
+import com.kk.securityhttp.utils.LogUtil;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Calendar;
@@ -34,6 +36,8 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
     }
 
     public static byte[] setting(String key, byte scmd, byte[] data, byte pid, boolean isEncrypt) {
+        LogUtil.msg("当前key:" + key);
+
         LockBLEPackage lockBLEPackage = new LockBLEPackage();
         lockBLEPackage.setPid(pid);
         LockBLEData lockBLEData = new LockBLEData();

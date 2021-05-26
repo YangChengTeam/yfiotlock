@@ -41,6 +41,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import io.reactivex.CompletableObserver;
@@ -217,6 +218,7 @@ public class IndexFragment extends BaseFragment {
 
                     lastDeviceInfos = new ArrayList<>();
                     List<DeviceInfo> finalLastDeviceInfos = lastDeviceInfos;
+
                     hashMap.forEach((k, v) -> {
                         finalLastDeviceInfos.add(v);
                     });

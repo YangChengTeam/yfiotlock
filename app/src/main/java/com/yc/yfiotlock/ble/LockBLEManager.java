@@ -34,7 +34,7 @@ import java.util.Map;
 
 public class LockBLEManager {
     public static final String DEVICE_NAME = "YF-L1";
-    public static final int OP_INTERVAL_TIME = 200;
+    public static final int OP_INTERVAL_TIME = 250;
     public static final String PIN_CODE = "123456";
     public static byte GROUP_TYPE = 0;
     public static final byte GROUP_TYPE_TEMP_PWD = 2;
@@ -51,7 +51,7 @@ public class LockBLEManager {
     private LockBLEManager() {
     }
 
-    private static LockBLEManager instance = new LockBLEManager();
+    private static final LockBLEManager instance = new LockBLEManager();
 
     public static LockBLEManager getInstance() {
         return instance;
@@ -59,7 +59,6 @@ public class LockBLEManager {
 
     private Map<String, BleDevice> scannedBleDevices = new HashMap<>();
 
-    private boolean isConnecting = false;
     private BleStateReceiver bleStateReceiver;
 
     public void initBle(Application context) {
@@ -153,7 +152,6 @@ public class LockBLEManager {
                                 activity.startActivityForResult(intent, REQUEST_GPS);
                             })
                             .setNegativeText("取消").show();
-
                     return;
                 }
                 startScan(callbck);
@@ -267,12 +265,8 @@ public class LockBLEManager {
         void onConnectFailed();
     }
 
-    private LockBLEConnectCallbck connectCallbck;
 
     public void connect(BleDevice bleDevice, LockBLEConnectCallbck callbck) {
-        if (isConnecting) return;
-        isConnecting = true;
-        this.connectCallbck = callbck;
         callbck.onConnectStarted();
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
@@ -282,13 +276,11 @@ public class LockBLEManager {
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                isConnecting = false;
                 callbck.onConnectFailed();
             }
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
-                isConnecting = false;
                 callbck.onConnectSuccess(bleDevice);
                 setMtu(bleDevice);
             }

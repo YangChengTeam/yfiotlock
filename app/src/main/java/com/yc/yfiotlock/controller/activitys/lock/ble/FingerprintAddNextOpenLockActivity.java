@@ -8,6 +8,7 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEBaseCmd;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
+import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
 
 import java.util.Arrays;
@@ -51,7 +52,8 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData != null && lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT && lockBLEData.getExtra()[0] > (byte) 0x01) {
-            resultTv.setText(lockBLEData.getExtra()[0] + "/6 录入成功");
+            int n = lockBLEData.getExtra()[0];
+            resultTv.setText(n + "/6 录入成功");
             fpIv.setImageResource(getResources().getIdentifier("fp" + lockBLEData.getExtra()[0], "mipmap", this.getPackageName()));
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {

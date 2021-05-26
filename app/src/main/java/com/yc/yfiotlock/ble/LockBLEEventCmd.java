@@ -2,6 +2,8 @@ package com.yc.yfiotlock.ble;
 
 import android.content.Context;
 
+import com.kk.securityhttp.utils.LogUtil;
+
 import java.nio.ByteBuffer;
 
 public class LockBLEEventCmd extends LockBLEBaseCmd {
@@ -38,6 +40,8 @@ public class LockBLEEventCmd extends LockBLEBaseCmd {
 
     // 2. 事件类 (0x08)
     public static byte[] op(String key, byte scmd, byte[] data) {
+        LogUtil.msg("当前key:" + key);
+
         LockBLEPackage lockBLEPackage = new LockBLEPackage();
         LockBLEData lockBLEData = new LockBLEData();
         lockBLEData.setMcmd(MCMD);
