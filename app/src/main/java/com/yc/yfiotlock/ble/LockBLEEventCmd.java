@@ -34,7 +34,6 @@ public class LockBLEEventCmd extends LockBLEBaseCmd {
     // 防撬报警（0x09）
     public static final byte SCMD_AVOID_PRY_ALARM = (byte) 0x09;
 
-
     // 更新成功
     public static final byte SCMD_UPDATE_SUCCESS = (byte) 0x0F;
 
