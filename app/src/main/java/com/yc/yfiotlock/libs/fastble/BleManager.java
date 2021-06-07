@@ -374,7 +374,7 @@ public class BleManager {
      */
     public BluetoothGatt connect(String mac, BleGattCallback bleGattCallback) {
         BluetoothDevice bluetoothDevice = getBluetoothAdapter().getRemoteDevice(mac);
-        boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + mac, false);
+        boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + mac, true);
         BleDevice bleDevice = new BleDevice(bluetoothDevice, 0, null, 0, isMatch);
         return connect(bleDevice, bleGattCallback);
     }
@@ -797,7 +797,7 @@ public class BleManager {
         if (scanRecord != null)
             bytes = scanRecord.getBytes();
         long timestampNanos = scanResult.getTimestampNanos();
-        boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + bluetoothDevice.getAddress(), false);
+        boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + bluetoothDevice.getAddress(), true);
         return new BleDevice(bluetoothDevice, rssi, bytes, timestampNanos, isMatch);
     }
 

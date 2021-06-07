@@ -39,7 +39,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-
     }
 
     compileSdkVersion 30
@@ -47,7 +46,7 @@ android {
 
     defaultConfig {
         applicationId "com.yc.yfiotlock"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 105
         versionName "1.0.5"

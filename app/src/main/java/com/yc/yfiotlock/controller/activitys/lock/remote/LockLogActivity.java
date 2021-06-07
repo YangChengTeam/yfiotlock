@@ -37,6 +37,7 @@ import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 import com.yc.yfiotlock.model.engin.LockEngine;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
+import com.yc.yfiotlock.view.adapters.LogAdapter;
 import com.yc.yfiotlock.view.adapters.ViewPagerAdapter;
 import com.yc.yfiotlock.view.widgets.VaryingTextSizeTitleView;
 
@@ -85,8 +86,11 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
     private OpenLockDao openLockDao;
     private LockEngine lockEngine;
     private int lastId = 1;
-    private final int MAC_COUNT = 5;
-    private int syncCount = MAC_COUNT;
+    private final int MAX_COUNT = 5;
+    private int syncCount = MAX_COUNT;
+
+    public static final int LOG_TYPE = 1;  //  日志类型
+    public static final int ALARM_TYPE = 2; // 警告类型
 
     @Override
     protected int getLayoutId() {
@@ -234,7 +238,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
                 lastId++;
                 syncCount--;
                 if (syncCount <= 0) {
-                    syncCount = MAC_COUNT;
+                    syncCount = MAX_COUNT;
                     EventBus.getDefault().post(new LockLogSyncDataEvent());
                 }
                 EventBus.getDefault().post(logInfo);
@@ -306,7 +310,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
             logInfo.setTime(time);
 
             logInfo.setAddtime(System.currentTimeMillis());
-            int logType = 1;
+            int logType = LOG_TYPE;
             switch (lockBLEData.getScmd()) {
                 case LockBLEEventCmd.SCMD_DOORBELL:
                     break;
@@ -315,7 +319,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
                         break;
                     } else {
                         if(logInfo.getGroupType() == LockBLEManager.GROUP_HIJACK){
-                            logType = 2;
+                            logType = ALARM_TYPE;
                         }
                         logInfo.setLogType(logType);
                         localGetOpenTypeName(logInfo);
@@ -324,7 +328,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
                 }
 
                 case LockBLEEventCmd.SCMD_LOW_BATTERY:
-                    logType = 2;
+                    logType = ALARM_TYPE;
                     break;
                 case LockBLEEventCmd.SCMD_LOCAL_INIT:
                     break;
@@ -335,7 +339,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
                 case LockBLEEventCmd.SCMD_DOOR_UNCLOSED:
                     break;
                 case LockBLEEventCmd.SCMD_AVOID_PRY_ALARM:
-                    logType = 2;
+                    logType = ALARM_TYPE;
                     break;
                 default:
                     logType = -1;
@@ -345,7 +349,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
                 bleSyncLog();
                 return;
             }
-            logInfo.setType(lockBLEData.getScmd() + 2);
+            logInfo.setType(lockBLEData.getScmd() + LogAdapter.OPEN_LOCK_HACK);
             logInfo.setLogType(logType);
             logInfo.setName("");
             localAdd(logInfo);

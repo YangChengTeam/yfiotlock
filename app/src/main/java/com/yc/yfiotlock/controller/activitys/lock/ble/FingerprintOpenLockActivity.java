@@ -40,7 +40,6 @@ public class FingerprintOpenLockActivity extends BaseOpenLockActivity {
         });
     }
 
-
     @Override
     public void setCountInfo(){
         String key = "locker_count_" + lockInfo.getId() + groupType;

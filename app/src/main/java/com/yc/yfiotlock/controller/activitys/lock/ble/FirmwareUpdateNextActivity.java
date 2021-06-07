@@ -135,7 +135,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
                 ToastCompat.show(getContext(), "蓝牙未连接");
                 return;
             }
-            bleOpenUpdate();
+            bleOpenUpdate(true);
         }
     }
 
@@ -169,10 +169,10 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         clear();
     }
 
-    private void bleOpenUpdate() {
+    private void bleOpenUpdate(boolean iswakeup) {
         if (lockBleSender != null) {
             byte[] bytes = LockBLESettingCmd.openUpdate(deviceInfo.getKey());
-            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_OPEN_UPDATE, bytes);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_OPEN_UPDATE, bytes, iswakeup);
         }
     }
 
@@ -199,7 +199,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
         generalDialog.setTitle("温馨提示");
         generalDialog.setMsg("开启蓝牙升级失败, 是否重试?");
         generalDialog.setOnPositiveClickListener(dialog -> {
-            bleOpenUpdate();
+            bleOpenUpdate(true);
         });
         generalDialog.show();
     }
@@ -274,7 +274,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
                 progressTv.setText( process + "%");
                 processView.setVisibility(View.VISIBLE);
             } else {
-                bleOpenUpdate();
+                bleOpenUpdate(false);
             }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_UPDATE) {
             int process = (int)(((totalPackageCount-packageCount)/(float)totalPackageCount) * 100);

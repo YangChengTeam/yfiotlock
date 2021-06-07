@@ -146,17 +146,15 @@ public class LockBLEPackage {
             return null;
         }
 
-        byte[] data;
+        byte[] data  = Arrays.copyOfRange(response, 4, response.length - 3);;
         if (!TextUtils.isEmpty(key)) {
-            data = LockBLEUtil.decrypt(key, Arrays.copyOfRange(response, 4, response.length - 3));
-        } else {
-            data = Arrays.copyOfRange(response, 4, response.length - 3);
+            data = LockBLEUtil.decrypt(key, data);
         }
 
         // position data LENGTH = 0, 1
         len = ByteBuffer.wrap(new byte[]{data[0], data[1]}).getShort();
         if (len != response.length - 7) {
-            LogUtil.msg("LockBLEPackage-> LENGTH is not package length!");
+            LogUtil.msg("LockBLEPackage-> LENGTH is not data length!");
             return null;
         }
 

@@ -1,6 +1,8 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble;
 
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 
 public abstract class BaseFingerprintAddOpenLockActivity extends BaseAddOpenLockActivity {
     @Override
@@ -20,10 +22,12 @@ public abstract class BaseFingerprintAddOpenLockActivity extends BaseAddOpenLock
 
     // fuck code
     @Override
-    protected void localAddSucc() { }
+    protected void localAddSucc() {
+    }
+
     // fuck code
     @Override
-    protected void localAdd(int keyid) { }
-
+    protected void localAdd(int keyid) {
+    }
 
 }

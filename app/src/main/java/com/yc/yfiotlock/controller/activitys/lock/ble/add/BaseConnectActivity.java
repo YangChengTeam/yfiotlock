@@ -173,6 +173,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             aliDeviceName = LockBLEUtil.toHexString(lockBLEData.getExtra()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
             if (isDoDeviceAddAction || isActiveDistributionNetwork) {
+                finish();
                 return;
             }
             isDoDeviceAddAction = true;

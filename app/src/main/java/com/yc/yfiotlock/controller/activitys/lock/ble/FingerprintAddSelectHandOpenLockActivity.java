@@ -6,14 +6,20 @@ import android.view.View;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.utils.ToastUtil;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
+import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLEOpCmd;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
+import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 
-public class FingerprintAddSelectHandOpenLockActivity extends BaseBackActivity {
+public class FingerprintAddSelectHandOpenLockActivity extends BaseFingerprintAddOpenLockActivity {
     @BindView(R.id.iv_left_hand)
     View leftHandBtn;
 

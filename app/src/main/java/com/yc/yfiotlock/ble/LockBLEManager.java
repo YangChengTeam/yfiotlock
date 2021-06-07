@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.kk.securityhttp.utils.VUiKit;
@@ -57,9 +58,7 @@ public class LockBLEManager {
         return instance;
     }
 
-    private Map<String, BleDevice> scannedBleDevices = new HashMap<>();
-
-    private BleStateReceiver bleStateReceiver;
+    private final Map<String, BleDevice> scannedBleDevices = new HashMap<>();
 
     public void initBle(Application context) {
         BleManager.getInstance()
@@ -166,7 +165,7 @@ public class LockBLEManager {
 
     // 蓝牙状态监听
     private void initBleState(Context context) {
-        bleStateReceiver = new BleStateReceiver();
+        BleStateReceiver bleStateReceiver = new BleStateReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         context.registerReceiver(bleStateReceiver, intentFilter);
@@ -232,7 +231,8 @@ public class LockBLEManager {
 
             @Override
             public void onScanning(BleDevice bleDevice) {
-                if (bleDevice == null) return;
+                if (bleDevice == null || TextUtils.isEmpty(bleDevice.getName())) return;
+                if(!bleDevice.getName().equals(DEVICE_NAME)) return;
                 Log.d("scan ble", "name:" + bleDevice.getName() + " mac:" + bleDevice.getMac());
 
                 if (scannedBleDevices.get(bleDevice.getMac()) == null) {

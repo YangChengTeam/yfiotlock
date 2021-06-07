@@ -120,6 +120,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
 
     private static WeakReference<LockIndexActivity> mInstance;
 
+
     public static LockIndexActivity getInstance() {
         if (mInstance != null && mInstance.get() != null) {
             return mInstance.get();

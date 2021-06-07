@@ -98,11 +98,8 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
         setRv();
         mSrlRefresh.setColorSchemeColors(0xff3091f8);
         mSrlRefresh.setOnRefreshListener(this::synctimeLoadData);
-
         mSrlRefresh.setRefreshing(true);
         synctimeLoadData();
-
-
     }
 
     @Override

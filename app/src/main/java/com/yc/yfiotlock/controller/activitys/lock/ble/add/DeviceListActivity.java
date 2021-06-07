@@ -74,6 +74,8 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
         mInstance = new WeakReference<>(this);
         super.initViews();
         setRvDevices();
+
+
     }
 
     private void setRvDevices() {
@@ -170,6 +172,10 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
 
     private void bleCheckLock() {
         if (lockBleSender != null) {
+            VUiKit.postDelayed(3000, () -> {
+                ToastCompat.show(getContext(), "检测超时");
+                finish();
+            });
             lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getOrigenKey()));
         }
     }

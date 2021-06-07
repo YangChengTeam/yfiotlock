@@ -1,6 +1,7 @@
 package com.yc.yfiotlock.controller.fragments.lock.remote;
 
 import com.kk.securityhttp.domain.ResultInfo;
+import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.dao.LockLogDao;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
@@ -15,7 +16,7 @@ public class AlarmsFragment extends LogFragment {
     public AlarmsFragment(LockLogDao lockLogDao, DeviceInfo lockInfo) {
         this.lockInfo = lockInfo;
         this.lockLogDao = lockLogDao;
-        logtype = 2;
+        logtype = LockLogActivity.ALARM_TYPE;
     }
 
     @Override

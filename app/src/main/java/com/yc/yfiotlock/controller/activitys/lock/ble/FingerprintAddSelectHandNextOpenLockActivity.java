@@ -6,16 +6,28 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLEOpCmd;
+import com.yc.yfiotlock.ble.LockBLESender;
+import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.model.bean.eventbus.CloudOpenLockUpdateEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
 import com.yc.yfiotlock.utils.CommonUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.BindViews;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprintAddOpenLockActivity {
 
@@ -47,39 +59,41 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
             final View fingerBtn = fingerBtns[i];
             RxView.clicks(fingerBtn).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
                 name += fingerBtn.getTag() + "";
-                localAdd(keyid);
+                localUpdate();
             });
         }
-
         nameTv.setText(name);
     }
 
+    private void localUpdate() {
+        openLockDao.updateOpenLockInfo(lockInfo.getId(), keyid, LockBLEManager.GROUP_TYPE, name).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
+            @Override
+            public void onSubscribe(Disposable d) {
 
-    @Override
-    protected void localAdd(int keyid) {
-        int fingerprintCount = 0;
-        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
-        if (countInfo != null) {
-            fingerprintCount = countInfo.getFingerprintCount();
-        }
-        fingerprintCount += 1;
-        name += fingerprintCount;
-        localAdd(name, LockBLEManager.OPEN_LOCK_FINGERPRINT, keyid, "");
-    }
+            }
 
-    @Override
-    protected void localAddSucc() {
-        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
-        if (countInfo != null) {
-            countInfo.setFingerprintCount(countInfo.getFingerprintCount() + 1);
-            CacheUtil.setCache(key, countInfo);
-        }
+            @Override
+            public void onComplete() {
+                OpenLockInfo openLockInfo = new OpenLockInfo();
+                openLockInfo.setLockId(lockInfo.getId());
+                openLockInfo.setKeyid(keyid);
+                openLockInfo.setName(name);
+                openLockInfo.setGroupType(LockBLEManager.GROUP_TYPE);
+                EventBus.getDefault().post(new CloudOpenLockUpdateEvent(openLockInfo));
+                finish();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                ToastCompat.show(getContext(), "更新失败, 请重试");
+            }
+        });
     }
 
     @Override
     public void finish() {
         mLoadingDialog.setIcon(R.mipmap.icon_finish);
-        mLoadingDialog.show("添加成功");
+        mLoadingDialog.show("更新成功");
         VUiKit.postDelayed(1500, new Runnable() {
             @Override
             public void run() {
@@ -90,4 +104,5 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
             }
         });
     }
+
 }

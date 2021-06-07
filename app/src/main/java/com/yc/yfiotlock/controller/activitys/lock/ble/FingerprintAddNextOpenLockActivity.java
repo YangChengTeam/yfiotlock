@@ -8,8 +8,11 @@ import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEBaseCmd;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
+import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
+import com.yc.yfiotlock.utils.CacheUtil;
 
 import java.util.Arrays;
 
@@ -22,6 +25,8 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
     @BindView(R.id.iv_tip)
     ImageView fpIv;
 
+    private String name = "未命名指纹";
+    private int keyid = 0;
     @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_activity_fingerprint_add_next_open_lock;
@@ -60,11 +65,8 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
                 if (lockBLEData.getExtra() != null) {
                     String number = new String(Arrays.copyOfRange(lockBLEData.getExtra(), 0, 8));
                     if (number.equals(this.number)) {
-                        int id = lockBLEData.getExtra()[8];
-                        Intent intent = new Intent(getContext(), FingerprintAddSelectHandOpenLockActivity.class);
-                        intent.putExtra("keyid", id);
-                        startActivity(intent);
-                        finish();
+                        keyid = lockBLEData.getExtra()[8];
+                        localAdd(keyid);
                     } else {
                         ToastCompat.show(getContext(), "流水号匹配不成功");
                     }
@@ -80,6 +82,32 @@ public class FingerprintAddNextOpenLockActivity extends BaseFingerprintAddOpenLo
             ToastCompat.show(getContext(), "指纹添加失败");
             finish();
         }
+    }
+
+    @Override
+    protected void localAdd(int keyid) {
+        int fingerprintCount = 0;
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
+        if (countInfo != null) {
+            fingerprintCount = countInfo.getFingerprintCount();
+        }
+        fingerprintCount += 1;
+        name += fingerprintCount;
+        localAdd(name, LockBLEManager.OPEN_LOCK_FINGERPRINT, keyid, "");
+    }
+
+    @Override
+    protected void localAddSucc() {
+        OpenLockCountInfo countInfo = CacheUtil.getCache(key, OpenLockCountInfo.class);
+        if (countInfo != null) {
+            countInfo.setFingerprintCount(countInfo.getFingerprintCount() + 1);
+            CacheUtil.setCache(key, countInfo);
+        }
+
+        Intent intent = new Intent(getContext(), FingerprintAddSelectHandOpenLockActivity.class);
+        intent.putExtra("keyid", keyid);
+        startActivity(intent);
+        finish();
     }
 
 }

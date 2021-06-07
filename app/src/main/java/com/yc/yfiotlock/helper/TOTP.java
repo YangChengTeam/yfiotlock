@@ -59,6 +59,12 @@ public class TOTP {
         return ret;
     }
 
+    public static void main(String[] args){
+        String seed32 = "3132333435363738393031323334353637383930"
+                + "313233343536373839303132";
+        TOTP.generateTOTP256(seed32, Long.toHexString(1619419670).toUpperCase(), "6");
+    }
+
     private static final int[] DIGITS_POWER
             // 0 1 2 3 4 5 6 7 8
             = { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000 };
@@ -135,7 +141,7 @@ public class TOTP {
 
     public static String generateTOTP(String key, String time,
                                       String returnDigits, String crypto) {
-        int codeDigits = Integer.decode(returnDigits).intValue();
+        int codeDigits = Integer.decode(returnDigits);
         String result = null;
 
         // Using the counter

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.dao.LockLogDao;
 import com.yc.yfiotlock.model.bean.eventbus.LockLogSyncDataEvent;
@@ -46,7 +47,7 @@ public class LogFragment extends BaseFragment {
     protected LockLogDao lockLogDao;
     protected DeviceInfo lockInfo;
 
-    protected int logtype = 1;
+    protected int logtype = LockLogActivity.LOG_TYPE;
     protected int page = 1;
     protected int pageSize = 200;
 
@@ -119,7 +120,7 @@ public class LogFragment extends BaseFragment {
 
     @SuppressLint("CheckResult")
     public void sync2Local(List<LogInfo> logInfos) {
-        for(LogInfo logInfo: logInfos){
+        for (LogInfo logInfo : logInfos) {
             logInfo.setAddtime(System.currentTimeMillis());
             logInfo.setLogType(logtype);
         }

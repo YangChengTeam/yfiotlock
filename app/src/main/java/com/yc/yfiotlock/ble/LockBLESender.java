@@ -3,6 +3,7 @@ package com.yc.yfiotlock.ble;
 import android.content.Context;
 import android.util.Log;
 
+import com.kk.utils.LogUtil;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleNotifyCallback;
@@ -13,7 +14,6 @@ import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
 import com.yc.yfiotlock.model.bean.eventbus.ForamtErrorEvent;
 import com.yc.yfiotlock.model.bean.eventbus.OpenLockReConnectEvent;
 import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
-import com.yc.yfiotlock.model.bean.eventbus.SyncTimeEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -37,10 +37,10 @@ public class LockBLESender {
     private byte[] cmdBytes;
 
     public static final int DEFAULT_RETRY_COUNT = 3; // 实际默认次数3
-    private boolean waupStatus = false;  // 唤醒状态
+    private boolean wakeupStatus = false;  // 唤醒状态
     private boolean isSend = false;      // 是否发送中
     private boolean isOpOver = false;    // 实际操作是否完成
-    private int wakeUpCount = 0;         // 发送唤醒次数
+    private int wakeupCount = 0;         // 发送唤醒次数
     public int responseErrorCount = 0;   // 响应失败次数
 
 
@@ -106,11 +106,11 @@ public class LockBLESender {
             isSend = true;
             isOpOver = false;
             if (isWakeup) {
-                waupStatus = false;
+                wakeupStatus = false;
                 wakeup();
             } else {
                 Log.d(TAG, "直接发送真正指令");
-                waupStatus = true;
+                wakeupStatus = true;
                 op(cmdBytes);
             }
         } else {
@@ -153,13 +153,18 @@ public class LockBLESender {
         }
     }
 
+
+    private long timestamp  = 0;
     // 持续唤醒
     private void wakeup() {
-        if (waupStatus && isSend) return;
+        Log.d(TAG, "发送间隔:" + (System.currentTimeMillis() - timestamp));
+        if(System.currentTimeMillis() - timestamp < LockBLEManager.OP_INTERVAL_TIME) return;
+        if (wakeupStatus && isSend) return;
         if (isOpOver) return;
         Log.d(TAG, "发送唤醒指令");
         byte[] bytes = LockBLEOpCmd.wakeup(key);
         op(bytes);
+        timestamp = System.currentTimeMillis();
         WakeUpRunnable wakeUpRunnable = new WakeUpRunnable(Arrays.hashCode(cmdBytes));
         VUiKit.postDelayed(LockBLEManager.OP_INTERVAL_TIME, wakeUpRunnable);
     }
@@ -176,10 +181,10 @@ public class LockBLESender {
             if (LockBLESender.this.cmdBytes == null || this.hashCode != Arrays.hashCode(LockBLESender.this.cmdBytes))
                 return;
             if (isOpOver) return;
-            if (waupStatus && isSend) return;
-            if (++wakeUpCount >= DEFAULT_RETRY_COUNT) {
+            if (wakeupStatus && isSend) return;
+            if (++wakeupCount >= DEFAULT_RETRY_COUNT) {
                 Log.d(TAG, "唤醒门锁失败,无法发送真正指令");
-                wakeUpCount = 0;
+                wakeupCount = 0;
                 wakeupFailureResponse();
                 return;
             }
@@ -256,8 +261,8 @@ public class LockBLESender {
         if (lockBLEData.getMcmd() == LockBLEOpCmd.MCMD && lockBLEData.getScmd() == LockBLEOpCmd.SCMD_WAKE_UP) {
             // 唤醒成功后发送真正操作
             if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
-                if (!waupStatus) {
-                    waupStatus = true;
+                if (!wakeupStatus) {
+                    wakeupStatus = true;
                     Log.d(TAG, "唤醒成功,发送真正指令");
                     op(cmdBytes);
                 }
@@ -267,24 +272,14 @@ public class LockBLESender {
         } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
             if (lockBLEData.getScmd() != LockBLEEventCmd.SCMD_FINGERPRINT_INPUT_COUNT) {
                 reset();
-                if (notifyCallback != null) {
-                    if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
-                        notifyCallback.onNotifySuccess(lockBLEData);
-                    } else {
-                        notifyCallback.onNotifyFailure(lockBLEData);
-                    }
-                }
-            } else {
-                if (notifyCallback != null) {
-                    if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
-                        notifyCallback.onNotifySuccess(lockBLEData);
-                    } else {
-                        reset();
-                        notifyCallback.onNotifyFailure(lockBLEData);
-                    }
+            }
+            if (notifyCallback != null) {
+                if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_OK) {
+                    notifyCallback.onNotifySuccess(lockBLEData);
+                } else {
+                    notifyCallback.onNotifyFailure(lockBLEData);
                 }
             }
-
         } else if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
             isOpOver = true;
             Log.d(TAG, "命令匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd() + " status:" + lockBLEData.getStatus());
@@ -300,11 +295,8 @@ public class LockBLESender {
                 }
             }
         } else {
-            if (waupStatus) {
+            if (wakeupStatus) {
                 reset();
-                if (notifyCallback != null) {
-                    notifyCallback.onNotifyFailure(lockBLEData);
-                }
                 Log.d(TAG, "命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
             } else {
                 Log.d(TAG, "未唤醒命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + mcmd + " scmd:" + lockBLEData.getScmd() + "-" + scmd);
@@ -316,11 +308,11 @@ public class LockBLESender {
     private void reset() {
         Log.d(TAG, "重置命令完毕");
         isSend = false;
-        waupStatus = false;
+        wakeupStatus = false;
         mcmd = 0x00;
         scmd = 0x00;
         cmdBytes = null;
-        wakeUpCount = 0;
+        wakeupCount = 0;
     }
 
     //  bleDevice 出现未知问题

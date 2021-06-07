@@ -110,6 +110,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         });
     }
 
+
+
     @Override
     protected void onResume() {
         super.onResume();

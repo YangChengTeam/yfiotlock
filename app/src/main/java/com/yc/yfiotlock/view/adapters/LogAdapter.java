@@ -20,6 +20,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreModule {
+    //
+    public static final int OPEN_LOCK_HACK = 2;
     public LogAdapter(@Nullable List data) {
         super(R.layout.item_log, data);
     }
@@ -52,25 +54,25 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
                     .OPEN_LOCK_CARD:
                 name = "NFC卡开门";
                 break;
-            case LockBLEEventCmd.SCMD_DOORBELL + 2:
+            case LockBLEEventCmd.SCMD_DOORBELL + OPEN_LOCK_HACK:
                 name = "门铃响了";
                 break;
-            case LockBLEEventCmd.SCMD_LOW_BATTERY + 2:
+            case LockBLEEventCmd.SCMD_LOW_BATTERY + OPEN_LOCK_HACK:
                 name = ("低电报警");
                 break;
-            case LockBLEEventCmd.SCMD_LOCAL_INIT + 2:
+            case LockBLEEventCmd.SCMD_LOCAL_INIT + OPEN_LOCK_HACK:
                 name = ("本地初始化");
                 break;
-            case LockBLEEventCmd.SCMD_LOCK_CLOSED + 2:
+            case LockBLEEventCmd.SCMD_LOCK_CLOSED + OPEN_LOCK_HACK:
                 name = ("门锁锁定");
                 break;
-            case LockBLEEventCmd.SCMD_LOCK_UNCLOSED + 2:
+            case LockBLEEventCmd.SCMD_LOCK_UNCLOSED + OPEN_LOCK_HACK:
                 name = ("门未锁好");
                 break;
-            case LockBLEEventCmd.SCMD_DOOR_UNCLOSED + 2:
+            case LockBLEEventCmd.SCMD_DOOR_UNCLOSED + OPEN_LOCK_HACK:
                 name = ("门未关上");
                 break;
-            case LockBLEEventCmd.SCMD_AVOID_PRY_ALARM + 2:
+            case LockBLEEventCmd.SCMD_AVOID_PRY_ALARM + OPEN_LOCK_HACK:
                 name = ("防撬报警");
                 break;
         }

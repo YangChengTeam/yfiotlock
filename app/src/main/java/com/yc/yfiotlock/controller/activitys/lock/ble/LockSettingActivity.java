@@ -133,7 +133,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setOnPositiveClickListener(dialog -> {
                 // 是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
                 // 设备端重置了的也可以直接删
-                boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + lockInfo.getMacAddress(), false);
+                boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + lockInfo.getMacAddress(), true);
                 if (lockInfo.isShare() || !isMatch) {
                     localDeviceDel();
                 } else {
