@@ -95,8 +95,8 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
     }
 
     // 1.6 设置AES密钥(0x06)
-    public static byte[] setAesKey(String key, String origkey) {
-        return setting(key, SCMD_SET_AES_KEY, (key + origkey).getBytes());
+    public static byte[] setAesKey(String okey, String key) {
+        return setting(key, SCMD_SET_AES_KEY, (okey + key).getBytes());
     }
 
     // 1.7 取消操作(0x07)

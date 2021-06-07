@@ -12,7 +12,6 @@ public class LockBLEBaseCmd {
     public static final byte STATUS_WAKEUP_ERROR = (byte) 0x12;
 
     public static final byte STATUS_NOTIFY_NO_CONNECTION = (byte) 0x13;
-
-
+    
     public static final byte EMPTY_BODY = (byte) 0x01;
 }
