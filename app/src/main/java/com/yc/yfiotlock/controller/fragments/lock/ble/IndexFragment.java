@@ -198,8 +198,7 @@ public class IndexFragment extends BaseFragment {
                 List<DeviceInfo> lastDeviceInfos;
                 if (lDeviceInfos == null || lDeviceInfos.size() == 0) {
                     lastDeviceInfos = cDeviceInfos;
-                }
-                else {
+                } else {
 
                     for (DeviceInfo cDeviceInfo : cDeviceInfos) {
                         cDeviceInfo.setAdd(true);
@@ -211,6 +210,8 @@ public class IndexFragment extends BaseFragment {
                             if (hashMap.get(lDeviceInfo.getMacAddress()) != null) {
                                 hashMap.remove(lDeviceInfo.getMacAddress());
                             }
+                        } else if (hashMap.get(lDeviceInfo.getMacAddress()) != null) {
+                            hashMap.get(lDeviceInfo.getMacAddress()).setName(lDeviceInfo.getName());
                         } else if (hashMap.get(lDeviceInfo.getMacAddress()) == null && !lDeviceInfo.isShare()) {
                             hashMap.put(lDeviceInfo.getMacAddress(), lDeviceInfo);
                         }

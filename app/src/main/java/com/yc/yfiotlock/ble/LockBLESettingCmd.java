@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.ble;
 
+import android.util.Log;
+
 import com.kk.securityhttp.utils.LogUtil;
 
 import java.nio.ByteBuffer;
@@ -36,7 +38,7 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
     }
 
     public static byte[] setting(String key, byte scmd, byte[] data, byte pid, boolean isEncrypt) {
-        LogUtil.msg("当前key:" + key);
+        Log.d(LockBLESender.TAG, "当前key:" + key);
 
         LockBLEPackage lockBLEPackage = new LockBLEPackage();
         lockBLEPackage.setPid(pid);
@@ -95,8 +97,8 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
     }
 
     // 1.6 设置AES密钥(0x06)
-    public static byte[] setAesKey(String okey, String key) {
-        return setting(key, SCMD_SET_AES_KEY, (okey + key).getBytes());
+    public static byte[] setAesKey(String oldKey, String newKey) {
+        return setting(oldKey, SCMD_SET_AES_KEY, (oldKey + newKey).getBytes());
     }
 
     // 1.7 取消操作(0x07)
@@ -140,8 +142,8 @@ public class LockBLESettingCmd extends LockBLEBaseCmd {
     }
 
     //  1.15 检测是否匹配
-    public static byte[] checkLock(String okey, String key) {
-        return setting(okey, SCMD_CHECK_LOCK, key.getBytes());
+    public static byte[] checkLock(String oldKey, String newKey) {
+        return setting(oldKey, SCMD_CHECK_LOCK, newKey.getBytes());
     }
 }
 

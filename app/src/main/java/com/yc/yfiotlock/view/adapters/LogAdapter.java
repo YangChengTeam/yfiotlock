@@ -6,6 +6,7 @@ import com.kk.securityhttp.utils.DateUtil;
 import com.yc.yfiotlock.R;
 import com.yc.yfiotlock.ble.LockBLEEventCmd;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 import com.yc.yfiotlock.view.BaseExtendAdapter;
 
@@ -33,7 +34,7 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
                 .setText(R.id.tv_log_des, logInfo.getName())
                 .setText(R.id.tv_log_date, logInfo.getTime());
 
-        if (logInfo.getLogType() == 1) {
+        if (logInfo.getLogType() == LockLogActivity.LOG_TYPE) {
             baseViewHolder.setImageResource(R.id.iv_log_icon, R.mipmap.icon_log);
         } else {
             baseViewHolder.setImageResource(R.id.iv_log_icon, R.mipmap.alarm);
