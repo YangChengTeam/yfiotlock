@@ -64,6 +64,8 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     TextView newVersionTv;
     @BindView(R.id.tv_desp)
     TextView despTv;
+    @BindView(R.id.tv_install_process)
+    TextView installDespTv;
 
     @BindView(R.id.ll_update_desc)
     View updateDescView;
@@ -122,15 +124,21 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDownload(UpdateInfo updateInfo) {
-        processDespTv.setText("正在下载");
-        circularProgressBar.setProgress(updateInfo.getProgress());
-        progressTv.setText(updateInfo.getProgress() + "%");
-        processView.setVisibility(View.VISIBLE);
         installView.setVisibility(View.GONE);
         updateSuccessView.setVisibility(View.GONE);
         updateBtn.setVisibility(View.GONE);
+
+        processView.setVisibility(View.VISIBLE);
+        processDespTv.setText("正在下载");
+        circularProgressBar.setProgress(updateInfo.getProgress());
+        progressTv.setText(updateInfo.getProgress() + "%");
+
         if (updateInfo.getProgress() == 100) {
-            processDespTv.setText("等待安装");
+            AnimatinUtil.rotate(installIv);
+            updateSuccessView.setVisibility(View.GONE);
+            processView.setVisibility(View.GONE);
+            installView.setVisibility(View.VISIBLE);
+            installDespTv.setText("等待安装");
             if (!LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
                 ToastCompat.show(getContext(), "蓝牙未连接");
                 return;
@@ -147,7 +155,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             lockBleSender.registerNotify();
         }
 
-        if(!isUpdating){
+        if (!isUpdating) {
             if (DeviceDownloadManager.getInstance().isDownloading()) {
                 processDespTv.setText("下载中");
                 updateBtn.setVisibility(View.GONE);
@@ -259,27 +267,19 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_OPEN_UPDATE) {
             count++;
-            if(count == 2){
+            if (count == 2) {
                 count = 0;
-                processView.setVisibility(View.GONE);
-                updateSuccessView.setVisibility(View.GONE);
-                installView.setVisibility(View.VISIBLE);
-                AnimatinUtil.rotate(installIv);
                 initBleUpdate();
                 bleUpdate();
                 isUpdating = true;
-                processDespTv.setText("正在安装");
-                int process = (int)(((totalPackageCount-packageCount)/(float)totalPackageCount) * 100);
-                circularProgressBar.setProgress(process);
-                progressTv.setText( process + "%");
-                processView.setVisibility(View.VISIBLE);
+                int process = (int) (((totalPackageCount - packageCount) / (float) totalPackageCount) * 100);
+                installDespTv.setText(process + "%\n正在安装...");
             } else {
                 bleOpenUpdate(false);
             }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_UPDATE) {
-            int process = (int)(((totalPackageCount-packageCount)/(float)totalPackageCount) * 100);
-            circularProgressBar.setProgress(process);
-            progressTv.setText( process + "%");
+            int process = (int) (((totalPackageCount - packageCount) / (float) totalPackageCount) * 100);
+            installDespTv.setText(process + "%");
             bleUpdate();
         } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_UPDATE_SUCCESS) {
             processView.setVisibility(View.GONE);

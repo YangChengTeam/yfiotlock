@@ -23,6 +23,7 @@ import io.reactivex.schedulers.Schedulers;
 public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreModule {
     //
     public static final int OPEN_LOCK_HACK = 2;
+
     public LogAdapter(@Nullable List data) {
         super(R.layout.item_log, data);
     }
@@ -77,7 +78,7 @@ public class LogAdapter extends BaseExtendAdapter<LogInfo> implements LoadMoreMo
                 name = ("防撬报警");
                 break;
         }
-        switch (logInfo.getKeyid()){
+        switch (logInfo.getKeyid()) {
             case 0xFC:
                 name = ("临时密码开门");
                 break;

@@ -254,7 +254,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         });
 
         RxView.longClicks(tabView).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view -> {
-            if (LockBLEManager.getInstance().isConnected(bleDevice)) {
+            if (LockBLEManager.getInstance().isConnected(bleDevice) && !isBleWorking()) {
                 bleOpen();
             }
         });

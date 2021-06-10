@@ -24,7 +24,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
-            android:gravity="center">
+            android:gravity="center"
+           >
 
             <com.yc.yfiotlock.view.widgets.CircularProgressBar
                 android:id="@+id/cpb_progress"
@@ -70,7 +71,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
-            android:visibility="gone">
+            android:visibility="gone"
+           >
 
             <ImageView
                 android:id="@+id/iv_install"
@@ -79,11 +81,13 @@
                 android:src="@mipmap/install"></ImageView>
 
             <TextView
+                android:id="@+id/tv_install_process"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="正在安装..."
+                android:text="等待安装..."
                 android:textColor="#3395fd"
+                android:textAlignment="center"
                 android:textSize="14dp" />
         </FrameLayout>
 

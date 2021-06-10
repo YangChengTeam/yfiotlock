@@ -225,11 +225,6 @@ public class LockBLEManager {
             }
 
             @Override
-            public void onLeScan(BleDevice bleDevice) {
-                super.onLeScan(bleDevice);
-            }
-
-            @Override
             public void onScanning(BleDevice bleDevice) {
                 if (bleDevice == null || TextUtils.isEmpty(bleDevice.getName())) return;
                 if(!bleDevice.getName().equals(DEVICE_NAME)) return;

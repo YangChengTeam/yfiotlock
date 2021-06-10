@@ -160,6 +160,11 @@ public class Connect2Activity extends BaseConnectActivity {
             valueAnimator.cancel();
             valueAnimator.end();
             showConnectedUi();
+            if (isDoDeviceAddAction || isActiveDistributionNetwork) {
+                finish();
+                ConnectActivity.safeFinish();
+                return;
+            }
             bleGetAliDeviceName();
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CANCEL_OP) {
             lockBleSender.setOpOver(true);

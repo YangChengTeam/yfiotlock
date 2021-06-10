@@ -85,6 +85,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
     private LockLogDao lockLogDao;
     private OpenLockDao openLockDao;
     private LockEngine lockEngine;
+    private BleDevice bleDevice;
     private int lastId = 1;
     private final int MAX_COUNT = 5;
     private int syncCount = MAX_COUNT;
@@ -105,7 +106,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
         lockEngine = new LockEngine(this);
         lockInfo = LockIndexActivity.getInstance().getLockInfo();
 
-        BleDevice bleDevice = LockIndexActivity.getInstance().getBleDevice();
+        bleDevice = LockIndexActivity.getInstance().getBleDevice();
         lockBLESender = new LockBLESender(this, bleDevice, lockInfo.getKey());
     }
 
@@ -119,28 +120,41 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
             syncView.setVisibility(View.VISIBLE);
             processView.setVisibility(View.VISIBLE);
             syncTv.setVisibility(View.VISIBLE);
-            syncTv.setText("同步中，请稍候...");
-            bleSyncLog();
             mSrlRefresh.setEnabled(false);
             mSrlRefresh.setRefreshing(false);
-            timeout();
+
+            if (LockBLEManager.getInstance().isConnected(bleDevice)) {
+                syncTv.setText("蓝牙同步中，请稍候...");
+                bleSyncLog();
+                timeout();
+            } else {
+                syncTv.setText("联网同步中，请稍候...");
+                VUiKit.postDelayed(3000, () -> {
+                    syncTv.setText("同步完成");
+                    bleSyncEnd();
+                });
+            }
         });
 
         mSrlRefresh.setEnabled(false);
 
-        bleFirstSynclog();
-        timeout();
+        if (LockBLEManager.getInstance().isConnected(bleDevice)) {
+            syncTv.setText("蓝牙同步中，请稍候...");
+            bleFirstSynclog();
+            timeout();
+        } else {
+            syncTv.setText("联网同步中，请稍候...");
+            VUiKit.postDelayed(3000, () -> {
+                syncTv.setText("同步完成");
+                bleSyncEnd();
+            });
+        }
     }
 
     private void timeout() {
         VUiKit.postDelayed(1000 * 30, () -> {
             if (CommonUtil.isActivityDestory(this)) return;
             if (lockBLESender.isOpOver()) return;
-
-            if (lockBLESender != null) {
-                lockBLESender.setNotifyCallback(null);
-                lockBLESender.unregisterNotify();
-            }
             syncTv.setText("同步超时");
             bleSyncEnd();
         });
@@ -282,10 +296,10 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
             logInfo.setKeyid(wrapped.get() & 0xFF);
 
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
-            logInfo.setType(wrapped.get()  & 0xFF );
+            logInfo.setType(wrapped.get() & 0xFF);
 
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
-            logInfo.setGroupType(wrapped.get()  & 0xFF);
+            logInfo.setGroupType(wrapped.get() & 0xFF);
 
             wrapped = ByteBuffer.wrap(Arrays.copyOfRange(lockBLEData.getExtra(), n, ++n));
             int year = wrapped.get();
@@ -318,7 +332,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
                     if (logInfo.getKeyid() == 0xFC || logInfo.getKeyid() == 0xFD || logInfo.getKeyid() == 0xFE || logInfo.getKeyid() == 0xFF) {
                         break;
                     } else {
-                        if(logInfo.getGroupType() == LockBLEManager.GROUP_HIJACK){
+                        if (logInfo.getGroupType() == LockBLEManager.GROUP_HIJACK) {
                             logType = ALARM_TYPE;
                         }
                         logInfo.setLogType(logType);
@@ -326,7 +340,6 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
                         return;
                     }
                 }
-
                 case LockBLEEventCmd.SCMD_LOW_BATTERY:
                     logType = ALARM_TYPE;
                     break;
@@ -401,6 +414,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD) {
+            mSrlRefresh.setEnabled(true);
             syncTv.setText("同步失败");
             bleSyncEnd();
         }
@@ -416,12 +430,11 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         if (lockBLESender != null) {
             lockBLESender.setNotifyCallback(null);
             lockBLESender.unregisterNotify();
         }
     }
-
 }

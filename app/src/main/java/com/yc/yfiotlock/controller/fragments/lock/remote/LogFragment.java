@@ -23,15 +23,16 @@ import com.yc.yfiotlock.view.widgets.NoDataView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import butterknife.BindView;
+import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import rx.Observer;
 import rx.functions.Action1;
 
 public class LogFragment extends BaseFragment {
@@ -47,7 +48,7 @@ public class LogFragment extends BaseFragment {
     protected LockLogDao lockLogDao;
     protected DeviceInfo lockInfo;
 
-    protected int logtype = LockLogActivity.LOG_TYPE;
+    protected int logType = LockLogActivity.LOG_TYPE;
     protected int page = 1;
     protected int pageSize = 200;
 
@@ -90,7 +91,7 @@ public class LogFragment extends BaseFragment {
 
     @SuppressLint("CheckResult")
     protected void localLoadData() {
-        lockLogDao.loadLogInfos(lockInfo.getId(), logtype, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
+        lockLogDao.loadLogInfos(lockInfo.getId(), logType, page, pageSize).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<LogInfo>>() {
             @Override
             public void accept(List<LogInfo> openLockInfos) throws Exception {
                 if (openLockInfos.size() != 0) {
@@ -111,7 +112,6 @@ public class LogFragment extends BaseFragment {
                     if (info.getData() == null || info.getData().getItems() == null || info.getData().getItems().size() == 0) {
                         return;
                     }
-
                     sync2Local(info.getData().getItems());
                 }
             }
@@ -122,12 +122,22 @@ public class LogFragment extends BaseFragment {
     public void sync2Local(List<LogInfo> logInfos) {
         for (LogInfo logInfo : logInfos) {
             logInfo.setAddtime(System.currentTimeMillis());
-            logInfo.setLogType(logtype);
+            logInfo.setLogType(logType);
         }
-        lockLogDao.insertLogInfos(logInfos).subscribeOn(Schedulers.io()).subscribe(new Action() {
+        lockLogDao.insertLogInfos(logInfos).subscribeOn(Schedulers.io()).subscribe(new CompletableObserver() {
             @Override
-            public void run() throws Exception {
+            public void onSubscribe(@NotNull Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
                 localLoadData();
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+
             }
         });
     }
@@ -141,7 +151,6 @@ public class LogFragment extends BaseFragment {
         } else {
             logAdapter.addData(items);
         }
-
         if (items.size() < pageSize) {
             logAdapter.getLoadMoreModule().loadMoreEnd();
         } else {
@@ -169,7 +178,7 @@ public class LogFragment extends BaseFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onSync(LockLogSyncEndEvent object) {
+    public void onEnd(LockLogSyncEndEvent object) {
         page = 1;
         localLoadData();
     }

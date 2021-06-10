@@ -29,7 +29,7 @@ import rx.Subscriber;
 
 public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESender.NotifyCallback {
 
-    protected boolean isDoDeviceAddAction = false;  // 是否 设备同步云端添加成功
+    protected boolean isDoDeviceAddAction = false;  // 是否 云端添加成功
     protected boolean isConnected = false;  // 是否 配网成功
     protected boolean isActiveDistributionNetwork = false;  // 是否 设备同步云端添加成功后 主动配网
     protected boolean isDeviceAdd = false;
@@ -174,6 +174,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             LogUtil.msg("设备名称:" + aliDeviceName);
             if (isDoDeviceAddAction || isActiveDistributionNetwork) {
                 finish();
+                ConnectActivity.safeFinish();
                 return;
             }
             isDoDeviceAddAction = true;
@@ -185,6 +186,8 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
             if (isDoDeviceAddAction || isActiveDistributionNetwork) {
+                finish();
+                ConnectActivity.safeFinish();
                 return;
             }
             isDoDeviceAddAction = true;

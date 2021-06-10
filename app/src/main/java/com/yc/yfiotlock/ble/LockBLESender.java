@@ -296,8 +296,8 @@ public class LockBLESender {
             }
         } else {
             if (wakeupStatus) {
-                reset();
                 Log.d(TAG, "命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
+                reset();
             } else {
                 Log.d(TAG, "未唤醒命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + mcmd + " scmd:" + lockBLEData.getScmd() + "-" + scmd);
             }

@@ -6,56 +6,14 @@
 #include "cr4.h"
 
 
-jbyteArray char2byteArray(JNIEnv *envPtr, char *src) {
-
-    JNIEnv env = *envPtr;
-
-    jsize len = strlen(src);
-    jbyteArray barr = env->NewByteArray(envPtr, len);
-
-    env->SetByteArrayRegion(envPtr, barr, 0, len, (jbyte *) src);
-
-    return barr;
-}
-
-jbyteArray as_byte_array(JNIEnv *envPtr, unsigned char* buf, int len) {
-    JNIEnv env = *envPtr;
-    jbyteArray array = env->NewByteArray (env, len);
-    env->SetByteArrayRegion (env, array, 0, len, buf);
-    return array;
-}
-
-unsigned char* as_unsigned_char_array(JNIEnv *envPtr, jbyteArray array) {
-    JNIEnv env = *envPtr;
-    int len = env->GetArrayLength (env, array);
-    unsigned char* buf[len];
-    memset(buf,0, len);
-    env->GetByteArrayRegion (env, array, 0, len, buf);
-    return buf;
-}
-
-
 
 JNIEXPORT jbyteArray JNICALL encrypt(JNIEnv *env,  jclass clazz, jstring  key, jbyteArray data) {
-
-    unsigned char  *AES_KEY = (unsigned char *)(*env)->GetByteArrayElements(env, data, NULL);
-    unsigned char *in = (unsigned char *)(*env)->GetByteArrayElements(env, data, NULL);
-    struct rc4_key s;
-    prepare_key(AES_KEY, sizeof(AES_KEY), &s);
-    rc4(in, sizeof(in), &s);
-    return as_unsigned_char_array(env, in);
+    return null;
 }
 
 
 JNIEXPORT jbyteArray JNICALL decrypt(JNIEnv *env, jclass clazz, jstring  key, jbyteArray data) {
-
-    unsigned char  *AES_KEY = (unsigned char *)(*env)->GetByteArrayElements(env, data, NULL);
-    unsigned char *in = (char *) (*env)->GetByteArrayElements(env, data, NULL);
-
-    struct rc4_key s;
-    prepare_key(AES_KEY, sizeof(AES_KEY), &s);
-    rc4(in, sizeof(in), &s);
-    return as_unsigned_char_array(env, in);
+    return null;
 }
 
 static JNINativeMethod method_table[] = {
