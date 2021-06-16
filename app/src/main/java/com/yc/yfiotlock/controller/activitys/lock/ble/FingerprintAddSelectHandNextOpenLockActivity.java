@@ -13,6 +13,7 @@ import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.model.bean.eventbus.CloudOpenLockUpdateEvent;
+import com.yc.yfiotlock.model.bean.eventbus.OpenLockRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockCountInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
@@ -79,8 +80,20 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
                 openLockInfo.setKeyid(keyid);
                 openLockInfo.setName(name);
                 openLockInfo.setGroupType(LockBLEManager.GROUP_TYPE);
+                EventBus.getDefault().post(new OpenLockRefreshEvent());
                 EventBus.getDefault().post(new CloudOpenLockUpdateEvent(openLockInfo));
-                finish();
+                mLoadingDialog.setIcon(R.mipmap.icon_finish);
+                mLoadingDialog.show("更新成功");
+                VUiKit.postDelayed(1500, new Runnable() {
+                    @Override
+                    public void run() {
+                        if (CommonUtil.isActivityDestory(getContext())) {
+                            return;
+                        }
+                        mLoadingDialog.dismiss();
+                        finish();
+                    }
+                });
             }
 
             @Override
@@ -89,20 +102,4 @@ public class FingerprintAddSelectHandNextOpenLockActivity extends BaseFingerprin
             }
         });
     }
-
-    @Override
-    public void finish() {
-        mLoadingDialog.setIcon(R.mipmap.icon_finish);
-        mLoadingDialog.show("更新成功");
-        VUiKit.postDelayed(1500, new Runnable() {
-            @Override
-            public void run() {
-                if (CommonUtil.isActivityDestory(getContext())) {
-                    return;
-                }
-                FingerprintAddSelectHandNextOpenLockActivity.super.finish();
-            }
-        });
-    }
-
 }

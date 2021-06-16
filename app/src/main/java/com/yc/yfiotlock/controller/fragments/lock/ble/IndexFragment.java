@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.fragments.lock.ble;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -24,8 +25,10 @@ import com.yc.yfiotlock.controller.activitys.lock.ble.add.ScanDeviceActivity;
 import com.yc.yfiotlock.controller.fragments.base.BaseFragment;
 import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
+import com.yc.yfiotlock.model.bean.eventbus.LockDeleteEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.FamilyInfo;
+import com.yc.yfiotlock.model.bean.lock.ble.LockInfo;
 import com.yc.yfiotlock.model.bean.user.IndexInfo;
 import com.yc.yfiotlock.model.engin.IndexEngin;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
@@ -158,11 +161,11 @@ public class IndexFragment extends BaseFragment {
         }
     }
 
+
     private void loadData() {
         IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
         if (indexInfo != null) {
             familyInfo = indexInfo.getFamilyInfo();
-            indexDeviceAdapter.setNewInstance(indexInfo.getDeviceInfos());
         } else {
             mSrlRefresh.setRefreshing(true);
         }
@@ -182,7 +185,6 @@ public class IndexFragment extends BaseFragment {
                 if (resultInfo != null && resultInfo.getCode() == 1 && resultInfo.getData() != null) {
                     familyInfo = resultInfo.getData().getFamilyInfo();
                     localLoadData(resultInfo.getData());
-                    OfflineManager.enqueue(getContext());
                 }
             }
         });
@@ -202,10 +204,13 @@ public class IndexFragment extends BaseFragment {
 
                     for (DeviceInfo cDeviceInfo : cDeviceInfos) {
                         cDeviceInfo.setAdd(true);
-                        hashMap.put(cDeviceInfo.getMacAddress(), cDeviceInfo);
+                        if (!TextUtils.isEmpty(cDeviceInfo.getMacAddress())) {
+                            hashMap.put(cDeviceInfo.getMacAddress(), cDeviceInfo);
+                        }
                     }
 
                     for (DeviceInfo lDeviceInfo : lDeviceInfos) {
+                        if (TextUtils.isEmpty(lDeviceInfo.getMacAddress())) continue;
                         if (lDeviceInfo.isDelete()) {
                             if (hashMap.get(lDeviceInfo.getMacAddress()) != null) {
                                 hashMap.remove(lDeviceInfo.getMacAddress());
@@ -251,6 +256,21 @@ public class IndexFragment extends BaseFragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefresh(IndexRefreshEvent object) {
         loadData();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDeleteLockInfo(LockDeleteEvent event) {
+        DeviceInfo lLockInfo = event.getLockInfo();
+        for (int i = 0; i < indexDeviceAdapter.getData().size(); i++) {
+            DeviceInfo lockInfo = indexDeviceAdapter.getData().get(i);
+            if (lockInfo.getMacAddress().equals(lLockInfo.getMacAddress())) {
+                indexDeviceAdapter.removeAt(i);
+                IndexInfo indexInfo = CacheUtil.getCache(Config.INDEX_DETAIL_URL, IndexInfo.class);
+                indexInfo.setDeviceInfos(indexDeviceAdapter.getData());
+                CacheUtil.setCache(Config.INDEX_DETAIL_URL, indexInfo);
+                return;
+            }
+        }
     }
 
     private void nav2MyFamily() {

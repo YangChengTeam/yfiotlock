@@ -33,7 +33,7 @@ public interface DeviceDao {
     Completable realDeleteDeviceInfo(String macAddress);
 
     // 更新本地已删除
-    @Query("update device_info set is_delete=1 where mac_address=:macAddress")
+    @Query("update device_info set is_delete=1 and is_add=1 where mac_address=:macAddress")
     Completable deleteDeviceInfo(String macAddress);
 
     // 本地修改名称
@@ -46,7 +46,7 @@ public interface DeviceDao {
 
 
     // 获取需要同步到云端的数据
-    @Query("SELECT * FROM device_info where is_add = 0 and is_delete = 0")
+    @Query("SELECT * FROM device_info where is_add=0 and is_delete=0")
     Single<List<DeviceInfo>> loadNeedAddDeviceInfos();
 
     // 获取需要删除的云端数据

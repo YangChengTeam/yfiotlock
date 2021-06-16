@@ -171,7 +171,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
                 MMKV.defaultMMKV().getBoolean("ismatch" + lockInfo.getMacAddress(), true);
                 initSends();
                 setConnectedInfo();
-                bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
+                bleSynctime(true);
             }
         }
 
@@ -242,7 +242,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
                 return;
             }
 
-            if(isBleOffline()){
+            if (isBleOffline()) {
                 return;
             }
 
@@ -260,11 +260,11 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         });
     }
 
-    private boolean isBleWorking() {
-        return  "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString());
+    public boolean isBleWorking() {
+        return "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString());
     }
 
-    private boolean isBleOffline(){
+    public boolean isBleOffline() {
         return "门锁已离线".equals(statusTitleTv.getText().toString());
     }
 
@@ -504,13 +504,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         }
     }
 
-    // 设置key
-    protected void bleSetkey(String oldKey, String newKey) {
-        if (lockBleSender != null) {
-            byte[] bytes = LockBLESettingCmd.setAesKey(oldKey, newKey);
-            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes, false);
-        }
-    }
 
     // 重连逻辑
     private GeneralDialog reConnectDialog;
@@ -659,16 +652,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             });
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
             LogUtil.msg("同步时间成功");
-        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
-            LogUtil.msg("设置密钥成功");
-            lockBleSender.setKey(lockInfo.getKey());
-            bleSynctime(true);
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             LogUtil.msg("key匹配成功" + lockInfo.getKey());
             // 设置连接成功状态
             setConnectedInfo();
             bleDevice.setMatch(true);
-            bleSynctime(true);
+            bleSynctime(false);
             MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), true);
             EventBus.getDefault().post(bleDevice);
         }
@@ -686,14 +675,6 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
             }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SYNC_TIME) {
             LogUtil.msg("同步时间失败");
-        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
-            LogUtil.msg("设置密钥失败");
-            if (retryCount-- > 0) {
-                bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
-            } else {
-                retryCount = 3;
-                bleSynctime(false);
-            }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_ERROR) {
                 LogUtil.msg("key匹配失败");

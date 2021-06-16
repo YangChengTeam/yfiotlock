@@ -160,7 +160,7 @@ public class TempPasswordOpenLockActivity extends BaseBackActivity {
             @Override
             public void accept(List<OpenLockInfo> openLockInfos) throws Exception {
                 tempPwdAdapter.setNewInstance(openLockInfos);
-                if (CommonUtil.isNetworkAvailable(getContext()) && openLockInfos.size() == 0) {
+                if (openLockInfos.size() == 0) {
                     cloudLoadData();
                 } else {
                     mSrlRefresh.setRefreshing(false);

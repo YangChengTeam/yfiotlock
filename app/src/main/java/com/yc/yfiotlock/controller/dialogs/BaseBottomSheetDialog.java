@@ -29,8 +29,6 @@ public abstract class BaseBottomSheetDialog extends BottomSheetDialog {
         super(context, style);
     }
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

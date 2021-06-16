@@ -19,7 +19,7 @@ public interface LockLogDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertLogInfo(LogInfo logInfo);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     Completable insertLogInfos(List<LogInfo> logInfos);
 
     // 获取本地列表数据

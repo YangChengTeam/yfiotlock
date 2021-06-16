@@ -37,6 +37,7 @@ public class FingerprintAddSelectHandOpenLockActivity extends BaseFingerprintAdd
     protected void initVars() {
         super.initVars();
         keyid = getIntent().getIntExtra("keyid", 0);
+        ToastCompat.show(getContext(), "添加成功");
     }
 
     @Override

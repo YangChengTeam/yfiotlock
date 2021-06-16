@@ -155,10 +155,11 @@ public class LockBLESender {
 
 
     private long timestamp  = 0;
+    private long DIFF = 50;
     // 持续唤醒
     private void wakeup() {
         Log.d(TAG, "发送间隔:" + (System.currentTimeMillis() - timestamp));
-        if(System.currentTimeMillis() - timestamp < LockBLEManager.OP_INTERVAL_TIME) return;
+        if(System.currentTimeMillis() - timestamp <= LockBLEManager.OP_INTERVAL_TIME - DIFF) return;
         if (wakeupStatus && isSend) return;
         if (isOpOver) return;
         Log.d(TAG, "发送唤醒指令");
@@ -298,6 +299,9 @@ public class LockBLESender {
             if (wakeupStatus) {
                 Log.d(TAG, "命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + " scmd:" + lockBLEData.getScmd());
                 reset();
+                if (notifyCallback != null) {
+                    notifyCallback.onNotifyFailure(lockBLEData);
+                }
             } else {
                 Log.d(TAG, "未唤醒命令不匹配:" + "mscd:" + lockBLEData.getMcmd() + mcmd + " scmd:" + lockBLEData.getScmd() + "-" + scmd);
             }
@@ -305,7 +309,7 @@ public class LockBLESender {
     }
 
     // 重置所有变量
-    private void reset() {
+    public void reset() {
         Log.d(TAG, "重置命令完毕");
         isSend = false;
         wakeupStatus = false;

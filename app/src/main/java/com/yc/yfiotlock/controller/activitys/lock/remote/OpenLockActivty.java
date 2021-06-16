@@ -166,7 +166,7 @@ public class OpenLockActivty extends BaseActivity {
                 .setPositiveText("去配置")
                 .setOnPositiveClickListener(dialog -> {
                     if (bleDevice == null) {
-                        ToastCompat.show(getContext(), "请先链接设备");
+                        ToastCompat.show(getContext(), "请先连接设备");
                         return;
                     }
                     Intent intent = new Intent(getContext(), ConnectActivity.class);

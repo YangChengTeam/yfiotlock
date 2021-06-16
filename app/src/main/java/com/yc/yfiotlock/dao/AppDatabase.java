@@ -7,7 +7,7 @@ import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ble.OpenLockInfo;
 import com.yc.yfiotlock.model.bean.lock.remote.LogInfo;
 
-@Database(entities = {OpenLockInfo.class, LogInfo.class, DeviceInfo.class}, version = 1, exportSchema = false)
+@Database(entities = {OpenLockInfo.class, LogInfo.class, DeviceInfo.class}, version = 2, exportSchema = false)
 public abstract  class AppDatabase extends RoomDatabase {
     public abstract OpenLockDao openLockDao();
     public abstract LockLogDao lockLogDao();

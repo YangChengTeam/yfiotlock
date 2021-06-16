@@ -24,6 +24,7 @@ import com.yc.yfiotlock.download.DeviceDownloadManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.CloudDeviceDelEvent;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
+import com.yc.yfiotlock.model.bean.eventbus.LockDeleteEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
@@ -133,8 +134,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setOnPositiveClickListener(dialog -> {
                 // 是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
                 // 设备端重置了的也可以直接删
-                boolean isMatch = MMKV.defaultMMKV().getBoolean("ismatch" + lockInfo.getMacAddress(), true);
-                if (lockInfo.isShare() || !isMatch) {
+                if (LockIndexActivity.getInstance().isBleWorking()) {
+                    ToastCompat.show(getContext(), "蓝牙连接中...");
+                    return;
+                }
+                if (lockInfo.isShare() || LockIndexActivity.getInstance().isBleOffline()) {
                     localDeviceDel();
                 } else {
                     if (LockBLEManager.getInstance().isConnected(bleDevice)) {
@@ -162,7 +166,7 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                 SafeUtil.setSafePwdType(lockInfo, SafeUtil.NO_PASSWORD);
                 UserInfoCache.decDeviceNumber();
                 EventBus.getDefault().post(new CloudDeviceDelEvent(lockInfo));
-                EventBus.getDefault().post(new IndexRefreshEvent());
+                EventBus.getDefault().post(new LockDeleteEvent(lockInfo));
                 LockIndexActivity.safeFinish();
                 if (lockBleSender != null) {
                     lockBleSender.clear();

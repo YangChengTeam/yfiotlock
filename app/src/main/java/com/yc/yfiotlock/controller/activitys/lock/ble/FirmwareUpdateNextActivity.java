@@ -279,7 +279,7 @@ public class FirmwareUpdateNextActivity extends BaseBackActivity implements Lock
             }
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_UPDATE) {
             int process = (int) (((totalPackageCount - packageCount) / (float) totalPackageCount) * 100);
-            installDespTv.setText(process + "%");
+            installDespTv.setText(process + "%\n正在安装...");
             bleUpdate();
         } else if (lockBLEData.getMcmd() == LockBLEEventCmd.MCMD && lockBLEData.getScmd() == LockBLEEventCmd.SCMD_UPDATE_SUCCESS) {
             processView.setVisibility(View.GONE);

@@ -4,6 +4,7 @@ import android.widget.TextView;
 
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEBaseCmd;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLEOpCmd;
@@ -82,6 +83,9 @@ public class CardAddOpenLockActivity extends BaseAddOpenLockActivity {
     public void onNotifyFailure(LockBLEData lockBLEData) {
         super.onNotifyFailure(lockBLEData);
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
+            if (lockBLEData.getStatus() != LockBLEBaseCmd.STATUS_ERROR) {
+                bleCancel();
+            }
             ToastCompat.show(getContext(), "卡片添加失败");
             finish();
         }

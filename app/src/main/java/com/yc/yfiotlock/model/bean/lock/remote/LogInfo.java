@@ -3,13 +3,14 @@ package com.yc.yfiotlock.model.bean.lock.remote;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
-@Entity(tableName = "log_info", primaryKeys = {"id", "event_id"})
+@Entity(tableName = "log_info", indices = {@Index(value = {"event_id"}, unique = true)})
 public class LogInfo {
-    @NonNull
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     @JSONField(name = "event_id")

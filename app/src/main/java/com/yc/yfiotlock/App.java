@@ -20,6 +20,7 @@ import com.yc.yfiotlock.helper.GlideHelper;
 import com.yc.yfiotlock.helper.Reflection;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
+import com.yc.yfiotlock.offline.OfflineManager;
 import com.yc.yfiotlock.utils.UserInfoCache;
 import com.yc.yfiotlock.view.widgets.CustomLoadMoreView;
 
@@ -61,6 +62,8 @@ public class App extends Application {
         checkUpdate();
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "lock").build();
+
+        OfflineManager.enqueue(this);
     }
 
 

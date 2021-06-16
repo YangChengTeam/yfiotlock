@@ -130,9 +130,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
             @Override
             public void onComplete() {
                 localDelSucc();
-                if (CommonUtil.isNetworkAvailable(getContext())) {
-                    EventBus.getDefault().post(new CloudOpenLockDeleteEvent(openLockInfo));
-                }
+                EventBus.getDefault().post(new CloudOpenLockDeleteEvent(openLockInfo));
                 EventBus.getDefault().post(new OpenLockRefreshEvent());
                 finish();
             }
@@ -205,7 +203,6 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            mLoadingDialog.dismiss();
             ToastCompat.show(getContext(), "删除失败");
         }
     }

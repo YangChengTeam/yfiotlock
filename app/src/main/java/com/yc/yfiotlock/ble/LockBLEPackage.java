@@ -146,9 +146,15 @@ public class LockBLEPackage {
             return null;
         }
 
-        byte[] data  = Arrays.copyOfRange(response, 4, response.length - 3);;
+        byte[] data = Arrays.copyOfRange(response, 4, response.length - 3);
+
+
         if (!TextUtils.isEmpty(key)) {
             data = LockBLEUtil.decrypt(key, data);
+            if (data.length == 0) {
+                LogUtil.msg("LockBLEPackage-> decrypt error!");
+                return null;
+            }
         }
 
         // position data LENGTH = 0, 1

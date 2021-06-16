@@ -124,6 +124,7 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
             mSrlRefresh.setRefreshing(false);
 
             if (LockBLEManager.getInstance().isConnected(bleDevice)) {
+                lockBLESender.reset();
                 syncTv.setText("蓝牙同步中，请稍候...");
                 bleSyncLog();
                 timeout();

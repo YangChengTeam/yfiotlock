@@ -18,6 +18,7 @@ import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.compat.ToastCompat;
+import com.yc.yfiotlock.controller.activitys.lock.ble.FirmwareUpdateNextActivity;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
 import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
@@ -143,10 +144,14 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
     public void onNotify(BleNotifyEvent bleNotifyEvent) {
         if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
             mLoadingDialog.show("检测中...");
+            VUiKit.postDelayed(3000, () -> {
+                if (lockBleSender.isOpOver()) return;
+                ToastCompat.show(this, "检测失败,请重试");
+                finish();
+            });
             bleCheckLock();
         }
     }
-
 
     @Override
     protected void bindClick() {
@@ -172,10 +177,6 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
 
     private void bleCheckLock() {
         if (lockBleSender != null) {
-            VUiKit.postDelayed(3000, () -> {
-                ToastCompat.show(getContext(), "检测超时");
-                finish();
-            });
             lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getOrigenKey()));
         }
     }
@@ -183,6 +184,7 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
     @Override
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            lockBleSender.setOpOver(true);
             mLoadingDialog.dismiss();
             bleDevice.setMatch(true);
             LogUtil.msg("key匹配成功");
@@ -191,22 +193,11 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
         }
     }
 
-    private int retryCount = 3;
-
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
-            if (lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_ERROR || lockBLEData.getStatus() == LockBLEBaseCmd.STATUS_KEY_ERROR) {
-                mLoadingDialog.dismiss();
-                LogUtil.msg("key匹配失败");
-                if (retryCount-- > 0) {
-                    bleCheckLock();
-                } else {
-                    retryCount = 3;
-                    ToastCompat.show(this, "设备已被添加");
-                    MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), false);
-                }
-            }
+            mLoadingDialog.dismiss();
+            ToastCompat.show(this, "检测失败,请重试");
         }
     }
 

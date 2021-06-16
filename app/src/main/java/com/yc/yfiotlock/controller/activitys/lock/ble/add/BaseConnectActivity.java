@@ -16,6 +16,7 @@ import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
+import com.yc.yfiotlock.model.bean.eventbus.LockDeleteEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.utils.UserInfoCache;
@@ -64,7 +65,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             @Override
             public void run() throws Exception {
                 UserInfoCache.incDeviceNumber();
-                nav2Index();
             }
         });
     }
@@ -89,19 +89,20 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
                 if (resultInfo != null && resultInfo.getCode() == 1) {
                     success(resultInfo.getData());
                 } else if (resultInfo != null && resultInfo.getCode() == Config.DEVICE_ADDED) {
-                    String msg = resultInfo.getMsg() != null ? resultInfo.getMsg() : "设备添加失败";
+                    String msg = resultInfo.getMsg() != null ? resultInfo.getMsg() : "添加失败";
                     ToastCompat.show(getContext(), msg);
                 } else {
-                    String msg = "设备添加失败";
+                    String msg = "添加失败";
                     ToastCompat.show(getContext(), msg);
                 }
+                lockBleSender.setKey(lockInfo.getKey());
+                bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
             }
         });
     }
 
     @Override
     public void success(Object data) {
-        isDeviceAdd = true;
         String key = lockInfo.getKey();
         lockInfo = (DeviceInfo) data;
         lockInfo.setMacAddress(bleDevice.getMac());
@@ -122,6 +123,15 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             }
             byte[] cmdBytes = LockBLESettingCmd.getAliDeviceName(lockInfo.getKey());
             lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes);
+        }
+    }
+
+
+    // 设置key
+    protected void bleSetkey(String oldKey, String newKey) {
+        if (lockBleSender != null) {
+            byte[] bytes = LockBLESettingCmd.setAesKey(oldKey, newKey);
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_SET_AES_KEY, bytes, false);
         }
     }
 
@@ -172,26 +182,26 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
             aliDeviceName = LockBLEUtil.toHexString(lockBLEData.getExtra()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
-            if (isDoDeviceAddAction || isActiveDistributionNetwork) {
-                finish();
-                ConnectActivity.safeFinish();
+            if (isDoDeviceAddAction) {
                 return;
             }
             isDoDeviceAddAction = true;
             cloudDeviceAdd();
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
+            isDeviceAdd = true;
+            nav2Index();
         }
     }
 
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
-            if (isDoDeviceAddAction || isActiveDistributionNetwork) {
-                finish();
-                ConnectActivity.safeFinish();
-                return;
-            }
-            isDoDeviceAddAction = true;
-            cloudDeviceAdd();
+            mLoadingDialog.dismiss();
+            ToastCompat.show(getContext(), "添加失败,请重试");
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
+            deviceDao.deleteDeviceInfo(lockInfo.getMacAddress()).subscribeOn(Schedulers.io()).subscribe();
+            EventBus.getDefault().post(new LockDeleteEvent(lockInfo));
+            ToastCompat.show(getContext(), "添加失败,请重试");
         }
     }
 

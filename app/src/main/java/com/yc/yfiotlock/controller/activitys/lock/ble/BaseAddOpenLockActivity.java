@@ -4,6 +4,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 import android.app.Dialog;
 
 import com.yc.yfiotlock.App;
+import com.yc.yfiotlock.ble.LockBLEBaseCmd;
 import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.ble.LockBLESender;
@@ -83,6 +84,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
         openLockInfo.setMasterLockId(lockInfo.getId());
         openLockInfo.setPassword(password);
         openLockInfo.setAddUserMobile("我");
+        openLockInfo.setDelete(false);
+        openLockInfo.setUpdate(false);
         openLockInfo.setGroupType(LockBLEManager.GROUP_TYPE);
         openLockDao.insertOpenLockInfo(openLockInfo).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
@@ -93,10 +96,8 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
             @Override
             public void onComplete() {
                 localAddSucc();
-                if (CommonUtil.isNetworkAvailable(getContext())) {
-                    openLockInfo.setAdd(true);
-                    EventBus.getDefault().post(new CloudOpenLockAddEvent(openLockInfo));
-                }
+                openLockInfo.setAdd(true);
+                EventBus.getDefault().post(new CloudOpenLockAddEvent(openLockInfo));
                 EventBus.getDefault().post(new OpenLockRefreshEvent());
                 ToastCompat.show(getContext(), "添加成功");
                 finish();
@@ -109,7 +110,6 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
             }
         });
     }
-
 
 
     @Override
@@ -145,7 +145,7 @@ public abstract class BaseAddOpenLockActivity extends BaseBackActivity implement
     }
 
 
-    private void bleCancel() {
+    protected void bleCancel() {
         if (cancelSend != null) {
             cancelSend.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CANCEL_OP, LockBLESettingCmd.cancelOp(lockInfo.getKey()));
         }
