@@ -11,11 +11,17 @@ import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.utils.LogUtil;
 import com.kk.securityhttp.utils.VUiKit;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLEData;
 import com.yc.yfiotlock.ble.LockBLEManager;
+import com.yc.yfiotlock.ble.LockBLESender;
+import com.yc.yfiotlock.ble.LockBLESettingCmd;
+import com.yc.yfiotlock.helper.CloudHelper;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
 import com.yc.yfiotlock.model.bean.eventbus.ReScanEvent;
 import com.yc.yfiotlock.utils.AnimatinUtil;
 import com.yc.yfiotlock.utils.BleUtil;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -24,10 +30,11 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import butterknife.BindView;
 
-public class ScanDeviceActivity extends BaseAddActivity {
+public class ScanDeviceActivity extends BaseAddActivity implements LockBLESender.NotifyCallback {
 
 
     @BindView(R.id.iv_scan_bg)
@@ -41,8 +48,17 @@ public class ScanDeviceActivity extends BaseAddActivity {
     @BindView(R.id.stv_rescan)
     SuperTextView mStvRescan;
 
+    private BleDevice bleDevice;
+
     private boolean isFoundOne;
     private boolean isNav2List;
+    private boolean isChecking;
+
+    private LockBLESender lockBleSender;
+    private ArrayBlockingQueue<BleDevice> bleDevices;
+    private CheckThread checkThread;
+
+    private CloudHelper cloudHelper;
 
     private static WeakReference<ScanDeviceActivity> mInstance;
 
@@ -60,6 +76,11 @@ public class ScanDeviceActivity extends BaseAddActivity {
     @Override
     protected void initVars() {
         super.initVars();
+        cloudHelper = new CloudHelper(this);
+        cloudHelper.registerNotify();
+        bleDevices = new ArrayBlockingQueue<BleDevice>(1);
+        checkThread = new CheckThread();
+        checkThread.start();
     }
 
     @Override
@@ -69,12 +90,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
         scan();
     }
 
-    private HashMap<String, BleDevice> deviceHashMap = new HashMap<>();
-
     private void scan() {
-        if (deviceHashMap == null) {
-            deviceHashMap = new HashMap<>();
-        }
         LockBLEManager.getInstance().initConfig();
         LockBLEManager.getInstance().scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override
@@ -85,30 +101,18 @@ public class ScanDeviceActivity extends BaseAddActivity {
             @Override
             public void onScanning(BleDevice bleDevice) {
                 if (!BleUtil.isFoundDevice(bleDevice.getMac())) {
-                    if (!isFoundOne) {
-                        isFoundOne = true;
-                        deviceHashMap.put(bleDevice.getMac(), bleDevice);
-                        nav2List(bleDevice);
-                    } else {
-                        deviceHashMap.put(bleDevice.getMac(), bleDevice);
-                        VUiKit.postDelayed(1000, () -> {
-                            EventBus.getDefault().post(bleDevice);
-                        });
-                    }
-                } else {
-                    LogUtil.msg("已经添加的锁不进入列表:" + bleDevice.getKey());
+                    bleDevices.offer(bleDevice);
                 }
             }
 
             @Override
             public void onScanSuccess(List<BleDevice> bleDevices) {
                 if (isFoundOne) {
-                    deviceHashMap.clear();
-                    deviceHashMap = null;
-                    isFoundOne = false;
+                    setSuccessInfo();
                 } else {
                     setFailInfo();
                 }
+                isFoundOne = false;
             }
 
             @Override
@@ -117,8 +121,7 @@ public class ScanDeviceActivity extends BaseAddActivity {
             }
         });
     }
-
-
+    
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReScan(ReScanEvent object) {
         isFoundOne = false;
@@ -130,15 +133,8 @@ public class ScanDeviceActivity extends BaseAddActivity {
     protected void onDestroy() {
         super.onDestroy();
         LockBLEManager.getInstance().stopScan();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (isNav2List) {
-            setFailInfo();
-            isNav2List = false;
-        }
+        checkThread.interrupt();
+        cloudHelper.unregisterNotify();
     }
 
     @Override
@@ -157,6 +153,12 @@ public class ScanDeviceActivity extends BaseAddActivity {
         mStvRescan.setVisibility(View.GONE);
         mTvScanState.setText("正在扫描...");
         mTvScanQa.setText("扫描不到怎么办？");
+    }
+
+    private void setSuccessInfo() {
+        mIvScanFlag.clearAnimation();
+        mStvRescan.setVisibility(View.VISIBLE);
+        mTvScanState.setText("扫描完成");
     }
 
     private void setFailInfo() {
@@ -187,4 +189,89 @@ public class ScanDeviceActivity extends BaseAddActivity {
         // 处理授权回调
         mPermissionHelper.onRequestPermissionsResult(this, requestCode);
     }
+
+
+    private class CheckThread extends Thread {
+        @Override
+        public void run() {
+            while (!isInterrupted() && !isChecking) {
+                try {
+                    connect(bleDevices.take());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void bleCheckLock() {
+        String key = CommonUtil.getOriginKey(bleDevice.getMac());
+        if (lockBleSender != null) {
+            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(key, key));
+        }
+    }
+
+    private void connect(BleDevice bleDevice) {
+        LockBLEManager.getInstance().connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
+            @Override
+            public void onConnectStarted() {
+            }
+
+            @Override
+            public void onDisconnect(BleDevice bleDevice) {
+
+            }
+
+            @Override
+            public void onConnectSuccess(BleDevice bleDevice) {
+                mLoadingDialog.dismiss();
+                ScanDeviceActivity.this.bleDevice = bleDevice;
+                lockBleSender = new LockBLESender(getContext(), bleDevice, CommonUtil.getOriginKey(bleDevice.getMac()));
+                lockBleSender.registerNotify();
+                lockBleSender.setNotifyCallback(ScanDeviceActivity.this);
+            }
+
+            @Override
+            public void onConnectFailed() {
+                isChecking = false;
+            }
+        });
+    }
+
+    public void onNotifySuccess(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            isChecking = false;
+            lockBleSender.setOpOver(true);
+            mLoadingDialog.dismiss();
+            bleDevice.setMatch(true);
+            LogUtil.msg("key匹配成功");
+            if (!isFoundOne) {
+                isFoundOne = true;
+                nav2List(bleDevice);
+            } else {
+                EventBus.getDefault().post(bleDevice);
+            }
+        }
+    }
+
+    @Override
+    public void onNotifyFailure(LockBLEData lockBLEData) {
+        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            isChecking = false;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNotify(BleNotifyEvent bleNotifyEvent) {
+        if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
+            VUiKit.postDelayed(3000, () -> {
+                if (CommonUtil.isActivityDestory(getContext())) return;
+                if (lockBleSender != null && lockBleSender.isOpOver()) return;
+                isChecking = false;
+            });
+            bleCheckLock();
+        }
+    }
+
+
 }

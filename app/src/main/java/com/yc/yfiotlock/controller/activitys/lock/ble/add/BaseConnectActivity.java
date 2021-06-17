@@ -3,7 +3,6 @@ package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 
-import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.utils.LogUtil;
 import com.yc.yfiotlock.App;
 import com.yc.yfiotlock.ble.LockBLEData;
@@ -11,22 +10,22 @@ import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.ble.LockBLESettingCmd;
 import com.yc.yfiotlock.ble.LockBLEUtil;
 import com.yc.yfiotlock.compat.ToastCompat;
-import com.yc.yfiotlock.constant.Config;
 import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.dao.DeviceDao;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
+import com.yc.yfiotlock.model.bean.eventbus.CloudDeviceAddEvent;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
-import com.yc.yfiotlock.model.bean.eventbus.LockDeleteEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import org.greenrobot.eventbus.EventBus;
+import org.jetbrains.annotations.NotNull;
 
+import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import rx.Subscriber;
 
 public abstract class BaseConnectActivity extends BaseAddActivity implements LockBLESender.NotifyCallback {
 
@@ -59,63 +58,40 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         lockBleSender = new LockBLESender(this, bleDevice, lockInfo.getKey());
     }
 
+    // 本地添加设备
     @SuppressLint("CheckResult")
     protected void localDeviceAdd(DeviceInfo deviceInfo) {
-        deviceDao.insertDeviceInfo(deviceInfo).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action() {
+        deviceDao.insertDeviceInfo(deviceInfo).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new CompletableObserver() {
             @Override
-            public void run() throws Exception {
+            public void onSubscribe(@NotNull Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
                 UserInfoCache.incDeviceNumber();
+                isDoDeviceAddAction = false;
+                isDeviceAdd = true;
+                nav2Index();
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+                localDeviceAdd(deviceInfo);
             }
         });
     }
 
-    protected void cloudDeviceAdd() {
-        lockInfo.setKey(LockBLEUtil.genKey());
-        deviceEngin.addDeviceInfo(familyInfo.getId() + "", bleDevice.getName(), bleDevice.getMac(), aliDeviceName, lockInfo.getKey()).subscribe(new Subscriber<ResultInfo<DeviceInfo>>() {
-            @Override
-            public void onCompleted() {
-                isDoDeviceAddAction = false;
-                mLoadingDialog.dismiss();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                isDoDeviceAddAction = false;
-                mLoadingDialog.dismiss();
-            }
-
-            @Override
-            public void onNext(ResultInfo<DeviceInfo> resultInfo) {
-                if (resultInfo != null && resultInfo.getCode() == 1) {
-                    success(resultInfo.getData());
-                } else if (resultInfo != null && resultInfo.getCode() == Config.DEVICE_ADDED) {
-                    String msg = resultInfo.getMsg() != null ? resultInfo.getMsg() : "添加失败";
-                    ToastCompat.show(getContext(), msg);
-                } else {
-                    String msg = "添加失败";
-                    ToastCompat.show(getContext(), msg);
-                }
-                lockBleSender.setKey(lockInfo.getKey());
-                bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
-            }
-        });
-    }
-
-    @Override
-    public void success(Object data) {
-        String key = lockInfo.getKey();
-        lockInfo = (DeviceInfo) data;
-        lockInfo.setMacAddress(bleDevice.getMac());
-        lockInfo.setName(bleDevice.getName());
+    private void localDeviceAdd() {
         lockInfo.setDeviceId(aliDeviceName);
         lockInfo.setFamilyId(familyInfo.getId());
-        lockInfo.setKey(key);
-        lockInfo.setAdd(true);
         lockInfo.setMasterId(UserInfoCache.getUserInfo().getId());
         EventBus.getDefault().post(new IndexRefreshEvent());
         localDeviceAdd(lockInfo);
+        EventBus.getDefault().post(new CloudDeviceAddEvent(lockInfo));
     }
 
+    // 获取阿里名称
     protected void bleGetAliDeviceName() {
         if (lockBleSender != null) {
             if (!isActiveDistributionNetwork) {
@@ -125,7 +101,6 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME, cmdBytes);
         }
     }
-
 
     // 设置key
     protected void bleSetkey(String oldKey, String newKey) {
@@ -182,14 +157,14 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
             aliDeviceName = LockBLEUtil.toHexString(lockBLEData.getExtra()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
+            lockBleSender.setKey(lockInfo.getKey());
+            bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
+        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
             if (isDoDeviceAddAction) {
                 return;
             }
             isDoDeviceAddAction = true;
-            cloudDeviceAdd();
-        } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
-            isDeviceAdd = true;
-            nav2Index();
+            localDeviceAdd();
         }
     }
 
@@ -199,16 +174,18 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
             mLoadingDialog.dismiss();
             ToastCompat.show(getContext(), "添加失败,请重试");
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {
-            deviceDao.deleteDeviceInfo(lockInfo.getMacAddress()).subscribeOn(Schedulers.io()).subscribe();
-            EventBus.getDefault().post(new LockDeleteEvent(lockInfo));
+            mLoadingDialog.dismiss();
             ToastCompat.show(getContext(), "添加失败,请重试");
         }
     }
 
+    private boolean isNav2fail = false;
+
     protected void nav2fail() {
+        if (isNav2fail) return;
+        isNav2fail = true;
         Intent intent = new Intent(this, ConnectFailActivity.class);
         intent.putExtra("name", bleDevice.getName());
         startActivity(intent);
-        finish();
     }
 }

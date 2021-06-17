@@ -116,7 +116,7 @@
     <string name="please_input_wifi_name">请先选择Wi-Fi</string>
     <string name="please_input_wifi_pwd">请输入Wi-Fi密码</string>
     <string name="next">下一步</string>
-    <string name="connecting_tip">设备连接中...请稍等</string>
+    <string name="connecting_tip">设备配网中...请稍等</string>
     <string name="connecting_tip_detail">尽量使您的路由器、手机和设备互相靠近</string>
     <string name="wift_connect_success">设备配网成功</string>
     <string name="device_add_success">设备添加成功</string>

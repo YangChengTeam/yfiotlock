@@ -1,5 +1,7 @@
 package com.yc.yfiotlock.controller.activitys.lock.ble.add;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -83,8 +85,17 @@ public class Connect2Activity extends BaseConnectActivity {
             float value = (float) animation.getAnimatedValue();
             mCpbProgress.setProgress(value);
             mTvProgress.setText((int) value + "%");
+
         });
-        valueAnimator.setDuration(1000 * 65);
+        valueAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!lockBleSender.isOpOver()) {
+                    nav2fail();
+                }
+            }
+        });
+        valueAnimator.setDuration(1000 * 70);
     }
 
     private void showConnectingUi() {
@@ -118,10 +129,11 @@ public class Connect2Activity extends BaseConnectActivity {
         if (lockBleSender != null) {
             String ssid = getIntent().getStringExtra("ssid");
             String pwd = getIntent().getStringExtra("pwd");
-            valueAnimator.start();
-            showConnectingUi();
             byte[] cmdBytes = LockBLESettingCmd.wiftDistributionNetwork(lockInfo.getKey(), ssid, pwd);
             lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_DISTRIBUTION_NETWORK, cmdBytes);
+
+            valueAnimator.start();
+            showConnectingUi();
         }
     }
 

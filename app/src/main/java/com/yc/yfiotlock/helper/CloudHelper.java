@@ -190,6 +190,7 @@ public class CloudHelper {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCloudDeviceAdd(CloudDeviceAddEvent cloudDeviceAddEvent) {
+        LogUtil.msg("-----------------------------------------------");
         cloudDeviceAdd(cloudDeviceAddEvent.getDeviceInfo());
     }
 

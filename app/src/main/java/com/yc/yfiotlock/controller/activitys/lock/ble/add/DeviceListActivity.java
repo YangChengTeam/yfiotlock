@@ -35,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import butterknife.BindView;
 
@@ -43,7 +44,7 @@ import butterknife.BindView;
  *
  * @author Dullyoung
  */
-public class DeviceListActivity extends BaseAddActivity implements LockBLESender.NotifyCallback {
+public class DeviceListActivity extends BaseAddActivity {
     @BindView(R.id.tv_scan_title)
     TextView mTvScanTitle;
     @BindView(R.id.rv_devices)
@@ -51,8 +52,6 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
     @BindView(R.id.stv_scan)
     SuperTextView mStvScan;
 
-    protected LockBLESender lockBleSender;
-    private BleDevice bleDevice;
     private DeviceAdapter mDeviceAdapter;
     private LockInfo lockInfo;
 
@@ -75,9 +74,8 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
         mInstance = new WeakReference<>(this);
         super.initViews();
         setRvDevices();
-
-
     }
+
 
     private void setRvDevices() {
         List<LockInfo> lockInfos = new ArrayList<>();
@@ -92,40 +90,12 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
         CommonUtil.setItemDivider(getContext(), mRvDevices);
         mDeviceAdapter.setOnItemClickListener((adapter, view, position) -> {
             DeviceListActivity.this.lockInfo = (LockInfo) adapter.getData().get(position);
-            connect(DeviceListActivity.this.lockInfo.getBleDevice(), DeviceListActivity.this.lockInfo.getKey());
-        });
-    }
-
-    private void connect(BleDevice bleDevice, String key) {
-        LockBLEManager.getInstance().connect(bleDevice, new LockBLEManager.LockBLEConnectCallbck() {
-            @Override
-            public void onConnectStarted() {
-                mLoadingDialog.show("正在连接");
-            }
-
-            @Override
-            public void onDisconnect(BleDevice bleDevice) {
-
-            }
-
-            @Override
-            public void onConnectSuccess(BleDevice bleDevice) {
-                mLoadingDialog.dismiss();
-                DeviceListActivity.this.bleDevice = bleDevice;
-                lockBleSender = new LockBLESender(getContext(), bleDevice, key);
-                lockBleSender.registerNotify();
-                lockBleSender.setNotifyCallback(DeviceListActivity.this);
-            }
-
-            @Override
-            public void onConnectFailed() {
-                mLoadingDialog.dismiss();
-                ToastCompat.show(getContext(), "连接失败");
-            }
+            nav2Connect(bleDevice);
         });
     }
 
     boolean isNav2Connect = false;
+
     private void nav2Connect(BleDevice bleDevice) {
         if (isNav2Connect) return;
         Intent intent = new Intent(this, ConnectActivity.class);
@@ -142,20 +112,6 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
         mDeviceAdapter.addData(lockInfo);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNotify(BleNotifyEvent bleNotifyEvent) {
-        if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
-            mLoadingDialog.show("检测中...");
-            VUiKit.postDelayed(3000, () -> {
-                if (CommonUtil.isActivityDestory(getContext())) return;
-                if (lockBleSender != null && lockBleSender.isOpOver()) return;
-                ToastCompat.show(this, "检测失败, 确认是否已被添加");
-                finish();
-            });
-            bleCheckLock();
-        }
-    }
-
     @Override
     protected void bindClick() {
         setClick(mStvScan, () -> {
@@ -165,7 +121,6 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
             });
         });
     }
-
 
     private static class DeviceAdapter extends BaseExtendAdapter<LockInfo> {
         public DeviceAdapter(@Nullable List<LockInfo> data) {
@@ -177,32 +132,4 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
             holder.setText(R.id.tv_name, lockInfo.getName());
         }
     }
-
-    private void bleCheckLock() {
-        if (lockBleSender != null) {
-            lockBleSender.send(LockBLESettingCmd.MCMD, LockBLESettingCmd.SCMD_CHECK_LOCK, LockBLESettingCmd.checkLock(lockInfo.getOrigenKey(), lockInfo.getOrigenKey()));
-        }
-    }
-
-
-    public void onNotifySuccess(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
-            lockBleSender.setOpOver(true);
-            mLoadingDialog.dismiss();
-            bleDevice.setMatch(true);
-            LogUtil.msg("key匹配成功");
-            MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), true);
-
-            nav2Connect(bleDevice);
-        }
-    }
-
-    @Override
-    public void onNotifyFailure(LockBLEData lockBLEData) {
-        if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
-            mLoadingDialog.dismiss();
-            ToastCompat.show(this, "检测失败, 确认是否已被添加");
-        }
-    }
-
 }

@@ -511,4 +511,8 @@ public class CommonUtil {
         return "";
     }
 
+    public static String getOriginKey(String macAddress) {
+        return macAddress.replaceAll(":", "").substring(0, 8).toLowerCase();
+    }
+
 }

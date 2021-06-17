@@ -39,7 +39,7 @@ public interface OpenLockDao {
     Completable realDeleteOpenLockInfo(int lockId, int keyid, int groupType);
 
     // 更新本地已删除
-    @Query("update open_lock_info set is_delete=1 and is_add=1  where lock_id=:lockId and key_id=:keyid")
+    @Query("update open_lock_info set is_delete=1 , is_add=1  where lock_id=:lockId and key_id=:keyid")
     Completable deleteOpenLockInfo(int lockId, int keyid);
 
     // 添加已同步到云端

@@ -158,8 +158,6 @@ public class LockBLESender {
     private long DIFF = 50;
     // 持续唤醒
     private void wakeup() {
-        Log.d(TAG, "发送间隔:" + (System.currentTimeMillis() - timestamp));
-        if(System.currentTimeMillis() - timestamp <= LockBLEManager.OP_INTERVAL_TIME - DIFF) return;
         if (wakeupStatus && isSend) return;
         if (isOpOver) return;
         Log.d(TAG, "发送唤醒指令");
@@ -189,6 +187,8 @@ public class LockBLESender {
                 wakeupFailureResponse();
                 return;
             }
+            Log.d(TAG, "发送间隔:" + (System.currentTimeMillis() - timestamp));
+            if(System.currentTimeMillis() - timestamp <= LockBLEManager.OP_INTERVAL_TIME - DIFF) return;
             wakeup();
         }
     }

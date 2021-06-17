@@ -14,6 +14,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.model.bean.user.UserInfo;
 import com.yc.yfiotlock.utils.CacheUtil;
+import com.yc.yfiotlock.utils.CommonUtil;
 
 import java.io.Serializable;
 
@@ -231,7 +232,7 @@ public class DeviceInfo implements Serializable {
         if(TextUtils.isEmpty(macAddress) || macAddress.length() < 8){
             return "00000000";
         }
-        return getMacAddress().replaceAll(":", "").substring(0, 8).toLowerCase();
+        return CommonUtil.getOriginKey(macAddress);
     }
 
     public void setKey(String key) {

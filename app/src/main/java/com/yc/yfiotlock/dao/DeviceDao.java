@@ -33,7 +33,7 @@ public interface DeviceDao {
     Completable realDeleteDeviceInfo(String macAddress);
 
     // 更新本地已删除
-    @Query("update device_info set is_delete=1 and is_add=1 where mac_address=:macAddress")
+    @Query("update device_info set is_delete=1, is_add=1 where mac_address=:macAddress")
     Completable deleteDeviceInfo(String macAddress);
 
     // 本地修改名称
