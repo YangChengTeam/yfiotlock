@@ -109,7 +109,7 @@ public class IndexFragment extends BaseFragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         devicesRecyclerView.setLayoutManager(gridLayoutManager);
         devicesRecyclerView.setAdapter(indexDeviceAdapter);
-
+        indexDeviceAdapter.setNewInstance(null);
         indexDeviceAdapter.setOnItemClickListener((adapter, view, position) -> {
             if (position == adapter.getData().size() - 1) {
                 nav2AddDevice();

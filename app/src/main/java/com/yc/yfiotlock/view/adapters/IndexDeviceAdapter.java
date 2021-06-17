@@ -49,6 +49,11 @@ public class IndexDeviceAdapter extends BaseExtendAdapter<DeviceInfo> {
 
     @Override
     public void setNewInstance(@Nullable List<DeviceInfo> list) {
+        process(list);
+        super.setNewInstance(list);
+    }
+
+    private void process(List<DeviceInfo> list){
         if (list != null) {
             boolean isNeedAdd = true;
             if (list.size() > 0) {
@@ -65,6 +70,5 @@ public class IndexDeviceAdapter extends BaseExtendAdapter<DeviceInfo> {
             list = new ArrayList<>();
             list.add(new DeviceInfo());
         }
-        super.setNewInstance(list);
     }
 }
