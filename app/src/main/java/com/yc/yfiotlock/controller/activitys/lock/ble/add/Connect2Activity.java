@@ -19,6 +19,8 @@ import com.yc.yfiotlock.view.widgets.CircularProgressBar;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.lang.ref.WeakReference;
+
 import butterknife.BindView;
 
 
@@ -39,6 +41,7 @@ public class Connect2Activity extends BaseConnectActivity {
 
     private ValueAnimator valueAnimator;
     private LockBLESender cancelSend;
+
 
     @Override
     protected int getLayoutId() {

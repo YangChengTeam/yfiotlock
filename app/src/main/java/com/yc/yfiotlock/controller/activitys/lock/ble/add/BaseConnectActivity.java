@@ -180,12 +180,12 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     private boolean isNav2fail = false;
-
     protected void nav2fail() {
         if (isNav2fail) return;
         isNav2fail = true;
         Intent intent = new Intent(this, ConnectFailActivity.class);
         intent.putExtra("name", bleDevice.getName());
         startActivity(intent);
+        finish();
     }
 }

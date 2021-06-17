@@ -121,7 +121,7 @@ public class ScanDeviceActivity extends BaseAddActivity implements LockBLESender
             }
         });
     }
-    
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReScan(ReScanEvent object) {
         isFoundOne = false;
