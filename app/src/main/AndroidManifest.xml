@@ -44,7 +44,7 @@
         <activity android:name=".controller.activitys.lock.ble.LockShareManageActivity" />
         <activity android:name=".controller.activitys.user.DeviceShareActivity" />
         <activity android:name=".controller.activitys.lock.ble.add.ConnectFailActivity" />
-        <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" android:launchMode="singleTop" />
+        <activity android:name=".controller.activitys.lock.ble.add.ConnectActivity" android:launchMode="singleInstance" />
         <activity android:name=".controller.activitys.lock.ble.add.Connect2Activity" />
         <activity android:name=".controller.activitys.lock.ble.add.DeviceListActivity" />
         <activity android:name=".controller.activitys.lock.ble.SafePwdCreateActivity" />

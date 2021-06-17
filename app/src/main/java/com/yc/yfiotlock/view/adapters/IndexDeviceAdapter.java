@@ -13,6 +13,7 @@ import com.yc.yfiotlock.view.BaseExtendAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class IndexDeviceAdapter extends BaseExtendAdapter<DeviceInfo> {
@@ -29,7 +30,7 @@ public class IndexDeviceAdapter extends BaseExtendAdapter<DeviceInfo> {
         if (holder.getAdapterPosition() % 2 == 0) {
             layoutParams.rightToRight = ConstraintLayout.LayoutParams.PARENT_ID;
             layoutParams.rightMargin = ScreenUtil.dip2px(getContext(), 5);
-            layoutParams.leftToLeft =  -1;
+            layoutParams.leftToLeft = -1;
         } else {
             layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
             layoutParams.leftMargin = ScreenUtil.dip2px(getContext(), 5);
@@ -48,18 +49,21 @@ public class IndexDeviceAdapter extends BaseExtendAdapter<DeviceInfo> {
 
     @Override
     public void setNewInstance(@Nullable List<DeviceInfo> list) {
-        if(list != null){
+        if (list != null) {
             boolean isNeedAdd = true;
-            if(list.size() > 0){
-                if(list.get(list.size() - 1).getId() > 0){
+            if (list.size() > 0) {
+                if (list.get(list.size() - 1).getId() > 0) {
                     isNeedAdd = true;
                 } else {
                     isNeedAdd = false;
                 }
             }
-            if(isNeedAdd){
+            if (isNeedAdd) {
                 list.add(new DeviceInfo());
             }
+        } else {
+            list = new ArrayList<>();
+            list.add(new DeviceInfo());
         }
         super.setNewInstance(list);
     }

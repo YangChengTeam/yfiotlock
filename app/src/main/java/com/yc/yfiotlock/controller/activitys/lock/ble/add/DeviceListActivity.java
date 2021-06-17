@@ -125,7 +125,9 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
         });
     }
 
+    boolean isNav2Connect = false;
     private void nav2Connect(BleDevice bleDevice) {
+        if (isNav2Connect) return;
         Intent intent = new Intent(this, ConnectActivity.class);
         intent.putExtra("bleDevice", bleDevice);
         intent.putExtra("family", familyInfo);
@@ -145,8 +147,9 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
         if (bleNotifyEvent.getStatus() == BleNotifyEvent.onNotifySuccess) {
             mLoadingDialog.show("检测中...");
             VUiKit.postDelayed(3000, () -> {
-                if (lockBleSender.isOpOver()) return;
-                ToastCompat.show(this, "检测失败,请重试");
+                if (CommonUtil.isActivityDestory(getContext())) return;
+                if (lockBleSender != null && lockBleSender.isOpOver()) return;
+                ToastCompat.show(this, "检测失败, 确认是否已被添加");
                 finish();
             });
             bleCheckLock();
@@ -181,7 +184,7 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
         }
     }
 
-    @Override
+
     public void onNotifySuccess(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             lockBleSender.setOpOver(true);
@@ -189,6 +192,7 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
             bleDevice.setMatch(true);
             LogUtil.msg("key匹配成功");
             MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), true);
+
             nav2Connect(bleDevice);
         }
     }
@@ -197,7 +201,7 @@ public class DeviceListActivity extends BaseAddActivity implements LockBLESender
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
             mLoadingDialog.dismiss();
-            ToastCompat.show(this, "检测失败,请重试");
+            ToastCompat.show(this, "检测失败, 确认是否已被添加");
         }
     }
 

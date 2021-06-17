@@ -196,7 +196,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         shakeSensor.setShakeListener(new ShakeSensor.OnShakeListener() {
             @Override
             public void onShakeComplete(SensorEvent event) {
-                if (LockBLEManager.getInstance().isConnected(bleDevice)) {
+                if (LockBLEManager.getInstance().isConnected(bleDevice) && !isBleWorking()) {
                     // 开门
                     bleOpen();
                     vibrate();
@@ -261,7 +261,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     }
 
     public boolean isBleWorking() {
-        return "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString());
+        return "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString()) ;
     }
 
     public boolean isBleOffline() {
@@ -317,7 +317,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         registerNotify();
 
         // 重新连接
-        if (bleDevice != null && !LockBLEManager.getInstance().isConnected(bleDevice) && !isBleWorking()) {
+        if (bleDevice != null && !LockBLEManager.getInstance().isConnected(bleDevice)) {
             reconnect();
         }
     }

@@ -249,13 +249,14 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     LockShareManageActivity.start(getContext(), lockInfo);
                     break;
                 case "固件升级": {
-                    Intent updateIntent = new Intent(this, FirmwareUpdateActivity.class);
                     if (updateInfo != null) {
+                        Intent updateIntent = new Intent(this, FirmwareUpdateActivity.class);
                         updateIntent.putExtra("updateInfo", updateInfo);
+                        startActivity(updateIntent);
+                    } else {
+                        ToastCompat.show(getContext(), "请稍后");
                     }
-                    startActivity(updateIntent);
                 }
-
                 break;
                 default:
                     break;

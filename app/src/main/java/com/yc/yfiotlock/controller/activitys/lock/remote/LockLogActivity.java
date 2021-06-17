@@ -87,8 +87,6 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
     private LockEngine lockEngine;
     private BleDevice bleDevice;
     private int lastId = 1;
-    private final int MAX_COUNT = 5;
-    private int syncCount = MAX_COUNT;
 
     public static final int LOG_TYPE = 1;  //  日志类型
     public static final int ALARM_TYPE = 2; // 警告类型
@@ -251,13 +249,11 @@ public class LockLogActivity extends BaseBackActivity implements LockBLESender.N
             @Override
             public void onComplete() {
                 lastId++;
-                syncCount--;
-                if (syncCount <= 0) {
-                    syncCount = MAX_COUNT;
-                    EventBus.getDefault().post(new LockLogSyncDataEvent());
-                }
                 EventBus.getDefault().post(logInfo);
-                bleSyncLog();
+                VUiKit.postDelayed(300, ()->{
+                    bleSyncLog();
+                });
+                EventBus.getDefault().post(new LockLogSyncDataEvent());
             }
 
             @Override

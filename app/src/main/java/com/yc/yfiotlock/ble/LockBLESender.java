@@ -88,20 +88,20 @@ public class LockBLESender {
     }
 
     public void send(byte mcmd, byte scmd, byte[] cmdBytes, boolean isWakeup) {
-        this.mcmd = mcmd;
-        this.scmd = scmd;
-        this.cmdBytes = cmdBytes;
-        if (!isConnected()) {
-            notifyNoConnectResponse("ble disconnection!");
-            EventBus.getDefault().post(new OpenLockReConnectEvent());
-            return;
-        } else {
-            if (!LockBLESender.isNotityReady()) {
-                LockBLESender.bleNotify(bleDevice);
-                return;
-            }
-        }
         if (!isSend) {
+            this.mcmd = mcmd;
+            this.scmd = scmd;
+            this.cmdBytes = cmdBytes;
+            if (!isConnected()) {
+                notifyNoConnectResponse("ble disconnection!");
+                EventBus.getDefault().post(new OpenLockReConnectEvent());
+                return;
+            } else {
+                if (!LockBLESender.isNotityReady()) {
+                    LockBLESender.bleNotify(bleDevice);
+                    return;
+                }
+            }
             Log.d(TAG, "正在发送");
             isSend = true;
             isOpOver = false;
@@ -251,6 +251,7 @@ public class LockBLESender {
             Log.d(TAG, "加密状态:" + " mcmd:" + mcmd + " scmd:" + scmd);
         }
         if (lockBLEData == null || lockBLEData.getMcmd() == (byte) 0x00 || lockBLEData.getScmd() == (byte) 0x00) {
+            reset();
             EventBus.getDefault().post(new ForamtErrorEvent());
         } else {
             processNotify(lockBLEData);
