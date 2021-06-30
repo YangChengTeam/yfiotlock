@@ -16,13 +16,16 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.text.Editable;
+import android.text.Html;
 import android.text.InputFilter;
+import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -513,6 +516,18 @@ public class CommonUtil {
 
     public static String getOriginKey(String macAddress) {
         return macAddress.replaceAll(":", "").substring(0, 8).toLowerCase();
+    }
+
+    public static CharSequence getConnectedOrOnlineTip() {
+        String msg = "该用户的<font color='#FF6766'>设备权限</font>和" +
+                "<font color='#FF6766'>开锁方式</font>将被删除，且不可恢复";
+        return Html.fromHtml(msg);
+    }
+
+    public static CharSequence getDisConnectAndOfflineTip() {
+        String msg = "该用户的设备权限将被删除,<font color='#FF6766'>" +
+                "无法同步删除该用户的开锁方式，清前往开锁方式管理页面手动删除</font>";
+        return Html.fromHtml(msg);
     }
 
 }
