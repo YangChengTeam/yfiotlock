@@ -123,8 +123,7 @@ public class IndexFragment extends BaseFragment {
             }
         });
     }
-
-
+    
     private void checkLockExist() {
         mLoadingDialog.show("设备校验中...");
         String msg = "校验失败";

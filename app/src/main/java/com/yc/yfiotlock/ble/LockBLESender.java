@@ -3,7 +3,6 @@ package com.yc.yfiotlock.ble;
 import android.content.Context;
 import android.util.Log;
 
-import com.kk.utils.LogUtil;
 import com.kk.utils.VUiKit;
 import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.callback.BleNotifyCallback;

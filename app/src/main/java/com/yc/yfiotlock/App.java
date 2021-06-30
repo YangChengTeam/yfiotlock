@@ -2,7 +2,12 @@ package com.yc.yfiotlock;
 
 import android.app.Application;
 import android.os.Build;
+import android.util.Log;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.room.Room;
 
 import com.baidu.mapapi.CoordType;
@@ -11,6 +16,7 @@ import com.chad.library.adapter.base.module.LoadMoreModuleConfig;
 import com.coorchice.library.ImageEngine;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
+import com.kk.securityhttp.utils.VUiKit;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.ble.LockBLEManager;
@@ -29,8 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-public class App extends Application {
+public class App extends Application implements LifecycleObserver {
+    private static final String TAG = "App";
     // 应用单例
     private static App app;
 
@@ -64,13 +70,50 @@ public class App extends Application {
                 AppDatabase.class, "lock").build();
 
         OfflineManager.enqueue(this);
+        ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+    }
+
+    private long startStop = 0;
+    private final long MAX_CONNECT_ON_STOP = 5 * 1000 * 60;
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    private void onAppBackgrounded() {
+        Log.d(TAG, "app is in background");
+        if (startStop == 0) {
+            startStop = System.currentTimeMillis();
+            clearTimer();
+        }
+    }
+
+    private void clearTimer() {
+        VUiKit.postDelayed(1000, () -> {
+            if (startStop == 0) {
+                Log.d(TAG, "stop");
+                return;
+            }
+            if (System.currentTimeMillis() - startStop > MAX_CONNECT_ON_STOP) {
+                LockBLEManager.getInstance().clear();
+                Log.d(TAG, "clear ble");
+                return;
+            }
+            Log.d(TAG, (System.currentTimeMillis() - startStop) + "");
+            clearTimer();
+        });
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    private void onAppForegrounded() {
+        Log.d(TAG, "app is in foreground");
+        startStop = 0;
     }
 
 
     private UpdateInfo mUpdateInfo;
+
     public UpdateInfo getUpdateInfo() {
         return mUpdateInfo;
     }
+
     private void checkUpdate() {
         UpdateEngine updateEngine = new UpdateEngine(this);
         updateEngine.getUpdateInfo().subscribe(resultInfo -> {
@@ -129,6 +172,4 @@ public class App extends Application {
             CrashReport.initCrashReport(getApplicationContext(), "73c6b29460", false);
         }
     }
-
-
 }

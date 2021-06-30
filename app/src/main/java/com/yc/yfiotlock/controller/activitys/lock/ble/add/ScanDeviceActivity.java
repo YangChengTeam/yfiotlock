@@ -36,7 +36,6 @@ import butterknife.BindView;
 
 public class ScanDeviceActivity extends BaseAddActivity implements LockBLESender.NotifyCallback {
 
-
     @BindView(R.id.iv_scan_bg)
     ImageView mIvScanBg;
     @BindView(R.id.iv_scan_flag)
@@ -257,6 +256,7 @@ public class ScanDeviceActivity extends BaseAddActivity implements LockBLESender
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_CHECK_LOCK) {
+            lockBleSender.clear();
             isChecking = false;
         }
     }
