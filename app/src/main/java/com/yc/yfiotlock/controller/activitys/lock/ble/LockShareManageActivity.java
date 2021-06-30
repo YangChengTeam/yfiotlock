@@ -114,8 +114,6 @@ public class LockShareManageActivity extends BaseBackActivity {
         CommonUtil.setItemDivider(getContext(), mRvList);
         mAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             if (view.getId() == R.id.stv_del) {
-                ShareDeviceWrapper shareDeviceWrapper = mAdapter.getData().get(position);
-                String mac = shareDeviceWrapper.getLocker().getMacAddress();
                 GeneralDialog dialog = new GeneralDialog(getContext());
                 dialog.setTitle("删除共享")
                         .setMsg(CommonUtil.getDisConnectAndOfflineTip(), Gravity.START)
