@@ -116,19 +116,11 @@ public class LockShareManageActivity extends BaseBackActivity {
             if (view.getId() == R.id.stv_del) {
                 ShareDeviceWrapper shareDeviceWrapper = mAdapter.getData().get(position);
                 String mac = shareDeviceWrapper.getLocker().getMacAddress();
-                CharSequence tipMsg = "";
-                if (BleManager.getInstance().isConnected(mac) ||
-                        shareDeviceWrapper.getLocker().isOnline()) {
-                    tipMsg = CommonUtil.getConnectedOrOnlineTip();
-                } else {
-                    tipMsg = CommonUtil.getDisConnectAndOfflineTip();
-                }
                 GeneralDialog dialog = new GeneralDialog(getContext());
                 dialog.setTitle("删除共享")
-                        .setMsg(tipMsg, Gravity.START)
+                        .setMsg(CommonUtil.getDisConnectAndOfflineTip(), Gravity.START)
                         .setOnPositiveClickListener(dialog1 -> {
                             deleteUsePermission(position);
-                            //todo  delete ble lock open-door-way
                         }).show();
             }
         });
