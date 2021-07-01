@@ -138,7 +138,9 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     ToastCompat.show(getContext(), "蓝牙连接中...");
                     return;
                 }
-                if (lockInfo.isShare() || LockIndexActivity.getInstance().isBleOffline()) {
+                if (lockInfo.isShare()) {
+                    localDeviceDel();
+                } else if (LockIndexActivity.getInstance().isBleOffline()) {
                     localDeviceDel();
                 } else {
                     if (LockBLEManager.getInstance().isConnected(bleDevice)) {

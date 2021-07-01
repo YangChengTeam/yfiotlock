@@ -17,6 +17,7 @@ import com.yc.yfiotlock.model.bean.eventbus.CloudDeviceAddEvent;
 import com.yc.yfiotlock.model.bean.eventbus.IndexRefreshEvent;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.engin.DeviceEngin;
+import com.yc.yfiotlock.utils.BleUtil;
 import com.yc.yfiotlock.utils.UserInfoCache;
 
 import org.greenrobot.eventbus.EventBus;
@@ -83,6 +84,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     private void localDeviceAdd() {
+        lockInfo.setKey(LockBLEUtil.genKey());
         lockInfo.setDeviceId(aliDeviceName);
         lockInfo.setFamilyId(familyInfo.getId());
         lockInfo.setMasterId(UserInfoCache.getUserInfo().getId());

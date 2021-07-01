@@ -94,8 +94,6 @@ public abstract class BaseOpenLockActivity extends BaseBackActivity {
             loadData();
         });
 
-
-
         loadData();
     }
 
