@@ -2,6 +2,8 @@ package com.yc.yfiotlock.controller.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -62,8 +64,14 @@ public class GeneralDialog extends BaseDialog {
         return this;
     }
 
-    public GeneralDialog setMsg(String text) {
+    public GeneralDialog setMsg(CharSequence text) {
         mTvContent.setText(text);
+        return this;
+    }
+
+    public GeneralDialog setMsg(CharSequence text, int gravity) {
+        mTvContent.setText(text);
+        mTvContent.setGravity(gravity);
         return this;
     }
 

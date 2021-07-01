@@ -2,6 +2,7 @@ package com.yc.yfiotlock.controller.activitys.lock.ble;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -16,9 +17,11 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.coorchice.library.SuperTextView;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.yc.yfiotlock.R;
+import com.yc.yfiotlock.ble.LockBLESender;
 import com.yc.yfiotlock.compat.ToastCompat;
 import com.yc.yfiotlock.controller.activitys.base.BaseBackActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
+import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.model.bean.lock.DeviceInfo;
 import com.yc.yfiotlock.model.bean.lock.ShareDeviceWrapper;
 import com.yc.yfiotlock.model.engin.ShareDeviceEngine;
@@ -112,8 +115,8 @@ public class LockShareManageActivity extends BaseBackActivity {
         mAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             if (view.getId() == R.id.stv_del) {
                 GeneralDialog dialog = new GeneralDialog(getContext());
-                dialog.setTitle("温馨提示")
-                        .setMsg("确定删除" + mAdapter.getData().get(position).getReceiveUser().getMobile() + "的使用权限?")
+                dialog.setTitle("删除共享")
+                        .setMsg(CommonUtil.getDisConnectAndOfflineTip(), Gravity.START)
                         .setOnPositiveClickListener(dialog1 -> {
                             deleteUsePermission(position);
                         }).show();
