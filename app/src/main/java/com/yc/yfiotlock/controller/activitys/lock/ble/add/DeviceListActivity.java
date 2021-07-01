@@ -65,6 +65,19 @@ public class DeviceListActivity extends BaseAddActivity {
     }
 
     @Override
+    public void finish() {
+        if (mDeviceAdapter != null) {
+            for (int i = 0; i < mDeviceAdapter.getData().size(); i++) {
+                LockInfo tLockInfo = mDeviceAdapter.getData().get(i);
+                if (lockInfo == null || tLockInfo.getId() != lockInfo.getId()) {
+                    LockBLEManager.getInstance().disConnect(tLockInfo.getBleDevice());
+                }
+            }
+        }
+        super.finish();
+    }
+
+    @Override
     protected int getLayoutId() {
         return R.layout.lock_ble_add_activity_device_list;
     }

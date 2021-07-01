@@ -90,6 +90,11 @@ public class ScanDeviceActivity extends BaseAddActivity implements LockBLESender
     }
 
     private void scan() {
+        isNav2List = false;
+        isFoundOne = false;
+        bleDevices.clear();
+        LockBLEManager.getInstance().stopScan();
+
         LockBLEManager.getInstance().initConfig();
         LockBLEManager.getInstance().scan(this, new LockBLEManager.LockBLEScanCallbck() {
             @Override
@@ -123,8 +128,6 @@ public class ScanDeviceActivity extends BaseAddActivity implements LockBLESender
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReScan(ReScanEvent object) {
-        isFoundOne = false;
-        LockBLEManager.getInstance().stopScan();
         scan();
     }
 
@@ -139,8 +142,6 @@ public class ScanDeviceActivity extends BaseAddActivity implements LockBLESender
     @Override
     protected void bindClick() {
         setClick(mStvRescan, () -> {
-            LockBLEManager.getInstance().stopScan();
-            isFoundOne = false;
             setStartInfo();
             scan();
         });

@@ -70,6 +70,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
 
             @Override
             public void onComplete() {
+                mLoadingDialog.dismiss();
                 UserInfoCache.incDeviceNumber();
                 isDoDeviceAddAction = false;
                 isDeviceAdd = true;
@@ -84,7 +85,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
     }
 
     private void localDeviceAdd() {
-        lockInfo.setKey(LockBLEUtil.genKey());
+        lockInfo.setRegtime((int)(System.currentTimeMillis()/1000));
         lockInfo.setDeviceId(aliDeviceName);
         lockInfo.setFamilyId(familyInfo.getId());
         lockInfo.setMasterId(UserInfoCache.getUserInfo().getId());
@@ -159,6 +160,7 @@ public abstract class BaseConnectActivity extends BaseAddActivity implements Loc
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_ALIDEVICE_NAME) {
             aliDeviceName = LockBLEUtil.toHexString(lockBLEData.getExtra()).replace(" ", "");
             LogUtil.msg("设备名称:" + aliDeviceName);
+            lockInfo.setKey(LockBLEUtil.genKey());
             lockBleSender.setKey(lockInfo.getKey());
             bleSetkey(lockInfo.getOrigenKey(), lockInfo.getKey());
         } else if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_SET_AES_KEY) {

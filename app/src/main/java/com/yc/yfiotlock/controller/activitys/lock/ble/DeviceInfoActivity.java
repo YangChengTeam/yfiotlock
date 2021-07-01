@@ -94,7 +94,7 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESende
         itemInfos.add(new ItemInfo("协议版本", deviceInfo.getProtocolVersion()));
         itemInfos.add(new ItemInfo("注册时间", CommonUtil.formatTime(deviceInfo.getRegtime())));
         itemInfos.add(new ItemInfo("剩余电量", deviceInfo.getBattery() + "%"));
-        itemInfos.add(new ItemInfo("设备id", deviceInfo.getDeviceId().replaceAll(":", "")));
+        itemInfos.add(new ItemInfo("设备id", deviceInfo.getDeviceId()));
         mAdapter.setNewInstance(itemInfos);
     }
 
@@ -110,7 +110,7 @@ public class DeviceInfoActivity extends BaseBackActivity implements LockBLESende
         if (lockBLEData.getMcmd() == LockBLESettingCmd.MCMD && lockBLEData.getScmd() == LockBLESettingCmd.SCMD_GET_BATTERY) {
             int battery = lockBLEData.getExtra()[0];
             MMKV.defaultMMKV().putInt("battery", battery);
-            mAdapter.getData().get(3).setValue(battery + "");
+            mAdapter.getData().get(3).setValue(battery + "%");
             mAdapter.notifyDataSetChanged();
         }
     }

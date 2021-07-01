@@ -31,6 +31,7 @@ import com.yc.yfiotlock.controller.activitys.lock.remote.LockLogActivity;
 import com.yc.yfiotlock.controller.activitys.lock.remote.VisitorManageActivity;
 import com.yc.yfiotlock.controller.dialogs.GeneralDialog;
 import com.yc.yfiotlock.helper.CloudHelper;
+import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.libs.fastble.data.BleDevice;
 import com.yc.yfiotlock.libs.sensor.ShakeSensor;
 import com.yc.yfiotlock.model.bean.eventbus.BleNotifyEvent;
@@ -181,7 +182,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         reConnectDialog.setOnPositiveClickListener(new GeneralDialog.OnBtnClickListener() {
             @Override
             public void onClick(Dialog dialog) {
-                connect(bleDevice);
+                scan();
             }
         });
 
@@ -261,7 +262,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     }
 
     public boolean isBleWorking() {
-        return "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString()) ;
+        return "搜索门锁中...".equals(statusTitleTv.getText().toString()) || "连接门锁中...".equals(statusTitleTv.getText().toString());
     }
 
     public boolean isBleOffline() {
@@ -340,9 +341,12 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
         if (lockEngine != null) {
             lockEngine.cancelAll();
         }
+
         if (cloudHelper != null) {
             cloudHelper.unregisterNotify();
         }
+
+        BleManager.getInstance().destroy();
 
         stopAnimations();
 
@@ -473,6 +477,9 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
                 // 设置连接失败状态
                 stopAnimations();
                 setConnectFailureInfo();
+                if (lockBleSender != null) {
+                    lockBleSender.clear();
+                }
             }
 
             @Override
@@ -509,9 +516,7 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
     private GeneralDialog reConnectDialog;
 
     private void reconnect() {
-        if (!reConnectDialog.isShowing()) {
-            reConnectDialog.show();
-        }
+        reConnectDialog.show();
     }
 
     // 进入开门方式管理
@@ -686,6 +691,10 @@ public class LockIndexActivity extends BaseActivity implements LockBLESender.Not
                     retryCount = 3;
                     MMKV.defaultMMKV().putBoolean("ismatch" + lockInfo.getMacAddress(), false);
                 }
+            } else {
+                VUiKit.postDelayed(300, () -> {
+                    bleCheckLock();
+                });
             }
         }
     }

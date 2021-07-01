@@ -526,7 +526,7 @@ public class CommonUtil {
 
     public static CharSequence getDisConnectAndOfflineTip() {
         String msg = "该用户的设备权限将被删除,<font color='#FF6766'>" +
-                "无法同步删除该用户的开锁方式，清前往开锁方式管理页面手动删除</font>";
+                "无法同步删除该用户的开锁方式，请前往开锁方式管理页面手动删除</font>";
         return Html.fromHtml(msg);
     }
 

@@ -21,9 +21,11 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.tencent.mmkv.MMKV;
 import com.yc.yfiotlock.ble.LockBLEManager;
 import com.yc.yfiotlock.constant.Config;
+import com.yc.yfiotlock.controller.activitys.lock.ble.LockIndexActivity;
 import com.yc.yfiotlock.dao.AppDatabase;
 import com.yc.yfiotlock.helper.GlideHelper;
 import com.yc.yfiotlock.helper.Reflection;
+import com.yc.yfiotlock.libs.fastble.BleManager;
 import com.yc.yfiotlock.model.bean.user.UpdateInfo;
 import com.yc.yfiotlock.model.engin.UpdateEngine;
 import com.yc.yfiotlock.offline.OfflineManager;
@@ -79,6 +81,10 @@ public class App extends Application implements LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private void onAppBackgrounded() {
         Log.d(TAG, "app is in background");
+        if (LockIndexActivity.getInstance() == null || !LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
+            startStop = 0;
+            return;
+        }
         if (startStop == 0) {
             startStop = System.currentTimeMillis();
             clearTimer();
@@ -92,7 +98,7 @@ public class App extends Application implements LifecycleObserver {
                 return;
             }
             if (System.currentTimeMillis() - startStop > MAX_CONNECT_ON_STOP) {
-                LockBLEManager.getInstance().clear();
+                LockBLEManager.getInstance().destory();
                 Log.d(TAG, "clear ble");
                 return;
             }

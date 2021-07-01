@@ -203,7 +203,7 @@ public abstract class BaseDetailOpenLockActivity extends BaseBackActivity implem
     @Override
     public void onNotifyFailure(LockBLEData lockBLEData) {
         if (lockBLEData.getMcmd() == mcmd && lockBLEData.getScmd() == scmd) {
-            ToastCompat.show(getContext(), "删除失败");
+            ToastCompat.show(getContext(), "删除" + title + "失败");
         }
     }
 }

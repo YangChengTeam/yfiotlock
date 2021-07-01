@@ -73,8 +73,8 @@ public class OLTOfflineManager {
                     if (info != null && (info.getCode() == 1 || info.getCode() == -101)) {
                         LogUtil.msg("同步添加开门方式: lockid:" + openLockInfo.getLockId() + " keyid:" + openLockInfo.getKeyid() + " group_type:" + openLockInfo.getGroupType());
                         openLockDao.updateAddOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid(), openLockInfo.getGroupType()).subscribeOn(Schedulers.io()).subscribe();
-                        loopOpenLockAdd(openLockInfos, n + 1);
                     }
+                    loopOpenLockAdd(openLockInfos, n + 1);
                 }
             });
         }
@@ -90,8 +90,8 @@ public class OLTOfflineManager {
                     if (info != null && info.getCode() == 1) {
                         LogUtil.msg("同步删除开门方式: lockid:" + openLockInfo.getLockId() + " keyid:" + openLockInfo.getKeyid() + " group_type:" + openLockInfo.getGroupType());
                         openLockDao.realDeleteOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid(), openLockInfo.getGroupType()).subscribeOn(Schedulers.io()).subscribe();
-                        loopOpenLockDel(openLockInfos, n + 1);
                     }
+                    loopOpenLockDel(openLockInfos, n + 1);
                 }
             });
         }
@@ -107,8 +107,8 @@ public class OLTOfflineManager {
                     if (info != null && info.getCode() == 1) {
                         LogUtil.msg("同步更新开门方式: lockid:" + openLockInfo.getLockId() + " keyid:" + openLockInfo.getKeyid() + " group_type:" + openLockInfo.getGroupType());
                         openLockDao.updateOpenLockInfo(openLockInfo.getLockId(), openLockInfo.getKeyid(), openLockInfo.getGroupType()).subscribeOn(Schedulers.io()).subscribe();
-                        loopOpenLockDel(openLockInfos, n + 1);
                     }
+                    loopOpenLockDel(openLockInfos, n + 1);
                 }
             });
         }
@@ -124,8 +124,8 @@ public class OLTOfflineManager {
                     if (info != null && info.getCode() == 1) {
                         LogUtil.msg("同步添加日志: lockid:" + logInfo.getLockId() + " eventid:" + logInfo.getEventId());
                         lockLogDao.updateAddLogInfo(logInfo.getLockId(), logInfo.getEventId(), true).subscribeOn(Schedulers.io()).subscribe();
-                        loopLogAdd(logInfos, n + 1);
                     }
+                    loopLogAdd(logInfos, n + 1);
                 }
             });
         }
@@ -141,8 +141,8 @@ public class OLTOfflineManager {
                     if (info != null && info.getCode() == 1) {
                         LogUtil.msg("同步添加设备: mac:" + deviceInfo.getMacAddress());
                         deviceDao.updateAddDeviceInfo(deviceInfo.getMacAddress()).subscribeOn(Schedulers.io()).subscribe();
-                        loopDeviceAdd(deviceInfos, n + 1);
                     }
+                    loopDeviceAdd(deviceInfos, n + 1);
                 }
             });
         }
@@ -174,8 +174,8 @@ public class OLTOfflineManager {
 
                             }
                         });
-                        loopDeviceDel(deviceInfos, n + 1);
                     }
+                    loopDeviceDel(deviceInfos, n + 1);
                 }
             });
         }

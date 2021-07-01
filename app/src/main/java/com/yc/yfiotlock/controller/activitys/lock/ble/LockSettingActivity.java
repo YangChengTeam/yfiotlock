@@ -134,15 +134,15 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
             generalDialog.setOnPositiveClickListener(dialog -> {
                 // 是管理员的话就需要链接蓝牙 不是管理员是分享来的锁就可以直接删
                 // 设备端重置了的也可以直接删
-                if (LockIndexActivity.getInstance().isBleWorking()) {
-                    ToastCompat.show(getContext(), "蓝牙连接中...");
-                    return;
-                }
                 if (lockInfo.isShare()) {
                     localDeviceDel();
                 } else if (LockIndexActivity.getInstance().isBleOffline()) {
                     localDeviceDel();
                 } else {
+                    if (LockIndexActivity.getInstance().isBleWorking()) {
+                        ToastCompat.show(getContext(), "蓝牙连接中...");
+                        return;
+                    }
                     if (LockBLEManager.getInstance().isConnected(bleDevice)) {
                         bleReset();
                     } else {
@@ -248,7 +248,11 @@ public class LockSettingActivity extends BaseBackActivity implements LockBLESend
                     startActivity(new Intent(this, FAQActivity.class));
                     break;
                 case "设备共享":
-                    LockShareManageActivity.start(getContext(), lockInfo);
+                    if (LockBLEManager.getInstance().isConnected(LockIndexActivity.getInstance().getBleDevice())) {
+                        LockShareManageActivity.start(getContext(), lockInfo);
+                    } else {
+                        ToastCompat.show(getContext(), "蓝牙未连接");
+                    }
                     break;
                 case "固件升级": {
                     if (updateInfo != null) {

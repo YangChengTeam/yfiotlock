@@ -53,7 +53,8 @@ public abstract class BaseDialog extends Dialog {
         bindClick();
     }
 
-    public void bindClick() {}
+    public void bindClick() {
+    }
 
     public void setClick(@IdRes int id, @NonNull Runnable runnable) {
         RxView.clicks(findViewById(id)).throttleFirst(Config.CLICK_LIMIT, TimeUnit.MILLISECONDS).subscribe(view1 -> {
@@ -62,12 +63,17 @@ public abstract class BaseDialog extends Dialog {
     }
 
     protected abstract int getLayoutId();
+
     protected abstract void initViews();
 
     @Override
     public void show() {
         if (!this.isShowing() && !CommonUtil.isActivityDestory(getContext())) {
-            super.show();
+            try {
+                super.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
